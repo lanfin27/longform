@@ -1,0 +1,90 @@
+{
+  "1": {
+    "success": true,
+    "scene_id": 1,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_001_1766062653972.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_001_1766062653972.png",
+    "prompt": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Exterior of the Saudi Arabian consulate in Istanbul, overcast weather, black and white photo of Jamal Khashoggi, 2018 news flash screen, 사우디아라비아 총영사관, 자말 카슈끄지 사진, 뉴스 보도 화면, 비극적, 암울함 atmosphere, 전경에서 시작하여 자말 카슈끄지 사진 클로즈업, background environment scene, empty scene, no people, no main character in foreground, high quality",
+    "original_scene_prompt": "Exterior of the Saudi Arabian consulate in Istanbul, overcast weather, black and white photo of Jamal Khashoggi, 2018 news flash screen",
+    "is_background": true,
+    "include_extras": false,
+    "generation_time": 20.374900102615356
+  },
+  "2": {
+    "success": true,
+    "scene_id": 2,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_002_1766062662499.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_002_1766062662499.png",
+    "prompt": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Close-up portrait of Mohammed bin Salman, international news headlines criticizing him, silhouettes of Saudi Arabian people, 무함마드 빈 살만 왕세자 사진, 국제 사회 비판, 침묵하는 사우디 사람들, 긴장감, 억압적 atmosphere, 무함마드 빈 살만 왕세자 사진 클로즈업, 실루엣으로 전환, background environment scene, empty scene, no people, no main character in foreground, high quality",
+    "original_scene_prompt": "Close-up portrait of Mohammed bin Salman, international news headlines criticizing him, silhouettes of Saudi Arabian people",
+    "is_background": true,
+    "include_extras": false,
+    "generation_time": 2.5275022983551025
+  },
+  "3": {
+    "success": true,
+    "scene_id": 3,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_003_1766062671042.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_003_1766062671042.png",
+    "prompt": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Icons representing law, human rights, and freedom of the press, a crown crushing the icons, Aramco logo, Saudi Arabian oil field, 법 아이콘, 인권 아이콘, 언론 자유 아이콘, 왕관, 아람코 로고, 유전, 억압적, 불평등 atmosphere, 아이콘에서 왕관으로 시점 이동, 아람코 로고와 유전 교차 편집, background environment scene, empty scene, no people, no main character in foreground, high quality",
+    "original_scene_prompt": "Icons representing law, human rights, and freedom of the press, a crown crushing the icons, Aramco logo, Saudi Arabian oil field",
+    "is_background": true,
+    "include_extras": false,
+    "generation_time": 2.542229175567627
+  },
+  "4": {
+    "success": true,
+    "scene_id": 4,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_004_1766062680130.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_004_1766062680130.png",
+    "prompt": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Portraits of the Saudi royal family, money flowing towards a crown, 사우디 왕가, 돈, 왕관, 권위적, 부패 atmosphere, 사우디 왕가 이미지에서 돈이 흘러 들어가는 모습으로 시점 이동, background environment scene, empty scene, no people, no main character in foreground, high quality",
+    "original_scene_prompt": "Portraits of the Saudi royal family, money flowing towards a crown",
+    "is_background": true,
+    "include_extras": false,
+    "generation_time": 3.0874977111816406
+  },
+  "5": {
+    "success": true,
+    "scene_id": 5,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_005_1766062688765.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_005_1766062688765.png",
+    "prompt": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Map of Saudi Arabia, time-lapse effect, ancient Arabian landscape, portrait of Prophet Muhammad, 사우디아라비아 지도, 시간 흐름 효과, 고대 아라비아, 예언자 무함마드, 역사적, 종교적 atmosphere, 사우디아라비아 지도에서 고대 아라비아로 시점 이동, 예언자 무함마드 클로즈업, background environment scene, empty scene, no people, no main character in foreground, high quality",
+    "original_scene_prompt": "Map of Saudi Arabia, time-lapse effect, ancient Arabian landscape, portrait of Prophet Muhammad",
+    "is_background": true,
+    "include_extras": false,
+    "generation_time": 2.6341655254364014
+  },
+  "6": {
+    "success": true,
+    "scene_id": 6,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_006_1766062696784.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_006_1766062696784.png",
+    "prompt": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Panoramic view of Mecca, panoramic view of Medina, interior of an Islamic mosque, religious leader, 메카, 메디나, 이슬람 사원, 종교 지도자, 종교적, 숭고함 atmosphere, 메카와 메디나 전경, 이슬람 사원 내부, 종교 지도자 상반신, background environment scene, empty scene, no people, no main character in foreground, high quality",
+    "original_scene_prompt": "Panoramic view of Mecca, panoramic view of Medina, interior of an Islamic mosque, religious leader",
+    "is_background": true,
+    "include_extras": false,
+    "generation_time": 2.019047260284424
+  },
+  "7": {
+    "success": true,
+    "scene_id": 7,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_007_1766062705317.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_007_1766062705317.png",
+    "prompt": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Abstract image of the passage of time, ancient tribal society landscape, tribal chief, 시간 흐름, 고대 부족 사회, 족장, 역사적, 원시적 atmosphere, 시간 흐름 이미지에서 족장으로 시점 이동, background environment scene, empty scene, no people, no main character in foreground, high quality",
+    "original_scene_prompt": "Abstract image of the passage of time, ancient tribal society landscape, tribal chief",
+    "is_background": true,
+    "include_extras": false,
+    "generation_time": 2.5322577953338623
+  },
+  "8": {
+    "success": true,
+    "scene_id": 8,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_008_1766062713831.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_008_1766062713831.png",
+    "prompt": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Symbols of power, symbols of religion, symbols of tradition, 권력 상징, 종교 상징, 전통 상징, 변화, 추상적 atmosphere, 권력 상징에서 종교, 전통 상징으로 시점 이동, background environment scene, empty scene, no people, no main character in foreground, high quality",
+    "original_scene_prompt": "Symbols of power, symbols of religion, symbols of tradition",
+    "is_background": true,
+    "include_extras": false,
+    "generation_time": 2.511986255645752
+  }
+}

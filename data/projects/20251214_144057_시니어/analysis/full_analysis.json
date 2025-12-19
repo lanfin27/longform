@@ -1,0 +1,8 @@
+{
+  "scenes": [],
+  "characters": [],
+  "total_scenes": 0,
+  "estimated_duration": 0,
+  "error": "JSON 파싱 실패",
+  "raw_response": "\n{\n    \"scenes\": [\n        {\n            \"scene_id\": 1,\n            \"script_text\": \"안녕하십니까? 혹시 올해 법인세가 또 바뀐다는 얘기 들어보셨습니까? 사업을 하고 계신 분들이라면 귀가 번쩍 뜨이는 소식이죠.\",\n            \"duration_estimate\": 12,\n            \"direction_guide\": \"시청자의 관심을 끄는 임팩트 있는 오프닝. 법인세 변화에 대한 궁금증을 자극하는 장면\",\n            \"visual_elements\": [\"사무실 배경\", \"세금 관련 서류\", \"변화를 나타내는 화살표\"],\n            \"characters\": [\"김세무\"],\n            \"camera_suggestion\": \"상반신\",\n            \"mood\": \"관심유발\",\n            \"image_prompt_ko\": \"세무 전문가가 사무실에서 법인세 변"
+}

@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Environment & Secrets
+.env
+.env.local
+*.env
+*api_key*
+*secret*
+config/secrets.py
+
+# Data & Cache
+data/cache/
+data/tts/*.mp3
+data/tts/*.wav
+data/tts/*.srt
+data/composites/
+data/backgrounds/*.png
+data/backgrounds/*.jpg
+*.db
+*.sqlite
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Node
+node_modules/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Temporary fix scripts
+fix_*.py
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# Windows reserved names
+nul
+NUL
+
+# Temporary files
+*.tmp
+*.tmp.*
+*.bak

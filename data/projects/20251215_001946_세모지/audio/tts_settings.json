@@ -1,0 +1,10 @@
+{
+  "language": "ko",
+  "voice": "ko-KR-HyunsuNeural",
+  "voice_name": "현수 (남성)",
+  "rate": "+8%",
+  "pitch": "+0Hz",
+  "silence_enabled": true,
+  "silence_ms": 1500,
+  "engine": "edge_tts"
+}

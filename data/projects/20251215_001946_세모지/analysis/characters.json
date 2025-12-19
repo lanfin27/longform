@@ -1,0 +1,50 @@
+[
+  {
+    "name": "자말 카슈끄지",
+    "name_ko": "자말 카슈끄지",
+    "name_en": "Jamal Khashoggi",
+    "role": "주연",
+    "description": "사우디 왕세자를 비판하던 언론인",
+    "appearance": "",
+    "nationality": "",
+    "era": "",
+    "character_prompt": "Middle Eastern man, late 50s, with a neatly trimmed salt-and-pepper beard, a kind and intelligent face, wearing a dark-colored blazer over a collared shirt, often seen with a pen in his hand, suggesting his profession as a journalist. He has a thoughtful expression and a gentle demeanor. His eyes reflect a deep understanding of the world and a commitment to truth.",
+    "visual_prompt": "Middle Eastern man, late 50s, with a neatly trimmed salt-and-pepper beard, a kind and intelligent face, wearing a dark-colored blazer over a collared shirt, often seen with a pen in his hand, suggesting his profession as a journalist. He has a thoughtful expression and a gentle demeanor. His eyes reflect a deep understanding of the world and a commitment to truth."
+  },
+  {
+    "name": "무함마드 빈 살만",
+    "name_ko": "무함마드 빈 살만",
+    "name_en": "Mohammed bin Salman",
+    "role": "조연",
+    "description": "사우디아라비아 왕세자",
+    "appearance": "",
+    "nationality": "",
+    "era": "",
+    "character_prompt": "Saudi Arabian prince, early 30s, clean-shaven with a strong jawline, wearing a traditional white thobe and a dark-colored bisht (outer cloak) with gold embroidery, exuding confidence and authority. His gaze is direct and assertive, reflecting his position of power. He often wears a luxury watch and carries himself with a regal bearing.",
+    "visual_prompt": "Saudi Arabian prince, early 30s, clean-shaven with a strong jawline, wearing a traditional white thobe and a dark-colored bisht (outer cloak) with gold embroidery, exuding confidence and authority. His gaze is direct and assertive, reflecting his position of power. He often wears a luxury watch and carries himself with a regal bearing."
+  },
+  {
+    "name": "예언자 무함마드",
+    "name_ko": "예언자 무함마드",
+    "name_en": "Prophet Muhammad",
+    "role": "조연",
+    "description": "이슬람교의 창시자",
+    "appearance": "",
+    "nationality": "",
+    "era": "",
+    "character_prompt": "Middle Eastern man, 50s, with a long, flowing dark beard, wearing a simple white robe and turban, radiating wisdom and serenity. His eyes are deep and compassionate, reflecting his spiritual leadership. He carries a staff as a symbol of his authority and guidance. His presence evokes a sense of reverence and respect.",
+    "visual_prompt": "Middle Eastern man, 50s, with a long, flowing dark beard, wearing a simple white robe and turban, radiating wisdom and serenity. His eyes are deep and compassionate, reflecting his spiritual leadership. He carries a staff as a symbol of his authority and guidance. His presence evokes a sense of reverence and respect."
+  },
+  {
+    "name": "족장",
+    "name_ko": "족장",
+    "name_en": "Tribal Chief",
+    "role": "조연",
+    "description": "고대 부족 사회의 지도자",
+    "appearance": "",
+    "nationality": "",
+    "era": "",
+    "character_prompt": "A strong and weathered man, late 40s, of indeterminate ethnicity, with a muscular build and a stern face marked by the elements. He wears simple, animal-hide clothing adorned with tribal markings and feathers. He carries a spear or club, symbolizing his authority and protection of his tribe. His eyes reflect wisdom, experience, and a deep connection to the land.",
+    "visual_prompt": "A strong and weathered man, late 40s, of indeterminate ethnicity, with a muscular build and a stern face marked by the elements. He wears simple, animal-hide clothing adorned with tribal markings and feathers. He carries a spear or club, symbolizing his authority and protection of his tribe. His eyes reflect wisdom, experience, and a deep connection to the land."
+  }
+]

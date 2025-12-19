@@ -1,0 +1,82 @@
+{
+  "1": {
+    "success": true,
+    "scene_id": 1,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_001_composited_1766069198241.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_001_composited_1766069198241.png",
+    "characters_used": [
+      "이슬람 예언자"
+    ],
+    "is_composited": true,
+    "layout": "single_center"
+  },
+  "2": {
+    "success": true,
+    "scene_id": 2,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_002_composited_1766062859550.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_002_composited_1766062859550.png",
+    "characters_used": [
+      "무함마드 빈 살만"
+    ],
+    "is_composited": true,
+    "layout": "single_center"
+  },
+  "3": {
+    "success": true,
+    "scene_id": 3,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_003_composited_1766062859618.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_003_composited_1766062859618.png",
+    "characters_used": [],
+    "is_composited": true,
+    "layout": "none"
+  },
+  "4": {
+    "success": true,
+    "scene_id": 4,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_004_composited_1766062859690.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_004_composited_1766062859690.png",
+    "characters_used": [],
+    "is_composited": true,
+    "layout": "none"
+  },
+  "5": {
+    "success": true,
+    "scene_id": 5,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_005_composited_1766062860207.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_005_composited_1766062860207.png",
+    "characters_used": [
+      "예언자 무함마드"
+    ],
+    "is_composited": true,
+    "layout": "single_center"
+  },
+  "6": {
+    "success": true,
+    "scene_id": 6,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_006_composited_1766062860276.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_006_composited_1766062860276.png",
+    "characters_used": [],
+    "is_composited": true,
+    "layout": "none"
+  },
+  "7": {
+    "success": true,
+    "scene_id": 7,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_007_composited_1766062860798.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_007_composited_1766062860798.png",
+    "characters_used": [
+      "족장"
+    ],
+    "is_composited": true,
+    "layout": "single_center"
+  },
+  "8": {
+    "success": true,
+    "scene_id": 8,
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_008_composited_1766062860862.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\composited\\scene_008_composited_1766062860862.png",
+    "characters_used": [],
+    "is_composited": true,
+    "layout": "none"
+  }
+}

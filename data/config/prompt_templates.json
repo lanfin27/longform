@@ -1,0 +1,38 @@
+{
+  "scene_analysis": {
+    "id": "scene_analysis",
+    "name": "기본 씬 분석",
+    "description": "스크립트를 씬으로 분할하고 각 씬의 시각적 요소를 분석합니다.",
+    "prompt": "당신은 유튜브 인포그래픽 영상의 전문 연출가입니다.\n다음 스크립트를 분석하여 씬(Scene) 단위로 분할하고, 각 씬과 캐릭터에 대한 상세 정보를 제공해주세요.\n\n## 분석 기준\n- 장면 전환이 필요한 시점에서 씬을 분할\n- 하나의 씬은 5~15초 분량 (약 50~150자)\n- 시각적으로 다른 장면이 필요할 때 새 씬으로 분할\n- 같은 맥락이면 하나의 씬으로 유지\n\n## 캐릭터 분석 (매우 중요!)\n각 캐릭터에 대해 반드시 visual_prompt를 생성하세요.\n\n### visual_prompt 작성 규칙:\n- **반드시 영어로** 작성\n- **50-100 단어**로 상세하게\n- 다음 요소 포함: 인종/민족, 성별과 나이, 얼굴 특징, 헤어스타일, 체형, 의상, 액세서리\n\n### visual_prompt 예시:\n- 현대 언론인: \"Middle Eastern man, late 50s, salt-and-pepper beard, glasses with thin metal frames, wearing dark gray business suit, professional journalist appearance\"\n- 왕족: \"Saudi Arabian prince, 30s, clean-shaven, wearing traditional white thobe and red-checkered keffiyeh, authoritative posture\"\n- 고대인물: \"Ancient Egyptian priest, shaved head, kohl-lined eyes, white linen robe, golden necklace\"\n\n## 출력 형식 (JSON)\n{\n    \"scenes\": [\n        {\n            \"scene_id\": 1,\n            \"script_text\": \"해당 씬의 스크립트 텍스트\",\n            \"duration_estimate\": 10,\n            \"direction_guide\": \"연출가이드: 어떤 장면으로 표현하면 좋을지 상세 설명\",\n            \"visual_elements\": [\"배경\", \"주요 오브젝트\", \"분위기\"],\n            \"characters\": [\"등장 캐릭터명\"],\n            \"camera_suggestion\": \"카메라 앵글 제안 (전신, 상반신, 클로즈업 등)\",\n            \"mood\": \"분위기 (밝음, 진지함, 긴장감 등)\",\n            \"image_prompt_ko\": \"이미지 프롬프트 (한국어)\",\n            \"image_prompt_en\": \"이미지 프롬프트 (영어, 상세하게)\"\n        }\n    ],\n    \"characters\": [\n        {\n            \"name\": \"캐릭터명 (한글)\",\n            \"name_en\": \"English Name\",\n            \"role\": \"주연/조연/엑스트라\",\n            \"description\": \"캐릭터 설명\",\n            \"visual_prompt\": \"반드시 영어로 50-100단어 상세 외모 묘사\"\n        }\n    ],\n    \"total_scenes\": 씬 개수,\n    \"estimated_duration\": 예상 총 길이(초)\n}\n\n## 중요 규칙\n1. **모든 캐릭터에 visual_prompt 필수** - 절대 비워두지 마세요!\n2. visual_prompt는 **반드시 영어**로 작성\n3. JSON 형식으로만 응답 (마크다운 코드 블록 사용 금지)",
+    "category": "scene_analysis",
+    "is_default": true,
+    "updated_at": "2025-12-16T01:03:02.754435"
+  },
+  "character_extraction": {
+    "id": "character_extraction",
+    "name": "캐릭터 추출 프롬프트",
+    "description": "스크립트에서 캐릭터를 추출하고 상세한 비주얼 프롬프트를 생성합니다.",
+    "prompt": "당신은 영상 제작을 위한 캐릭터 분석가입니다.\n다음 스크립트에서 등장하는 모든 인물/캐릭터를 추출하고, 각 캐릭터에 대해 **매우 구체적인 외모 묘사 프롬프트**를 생성해주세요.\n\n## 중요: 프롬프트 작성 규칙\n\n**반드시 포함할 내용 (구체적으로):**\n\n1. 신체적 특징:\n   - 인종과 성별\n   - 정확한 나이 (예: \"47 years old\", \"middle-aged\" 같은 추상적 표현 금지)\n   - 얼굴형 (oval, round, square, heart-shaped, long)\n   - 눈 특징 (크기, 모양, 쌍꺼풀 유무 - 아시아인의 경우)\n   - 코 유형 (straight, rounded, prominent)\n   - 입/입술 묘사\n   - 피부톤 (fair, medium, tan, dark)\n   - 특이점 (점, 주름, 보조개 등)\n\n2. 헤어스타일:\n   - 길이 (very short, short, medium, long)\n   - 색상 (jet black, dark brown, salt-and-pepper, white 등 구체적으로)\n   - 스타일 (slicked back, parted, messy, curly, straight)\n   - 헤어라인 (receding, widow's peak, full)\n   - 남성의 경우 수염 (clean-shaven, stubble, mustache, beard)\n\n3. 체형:\n   - 키 인상 (tall, average, short)\n   - 체격 (slim, lean, medium, athletic, stocky, heavy)\n   - 자세\n\n4. 의상 (매우 구체적으로):\n   - 의류 종류와 스타일\n   - 정확한 색상 (navy blue, charcoal gray, cream white - \"blue\"만 쓰지 말것)\n   - 핏 (fitted, loose, tailored)\n   - 액세서리 (안경 프레임 스타일과 색상, 시계, 장신구, 넥타이, 가방)\n   - 신발 (보이는 경우)\n\n5. 포즈/자세:\n   - 몸 위치 (standing, sitting, walking)\n   - 손 위치\n   - 바라보는 방향\n\n**절대 포함하지 말 것:**\n- 아트 스타일 (flat, vector, 3D, anime 등) - 별도로 추가됨\n- 배경 설명\n- 성격 특성 (professional, friendly, serious 등)\n- 감정 상태\n- 추상적 특성 (trustworthy, confident 등)\n\n## 출력 형식 (JSON 배열)\n[\n    {\n        \"name\": \"캐릭터명 (한글)\",\n        \"name_en\": \"영문명\",\n        \"role\": \"역할 (주연, 조연, 엑스트라)\",\n        \"description\": \"캐릭터 설명 (한국어)\",\n        \"era\": \"시대 (현대, 1990년대 등)\",\n        \"nationality\": \"국적\",\n        \"appearance\": \"외모 특징 요약 (한국어)\",\n        \"character_prompt\": \"상세 영문 프롬프트\"\n    }\n]\n\n## character_prompt 예시:\n\"Korean man, 47 years old, short neat black hair with gray at temples and receding hairline, rectangular black-framed glasses, oval face with small monolid eyes and straight nose, clean-shaven, fair skin, medium athletic build, wearing charcoal gray two-piece suit with white dress shirt and burgundy silk tie, silver wristwatch, standing with hands clasped in front\"\n\nJSON 배열로만 응답해주세요.",
+    "category": "character_extraction",
+    "is_default": true,
+    "updated_at": "2025-12-16T01:03:02.754450"
+  },
+  "image_prompt_generation": {
+    "id": "image_prompt_generation",
+    "name": "이미지 프롬프트 생성",
+    "description": "씬 설명에서 이미지 생성용 프롬프트를 만듭니다.",
+    "prompt": "당신은 AI 이미지 생성 도구를 위한 프롬프트 전문가입니다.\n\n주어진 씬 설명과 캐릭터 정보를 바탕으로 상세한 이미지 프롬프트를 작성해주세요.\n\n## 가이드라인:\n1. 주요 피사체로 시작\n2. 구체적인 시각 디테일 포함\n3. 구도와 프레이밍 설명\n4. 필요시 조명 언급\n5. 200단어 이내로 유지\n\n## 포함하지 말 것:\n- 아트 스타일 (별도로 추가됨)\n- 네거티브 프롬프트\n- 기술적 파라미터\n\n단일 문단으로 프롬프트만 출력하세요.",
+    "category": "image_prompt_generation",
+    "is_default": true,
+    "updated_at": "2025-12-16T01:03:02.754451"
+  },
+  "scene_image_prompt": {
+    "id": "scene_image_prompt",
+    "name": "씬 이미지 프롬프트",
+    "description": "개별 씬에 대한 이미지 프롬프트를 생성합니다.",
+    "prompt": "씬 설명을 바탕으로 이미지 생성 프롬프트를 작성하세요.\n\n## 규칙:\n- 영어로 작성\n- 주요 요소부터 시작\n- 배경과 분위기 포함\n- 캐릭터가 있으면 동작/표정 포함\n- 100-150 단어\n\n## 제외:\n- 아트 스타일 관련 표현\n- 텍스트나 글자\n- 기술적 용어\n\n프롬프트만 출력하세요.",
+    "category": "scene_image_prompt",
+    "is_default": true,
+    "updated_at": "2025-12-16T01:03:02.754452"
+  }
+}

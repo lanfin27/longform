@@ -1,0 +1,24 @@
+{
+  "selected_apis": {
+    "script_generation": "claude-sonnet",
+    "scene_analysis": "gemini-flash",
+    "character_extraction": "claude-sonnet",
+    "image_prompt_generation": "claude-haiku",
+    "image_generation": "flux-free",
+    "image_analysis": "claude-vision",
+    "tts": "edge-tts",
+    "video_search": "youtube-data"
+  },
+  "api_keys": {
+    "google": "AIzaSyBjq8WOQH45CxVts_o5jljwlGaOImCip8U"
+  },
+  "enabled_providers": [
+    "edge_tts",
+    "anthropic",
+    "elevenlabs",
+    "openai",
+    "youtube",
+    "google",
+    "together"
+  ]
+}

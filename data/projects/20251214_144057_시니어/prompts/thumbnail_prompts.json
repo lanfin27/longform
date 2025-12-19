@@ -1,0 +1,27 @@
+{
+  "thumbnail_prompts": [
+    {
+      "version": "A",
+      "type": "text_focus_background",
+      "image_prompt": "YouTube thumbnail background, animation style, clean gradient, space for large text in center, no text, no letters, no words",
+      "overlay_text": {
+        "main": "2025년 법인세 개정안",
+        "sub": "",
+        "font_suggestion": "나눔스퀘어 Bold",
+        "color_suggestion": "#FFFFFF with #000000 outline"
+      }
+    },
+    {
+      "version": "B",
+      "type": "image_focus_background",
+      "image_prompt": "YouTube thumbnail, animation style, professional person working, success concept, warm lighting, no text, no letters",
+      "overlay_text": {
+        "main": "2025년 법인세 개정안",
+        "sub": "완전 가이드",
+        "font_suggestion": "Pretendard Bold",
+        "color_suggestion": "#FFD700"
+      }
+    }
+  ],
+  "note": "FLUX는 텍스트 생성이 불안정합니다. 이미지 생성 후 텍스트를 수동 합성하세요."
+}

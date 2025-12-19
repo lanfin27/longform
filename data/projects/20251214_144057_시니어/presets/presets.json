@@ -1,0 +1,168 @@
+{
+  "styles": [
+    {
+      "id": "animation",
+      "name": "애니메이션 스타일",
+      "prompt": "animation style, vibrant colors, clean lines, no text, simple background",
+      "category": "style"
+    },
+    {
+      "id": "3d_clay",
+      "name": "3D 클레이 스타일",
+      "prompt": "3D clay render, cute character, soft lighting, pastel colors, simple background",
+      "category": "style"
+    },
+    {
+      "id": "flat_illustration",
+      "name": "플랫 일러스트",
+      "prompt": "flat illustration, minimal design, solid colors, geometric shapes",
+      "category": "style"
+    },
+    {
+      "id": "pixel_art",
+      "name": "픽셀아트",
+      "prompt": "pixel art style, retro game aesthetic, 16-bit graphics",
+      "category": "style"
+    },
+    {
+      "id": "semoji_style",
+      "name": "세모지 스타일",
+      "prompt": "animation style, infographic, clean lines, simple shapes, bright colors, no text, educational illustration",
+      "category": "style"
+    },
+    {
+      "id": "realistic_illustration",
+      "name": "리얼리스틱 일러스트",
+      "prompt": "realistic illustration, detailed, professional digital art, cinematic lighting",
+      "category": "style"
+    },
+    {
+      "id": "watercolor",
+      "name": "수채화 스타일",
+      "prompt": "watercolor painting style, soft edges, flowing colors, artistic",
+      "category": "style"
+    }
+  ],
+  "characters": [
+    {
+      "id": "full_body",
+      "name": "전신 캐릭터",
+      "prompt": "full body, standing pose, front view, simple background",
+      "category": "character"
+    },
+    {
+      "id": "half_body",
+      "name": "상반신 캐릭터",
+      "prompt": "half body, upper body, front view, simple background",
+      "category": "character"
+    },
+    {
+      "id": "chibi",
+      "name": "3등신 캐릭터",
+      "prompt": "chibi style, 3 head tall, cute, big head, small body",
+      "category": "character"
+    },
+    {
+      "id": "badge",
+      "name": "배지 캐릭터",
+      "prompt": "badge style, circular frame, portrait, icon design",
+      "category": "character"
+    },
+    {
+      "id": "portrait",
+      "name": "인물 초상화",
+      "prompt": "portrait, head and shoulders, detailed face, professional",
+      "category": "character"
+    }
+  ],
+  "backgrounds": [
+    {
+      "id": "news_desk",
+      "name": "뉴스 데스크",
+      "prompt": "news studio, anchor desk, professional broadcast setting, monitors in background",
+      "category": "background"
+    },
+    {
+      "id": "office",
+      "name": "사무실",
+      "prompt": "modern office, desk, computer, bookshelf, professional environment",
+      "category": "background"
+    },
+    {
+      "id": "outdoor",
+      "name": "야외",
+      "prompt": "outdoor setting, natural lighting, landscape background",
+      "category": "background"
+    },
+    {
+      "id": "simple_gradient",
+      "name": "단순 그라데이션",
+      "prompt": "simple gradient background, solid color, minimal",
+      "category": "background"
+    },
+    {
+      "id": "studio",
+      "name": "스튜디오",
+      "prompt": "studio background, professional lighting, clean backdrop",
+      "category": "background"
+    },
+    {
+      "id": "abstract",
+      "name": "추상적 배경",
+      "prompt": "abstract background, colorful shapes, modern design",
+      "category": "background"
+    }
+  ],
+  "negatives": [
+    {
+      "id": "no_text",
+      "name": "텍스트 금지",
+      "prompt": "no text, no words, no letters, no numbers, no watermark",
+      "category": "negative"
+    },
+    {
+      "id": "no_realistic",
+      "name": "사실적 금지",
+      "prompt": "no realistic, no photorealistic, no photograph",
+      "category": "negative"
+    },
+    {
+      "id": "quality",
+      "name": "품질 네거티브",
+      "prompt": "low quality, blurry, distorted, deformed, ugly, bad anatomy",
+      "category": "negative"
+    },
+    {
+      "id": "no_nsfw",
+      "name": "성인 콘텐츠 금지",
+      "prompt": "nsfw, nude, explicit, violence, gore",
+      "category": "negative"
+    }
+  ],
+  "compositions": [
+    {
+      "id": "centered",
+      "name": "중앙 구도",
+      "prompt": "centered composition, symmetrical, balanced",
+      "category": "composition"
+    },
+    {
+      "id": "rule_of_thirds",
+      "name": "삼분할 구도",
+      "prompt": "rule of thirds composition, dynamic, balanced",
+      "category": "composition"
+    },
+    {
+      "id": "wide_shot",
+      "name": "와이드 샷",
+      "prompt": "wide shot, full scene, establishing shot",
+      "category": "composition"
+    },
+    {
+      "id": "close_up",
+      "name": "클로즈업",
+      "prompt": "close up, detailed, focused",
+      "category": "composition"
+    }
+  ]
+}

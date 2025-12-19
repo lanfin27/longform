@@ -1,0 +1,33 @@
+[
+  {
+    "success": true,
+    "scene_id": 1,
+    "prompt": "animation style scene,, Exterior of the Saudi Arabian consulate in Istanbul, overcast weather, black and white photo of Jamal Khashoggi, 2018 news flash screen, single character in scene, full body, standing, Middle Eastern man, late 50s, with a neatly trimmed salt-and-pepper beard, a kind and intelligent face, wearing a dark-colored blazer over a collared shirt, often seen with a pen in his hand, suggesting his profession as a journalist. He has a thoughtful expression and a gentle demeanor. His eyes reflect a deep understanding of the world and a commitment to truth., 비극적, 암울함 mood, 사우디아라비아 총영사관, 자말 카슈끄지 사진, 뉴스 보도 화면",
+    "characters": [
+      "자말 카슈끄지"
+    ],
+    "saved_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\scenes\\scene_001.png",
+    "filename": "scene_001.png",
+    "generation_time": 0.9529638290405273
+  },
+  {
+    "success": true,
+    "scene_id": 2,
+    "prompt": "animation style scene,, Close-up portrait of Mohammed bin Salman, international news headlines criticizing him, silhouettes of Saudi Arabian people, single character in scene, full body, standing, Middle Eastern man, early 30s, clean-shaven with a strong jawline. He has dark, intense eyes and a confident expression. He is wearing traditional Saudi Arabian attire, such as a white thobe and a dark bisht. His posture is upright and authoritative. The lighting should be strong and highlight his power and influence. He has a well-groomed appearance, reflecting his status as a crown prince. He may be wearing a luxury watch or other subtle accessories., 긴장감, 억압적 mood, 무함마드 빈 살만 왕세자 사진, 국제 사회 비판, 침묵하는 사우디 사람들",
+    "characters": [
+      "무함마드 빈 살만"
+    ],
+    "saved_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\scenes\\scene_002.png",
+    "filename": "scene_002.png",
+    "generation_time": 0.9604935646057129
+  },
+  {
+    "success": true,
+    "scene_id": 3,
+    "prompt": "animation style scene,, Icons representing law, human rights, and freedom of the press, a crown crushing the icons, Aramco logo, Saudi Arabian oil field, 억압적, 불평등 mood, 법 아이콘, 인권 아이콘, 언론 자유 아이콘, 왕관, 아람코 로고, 유전",
+    "characters": [],
+    "saved_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\scenes\\scene_003.png",
+    "filename": "scene_003.png",
+    "generation_time": 2.4194495677948
+  }
+]

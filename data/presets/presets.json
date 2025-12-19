@@ -1,0 +1,441 @@
+{
+  "styles": [
+    {
+      "id": "animation",
+      "name": "애니메이션 스타일",
+      "prompt": "animation style, vibrant colors, clean lines, no text, simple background, smooth shading, anime-inspired illustration",
+      "category": "styles",
+      "description": "밝고 깔끔한 애니메이션 스타일. 선명한 윤곽선과 생동감 있는 색상이 특징입니다.",
+      "example_images": [],
+      "tags": [
+        "애니메이션",
+        "컬러풀",
+        "깔끔한"
+      ],
+      "created_at": "2025-12-14T19:02:04.792079",
+      "updated_at": "2025-12-14T22:04:58.362887",
+      "is_default": true
+    },
+    {
+      "id": "3d_clay",
+      "name": "3D 클레이 스타일",
+      "prompt": "3D clay render style, soft lighting, pastel colors, cute chibi proportions, smooth surface, simple background, no text, studio lighting",
+      "category": "styles",
+      "description": "부드러운 점토 느낌의 3D 렌더링. 파스텔 톤과 귀여운 비율이 특징입니다.",
+      "example_images": [],
+      "tags": [
+        "3D",
+        "클레이",
+        "파스텔",
+        "귀여운"
+      ],
+      "created_at": "2025-12-14T19:02:04.792091",
+      "updated_at": "2025-12-14T22:04:58.362896",
+      "is_default": true
+    },
+    {
+      "id": "flat_illustration",
+      "name": "플랫 일러스트",
+      "prompt": "flat illustration style, minimal design, solid colors, geometric shapes, simple composition, vector art, no gradients, clean edges, no text",
+      "category": "styles",
+      "description": "미니멀한 플랫 디자인. 단순한 도형과 단색 사용이 특징입니다.",
+      "example_images": [],
+      "tags": [
+        "플랫",
+        "미니멀",
+        "벡터",
+        "심플"
+      ],
+      "created_at": "2025-12-14T19:02:04.792097",
+      "updated_at": "2025-12-14T22:04:58.362899",
+      "is_default": true
+    },
+    {
+      "id": "semoji_style",
+      "name": "세모지 스타일",
+      "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere",
+      "category": "styles",
+      "description": "세상의 모든 지식 채널 스타일. 인포그래픽과 교육용 일러스트에 최적화되어 있습니다.",
+      "example_images": [
+        "data\\presets\\test_images\\test_semoji_style_20251214_235021.png",
+        "data\\presets\\test_images\\test_semoji_style_20251214_235536.png"
+      ],
+      "tags": [
+        "세모지",
+        "인포그래픽",
+        "교육",
+        "유튜브"
+      ],
+      "created_at": "2025-12-14T19:02:04.792101",
+      "updated_at": "2025-12-14T23:49:23.894172",
+      "is_default": true
+    },
+    {
+      "id": "pixel_art",
+      "name": "픽셀아트",
+      "prompt": "pixel art style, retro game aesthetic, 16-bit graphics, limited color palette, crisp pixels, nostalgic, no anti-aliasing",
+      "category": "styles",
+      "description": "레트로 게임 스타일의 픽셀아트. 16비트 게임 느낌이 특징입니다.",
+      "example_images": [],
+      "tags": [
+        "픽셀",
+        "레트로",
+        "게임",
+        "8비트"
+      ],
+      "created_at": "2025-12-14T19:02:04.792104",
+      "updated_at": "2025-12-14T22:04:58.362902",
+      "is_default": true
+    },
+    {
+      "id": "watercolor",
+      "name": "수채화 스타일",
+      "prompt": "watercolor painting style, soft edges, color bleeding, paper texture, artistic, delicate brushstrokes, pastel tones, dreamy atmosphere",
+      "category": "styles",
+      "description": "부드러운 수채화 느낌. 자연스러운 색 번짐과 종이 질감이 특징입니다.",
+      "example_images": [],
+      "tags": [
+        "수채화",
+        "아트",
+        "부드러운",
+        "감성"
+      ],
+      "created_at": "2025-12-14T19:02:04.792108",
+      "updated_at": "2025-12-14T22:04:58.362903",
+      "is_default": true
+    },
+    {
+      "id": "realistic_illustration",
+      "name": "리얼리스틱 일러스트",
+      "prompt": "realistic illustration, detailed digital art, cinematic lighting, professional quality, photorealistic elements, dramatic composition",
+      "category": "styles",
+      "description": "사실적인 디지털 일러스트. 영화적 조명과 디테일이 특징입니다.",
+      "example_images": [],
+      "tags": [
+        "리얼리스틱",
+        "사실적",
+        "시네마틱",
+        "디테일"
+      ],
+      "created_at": "2025-12-14T19:02:04.792112",
+      "updated_at": "2025-12-14T22:04:58.362905",
+      "is_default": true
+    }
+  ],
+  "characters": [
+    {
+      "id": "full_body",
+      "name": "전신 캐릭터",
+      "prompt": "full body character, standing pose, front view, simple solid color background, clear silhouette, visible from head to toe",
+      "category": "characters",
+      "description": "머리부터 발끝까지 보이는 전신 캐릭터. 기본 스탠딩 포즈입니다.",
+      "example_images": [],
+      "tags": [
+        "전신",
+        "스탠딩",
+        "정면"
+      ],
+      "created_at": "2025-12-14T19:02:04.792116",
+      "updated_at": "2025-12-14T22:04:58.362907",
+      "is_default": true
+    },
+    {
+      "id": "half_body",
+      "name": "상반신 캐릭터",
+      "prompt": "upper body character, half body shot, portrait style, front view, simple background, focus on face and torso",
+      "category": "characters",
+      "description": "상반신만 보이는 캐릭터. 표정과 제스처에 집중합니다.",
+      "example_images": [],
+      "tags": [
+        "상반신",
+        "포트레이트",
+        "얼굴"
+      ],
+      "created_at": "2025-12-14T19:02:04.792119",
+      "updated_at": "2025-12-14T22:04:58.362908",
+      "is_default": true
+    },
+    {
+      "id": "chibi",
+      "name": "3등신 캐릭터",
+      "prompt": "chibi style character, 3 head tall proportions, cute big head, small body, adorable, super deformed, kawaii",
+      "category": "characters",
+      "description": "귀여운 3등신 비율의 캐릭터. 머리가 크고 몸이 작습니다.",
+      "example_images": [],
+      "tags": [
+        "치비",
+        "3등신",
+        "귀여운",
+        "SD"
+      ],
+      "created_at": "2025-12-14T19:02:04.792122",
+      "updated_at": "2025-12-14T22:04:58.362909",
+      "is_default": true
+    },
+    {
+      "id": "icon_badge",
+      "name": "아이콘/배지",
+      "prompt": "icon style character, circular badge frame, portrait headshot, centered composition, clean edges, suitable for profile picture",
+      "category": "characters",
+      "description": "프로필 아이콘이나 배지 스타일. 원형 프레임에 얼굴이 들어갑니다.",
+      "example_images": [],
+      "tags": [
+        "아이콘",
+        "배지",
+        "프로필",
+        "원형"
+      ],
+      "created_at": "2025-12-14T19:02:04.792125",
+      "updated_at": "2025-12-14T22:04:58.362913",
+      "is_default": true
+    },
+    {
+      "id": "action_pose",
+      "name": "액션 포즈",
+      "prompt": "dynamic action pose, movement, energetic, dramatic angle, motion blur effect, exciting composition",
+      "category": "characters",
+      "description": "역동적인 액션 포즈. 움직임과 에너지가 느껴집니다.",
+      "example_images": [],
+      "tags": [
+        "액션",
+        "다이나믹",
+        "움직임"
+      ],
+      "created_at": "2025-12-14T19:02:04.792128",
+      "updated_at": "2025-12-14T22:04:58.362914",
+      "is_default": true
+    }
+  ],
+  "backgrounds": [
+    {
+      "id": "news_desk",
+      "name": "뉴스 데스크",
+      "prompt": "professional news studio background, anchor desk, broadcast setting, multiple monitors showing graphics, blue lighting, modern design",
+      "category": "backgrounds",
+      "description": "뉴스 방송 스튜디오 배경. 앵커 데스크와 모니터가 있습니다.",
+      "example_images": [],
+      "tags": [
+        "뉴스",
+        "스튜디오",
+        "방송",
+        "전문적"
+      ],
+      "created_at": "2025-12-14T19:02:04.792133",
+      "updated_at": "2025-12-14T22:04:58.362916",
+      "is_default": true
+    },
+    {
+      "id": "office",
+      "name": "사무실",
+      "prompt": "modern office interior background, desk with computer, bookshelf, professional environment, natural lighting from window, clean organized space",
+      "category": "backgrounds",
+      "description": "현대적인 사무실 배경. 책상, 컴퓨터, 책장이 있습니다.",
+      "example_images": [],
+      "tags": [
+        "사무실",
+        "오피스",
+        "비즈니스",
+        "현대적"
+      ],
+      "created_at": "2025-12-14T19:02:04.792136",
+      "updated_at": "2025-12-14T22:04:58.362917",
+      "is_default": true
+    },
+    {
+      "id": "simple_gradient",
+      "name": "단순 그라데이션",
+      "prompt": "simple gradient background, smooth color transition, solid colors, minimal, clean, no distractions, professional",
+      "category": "backgrounds",
+      "description": "깔끔한 그라데이션 배경. 캐릭터에 집중할 수 있습니다.",
+      "example_images": [],
+      "tags": [
+        "그라데이션",
+        "심플",
+        "단색",
+        "깔끔"
+      ],
+      "created_at": "2025-12-14T19:02:04.792140",
+      "updated_at": "2025-12-14T22:04:58.362918",
+      "is_default": true
+    },
+    {
+      "id": "outdoor_city",
+      "name": "도시 야외",
+      "prompt": "urban outdoor background, city street, modern buildings, daytime, clear sky, busy metropolitan area",
+      "category": "backgrounds",
+      "description": "도시의 야외 배경. 건물과 거리가 보입니다.",
+      "example_images": [],
+      "tags": [
+        "도시",
+        "야외",
+        "거리",
+        "건물"
+      ],
+      "created_at": "2025-12-14T19:02:04.792143",
+      "updated_at": "2025-12-14T22:04:58.362919",
+      "is_default": true
+    },
+    {
+      "id": "nature",
+      "name": "자연 배경",
+      "prompt": "natural outdoor background, green trees, blue sky, peaceful atmosphere, park or forest setting, natural lighting",
+      "category": "backgrounds",
+      "description": "자연 속 배경. 나무와 하늘이 있는 평화로운 분위기입니다.",
+      "example_images": [],
+      "tags": [
+        "자연",
+        "숲",
+        "공원",
+        "평화로운"
+      ],
+      "created_at": "2025-12-14T19:02:04.792146",
+      "updated_at": "2025-12-14T22:04:58.362921",
+      "is_default": true
+    },
+    {
+      "id": "abstract",
+      "name": "추상적 배경",
+      "prompt": "abstract background, colorful shapes, modern art, geometric patterns, creative composition, artistic",
+      "category": "backgrounds",
+      "description": "추상적인 아트 배경. 다양한 도형과 색상이 특징입니다.",
+      "example_images": [],
+      "tags": [
+        "추상",
+        "아트",
+        "기하학",
+        "모던"
+      ],
+      "created_at": "2025-12-14T19:02:04.792149",
+      "updated_at": "2025-12-14T22:04:58.362922",
+      "is_default": true
+    }
+  ],
+  "negatives": [
+    {
+      "id": "no_text",
+      "name": "텍스트 금지",
+      "prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+      "category": "negatives",
+      "description": "이미지에 텍스트가 포함되지 않도록 합니다.",
+      "example_images": [],
+      "tags": [
+        "텍스트금지",
+        "워터마크금지"
+      ],
+      "created_at": "2025-12-14T19:02:04.792153",
+      "updated_at": "2025-12-14T22:04:58.362923",
+      "is_default": true
+    },
+    {
+      "id": "quality_negative",
+      "name": "품질 네거티브",
+      "prompt": "low quality, blurry, distorted, deformed, ugly, bad anatomy, bad proportions, extra limbs, cloned face, disfigured",
+      "category": "negatives",
+      "description": "저품질 결과물을 방지하는 네거티브 프롬프트입니다.",
+      "example_images": [],
+      "tags": [
+        "품질",
+        "네거티브"
+      ],
+      "created_at": "2025-12-14T19:02:04.792156",
+      "updated_at": "2025-12-14T22:04:58.362925",
+      "is_default": true
+    },
+    {
+      "id": "no_realistic",
+      "name": "사실적 금지",
+      "prompt": "no photorealistic, no photograph, no realistic, no real person, illustration only, drawn style only",
+      "category": "negatives",
+      "description": "사실적인 사진 스타일을 방지합니다.",
+      "example_images": [],
+      "tags": [
+        "사실적금지",
+        "일러스트전용"
+      ],
+      "created_at": "2025-12-14T19:02:04.792159",
+      "updated_at": "2025-12-14T22:04:58.362926",
+      "is_default": true
+    },
+    {
+      "id": "no_nsfw",
+      "name": "성인 콘텐츠 금지",
+      "prompt": "nsfw, nude, explicit, violence, gore, blood, inappropriate content",
+      "category": "negatives",
+      "description": "성인/폭력 콘텐츠를 방지합니다.",
+      "example_images": [],
+      "tags": [
+        "성인금지",
+        "폭력금지"
+      ],
+      "created_at": "2025-12-14T19:02:04.792161",
+      "updated_at": "2025-12-14T22:04:58.362927",
+      "is_default": true
+    }
+  ],
+  "compositions": [
+    {
+      "id": "centered",
+      "name": "중앙 구도",
+      "prompt": "centered composition, symmetrical, balanced, subject in center, stable framing",
+      "category": "compositions",
+      "description": "주제가 중앙에 위치하는 안정적인 구도입니다.",
+      "example_images": [],
+      "tags": [
+        "중앙",
+        "대칭",
+        "안정적"
+      ],
+      "created_at": "2025-12-14T19:02:04.792165",
+      "updated_at": "2025-12-14T22:04:58.362929",
+      "is_default": true
+    },
+    {
+      "id": "rule_of_thirds",
+      "name": "삼분할 구도",
+      "prompt": "rule of thirds composition, dynamic placement, balanced asymmetry, professional framing",
+      "category": "compositions",
+      "description": "삼분할 법칙을 적용한 역동적인 구도입니다.",
+      "example_images": [],
+      "tags": [
+        "삼분할",
+        "다이나믹",
+        "프로페셔널"
+      ],
+      "created_at": "2025-12-14T19:02:04.792168",
+      "updated_at": "2025-12-14T22:04:58.362930",
+      "is_default": true
+    },
+    {
+      "id": "wide_shot",
+      "name": "와이드 샷",
+      "prompt": "wide shot, full scene view, establishing shot, panoramic, environmental context",
+      "category": "compositions",
+      "description": "넓은 장면을 보여주는 와이드 샷입니다.",
+      "example_images": [],
+      "tags": [
+        "와이드",
+        "파노라마",
+        "전경"
+      ],
+      "created_at": "2025-12-14T19:02:04.792171",
+      "updated_at": "2025-12-14T22:04:58.362931",
+      "is_default": true
+    },
+    {
+      "id": "close_up",
+      "name": "클로즈업",
+      "prompt": "close up shot, detailed focus, intimate framing, emphasis on subject, shallow depth of field",
+      "category": "compositions",
+      "description": "주제에 가까이 다가간 클로즈업 샷입니다.",
+      "example_images": [],
+      "tags": [
+        "클로즈업",
+        "디테일",
+        "집중"
+      ],
+      "created_at": "2025-12-14T19:02:04.792174",
+      "updated_at": "2025-12-14T22:04:58.362932",
+      "is_default": true
+    }
+  ]
+}

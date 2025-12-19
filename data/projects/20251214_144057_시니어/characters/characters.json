@@ -1,0 +1,53 @@
+[
+  {
+    "id": "kim_semu",
+    "name": "김세무",
+    "name_en": "Kim Semu",
+    "description": "40대 중반, 남성, 세무 전문가, 정장 착용, 안경 착용, 신뢰감 있는 외모, 차분하고 전문적인 말투",
+    "role": "주연",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged Korean male tax expert in his 40s, wearing business suit and glasses, professional and trustworthy appearance, confident posture, expert demeanor",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\characters\\images\\kim_semu.png"
+    ],
+    "created_at": "2025-12-14T18:15:58.345337",
+    "updated_at": "2025-12-14T18:26:15.818482"
+  },
+  {
+    "id": "small_business_owner",
+    "name": "중소기업사장",
+    "name_en": "Small Business Owner",
+    "description": "50대 초반, 남성, 중소기업 경영자, 캐주얼한 정장, 진지한 표정, 세금 고민하는 모습",
+    "role": "주연",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Korean small business owner in early 50s, casual business attire, concerned expression about tax matters, realistic entrepreneur appearance",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\characters\\images\\small_business_owner.png"
+    ],
+    "created_at": "2025-12-14T18:15:58.346422",
+    "updated_at": "2025-12-14T18:26:15.818493"
+  },
+  {
+    "id": "mr._kim",
+    "name": "김사장님",
+    "name_en": "Mr. Kim",
+    "description": "45세, 남성, 제조업체 사장, 작업복 또는 캐주얼 정장, 성실한 외모, 중소기업 경영자의 전형적 모습",
+    "role": "주연",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Korean manufacturing company president, 45 years old, wearing work clothes or casual suit, diligent appearance, typical small business owner look",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\characters\\images\\mr._kim.png"
+    ],
+    "created_at": "2025-12-14T18:15:58.347270",
+    "updated_at": "2025-12-14T18:26:15.818497"
+  }
+]

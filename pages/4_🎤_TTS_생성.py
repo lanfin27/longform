@@ -569,6 +569,344 @@ def generate_edge_tts(text, voice_id, rate, pitch, volume, add_breaks, generate_
 
 
 # ============================================================
+# Chatterbox 탭 - 음성 클론 관리
+# ============================================================
+
+def get_voice_samples_dir():
+    """프로젝트별 음성 샘플 디렉토리 반환"""
+    current_project = st.session_state.get("current_project")
+    if current_project:
+        samples_dir = Path(f"data/projects/{current_project}/voice_samples")
+    else:
+        samples_dir = Path("data/voice_samples/default")
+    samples_dir.mkdir(parents=True, exist_ok=True)
+    return samples_dir
+
+
+def get_voice_samples(samples_dir: Path) -> list:
+    """음성 샘플 목록 조회"""
+    import json
+
+    samples = []
+    meta_path = samples_dir / "samples_meta.json"
+
+    if meta_path.exists():
+        with open(meta_path, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+
+        for s in meta.get("samples", []):
+            filepath = samples_dir / s["filename"]
+            if filepath.exists():
+                samples.append({
+                    "name": s["name"],
+                    "path": str(filepath),
+                    "description": s.get("description", ""),
+                    "created_at": s.get("created_at", "")
+                })
+    else:
+        # 메타 없으면 파일 직접 스캔
+        for f in samples_dir.glob("*"):
+            if f.suffix.lower() in ['.wav', '.mp3', '.m4a', '.ogg']:
+                samples.append({
+                    "name": f.stem,
+                    "path": str(f),
+                    "description": "",
+                    "created_at": ""
+                })
+
+    # voice_library/ko 폴더도 포함
+    voice_lib = Path("voice_library/ko")
+    if voice_lib.exists():
+        for f in voice_lib.glob("*"):
+            if f.suffix.lower() in ['.wav', '.mp3', '.m4a', '.ogg']:
+                samples.append({
+                    "name": f"[라이브러리] {f.stem}",
+                    "path": str(f),
+                    "description": "기본 음성 라이브러리",
+                    "created_at": ""
+                })
+
+    return samples
+
+
+def save_voice_sample(uploaded_file, name: str, description: str, samples_dir: Path):
+    """음성 샘플 저장"""
+    import json
+
+    # 파일 저장
+    ext = uploaded_file.name.rsplit('.', 1)[-1]
+    filename = f"{name.replace(' ', '_')}.{ext}"
+    filepath = samples_dir / filename
+
+    with open(filepath, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+
+    # 메타데이터 저장
+    meta_path = samples_dir / "samples_meta.json"
+
+    if meta_path.exists():
+        with open(meta_path, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+    else:
+        meta = {"samples": []}
+
+    # 중복 제거
+    meta["samples"] = [s for s in meta["samples"] if s["filename"] != filename]
+
+    meta["samples"].append({
+        "name": name,
+        "filename": filename,
+        "description": description,
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
+    })
+
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+
+    st.success(f"✅ '{name}' 샘플이 저장되었습니다!")
+    time.sleep(0.5)
+    st.rerun()
+
+
+def delete_voice_sample(filepath: str):
+    """음성 샘플 삭제"""
+    import json
+
+    filepath = Path(filepath)
+
+    if filepath.exists():
+        filepath.unlink()
+
+    # 메타데이터에서도 제거
+    samples_dir = filepath.parent
+    meta_path = samples_dir / "samples_meta.json"
+
+    if meta_path.exists():
+        with open(meta_path, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+
+        filename = filepath.name
+        meta["samples"] = [s for s in meta["samples"] if s["filename"] != filename]
+
+        with open(meta_path, "w", encoding="utf-8") as f:
+            json.dump(meta, f, ensure_ascii=False, indent=2)
+
+    st.success("삭제되었습니다.")
+    time.sleep(0.5)
+    st.rerun()
+
+
+def render_voice_clone_manager():
+    """🎭 음성 클론 관리 섹션"""
+    st.markdown("### 🎭 음성 클론 관리")
+
+    samples_dir = get_voice_samples_dir()
+
+    # 탭: 업로드 / 녹음 / 관리
+    clone_tabs = st.tabs(["📤 업로드", "🎙️ 녹음", "📋 클론 목록"])
+
+    # ─────────────────────────────────────────────
+    # 탭 1: 음성 샘플 업로드
+    # ─────────────────────────────────────────────
+    with clone_tabs[0]:
+        st.markdown("#### 📤 새 음성 샘플 업로드")
+        st.info("💡 3~10초 길이의 깨끗한 음성 파일을 업로드하세요. (WAV/MP3 권장)")
+
+        uploaded_file = st.file_uploader(
+            "음성 파일 선택",
+            type=["wav", "mp3", "m4a", "ogg"],
+            key="voice_sample_upload"
+        )
+
+        if uploaded_file:
+            # 미리듣기
+            st.audio(uploaded_file)
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                sample_name = st.text_input(
+                    "샘플 이름",
+                    value=uploaded_file.name.rsplit('.', 1)[0],
+                    key="sample_name_input"
+                )
+
+            with col2:
+                sample_desc = st.text_input(
+                    "설명 (선택)",
+                    placeholder="예: 밝은 톤, 차분한 목소리",
+                    key="sample_desc_input"
+                )
+
+            if st.button("💾 샘플 저장", type="primary", use_container_width=True, key="save_sample"):
+                if sample_name:
+                    save_voice_sample(uploaded_file, sample_name, sample_desc, samples_dir)
+                else:
+                    st.warning("샘플 이름을 입력하세요.")
+
+    # ─────────────────────────────────────────────
+    # 탭 2: 음성 녹음
+    # ─────────────────────────────────────────────
+    with clone_tabs[1]:
+        st.markdown("#### 🎙️ 음성 녹음")
+
+        # audiorecorder 라이브러리 시도
+        try:
+            from audiorecorder import audiorecorder
+
+            st.info("💡 🔴 버튼을 클릭하여 녹음을 시작/중지하세요.")
+
+            audio = audiorecorder("🔴 녹음 시작", "⏹️ 녹음 중지", key="voice_recorder")
+
+            if len(audio) > 0:
+                st.audio(audio.export().read())
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    rec_name = st.text_input("녹음 이름", key="rec_name_input")
+
+                with col2:
+                    rec_desc = st.text_input("설명", key="rec_desc_input")
+
+                if st.button("💾 녹음 저장", type="primary", key="save_recording"):
+                    if rec_name:
+                        # WAV로 저장
+                        filepath = samples_dir / f"{rec_name}.wav"
+                        audio.export(str(filepath), format="wav")
+
+                        # 메타데이터 저장
+                        import json
+                        meta_path = samples_dir / "samples_meta.json"
+
+                        if meta_path.exists():
+                            with open(meta_path, "r", encoding="utf-8") as f:
+                                meta = json.load(f)
+                        else:
+                            meta = {"samples": []}
+
+                        meta["samples"].append({
+                            "name": rec_name,
+                            "filename": f"{rec_name}.wav",
+                            "description": rec_desc,
+                            "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
+                        })
+
+                        with open(meta_path, "w", encoding="utf-8") as f:
+                            json.dump(meta, f, ensure_ascii=False, indent=2)
+
+                        st.success("녹음이 저장되었습니다!")
+                        time.sleep(0.5)
+                        st.rerun()
+                    else:
+                        st.warning("녹음 이름을 입력하세요.")
+
+        except ImportError:
+            st.warning("녹음 기능을 사용하려면 라이브러리를 설치하세요:")
+            st.code("pip install streamlit-audiorecorder")
+
+            st.markdown("---")
+            st.markdown("**대안: 녹음 파일 직접 업로드**")
+            st.info("휴대폰이나 다른 기기로 녹음 후 '📤 업로드' 탭에서 업로드하세요.")
+
+    # ─────────────────────────────────────────────
+    # 탭 3: 클론 목록 관리
+    # ─────────────────────────────────────────────
+    with clone_tabs[2]:
+        st.markdown("#### 📋 저장된 음성 클론")
+
+        samples = get_voice_samples(samples_dir)
+
+        if not samples:
+            st.info("저장된 음성 샘플이 없습니다. 위에서 업로드하거나 녹음하세요.")
+        else:
+            st.caption(f"총 {len(samples)}개의 음성 샘플")
+
+            for i, sample in enumerate(samples):
+                with st.container():
+                    col1, col2, col3, col4 = st.columns([4, 1, 1, 1])
+
+                    with col1:
+                        st.markdown(f"**{sample['name']}**")
+                        if sample.get('description'):
+                            st.caption(sample['description'])
+
+                    with col2:
+                        # 미리듣기
+                        if st.button("▶️", key=f"play_sample_{i}", help="미리듣기"):
+                            st.session_state[f"preview_sample_{i}"] = True
+
+                    with col3:
+                        # 기본 음성으로 설정
+                        is_default = sample['path'] == st.session_state.get("default_voice_sample")
+                        if st.button(
+                            "⭐" if is_default else "☆",
+                            key=f"default_sample_{i}",
+                            help="기본 음성으로 설정"
+                        ):
+                            st.session_state["default_voice_sample"] = sample['path']
+                            st.toast(f"'{sample['name']}'을 기본 음성으로 설정했습니다.")
+
+                    with col4:
+                        # 삭제 (라이브러리 파일은 삭제 불가)
+                        if "[라이브러리]" not in sample['name']:
+                            if st.button("🗑️", key=f"delete_sample_{i}", help="삭제"):
+                                delete_voice_sample(sample['path'])
+                        else:
+                            st.caption("🔒")
+
+                    # 미리듣기 오디오
+                    if st.session_state.get(f"preview_sample_{i}"):
+                        st.audio(sample['path'])
+                        st.session_state[f"preview_sample_{i}"] = False
+
+                    st.markdown("---")
+
+
+def render_reference_voice_selector():
+    """참조 음성 선택 (개선된 버전)"""
+    st.markdown("#### 🎤 참조 음성 선택")
+
+    samples_dir = get_voice_samples_dir()
+    samples = get_voice_samples(samples_dir)
+
+    if not samples:
+        st.warning("저장된 음성 샘플이 없습니다. 위 '음성 클론 관리'에서 먼저 샘플을 추가하세요.")
+        return None
+
+    # 기본 음성 확인
+    default_voice = st.session_state.get("default_voice_sample")
+    default_index = 0
+
+    sample_options = ["없음 (기본 음성)"] + [s['name'] for s in samples]
+    sample_paths = {s['name']: s['path'] for s in samples}
+
+    if default_voice:
+        for i, s in enumerate(samples):
+            if s['path'] == default_voice:
+                default_index = i + 1
+                break
+
+    selected_name = st.selectbox(
+        "참조 음성",
+        options=sample_options,
+        index=default_index,
+        key="ref_voice_select"
+    )
+
+    if selected_name and selected_name != "없음 (기본 음성)":
+        selected_path = sample_paths.get(selected_name)
+
+        if selected_path:
+            # 미리듣기
+            st.audio(selected_path)
+            st.session_state["selected_reference_voice"] = selected_path
+            return selected_path
+
+    return None
+
+
+# ============================================================
 # Chatterbox 탭
 # ============================================================
 
@@ -627,6 +965,14 @@ def render_chatterbox_tab():
                             st.rerun()
                     except Exception as e:
                         st.error(f"로드 실패: {e}")
+
+    st.markdown("---")
+
+    # =========================================================
+    # 🎭 음성 클론 관리 (핵심 기능!)
+    # =========================================================
+    with st.expander("🎭 음성 클론 관리", expanded=True):
+        render_voice_clone_manager()
 
     st.markdown("---")
 
@@ -716,25 +1062,8 @@ def render_chatterbox_tab():
 
     st.markdown("---")
 
-    # === 참조 음성 선택 ===
-    st.markdown("#### 🎤 참조 음성 선택")
-
-    voice_files = get_voice_files()
-    if voice_files:
-        selected_voice = st.selectbox(
-            "참조 음성",
-            options=["없음 (기본 음성)"] + voice_files,
-            key="chatter_voice_select"
-        )
-
-        if selected_voice != "없음 (기본 음성)":
-            voice_path = str(Path("voice_library/ko") / selected_voice)
-            st.audio(voice_path)
-        else:
-            voice_path = None
-    else:
-        voice_path = None
-        st.info("voice_library/ko 폴더에 음성 파일을 추가하세요")
+    # === 참조 음성 선택 (개선된 버전) ===
+    voice_path = render_reference_voice_selector()
 
     st.markdown("---")
 

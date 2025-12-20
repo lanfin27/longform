@@ -1,25 +1,11 @@
 {
   "1": {
-    "success": true,
-    "scene_id": 1,
-    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_001_1766062653972.png",
-    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_001_1766062653972.png",
-    "prompt": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Exterior of the Saudi Arabian consulate in Istanbul, overcast weather, black and white photo of Jamal Khashoggi, 2018 news flash screen, 사우디아라비아 총영사관, 자말 카슈끄지 사진, 뉴스 보도 화면, 비극적, 암울함 atmosphere, 전경에서 시작하여 자말 카슈끄지 사진 클로즈업, background environment scene, empty scene, no people, no main character in foreground, high quality",
-    "original_scene_prompt": "Exterior of the Saudi Arabian consulate in Istanbul, overcast weather, black and white photo of Jamal Khashoggi, 2018 news flash screen",
-    "is_background": true,
-    "include_extras": false,
-    "generation_time": 20.374900102615356
+    "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_001_1766245320411.png",
+    "url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_001_1766245320411.png"
   },
   "2": {
-    "success": true,
-    "scene_id": 2,
-    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_002_1766062662499.png",
-    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_002_1766062662499.png",
-    "prompt": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Close-up portrait of Mohammed bin Salman, international news headlines criticizing him, silhouettes of Saudi Arabian people, 무함마드 빈 살만 왕세자 사진, 국제 사회 비판, 침묵하는 사우디 사람들, 긴장감, 억압적 atmosphere, 무함마드 빈 살만 왕세자 사진 클로즈업, 실루엣으로 전환, background environment scene, empty scene, no people, no main character in foreground, high quality",
-    "original_scene_prompt": "Close-up portrait of Mohammed bin Salman, international news headlines criticizing him, silhouettes of Saudi Arabian people",
-    "is_background": true,
-    "include_extras": false,
-    "generation_time": 2.5275022983551025
+    "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_002_1766245338004.png",
+    "url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\backgrounds\\bg_scene_002_1766245338004.png"
   },
   "3": {
     "success": true,

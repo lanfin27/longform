@@ -169,7 +169,7 @@ def render_search_form():
 
 def render_metrics(result: TrendAnalysisResult):
     """주요 지표 렌더링"""
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         st.metric(
@@ -191,6 +191,15 @@ def render_metrics(result: TrendAnalysisResult):
         )
 
     with col4:
+        # 키워드 관련 채널 수
+        relevant_count = len([c for c in result.new_channels if c.keyword_relevant])
+        st.metric(
+            "🎯 키워드 관련",
+            f"{relevant_count}개",
+            help="채널명/설명에 키워드가 포함된 채널"
+        )
+
+    with col5:
         # 진입 강도 계산
         monthly_avg = result.new_channels_count / result.period_months if result.period_months > 0 else 0
         if monthly_avg >= 5:
@@ -262,35 +271,80 @@ def render_channel_list(result: TrendAnalysisResult):
         st.info("발견된 신규 채널이 없습니다.")
         return
 
-    # 정렬 옵션
-    sort_option = st.selectbox(
-        "정렬 기준",
-        options=["created_at", "subscribers", "avg_views", "efficiency"],
-        format_func=lambda x: {
-            "created_at": "📅 최신순",
-            "subscribers": "👥 구독자순",
-            "avg_views": "👁️ 평균조회수순",
-            "efficiency": "📈 성장효율순"
-        }.get(x)
-    )
+    # 관련 채널과 기타 채널 분리
+    relevant_channels = [c for c in result.new_channels if c.keyword_relevant]
+    other_channels = [c for c in result.new_channels if not c.keyword_relevant]
+
+    # 필터 및 정렬 옵션
+    col1, col2 = st.columns(2)
+
+    with col1:
+        filter_option = st.selectbox(
+            "표시 필터",
+            options=["all", "relevant", "other"],
+            format_func=lambda x: {
+                "all": f"🔎 전체 ({len(result.new_channels)}개)",
+                "relevant": f"🎯 키워드 관련 ({len(relevant_channels)}개)",
+                "other": f"📋 기타 ({len(other_channels)}개)"
+            }.get(x)
+        )
+
+    with col2:
+        sort_option = st.selectbox(
+            "정렬 기준",
+            options=["relevance", "created_at", "subscribers", "avg_views", "efficiency"],
+            format_func=lambda x: {
+                "relevance": "🎯 관련성순",
+                "created_at": "📅 최신순",
+                "subscribers": "👥 구독자순",
+                "avg_views": "👁️ 평균조회수순",
+                "efficiency": "📈 성장효율순"
+            }.get(x)
+        )
+
+    # 필터링
+    if filter_option == "relevant":
+        channels = relevant_channels.copy()
+    elif filter_option == "other":
+        channels = other_channels.copy()
+    else:
+        channels = result.new_channels.copy()
 
     # 정렬
-    channels = result.new_channels.copy()
-    if sort_option == "subscribers":
+    if sort_option == "relevance":
+        channels.sort(key=lambda x: (-x.relevance_score, -x.subscribers))
+    elif sort_option == "subscribers":
         channels.sort(key=lambda x: x.subscribers, reverse=True)
     elif sort_option == "avg_views":
         channels.sort(key=lambda x: x.avg_views_per_video, reverse=True)
     elif sort_option == "efficiency":
         channels.sort(key=lambda x: x.subscribers_per_video, reverse=True)
+    elif sort_option == "created_at":
+        channels.sort(key=lambda x: x.created_at_dt, reverse=True)
+
+    if not channels:
+        st.info("해당 조건에 맞는 채널이 없습니다.")
+        return
 
     # 채널 카드 표시
     for i, channel in enumerate(channels[:20]):  # 최대 20개
         with st.container():
-            col1, col2, col3, col4, col5 = st.columns([3, 1, 1, 1, 1])
+            col1, col2, col3, col4, col5, col6 = st.columns([3, 1, 1, 1, 1, 1])
 
             with col1:
-                st.markdown(f"**[{channel.title}]({channel.channel_url})**")
+                # 관련성 배지 + 채널명
+                relevance_badge = ""
+                if channel.keyword_relevant:
+                    relevance_badge = "🎯 "
+                elif channel.relevance_score > 0:
+                    relevance_badge = "🔸 "
+
+                st.markdown(f"**{relevance_badge}[{channel.title}]({channel.channel_url})**")
                 st.caption(f"📅 {channel.created_at} 생성 ({channel.days_since_creation}일 전)")
+
+                # 관련성 이유 표시 (있으면)
+                if channel.relevance_reason and channel.relevance_reason != "관련성 낮음":
+                    st.caption(f"💡 {channel.relevance_reason}")
 
             with col2:
                 st.metric("구독자", f"{channel.subscribers:,}")
@@ -302,6 +356,17 @@ def render_channel_list(result: TrendAnalysisResult):
                 st.metric("평균조회", f"{channel.avg_views_per_video:,.0f}")
 
             with col5:
+                # 관련성 점수
+                score = channel.relevance_score
+                if score >= 5:
+                    score_display = f"🟢 {score}/10"
+                elif score >= 3:
+                    score_display = f"🟡 {score}/10"
+                else:
+                    score_display = f"⚪ {score}/10"
+                st.markdown(f"**관련성**\n{score_display}")
+
+            with col6:
                 # 성장 배지
                 badge_color = {
                     "🚀 급성장": "🟢",
@@ -309,7 +374,7 @@ def render_channel_list(result: TrendAnalysisResult):
                     "➡️ 보통": "🟡",
                     "📉 저조": "🔴"
                 }.get(channel.growth_rate, "⚪")
-                st.markdown(f"{badge_color} {channel.growth_rate}")
+                st.markdown(f"**성장**\n{badge_color} {channel.growth_rate}")
 
             st.divider()
 
@@ -372,7 +437,10 @@ def render_download(result: TrendAnalysisResult):
             "총 조회수": ch.view_count,
             "평균 조회수": round(ch.avg_views_per_video),
             "영상당 구독자": round(ch.subscribers_per_video, 1),
-            "성장 등급": ch.growth_rate
+            "성장 등급": ch.growth_rate,
+            "관련성 점수": ch.relevance_score,
+            "키워드 관련": "O" if ch.keyword_relevant else "",
+            "관련성 이유": ch.relevance_reason
         }
         for ch in result.new_channels
     ])
@@ -484,6 +552,20 @@ def main():
         최근 {result.period_months}개월간 총 {result.total_videos_searched:,}개의 영상을 분석하여
         **{result.new_channels_count}개의 신규 채널**을 발견했습니다.
         """)
+
+        # 키워드 관련성 분석에 사용된 변형 표시
+        with st.expander("🔍 관련성 분석에 사용된 키워드 변형", expanded=False):
+            # 분석기에서 키워드 변형 가져오기
+            try:
+                from core.youtube.channel_trend_analyzer import ChannelTrendAnalyzer
+                temp_analyzer = ChannelTrendAnalyzer.__new__(ChannelTrendAnalyzer)
+                variants = temp_analyzer._get_keyword_variants(result.keyword)
+                st.caption(f"'{result.keyword}' 검색 시 다음 키워드들이 관련성 판단에 사용됩니다:")
+                st.code(", ".join(variants[:20]))  # 상위 20개만 표시
+                if len(variants) > 20:
+                    st.caption(f"... 외 {len(variants) - 20}개 더")
+            except:
+                st.caption("키워드 변형 정보를 가져올 수 없습니다.")
 
         # 지표
         render_metrics(result)

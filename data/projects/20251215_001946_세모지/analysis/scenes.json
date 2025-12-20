@@ -1,143 +1,166 @@
 [
   {
     "scene_id": 1,
-    "script_text": "2018년 언론인 자말 카슈크지가 튜르키의 이스탄불의 사우디아라비아 총영사관에서 살해되었습니다. 그는 사우디 왕세자 무한마드 빈살만을 비판하던 기자였는데요.",
-    "duration_estimate": 12,
-    "direction_guide": "사우디아라비아 총영사관 외부 전경을 보여주고, 자말 카슈끄지의 사진을 띄운다. 2018년 당시 뉴스 보도 화면을 짧게 삽입한다.",
-    "visual_elements": [
-      "사우디아라비아 총영사관",
-      "자말 카슈끄지 사진",
-      "뉴스 보도 화면"
-    ],
+    "script_text": "2018년 언론인 자말 카슈크지가 튜르키의 이스탄불의 사우디아라비아 총영사관에서 살해되었습니다.",
+    "char_count": 53,
+    "duration_estimate": 5,
     "characters": [
       "자말 카슈끄지"
     ],
-    "camera_suggestion": "전경에서 시작하여 자말 카슈끄지 사진 클로즈업",
-    "mood": "비극적, 암울함",
-    "image_prompt_ko": "사우디아라비아 이스탄불 총영사관 외부, 흐린 날씨, 자말 카슈끄지 흑백 사진, 2018년 뉴스 속보 화면",
-    "image_prompt_en": "Exterior of the Saudi Arabian consulate in Istanbul, overcast weather, black and white photo of Jamal Khashoggi, 2018 news flash screen"
+    "visual_elements": [
+      "사우디아라비아 총영사관"
+    ],
+    "mood": "비극적인",
+    "direction_guide": "총영사관 건물 외경을 보여준다.",
+    "camera_suggestion": "정적인 앵글",
+    "image_prompt_ko": "튀르키예 이스탄불에 위치한 사우디아라비아 총영사관의 외부 모습. 흐린 날씨, 어두운 분위기.",
+    "image_prompt_en": "Exterior of the Saudi Arabian consulate in Istanbul, Turkey. Overcast day, somber atmosphere, no characters, no people.",
+    "character_prompt_ko": "사우디아라비아 언론인 자말 카슈끄지, 슬픈 표정.",
+    "character_prompt_en": "Jamal Khashoggi, Saudi Arabian journalist, sad expression, white background",
+    "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+    "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
   },
   {
     "scene_id": 2,
-    "script_text": "튜르키의 정부와 국제 사회에서는 이 사건의 배우로 사우디의 왕세자 무한마드 빈살만을 지목했지만 정작 사우디 안에서는 그 누구도 왕세자를 향해 질문조차 던질 수 없었습니다.",
-    "duration_estimate": 10,
-    "direction_guide": "무함마드 빈 살만 왕세자의 사진을 보여주고, 그를 비판하는 국제 사회의 반응 (뉴스 헤드라인, 시위 장면)을 짧게 보여준다. 사우디아라비아 내부에서 침묵하는 사람들의 모습을 실루엣으로 표현한다.",
-    "visual_elements": [
-      "무함마드 빈 살만 왕세자 사진",
-      "국제 사회 비판",
-      "침묵하는 사우디 사람들"
-    ],
+    "script_text": "그는 사우디 왕세자 무함마드 빈 살만을 비판하던 기자였는데요. 튜르키의 정부와 국제 사회에서는 이 사건의 배우로 사우디의 왕세자 무함마드 빈 살만을 지목했지만 정작 사우디 안에서는 그 누구도 왕세자를 향해 질문조차 던질 수 없었습니다.",
+    "char_count": 131,
+    "duration_estimate": 18,
     "characters": [
+      "자말 카슈끄지",
       "무함마드 빈 살만"
     ],
-    "camera_suggestion": "무함마드 빈 살만 왕세자 사진 클로즈업, 실루엣으로 전환",
-    "mood": "긴장감, 억압적",
-    "image_prompt_ko": "무함마드 빈 살만 왕세자 정면 사진, 국제 뉴스 헤드라인, 사우디아라비아 사람들 실루엣",
-    "image_prompt_en": "Close-up portrait of Mohammed bin Salman, international news headlines criticizing him, silhouettes of Saudi Arabian people"
+    "visual_elements": [
+      "뉴스 스튜디오",
+      "사우디 왕세자 사진"
+    ],
+    "mood": "심각한",
+    "direction_guide": "뉴스 보도 화면, 왕세자 사진 클로즈업",
+    "camera_suggestion": "줌인, 줌아웃",
+    "image_prompt_ko": "뉴스 스튜디오 배경, 국제 뉴스 속보 분위기, 어두운 조명.",
+    "image_prompt_en": "News studio background, international news breaking, dark lighting, no characters, no people.",
+    "character_prompt_ko": "사우디 왕세자 무함마드 빈 살만, 심각한 표정.",
+    "character_prompt_en": "Saudi Crown Prince Mohammed bin Salman, serious expression, white background",
+    "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+    "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
   },
   {
     "scene_id": 3,
-    "script_text": "법과 인권 언론의 자유보다 왕의 권력이 절대적으로 강하다는 것을 전 세계에 보여준 사건이죠. 뿐만 아니라 사우디아라비아를 대표하는 석유 회사 아람코는 사실상 왕가의 재산으로 취급됩니다.",
-    "duration_estimate": 13,
-    "direction_guide": "법, 인권, 언론의 자유를 상징하는 아이콘을 보여주고, 왕관이 이들을 짓누르는 모습을 표현한다. 아람코 로고와 유전 이미지를 보여준다.",
-    "visual_elements": [
-      "법 아이콘",
-      "인권 아이콘",
-      "언론 자유 아이콘",
-      "왕관",
-      "아람코 로고",
-      "유전"
-    ],
+    "script_text": "법과 인권 언론의 자유보다 왕의 권력이 절대적으로 강하다는 것을 전 세계에 보여준 사건이죠.",
+    "char_count": 51,
+    "duration_estimate": 5,
     "characters": [],
-    "camera_suggestion": "아이콘에서 왕관으로 시점 이동, 아람코 로고와 유전 교차 편집",
-    "mood": "억압적, 불평등",
-    "image_prompt_ko": "법, 인권, 언론 자유 아이콘, 왕관이 짓누르는 모습, 아람코 로고, 사우디아라비아 유전",
-    "image_prompt_en": "Icons representing law, human rights, and freedom of the press, a crown crushing the icons, Aramco logo, Saudi Arabian oil field"
+    "visual_elements": [
+      "법전",
+      "인권",
+      "언론 자유 상징"
+    ],
+    "mood": "비판적인",
+    "direction_guide": "법전, 인권, 언론 자유 상징 이미지 나열",
+    "camera_suggestion": "고정 앵글",
+    "image_prompt_ko": "법전, 인권, 언론 자유를 상징하는 이미지. 어두운 배경.",
+    "image_prompt_en": "Images symbolizing law, human rights, and freedom of the press. Dark background, no characters, no people.",
+    "character_prompt_ko": "없음",
+    "character_prompt_en": "No character, white background",
+    "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+    "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
   },
   {
     "scene_id": 4,
-    "script_text": "구강과 왕세자가 이 회사의 이익을 직접 통제하며 정치뿐 아니라 경제마저 왕가 중심으로 운영되고 있죠.",
-    "duration_estimate": 8,
-    "direction_guide": "사우디 왕가의 초상화 또는 상징적인 이미지를 보여주고, 돈이 왕가로 흘러 들어가는 모습을 시각적으로 표현한다.",
-    "visual_elements": [
-      "사우디 왕가",
-      "돈",
-      "왕관"
-    ],
+    "script_text": "뿐만 아니라 사우디아라비아를 대표하는 석유 회사 아람코는 사실상 왕가의 재산으로 취급됩니다. 구강과 왕세자가 이 회사의 이익을 직접 통제하며 정치뿐 아니라 경제마저 왕가 중심으로 운영되고 있죠.",
+    "char_count": 108,
+    "duration_estimate": 13,
     "characters": [],
-    "camera_suggestion": "사우디 왕가 이미지에서 돈이 흘러 들어가는 모습으로 시점 이동",
-    "mood": "권위적, 부패",
-    "image_prompt_ko": "사우디 왕가 초상화, 돈이 왕관으로 흘러 들어가는 모습",
-    "image_prompt_en": "Portraits of the Saudi royal family, money flowing towards a crown"
+    "visual_elements": [
+      "아람코 로고",
+      "석유 시추 시설"
+    ],
+    "mood": "설명적인",
+    "direction_guide": "아람코 로고, 석유 시추 시설 이미지 교차 편집",
+    "camera_suggestion": "패닝",
+    "image_prompt_ko": "사우디 아람코 로고, 석유 시추 시설, 사막 배경.",
+    "image_prompt_en": "Saudi Aramco logo, oil drilling facilities, desert background, no characters, no people.",
+    "character_prompt_ko": "없음",
+    "character_prompt_en": "No character, white background",
+    "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+    "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
   },
   {
     "scene_id": 5,
-    "script_text": "그렇다면 오랜 세월이 흐르는 동안 어떻게 사우디의 절대 군주 체제는 더 강력해졌을까요? 놀랍게도 이 나라를 이끄는 왕가의 절대적 권위는 1400년 전 예언자의 가르침에 기반합니다.",
-    "duration_estimate": 12,
-    "direction_guide": "사우디아라비아 지도에서 시간이 흐르는 효과를 보여주고, 고대 아라비아의 모습과 예언자 무함마드의 이미지를 보여준다.",
+    "script_text": "그렇다면 오랜 세월이 흐르는 동안 어떻게 사우디의 절대 군주 체제는 더 강력해졌을까요?",
+    "char_count": 48,
+    "duration_estimate": 5,
+    "characters": [],
     "visual_elements": [
-      "사우디아라비아 지도",
-      "시간 흐름 효과",
-      "고대 아라비아",
-      "예언자 무함마드"
+      "사우디 왕가 상징"
     ],
-    "characters": [
-      "예언자 무함마드"
-    ],
-    "camera_suggestion": "사우디아라비아 지도에서 고대 아라비아로 시점 이동, 예언자 무함마드 클로즈업",
-    "mood": "역사적, 종교적",
-    "image_prompt_ko": "사우디아라비아 지도, 시간 흐름 효과, 고대 아라비아 풍경, 예언자 무함마드 초상화",
-    "image_prompt_en": "Map of Saudi Arabia, time-lapse effect, ancient Arabian landscape, portrait of Prophet Muhammad"
+    "mood": "궁금증 유발",
+    "direction_guide": "사우디 왕가 상징 이미지 강조",
+    "camera_suggestion": "줌인",
+    "image_prompt_ko": "사우디 왕가를 상징하는 문양, 금색 배경.",
+    "image_prompt_en": "Symbol representing the Saudi royal family, gold background, no characters, no people.",
+    "character_prompt_ko": "없음",
+    "character_prompt_en": "No character, white background",
+    "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+    "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
   },
   {
     "scene_id": 6,
-    "script_text": "사우디아라비아를 비롯한 중동의 국가들은 여전히 종교가 굉장히 중요한 사회적 가치를 가지고 있습니다. 이들의 권력 기반이 여전히 이슬람 성지의 수호자라고 하는 종교적 권위에 있다는 것도 과언이 아닙니다.",
-    "duration_estimate": 13,
-    "direction_guide": "메카와 메디나의 이미지를 보여주고, 이슬람 사원의 웅장한 모습을 강조한다. 종교 지도자의 모습을 보여준다.",
-    "visual_elements": [
-      "메카",
-      "메디나",
-      "이슬람 사원",
-      "종교 지도자"
-    ],
+    "script_text": "놀랍게도 이 나라를 이끄는 왕가의 절대적 권위는 1400년 전 예언자의 가르침에 기반합니다.",
+    "char_count": 51,
+    "duration_estimate": 5,
     "characters": [],
-    "camera_suggestion": "메카와 메디나 전경, 이슬람 사원 내부, 종교 지도자 상반신",
-    "mood": "종교적, 숭고함",
-    "image_prompt_ko": "메카 전경, 메디나 전경, 이슬람 사원 내부, 종교 지도자",
-    "image_prompt_en": "Panoramic view of Mecca, panoramic view of Medina, interior of an Islamic mosque, religious leader"
+    "visual_elements": [
+      "이슬람 경전",
+      "예언자 초상화 (간접적)"
+    ],
+    "mood": "신비로운",
+    "direction_guide": "이슬람 경전, 예언자 초상화 (간접적) 이미지",
+    "camera_suggestion": "틸트 업",
+    "image_prompt_ko": "오래된 이슬람 경전, 고풍스러운 분위기.",
+    "image_prompt_en": "Ancient Islamic scripture, antique atmosphere, no characters, no people.",
+    "character_prompt_ko": "없음",
+    "character_prompt_en": "No character, white background",
+    "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+    "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
   },
   {
     "scene_id": 7,
-    "script_text": "오랜 세월이 흐르는 동안 어떻게 이 국가들은 절대군주 체제를 유지할 수 있었을까요? 일부에서 우리는 인류 최초의 리더가 신체적 능력과 지혜로 권력을 획득했던 족장이었음을 보았습니다.",
-    "duration_estimate": 15,
-    "direction_guide": "시간이 흐르는 추상적인 이미지를 보여주고, 고대 부족 사회의 족장 이미지를 보여준다.",
+    "script_text": "사우디아라비아를 비롯한 중동의 국가들은 여전히 종교가 굉장히 중요한 사회적 가치를 가지고 있습니다. 이들의 권력 기반이 여전히 이슬람 성지의 수호자라고 하는 종교적 권위에 있다는 것도 과언이 아닙니다.",
+    "char_count": 112,
+    "duration_estimate": 12,
+    "characters": [],
     "visual_elements": [
-      "시간 흐름",
-      "고대 부족 사회",
-      "족장"
+      "메카",
+      "메디나"
     ],
-    "characters": [
-      "족장"
-    ],
-    "camera_suggestion": "시간 흐름 이미지에서 족장으로 시점 이동",
-    "mood": "역사적, 원시적",
-    "image_prompt_ko": "시간 흐름 추상적 이미지, 고대 부족 사회 풍경, 족장",
-    "image_prompt_en": "Abstract image of the passage of time, ancient tribal society landscape, tribal chief"
+    "mood": "종교적인",
+    "direction_guide": "메카, 메디나 이미지 교차 편집",
+    "camera_suggestion": "와이드 앵글",
+    "image_prompt_ko": "메카, 메디나 성지, 맑은 하늘.",
+    "image_prompt_en": "Holy cities of Mecca and Medina, clear sky, no characters, no people.",
+    "character_prompt_ko": "없음",
+    "character_prompt_en": "No character, white background",
+    "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+    "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
   },
   {
     "scene_id": 8,
-    "script_text": "하지만 시간이 흐르면서 권력의 원천은 힘을 넘어선 곳에서 찾기 시작했습니다.",
-    "duration_estimate": 7,
-    "direction_guide": "권력의 상징이 힘에서 종교, 전통 등으로 변화하는 모습을 추상적으로 표현한다.",
-    "visual_elements": [
-      "권력 상징",
-      "종교 상징",
-      "전통 상징"
-    ],
+    "script_text": "오랜 세월이 흐르는 동안 어떻게 이 국가들은 절대군주 체제를 유지할 수 있었을까요? 일부에서 우리는 인류 최초의 리더가 신체적 능력과 지혜로 권력을 획득했던 족장이었음을 보았습니다. 하지만 시간이 흐르면서 권력의 원천은 힘을 넘어선 곳에서 찾기 시작했습니다.",
+    "char_count": 144,
+    "duration_estimate": 18,
     "characters": [],
-    "camera_suggestion": "권력 상징에서 종교, 전통 상징으로 시점 이동",
-    "mood": "변화, 추상적",
-    "image_prompt_ko": "권력 상징, 종교 상징, 전통 상징",
-    "image_prompt_en": "Symbols of power, symbols of religion, symbols of tradition"
+    "visual_elements": [
+      "고대 족장",
+      "권력 상징"
+    ],
+    "mood": "역사적인",
+    "direction_guide": "고대 족장, 권력 상징 이미지",
+    "camera_suggestion": "줌 아웃",
+    "image_prompt_ko": "고대 족장의 모습, 권력을 상징하는 물건들.",
+    "image_prompt_en": "Image of an ancient tribal chief, objects symbolizing power, no characters, no people.",
+    "character_prompt_ko": "없음",
+    "character_prompt_en": "No character, white background",
+    "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+    "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
   }
 ]

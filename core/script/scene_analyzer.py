@@ -355,7 +355,9 @@ JSON 형식으로만 응답해주세요. 다른 텍스트는 포함하지 마세
         """
         씬 배열 정규화
 
-        씬 내부의 characters 필드도 처리
+        - 씬 내부의 characters 필드 처리
+        - 비디오 프롬프트 기본값 생성
+        - 글자 수 검증 로그
         """
         if not raw_scenes:
             return []
@@ -381,9 +383,70 @@ JSON 형식으로만 응답해주세요. 다른 텍스트는 포함하지 마세
                         for c in scene_characters
                     ]
 
+            # === 비디오 프롬프트 정규화 ===
+            # video_prompt_character가 없거나 N/A면 기본값 생성
+            video_char = scene.get("video_prompt_character", "")
+            if not video_char or video_char == "N/A":
+                scene["video_prompt_character"] = self._generate_default_video_prompt_character(scene)
+                debug_log(f"  씬 {scene.get('scene_id', '?')}: video_prompt_character 자동 생성")
+
+            # video_prompt_full이 없거나 N/A면 기본값 생성
+            video_full = scene.get("video_prompt_full", "")
+            if not video_full or video_full == "N/A":
+                scene["video_prompt_full"] = self._generate_default_video_prompt_full(scene)
+                debug_log(f"  씬 {scene.get('scene_id', '?')}: video_prompt_full 자동 생성")
+
+            # === 글자 수 검증 ===
+            script_text = scene.get("script_text", "")
+            char_count = len(script_text)
+            scene["char_count"] = char_count  # 글자 수 필드 추가
+
+            if char_count > 250:
+                debug_log(f"  ⚠️ 씬 {scene.get('scene_id', '?')}: 글자 수 {char_count}자 (권장 250자 초과)")
+
             normalized.append(scene)
 
         return normalized
+
+    def _generate_default_video_prompt_character(self, scene: dict) -> str:
+        """기본 캐릭터 비디오 프롬프트 생성"""
+        mood = scene.get("mood", "neutral")
+
+        mood_prompts = {
+            "긴장감": "Serious expression, intense eye contact, measured breathing, subtle tension in facial muscles, mouth moving naturally while speaking",
+            "긴장": "Serious expression, intense eye contact, measured breathing, subtle tension in facial muscles, mouth moving naturally while speaking",
+            "슬픔": "Sorrowful expression, eyes glistening, slight trembling of lips, looking down occasionally, speaking softly",
+            "분노": "Angry expression, furrowed brows, tight jaw, intense gaze, controlled breathing, emphatic speech",
+            "기쁨": "Happy expression, warm smile, bright eyes, relaxed facial muscles, enthusiastic speaking",
+            "진지함": "Serious focused expression, thoughtful eye movements, measured speaking pace, subtle nods",
+            "설명적": "Engaged expression, eyebrows moving expressively, clear articulation, occasional hand gestures",
+            "역사적": "Dignified expression, steady gaze, measured speaking, scholarly demeanor",
+            "비판적": "Critical expression, raised eyebrow, intense gaze, deliberate speaking pace",
+            "억압적": "Stern expression, tight-lipped, cold gaze, authoritative tone",
+            "권위적": "Authoritative expression, confident posture, commanding voice, powerful presence"
+        }
+
+        return mood_prompts.get(mood, "Calm expression, natural eye blinks, subtle head movements, mouth moving naturally while speaking")
+
+    def _generate_default_video_prompt_full(self, scene: dict) -> str:
+        """기본 전체 비디오 프롬프트 생성"""
+        camera = scene.get("camera_suggestion", "medium shot")
+        mood = scene.get("mood", "neutral")
+
+        # 카메라 움직임 매핑
+        camera_motion = "steady shot"
+        if "줌인" in camera or "zoom in" in camera.lower():
+            camera_motion = "camera slowly zooms in"
+        elif "줌아웃" in camera or "zoom out" in camera.lower():
+            camera_motion = "camera slowly zooms out"
+        elif "패닝" in camera or "pan" in camera.lower():
+            camera_motion = "camera pans across the scene"
+        elif "전환" in camera:
+            camera_motion = "smooth transition"
+        else:
+            camera_motion = "camera holds steady with subtle movement"
+
+        return f"{camera_motion}, character speaking with natural gestures, subtle background movement, atmospheric lighting matching {mood} mood"
 
     def _ensure_visual_prompts(self, characters: list, script: str = "") -> list:
         """

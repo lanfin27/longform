@@ -2,34 +2,35 @@
   {
     "scene_id": 1,
     "filename": "scene_001.png",
-    "script_text": "2018년 언론인 자말 카슈크지가 튜르키의 이스탄불의 사우디아라비아 총영사관에서 살해되었습니다. 그는 사우디 왕세자 무한마드 빈살만을 비판하던 기자였는데요.",
+    "script_text": "2018년 언론인 자말 카슈크지가 튜르키의 이스탄불의 사우디아라비아 총영사관에서 살해되었습니다.",
     "characters": [
       "자말 카슈끄지"
     ],
-    "direction_guide": "사우디아라비아 총영사관 외부 전경을 보여주고, 자말 카슈끄지의 사진을 띄운다. 2018년 당시 뉴스 보도 화면을 짧게 삽입한다.",
-    "prompt": "animation style, vibrant colors, clean lines, no text, simple background, smooth shading, anime-inspired illustration, Exterior of the Saudi Arabian consulate in Istanbul, overcast weather, black and white photo of Jamal Khashoggi, 2018 news flash screen, single character, Middle Eastern man, late 50s, with a neatly trimmed salt-and-pepper beard, a kind and intelligent face, wearing a dark-colored blazer over a collared shirt, often seen with a pen in his hand, suggesting his profession as a journalist. He has a thoughtful expression and a gentle demeanor. His eyes reflect a deep understanding of the world and a commitment to truth., 비극적, 암울함 mood",
+    "direction_guide": "총영사관 건물 외경을 보여주며 시작",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Exterior of the Saudi Arabian consulate in Istanbul, Turkey, overcast day, no characters, single character, Middle Eastern man, late 50s, with a neatly trimmed salt-and-pepper beard, a kind and intelligent face, wearing a dark-colored blazer over a collared shirt, often seen with a pen in his hand, suggesting his profession as a journalist. He has a thoughtful expression and a gentle demeanor. His eyes reflect a deep understanding of the world and a commitment to truth., 비극적인 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 12
+    "duration_estimate": 5
   },
   {
     "scene_id": 2,
     "filename": "scene_002.png",
-    "script_text": "튜르키의 정부와 국제 사회에서는 이 사건의 배우로 사우디의 왕세자 무한마드 빈살만을 지목했지만 정작 사우디 안에서는 그 누구도 왕세자를 향해 질문조차 던질 수 없었습니다.",
+    "script_text": "그는 사우디 왕세자 무함마드 빈 살만을 비판하던 기자였는데요. 튜르키의 정부와 국제 사회에서는 이 사건의 배우로 사우디의 왕세자 무함마드 빈 살만을 지목했지만 정작 사우디 안에서는 그 누구도 왕세자를 향해 질문조차 던질 수 없었습니다.",
     "characters": [
+      "자말 카슈끄지",
       "무함마드 빈 살만"
     ],
-    "direction_guide": "무함마드 빈 살만 왕세자의 사진을 보여주고, 그를 비판하는 국제 사회의 반응 (뉴스 헤드라인, 시위 장면)을 짧게 보여준다. 사우디아라비아 내부에서 침묵하는 사람들의 모습을 실루엣으로 표현한다.",
-    "prompt": "animation style, vibrant colors, clean lines, no text, simple background, smooth shading, anime-inspired illustration, Close-up portrait of Mohammed bin Salman, international news headlines criticizing him, silhouettes of Saudi Arabian people, single character, Middle Eastern man, early 30s, clean-shaven with a strong jawline. He has dark, intense eyes and a confident expression. He is wearing traditional Saudi Arabian attire, such as a white thobe and a dark bisht. His posture is upright and authoritative. The lighting should be strong and highlight his power and influence. He has a well-groomed appearance, reflecting his status as a crown prince. He may be wearing a luxury watch or other subtle accessories., 긴장감, 억압적 mood",
+    "direction_guide": "뉴스 보도 화면처럼 연출",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, News studio background, serious atmosphere, no characters, multiple characters, Middle Eastern man, late 50s, with a neatly trimmed salt-and-pepper beard, a kind and intelligent face, wearing a dark-colored blazer over a collared shirt, often seen with a pen in his hand, suggesting his profession as a journalist. He has a thoughtful expression and a gentle demeanor. His eyes reflect a deep understanding of the world and a commitment to truth., Middle Eastern man, early 30s, clean-shaven with a strong jawline. He has dark, intense eyes and a confident expression. He is wearing traditional Saudi Arabian attire, such as a white thobe and a dark bisht. His posture is upright and authoritative. The lighting should be strong and highlight his power and influence. He has a well-groomed appearance, reflecting his status as a crown prince. He may be wearing a luxury watch or other subtle accessories., 심각한 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 10
+    "duration_estimate": 17
   },
   {
     "scene_id": 3,
     "filename": "scene_003.png",
     "script_text": "법과 인권 언론의 자유보다 왕의 권력이 절대적으로 강하다는 것을 전 세계에 보여준 사건이죠. 뿐만 아니라 사우디아라비아를 대표하는 석유 회사 아람코는 사실상 왕가의 재산으로 취급됩니다.",
     "characters": [],
-    "direction_guide": "법, 인권, 언론의 자유를 상징하는 아이콘을 보여주고, 왕관이 이들을 짓누르는 모습을 표현한다. 아람코 로고와 유전 이미지를 보여준다.",
-    "prompt": "animation style, vibrant colors, clean lines, no text, simple background, smooth shading, anime-inspired illustration, Icons representing law, human rights, and freedom of the press, a crown crushing the icons, Aramco logo, Saudi Arabian oil field, 억압적, 불평등 mood",
+    "direction_guide": "아람코 건물 보여주기",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Aerial view of Saudi Aramco headquarters, clear day, no characters, 권위적인 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
     "duration_estimate": 13
   },
@@ -38,53 +39,49 @@
     "filename": "scene_004.png",
     "script_text": "구강과 왕세자가 이 회사의 이익을 직접 통제하며 정치뿐 아니라 경제마저 왕가 중심으로 운영되고 있죠.",
     "characters": [],
-    "direction_guide": "사우디 왕가의 초상화 또는 상징적인 이미지를 보여주고, 돈이 왕가로 흘러 들어가는 모습을 시각적으로 표현한다.",
-    "prompt": "animation style, vibrant colors, clean lines, no text, simple background, smooth shading, anime-inspired illustration, Portraits of the Saudi royal family, money flowing towards a crown, 권위적, 부패 mood",
+    "direction_guide": "왕궁 내부 모습 보여주기",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Interior of the Saudi Arabian royal palace, luxurious and grand atmosphere, no characters, 지배적인 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 8
+    "duration_estimate": 6
   },
   {
     "scene_id": 5,
     "filename": "scene_005.png",
-    "script_text": "그렇다면 오랜 세월이 흐르는 동안 어떻게 사우디의 절대 군주 체제는 더 강력해졌을까요? 놀랍게도 이 나라를 이끄는 왕가의 절대적 권위는 1400년 전 예언자의 가르침에 기반합니다.",
-    "characters": [
-      "예언자 무함마드"
-    ],
-    "direction_guide": "사우디아라비아 지도에서 시간이 흐르는 효과를 보여주고, 고대 아라비아의 모습과 예언자 무함마드의 이미지를 보여준다.",
-    "prompt": "animation style, vibrant colors, clean lines, no text, simple background, smooth shading, anime-inspired illustration, Map of Saudi Arabia, time-lapse effect, ancient Arabian landscape, portrait of Prophet Muhammad, single character, Middle Eastern man, 50s, with a long, flowing dark beard, wearing a simple white robe and turban, radiating wisdom and serenity. His eyes are deep and compassionate, reflecting his spiritual leadership. He carries a staff as a symbol of his authority and guidance. His presence evokes a sense of reverence and respect., 역사적, 종교적 mood",
+    "script_text": "그렇다면 오랜 세월이 흐르는 동안 어떻게 사우디의 절대 군주 체제는 더 강력해졌을까요?",
+    "characters": [],
+    "direction_guide": "역사적 사건 나열",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Timeline of Saudi Arabian history, from ancient times to the present, no characters, 궁금증 유발 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 12
+    "duration_estimate": 5
   },
   {
     "scene_id": 6,
     "filename": "scene_006.png",
-    "script_text": "사우디아라비아를 비롯한 중동의 국가들은 여전히 종교가 굉장히 중요한 사회적 가치를 가지고 있습니다. 이들의 권력 기반이 여전히 이슬람 성지의 수호자라고 하는 종교적 권위에 있다는 것도 과언이 아닙니다.",
+    "script_text": "놀랍게도 이 나라를 이끄는 왕가의 절대적 권위는 1400년 전 예언자의 가르침에 기반합니다.",
     "characters": [],
-    "direction_guide": "메카와 메디나의 이미지를 보여주고, 이슬람 사원의 웅장한 모습을 강조한다. 종교 지도자의 모습을 보여준다.",
-    "prompt": "animation style, vibrant colors, clean lines, no text, simple background, smooth shading, anime-inspired illustration, Panoramic view of Mecca, panoramic view of Medina, interior of an Islamic mosque, religious leader, 종교적, 숭고함 mood",
+    "direction_guide": "경전 보여주기",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Ancient Islamic scripture, sacred atmosphere, no characters, 신성한 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 13
+    "duration_estimate": 5
   },
   {
     "scene_id": 7,
     "filename": "scene_007.png",
-    "script_text": "오랜 세월이 흐르는 동안 어떻게 이 국가들은 절대군주 체제를 유지할 수 있었을까요? 일부에서 우리는 인류 최초의 리더가 신체적 능력과 지혜로 권력을 획득했던 족장이었음을 보았습니다.",
-    "characters": [
-      "족장"
-    ],
-    "direction_guide": "시간이 흐르는 추상적인 이미지를 보여주고, 고대 부족 사회의 족장 이미지를 보여준다.",
-    "prompt": "animation style, vibrant colors, clean lines, no text, simple background, smooth shading, anime-inspired illustration, Abstract image of the passage of time, ancient tribal society landscape, tribal chief, single character, A strong and weathered man, late 40s, of indeterminate ethnicity, with a muscular build and a stern face marked by the elements. He wears simple, animal-hide clothing adorned with tribal markings and feathers. He carries a spear or club, symbolizing his authority and protection of his tribe. His eyes reflect wisdom, experience, and a deep connection to the land., 역사적, 원시적 mood",
+    "script_text": "사우디아라비아를 비롯한 중동의 국가들은 여전히 종교가 굉장히 중요한 사회적 가치를 가지고 있습니다. 이들의 권력 기반이 여전히 이슬람 성지의 수호자라고 하는 종교적 권위에 있다는 것도 과언이 아닙니다.",
+    "characters": [],
+    "direction_guide": "메카 성지 보여주기",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Mecca, with many pilgrims gathered, no characters, 종교적인 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 15
+    "duration_estimate": 12
   },
   {
     "scene_id": 8,
     "filename": "scene_008.png",
-    "script_text": "하지만 시간이 흐르면서 권력의 원천은 힘을 넘어선 곳에서 찾기 시작했습니다.",
+    "script_text": "오랜 세월이 흐르는 동안 어떻게이 국가들은 절대군주 체제를 유지할 수 있었을까요? 일부에서 우리는 인류 최초의 리더가 신체적 능력과 지혜로 권력을 획득했던 족장이었음을 보았습니다. 하지만 시간이 흐르면서 권력의 원천은 힘을 넘어선 곳에서 찾기 시작했습니다.",
     "characters": [],
-    "direction_guide": "권력의 상징이 힘에서 종교, 전통 등으로 변화하는 모습을 추상적으로 표현한다.",
-    "prompt": "animation style, vibrant colors, clean lines, no text, simple background, smooth shading, anime-inspired illustration, Symbols of power, symbols of religion, symbols of tradition, 변화, 추상적 mood",
+    "direction_guide": "고대 부족 사회 모습 보여주기",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Scene of an ancient tribal society, with the chieftain leading the tribe, no characters, 역사적인 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 7
+    "duration_estimate": 17
   }
 ]

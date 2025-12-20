@@ -252,33 +252,56 @@ JSON 배열로만 응답해주세요.'''
 
         _debug_log(f"  기본 템플릿 {len(self.templates)}개 로드됨")
 
-        # 저장된 템플릿 덮어쓰기
+        # 저장된 템플릿 로드 (기본 템플릿 덮어쓰기 + 커스텀 템플릿 추가)
         if self.CONFIG_PATH.exists():
             try:
                 with open(self.CONFIG_PATH, "r", encoding="utf-8") as f:
                     saved = json.load(f)
 
+                _debug_log(f"  JSON 파일에서 {len(saved)}개 항목 발견")
+
                 custom_count = 0
                 for key, data in saved.items():
+                    is_default = data.get("is_default", True)
+
+                    # 기존 기본 템플릿 업데이트 또는 새 커스텀 템플릿 추가
                     if key in self.templates:
-                        is_default = data.get("is_default", True)
+                        # 기본 템플릿 덮어쓰기 (수정된 경우)
+                        existing = self.templates[key]
                         self.templates[key] = PromptTemplate(
                             id=key,
-                            name=data.get("name", self.templates[key].name),
-                            category=data.get("category", getattr(self.templates[key], 'category', 'general')),
-                            description=data.get("description", self.templates[key].description),
-                            prompt=data.get("prompt", self.templates[key].prompt),
+                            name=data.get("name", existing.name),
+                            category=data.get("category", getattr(existing, 'category', 'general')),
+                            description=data.get("description", existing.description),
+                            prompt=data.get("prompt", existing.prompt),
                             is_default=is_default,
                             updated_at=data.get("updated_at", "")
                         )
                         if not is_default:
                             custom_count += 1
-                            _debug_log(f"  ✏️ 커스텀 템플릿 로드됨: {key}")
+                            _debug_log(f"  ✏️ 기본 템플릿 수정됨: {key}")
+                    else:
+                        # 🔧 수정: 새 커스텀 템플릿 추가 (기본 템플릿에 없는 것도 로드!)
+                        self.templates[key] = PromptTemplate(
+                            id=key,
+                            name=data.get("name", key),
+                            category=data.get("category", "general"),
+                            description=data.get("description", ""),
+                            prompt=data.get("prompt", ""),
+                            is_default=is_default,
+                            updated_at=data.get("updated_at", "")
+                        )
+                        if not is_default:
+                            custom_count += 1
+                            _debug_log(f"  ✅ 커스텀 템플릿 로드됨: {key} (이름: {data.get('name', key)})")
 
                 _debug_log(f"  저장된 템플릿에서 {custom_count}개 커스텀 로드됨")
+                _debug_log(f"  총 템플릿 수: {len(self.templates)}")
 
             except Exception as e:
                 _debug_log(f"❌ 템플릿 로드 실패: {e}")
+                import traceback
+                _debug_log(f"  상세 오류: {traceback.format_exc()}")
         else:
             _debug_log("  저장된 템플릿 파일 없음 (기본값 사용)")
 

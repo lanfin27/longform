@@ -327,7 +327,7 @@ def post_composite_editor(
         <div class="editor-wrapper">
             <!-- 정보 바 -->
             <div class="info-bar">
-                <span class="hint">캐릭터를 드래그하여 이동 | 모서리를 드래그하여 크기 조정</span>
+                <span class="hint">드래그: 이동 | 모서리: 크기 | <b style="color:#ff6b6b">Delete키: 삭제</b></span>
                 <span class="selected-info" id="selectedInfo_{unique_id}">선택된 캐릭터 없음</span>
             </div>
 
@@ -340,10 +340,14 @@ def post_composite_editor(
             <div class="toolbar">
                 <button class="btn-secondary" onclick="resetAll_{unique_id}()">초기화</button>
                 <button class="btn-secondary" onclick="flipSelected_{unique_id}()">좌우반전</button>
+                <button class="btn-danger" onclick="deleteSelected_{unique_id}()">🗑️ 삭제</button>
                 <button class="btn-secondary" onclick="bringForward_{unique_id}()">앞으로</button>
                 <button class="btn-secondary" onclick="sendBackward_{unique_id}()">뒤로</button>
-                <button class="btn-success" onclick="saveAndApply_{unique_id}()">위치 저장 (재합성용)</button>
+                <button class="btn-success" onclick="saveAndApply_{unique_id}()">💾 위치 저장</button>
             </div>
+
+            <!-- Hidden input for Streamlit sync -->
+            <input type="hidden" id="syncData_{unique_id}" value="" />
         </div>
 
         <script>
@@ -662,6 +666,47 @@ def post_composite_editor(
                     characters[idx].z_index = newZ;
                 }};
 
+                // 🗑️ 캐릭터 삭제 함수
+                window['deleteSelected_{unique_id}'] = function() {{
+                    if (!selectedElement) {{
+                        alert('삭제할 캐릭터를 먼저 선택하세요');
+                        return;
+                    }}
+
+                    const idx = parseInt(selectedElement.dataset.index);
+                    const charName = characters[idx].name || characters[idx].id;
+
+                    if (confirm(`'${{charName}}' 캐릭터를 삭제하시겠습니까?`)) {{
+                        // 배열에서 제거
+                        characters.splice(idx, 1);
+
+                        // DOM에서 제거
+                        selectedElement.remove();
+                        selectElement(null);
+
+                        // 남은 캐릭터 레이어 재생성 (인덱스 업데이트)
+                        createCharacterLayers();
+
+                        // localStorage에도 반영
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(characters));
+
+                        console.log('캐릭터 삭제됨:', charName);
+                    }}
+                }};
+
+                // ⌨️ Delete 키 이벤트 핸들러
+                document.addEventListener('keydown', function(e) {{
+                    if (e.key === 'Delete' || e.key === 'Backspace') {{
+                        // 입력 필드에서는 무시
+                        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+                        if (selectedElement) {{
+                            e.preventDefault();
+                            window['deleteSelected_{unique_id}']();
+                        }}
+                    }}
+                }});
+
                 window['saveAndApply_{unique_id}'] = function() {{
                     const result = characters.map(char => ({{
                         id: char.id,
@@ -672,18 +717,39 @@ def post_composite_editor(
                         width: char.width,
                         height: char.height,
                         z_index: char.z_index,
-                        flip_x: char.flip_x
+                        flip_x: char.flip_x,
+                        // 슬라이더 형식 호환용 scale 추가
+                        scale: char.width / 0.25  // 기본 0.25 대비 배율
                     }}));
 
+                    // localStorage에 저장
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
 
-                    // 콘솔에도 출력 (디버깅용)
-                    console.log('저장된 위치:', result);
+                    // 콘솔에 상세 정보 출력
+                    console.log('[PostEditor] 저장된 위치 데이터:');
+                    result.forEach(r => {{
+                        console.log(`  ${{r.name}}: x=${{(r.x*100).toFixed(1)}}%, y=${{(r.y*100).toFixed(1)}}%, scale=${{r.scale.toFixed(2)}}`);
+                    }});
+
+                    // 🔄 URL 파라미터로 Streamlit에 동기화
+                    try {{
+                        const syncData = btoa(unescape(encodeURIComponent(JSON.stringify(result))));
+                        const params = new URLSearchParams(window.parent.location.search);
+                        params.set('editor_sync_{editor_id}', syncData);
+
+                        // URL 업데이트 (Streamlit이 읽을 수 있도록)
+                        const newUrl = window.parent.location.pathname + '?' + params.toString();
+                        window.parent.history.replaceState({{}}, '', newUrl);
+
+                        console.log('[PostEditor] Streamlit 동기화 완료');
+                    }} catch(e) {{
+                        console.warn('[PostEditor] URL 동기화 실패:', e);
+                    }}
 
                     // 시각적 피드백
                     const btn = event.target;
                     const originalText = btn.textContent;
-                    btn.textContent = '저장됨!';
+                    btn.textContent = '✅ 저장됨!';
                     btn.style.background = '#4CAF50';
                     setTimeout(() => {{
                         btn.textContent = originalText;

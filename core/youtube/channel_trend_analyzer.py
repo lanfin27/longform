@@ -45,6 +45,11 @@ class NewChannel:
     days_since_creation: int = 0
     growth_rate: str = "보통"  # 급성장/보통/저조
 
+    # 키워드 관련성 지표
+    relevance_score: int = 0  # 0-10 점수
+    keyword_relevant: bool = False  # 키워드 직접 포함 여부
+    relevance_reason: str = ""  # 관련성 이유
+
     def calculate_metrics(self):
         """성과 지표 계산"""
         if self.video_count > 0:
@@ -77,7 +82,10 @@ class NewChannel:
             "days_since_creation": self.days_since_creation,
             "growth_rate": self.growth_rate,
             "channel_url": self.channel_url,
-            "thumbnail_url": self.thumbnail_url
+            "thumbnail_url": self.thumbnail_url,
+            "relevance_score": self.relevance_score,
+            "keyword_relevant": self.keyword_relevant,
+            "relevance_reason": self.relevance_reason
         }
 
 
@@ -280,10 +288,14 @@ class ChannelTrendAnalyzer:
             except Exception as e:
                 update_progress(f"채널 조회 오류: {e}")
 
-        # 5. 채널 생성일 필터링 (Step 4) - 핵심!
-        update_progress("신규 채널 필터링 중...")
+        # 5. 채널 생성일 필터링 + 키워드 관련성 계산 (Step 4) - 핵심!
+        update_progress("신규 채널 필터링 및 관련성 분석 중...")
         new_channels: List[NewChannel] = []
         monthly_counter = Counter()
+
+        # 키워드 변형 준비 (관련성 검사용)
+        keyword_lower = keyword.lower()
+        keyword_variants = self._get_keyword_variants(keyword)
 
         for ch in all_channel_data:
             try:
@@ -300,10 +312,13 @@ class ChannelTrendAnalyzer:
                     video_count = int(stats.get('videoCount', 0))
                     view_count = int(stats.get('viewCount', 0))
 
+                    title = ch['snippet']['title']
+                    description = ch['snippet'].get('description', '')
+
                     new_channel = NewChannel(
                         channel_id=ch['id'],
-                        title=ch['snippet']['title'],
-                        description=ch['snippet'].get('description', ''),
+                        title=title,
+                        description=description,
                         created_at=created_at.strftime('%Y-%m-%d'),
                         created_at_dt=created_at,
                         subscribers=subscribers,
@@ -314,6 +329,15 @@ class ChannelTrendAnalyzer:
                     )
 
                     new_channel.calculate_metrics()
+
+                    # ⭐ 키워드 관련성 계산 (핵심!)
+                    relevance_score, is_relevant, reason = self._calculate_keyword_relevance(
+                        title, description, keyword_variants
+                    )
+                    new_channel.relevance_score = relevance_score
+                    new_channel.keyword_relevant = is_relevant
+                    new_channel.relevance_reason = reason
+
                     new_channels.append(new_channel)
 
                     # 월별 카운트
@@ -324,13 +348,16 @@ class ChannelTrendAnalyzer:
                 print(f"[ChannelTrend] 채널 처리 오류: {e}")
                 continue
 
-        # 6. 결과 정렬 (최신순)
-        new_channels.sort(key=lambda x: x.created_at_dt, reverse=True)
+        # 6. 결과 정렬 (관련성 높은 순 → 최신순)
+        # 관련성 점수가 높은 채널이 먼저, 같으면 최신순
+        new_channels.sort(key=lambda x: (-x.relevance_score, -x.created_at_dt.timestamp()))
 
         # 월별 트렌드 정렬
         monthly_trend = dict(sorted(monthly_counter.items()))
 
-        update_progress(f"신규 채널 {len(new_channels)}개 발견")
+        # 관련성 통계 로깅
+        relevant_count = len([c for c in new_channels if c.keyword_relevant])
+        update_progress(f"신규 채널 {len(new_channels)}개 발견 (키워드 관련: {relevant_count}개)")
 
         # 7. 결과 생성
         result = TrendAnalysisResult(
@@ -389,7 +416,10 @@ class ChannelTrendAnalyzer:
                     avg_views_per_video=ch_data.get("avg_views_per_video", 0),
                     subscribers_per_video=ch_data.get("subscribers_per_video", 0),
                     days_since_creation=ch_data.get("days_since_creation", 0),
-                    growth_rate=ch_data.get("growth_rate", "보통")
+                    growth_rate=ch_data.get("growth_rate", "보통"),
+                    relevance_score=ch_data.get("relevance_score", 0),
+                    keyword_relevant=ch_data.get("keyword_relevant", False),
+                    relevance_reason=ch_data.get("relevance_reason", "")
                 )
                 new_channels.append(ch)
             except Exception as e:
@@ -505,6 +535,196 @@ class ChannelTrendAnalyzer:
             insights.append("평균 구독자가 높아 양질의 콘텐츠로 충분히 성장 가능한 분야입니다.")
 
         return " ".join(insights)
+
+    def _get_keyword_variants(self, keyword: str) -> List[str]:
+        """
+        키워드의 다양한 변형 생성 (관련성 검사용)
+
+        예: "브이로그" → ["브이로그", "vlog", "v-log", "일상", "데일리"]
+        예: "일본" → ["일본", "japan", "japanese", "도쿄", "tokyo", ...]
+        """
+        keyword_lower = keyword.lower()
+        variants = [keyword_lower]
+
+        # 한글-영어 매핑 (확장된 버전)
+        korean_english_map = {
+            # === 국가/지역 ===
+            "일본": ["japan", "japanese", "일본", "도쿄", "tokyo", "오사카", "osaka",
+                    "교토", "kyoto", "후쿠오카", "fukuoka", "나고야", "nagoya",
+                    "삿포로", "sapporo", "오키나와", "okinawa", "일드", "j-pop",
+                    "jvlog", "일본여행", "일본생활", "일본일상", "재팬", "니혼"],
+            "japan": ["japan", "japanese", "일본", "tokyo", "osaka", "kyoto"],
+            "한국": ["korea", "korean", "한국", "서울", "seoul", "부산", "busan",
+                    "k-pop", "kpop", "한류", "코리아"],
+            "미국": ["usa", "america", "american", "미국", "뉴욕", "newyork", "la",
+                    "los angeles", "미국생활", "미국일상"],
+            "중국": ["china", "chinese", "중국", "베이징", "beijing", "상하이", "shanghai"],
+            "유럽": ["europe", "european", "유럽", "프랑스", "france", "독일", "germany",
+                    "이탈리아", "italy", "스페인", "spain", "영국", "uk", "london"],
+            "동남아": ["southeast asia", "동남아", "태국", "thailand", "베트남", "vietnam",
+                      "필리핀", "philippines", "인도네시아", "indonesia", "싱가포르", "singapore"],
+
+            # === 콘텐츠 유형 ===
+            "브이로그": ["vlog", "v-log", "v log", "브이로그", "일상", "데일리", "daily",
+                       "일상기록", "일상브이로그", "vlogger", "브이로거"],
+            "vlog": ["vlog", "v-log", "브이로그", "일상", "데일리", "daily", "vlogger"],
+            "먹방": ["mukbang", "eating show", "먹방", "맛집", "음식", "food", "eating",
+                    "foodie", "먹스타그램", "푸드", "맛집탐방", "먹방유튜버"],
+            "리뷰": ["review", "리뷰", "언박싱", "unboxing", "사용기", "후기", "리뷰어"],
+            "게임": ["game", "gaming", "게임", "겜", "플레이", "gameplay", "gamer",
+                    "게이머", "스트리머", "streamer", "실황", "공략"],
+            "쿠킹": ["cooking", "cook", "쿠킹", "요리", "레시피", "recipe", "chef",
+                    "요리사", "쿡방", "요리법", "집밥"],
+            "뷰티": ["beauty", "뷰티", "메이크업", "makeup", "화장", "스킨케어", "skincare",
+                    "cosmetic", "화장품", "뷰티유튜버"],
+            "여행": ["travel", "여행", "트래블", "trip", "투어", "tour", "관광", "tourism",
+                    "여행기", "여행브이로그", "traveler", "해외여행", "국내여행"],
+            "재테크": ["finance", "재테크", "투자", "주식", "부동산", "money", "stock",
+                      "investment", "부업", "경제", "금융"],
+            "운동": ["fitness", "workout", "운동", "헬스", "gym", "다이어트", "diet",
+                    "exercise", "홈트", "홈트레이닝", "피트니스"],
+            "공부": ["study", "공부", "스터디", "공스타그램", "studywithme", "학습",
+                    "수험생", "공부법", "자기계발"],
+            "육아": ["parenting", "육아", "아기", "baby", "키즈", "kids", "child",
+                    "엄마", "아빠", "부모", "유아", "어린이"],
+            "음악": ["music", "음악", "노래", "song", "singing", "cover", "커버",
+                    "뮤직", "musician", "가수"],
+            "패션": ["fashion", "패션", "옷", "outfit", "ootd", "스타일", "style",
+                    "코디", "의류", "패션유튜버"],
+            "테크": ["tech", "technology", "테크", "기술", "it", "gadget", "가젯",
+                    "스마트폰", "전자기기", "리뷰"],
+            "자동차": ["car", "auto", "자동차", "차량", "드라이브", "drive", "vehicle",
+                      "카리뷰", "시승기"],
+            "반려동물": ["pet", "반려동물", "강아지", "dog", "고양이", "cat", "애완동물",
+                       "펫", "동물"],
+        }
+
+        # 정확한 키워드 매칭
+        if keyword_lower in korean_english_map:
+            variants.extend(korean_english_map[keyword_lower])
+
+        # 부분 매칭 (키워드가 더 긴 경우 - 예: "일본여행")
+        for key, values in korean_english_map.items():
+            if key in keyword_lower or keyword_lower in key:
+                variants.extend(values)
+
+        # 중복 제거하고 원본 키워드가 항상 첫 번째가 되도록
+        unique_variants = list(set([v.lower() for v in variants]))
+        if keyword_lower in unique_variants:
+            unique_variants.remove(keyword_lower)
+        return [keyword_lower] + unique_variants
+
+    def _calculate_keyword_relevance(
+        self,
+        title: str,
+        description: str,
+        keyword_variants: List[str]
+    ) -> Tuple[int, bool, str]:
+        """
+        채널의 키워드 관련성 점수 계산
+
+        Returns:
+            Tuple[int, bool, str]: (점수 0-10, 직접관련여부, 관련성 이유)
+        """
+        score = 0
+        reasons = []
+
+        title_lower = title.lower()
+        desc_lower = description.lower() if description else ""
+
+        # 원본 키워드 (첫 번째)
+        main_keyword = keyword_variants[0] if keyword_variants else ""
+
+        # 1. 채널명에 키워드 직접 포함 (가장 중요: 최대 +5점)
+        title_match = False
+        title_matched_keyword = None
+        for variant in keyword_variants:
+            if variant in title_lower:
+                # 메인 키워드 매칭은 +5점, 관련 키워드는 +3점
+                if variant == main_keyword:
+                    score += 5
+                    title_matched_keyword = variant
+                elif not title_match:  # 첫 번째 관련 키워드만
+                    score += 3
+                    title_matched_keyword = variant
+                title_match = True
+                reasons.append(f"채널명에 '{variant}' 포함")
+                break
+
+        # 2. 설명에 키워드 포함 (최대 +3점)
+        desc_matched = []
+        for variant in keyword_variants:
+            if variant in desc_lower and variant not in desc_matched:
+                desc_matched.append(variant)
+
+        if desc_matched:
+            # 메인 키워드가 설명에 있으면 +3점, 관련 키워드는 개당 +1점 (최대 2점)
+            if main_keyword in desc_matched:
+                score += 3
+                reasons.append(f"설명에 '{main_keyword}' 포함")
+            else:
+                score += min(len(desc_matched), 2)
+                reasons.append(f"설명에 관련어 {len(desc_matched)}개 포함")
+
+        # 3. 키워드가 채널 주제인지 판단 (테마 키워드 패턴)
+        theme_keywords = {
+            # 국가/지역 테마
+            "일본": ["일본유튜버", "일본생활", "일본브이로그", "재일교포", "도쿄생활",
+                    "일본먹방", "일본여행", "japan vlog", "일본일상", "in japan",
+                    "japanese", "tokyo life", "일본이민", "일본취업"],
+            "japan": ["japan vlog", "living in japan", "tokyo", "japanese life"],
+            "한국": ["한국유튜버", "korean vlog", "korea life", "seoul", "한국생활"],
+            "미국": ["미국유튜버", "미국생활", "usa vlog", "american life", "la생활"],
+
+            # 콘텐츠 테마
+            "브이로그": ["vlogger", "일상유튜버", "데일리", "daily life", "일상기록"],
+            "vlog": ["vlogger", "daily life", "lifestyle", "day in my life"],
+            "먹방": ["먹방러", "푸드크리에이터", "food creator", "eating show", "mukbanger"],
+            "게임": ["게이머", "gamer", "streamer", "게임유튜버", "gaming channel"],
+            "뷰티": ["뷰티크리에이터", "beauty creator", "makeup artist", "뷰티유튜버"],
+            "여행": ["여행유튜버", "traveler", "travel vlog", "여행크리에이터"],
+            "음악": ["musician", "singer", "cover artist", "음악유튜버"],
+            "요리": ["chef", "cook", "cooking channel", "요리유튜버", "쿡방"],
+        }
+
+        if main_keyword in theme_keywords:
+            for theme in theme_keywords[main_keyword]:
+                theme_lower = theme.lower()
+                if theme_lower in title_lower or theme_lower in desc_lower:
+                    score += 2
+                    reasons.append(f"'{theme}' 테마 발견")
+                    break
+
+        # 4. 전문 채널 패턴 보너스 (+1점)
+        specialty_patterns = ["채널", "channel", "tv", "튜브", "tube", "유튜버", "youtuber", "크리에이터", "creator"]
+        for pattern in specialty_patterns:
+            if pattern in title_lower:
+                # 키워드 + 채널명 패턴 (예: "일본채널", "japan tv")
+                for variant in keyword_variants[:5]:  # 상위 5개 변형만 확인
+                    if variant in title_lower:
+                        score += 1
+                        reasons.append(f"전문채널 패턴")
+                        break
+                break
+
+        # 5. 관련 없는 패턴 감점 (스팸, 자동생성 등)
+        spam_patterns = ["shorts", "쇼츠", "클립", "clip", "highlight", "하이라이트", "best moments"]
+        if title_match is False:  # 채널명에 키워드 없는 경우만 감점
+            for pattern in spam_patterns:
+                if pattern in title_lower:
+                    score = max(0, score - 1)
+                    reasons.append(f"'{pattern}' 패턴 감점")
+                    break
+
+        # 6. 최종 점수 정규화 (0-10)
+        final_score = min(10, max(0, score))
+
+        # 키워드 직접 관련 여부 (채널명에 포함되거나 점수 4 이상)
+        is_relevant = title_match or final_score >= 4
+
+        reason_str = ", ".join(reasons) if reasons else "관련성 낮음"
+
+        return final_score, is_relevant, reason_str
 
 
 # 팩토리 함수

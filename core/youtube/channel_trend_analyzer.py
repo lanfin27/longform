@@ -45,6 +45,10 @@ class NewChannel:
     days_since_creation: int = 0
     growth_rate: str = "보통"  # 급성장/보통/저조
 
+    # ⭐ 기회 지수 (Opportunity Score) - 핵심 지표!
+    opportunity_score: float = 0.0  # 평균조회수 / 구독자수
+    opportunity_label: str = ""  # 기회 레벨 라벨
+
     # 키워드 관련성 지표
     relevance_score: int = 0  # 0-10 점수
     keyword_relevant: bool = False  # 키워드 직접 포함 여부
@@ -57,6 +61,23 @@ class NewChannel:
             self.subscribers_per_video = self.subscribers / self.video_count
 
         self.days_since_creation = (datetime.now() - self.created_at_dt).days
+
+        # ⭐ 기회 지수 계산: 평균조회수 / 구독자수
+        # 구독자가 적은데 조회수가 높다 = 알고리즘이 밀어주는 키워드
+        if self.subscribers > 0:
+            self.opportunity_score = self.avg_views_per_video / self.subscribers
+        else:
+            self.opportunity_score = self.avg_views_per_video  # 구독자 0이면 조회수 그대로
+
+        # 기회 지수 레벨 판정
+        if self.opportunity_score >= 100:
+            self.opportunity_label = "🌟 황금기회"
+        elif self.opportunity_score >= 50:
+            self.opportunity_label = "✅ 좋은기회"
+        elif self.opportunity_score >= 10:
+            self.opportunity_label = "🟡 보통"
+        else:
+            self.opportunity_label = "🔴 포화"
 
         # 성장률 판정 (영상당 구독자 기준)
         if self.subscribers_per_video >= 100:
@@ -83,6 +104,8 @@ class NewChannel:
             "growth_rate": self.growth_rate,
             "channel_url": self.channel_url,
             "thumbnail_url": self.thumbnail_url,
+            "opportunity_score": round(self.opportunity_score, 2),
+            "opportunity_label": self.opportunity_label,
             "relevance_score": self.relevance_score,
             "keyword_relevant": self.keyword_relevant,
             "relevance_reason": self.relevance_reason
@@ -109,15 +132,84 @@ class TrendAnalysisResult:
     avg_video_count: float = 0.0
     avg_views: float = 0.0
 
+    # ⭐ 시장 기회 지표 (Market Opportunity Metrics)
+    avg_opportunity_score: float = 0.0  # 전체 채널 평균 기회 지수
+    market_verdict: str = ""  # blue_ocean, growing, competitive, red_ocean
+    market_verdict_label: str = ""  # 한글 라벨
+    supply_index: float = 0.0  # 경쟁 강도 (월 평균 신규 채널 수)
+    demand_index: float = 0.0  # 수요 지수 (평균 조회수 기반)
+
     # AI 인사이트
     ai_insight: str = ""
 
     def calculate_summary(self):
-        """요약 통계 계산"""
+        """요약 통계 및 시장 기회 지표 계산"""
         if self.new_channels:
             self.avg_subscribers = sum(c.subscribers for c in self.new_channels) / len(self.new_channels)
             self.avg_video_count = sum(c.video_count for c in self.new_channels) / len(self.new_channels)
             self.avg_views = sum(c.view_count for c in self.new_channels) / len(self.new_channels)
+
+            # ⭐ 시장 기회 지수 계산
+            self._calculate_market_opportunity()
+
+    def _calculate_market_opportunity(self):
+        """시장 기회 지표 계산"""
+        if not self.new_channels:
+            return
+
+        # 1. 평균 기회 지수 (관련 채널만 대상)
+        relevant_channels = [c for c in self.new_channels if c.keyword_relevant]
+        if relevant_channels:
+            self.avg_opportunity_score = sum(c.opportunity_score for c in relevant_channels) / len(relevant_channels)
+        else:
+            # 관련 채널이 없으면 전체 채널 기준
+            self.avg_opportunity_score = sum(c.opportunity_score for c in self.new_channels) / len(self.new_channels)
+
+        # 2. 공급 지수 (경쟁 강도): 월 평균 신규 채널 수
+        self.supply_index = self.new_channels_count / max(1, self.period_months)
+
+        # 3. 수요 지수: 평균 조회수 기반 (로그 스케일 정규화)
+        avg_views = sum(c.avg_views_per_video for c in self.new_channels) / len(self.new_channels)
+        import math
+        self.demand_index = math.log10(max(1, avg_views)) * 10  # 0~60 범위
+
+        # 4. 시장 판정 (Market Verdict)
+        # 기준: 기회지수 + 공급지수 조합
+        if self.avg_opportunity_score >= 50:
+            if self.supply_index < 3:
+                self.market_verdict = "blue_ocean"
+                self.market_verdict_label = "🔵 블루오션"
+            else:
+                self.market_verdict = "growing"
+                self.market_verdict_label = "🟢 성장시장"
+        elif self.avg_opportunity_score >= 10:
+            if self.supply_index < 5:
+                self.market_verdict = "growing"
+                self.market_verdict_label = "🟢 성장시장"
+            else:
+                self.market_verdict = "competitive"
+                self.market_verdict_label = "🟡 경쟁시장"
+        else:
+            if self.supply_index >= 5:
+                self.market_verdict = "red_ocean"
+                self.market_verdict_label = "🔴 레드오션"
+            else:
+                self.market_verdict = "competitive"
+                self.market_verdict_label = "🟡 경쟁시장"
+
+    def get_rising_stars(self, top_n: int = 5) -> List['NewChannel']:
+        """기회 지수가 높은 상위 채널 (라이징 스타) 반환"""
+        # 관련 채널 중에서 기회 지수 높은 순
+        relevant = [c for c in self.new_channels if c.keyword_relevant]
+        if not relevant:
+            relevant = self.new_channels
+
+        sorted_channels = sorted(relevant, key=lambda x: x.opportunity_score, reverse=True)
+        return sorted_channels[:top_n]
+
+    def get_golden_opportunities(self) -> List['NewChannel']:
+        """황금 기회 채널들 (opportunity_score >= 100) 반환"""
+        return [c for c in self.new_channels if c.opportunity_score >= 100 and c.keyword_relevant]
 
 
 class ChannelTrendAnalyzer:
@@ -394,6 +486,11 @@ class ChannelTrendAnalyzer:
             "avg_subscribers": result.avg_subscribers,
             "avg_video_count": result.avg_video_count,
             "avg_views": result.avg_views,
+            "avg_opportunity_score": result.avg_opportunity_score,
+            "market_verdict": result.market_verdict,
+            "market_verdict_label": result.market_verdict_label,
+            "supply_index": result.supply_index,
+            "demand_index": result.demand_index,
             "ai_insight": result.ai_insight
         }
 
@@ -417,6 +514,8 @@ class ChannelTrendAnalyzer:
                     subscribers_per_video=ch_data.get("subscribers_per_video", 0),
                     days_since_creation=ch_data.get("days_since_creation", 0),
                     growth_rate=ch_data.get("growth_rate", "보통"),
+                    opportunity_score=ch_data.get("opportunity_score", 0.0),
+                    opportunity_label=ch_data.get("opportunity_label", ""),
                     relevance_score=ch_data.get("relevance_score", 0),
                     keyword_relevant=ch_data.get("keyword_relevant", False),
                     relevance_reason=ch_data.get("relevance_reason", "")
@@ -439,8 +538,17 @@ class ChannelTrendAnalyzer:
             avg_subscribers=data.get("avg_subscribers", 0),
             avg_video_count=data.get("avg_video_count", 0),
             avg_views=data.get("avg_views", 0),
+            avg_opportunity_score=data.get("avg_opportunity_score", 0.0),
+            market_verdict=data.get("market_verdict", ""),
+            market_verdict_label=data.get("market_verdict_label", ""),
+            supply_index=data.get("supply_index", 0.0),
+            demand_index=data.get("demand_index", 0.0),
             ai_insight=data.get("ai_insight", "")
         )
+
+        # 캐시 데이터에 시장 지표가 없으면 다시 계산
+        if not result.market_verdict and result.new_channels:
+            result._calculate_market_opportunity()
 
         return result
 

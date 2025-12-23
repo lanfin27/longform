@@ -1,0 +1,84 @@
+{
+  "version": "2.0",
+  "auto_generated": true,
+  "source": "scene_analysis_matcher",
+  "mappings": [
+    {
+      "scene_num": 1,
+      "character_id": "images",
+      "character_name": "images",
+      "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\ancient_tribal_leader.png",
+      "confidence": 0.0,
+      "match_type": "default",
+      "source_field": null,
+      "original_name": "자말 카슈끄지, 무함마드 빈 살만",
+      "auto_mapped": true
+    },
+    {
+      "scene_num": 2,
+      "character_id": "images",
+      "character_name": "images",
+      "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\ancient_tribal_leader.png",
+      "confidence": 0.0,
+      "match_type": "default",
+      "source_field": null,
+      "original_name": "무함마드 빈 살만",
+      "auto_mapped": true
+    },
+    {
+      "scene_num": 3,
+      "character_id": "images",
+      "character_name": "images",
+      "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\ancient_tribal_leader.png",
+      "confidence": 0.0,
+      "match_type": "default",
+      "source_field": null,
+      "original_name": "없음",
+      "auto_mapped": true
+    },
+    {
+      "scene_num": 4,
+      "character_id": "images",
+      "character_name": "images",
+      "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\ancient_tribal_leader.png",
+      "confidence": 0.0,
+      "match_type": "default",
+      "source_field": null,
+      "original_name": "없음",
+      "auto_mapped": true
+    },
+    {
+      "scene_num": 5,
+      "character_id": "images",
+      "character_name": "images",
+      "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\ancient_tribal_leader.png",
+      "confidence": 0.0,
+      "match_type": "default",
+      "source_field": null,
+      "original_name": "없음",
+      "auto_mapped": true
+    },
+    {
+      "scene_num": 6,
+      "character_id": "images",
+      "character_name": "images",
+      "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\ancient_tribal_leader.png",
+      "confidence": 0.0,
+      "match_type": "default",
+      "source_field": null,
+      "original_name": "없음",
+      "auto_mapped": true
+    },
+    {
+      "scene_num": 7,
+      "character_id": "images",
+      "character_name": "images",
+      "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\ancient_tribal_leader.png",
+      "confidence": 0.0,
+      "match_type": "default",
+      "source_field": null,
+      "original_name": "없음",
+      "auto_mapped": true
+    }
+  ]
+}

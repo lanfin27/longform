@@ -32,22 +32,24 @@
   "무함마드 빈 살만": {
     "success": true,
     "character_name": "무함마드 빈 살만",
-    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1765843243588.png",
-    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1765843243588.png",
-    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nKorean businessman 40s, dark navy suit, dark red tie, thin round glasses, short neat black hair\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man, early 30s, clean-shaven with a strong jawline. He has dark, intense eyes and a confident expression. He is wearing traditional Saudi Arabian attire, such as a white thobe and a dark bisht. His posture is upright and authoritative. The lighting should be strong and highlight his power and influence. He has a well-groomed appearance, reflecting his status as a crown prince. He may be wearing a luxury watch or other subtle accessories., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
-    "pose": "standing",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766482528785.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766482528785.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or a modern business suit, confident expression, full body character, upper body portrait, shoulders up, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "portrait",
     "background": "solid_gray",
-    "generation_time": 3.370279312133789
+    "generation_time": 2.5124642848968506,
+    "api_provider": "Together.ai FLUX"
   },
   "자말 카슈끄지": {
     "success": true,
     "character_name": "자말 카슈끄지",
-    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766062548160.png",
-    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766062548160.png",
-    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man, late 50s, with a neatly trimmed salt-and-pepper beard, a kind and intelligent face, wearing a dark-colored blazer over a collared shirt, often seen with a pen in his hand, suggesting his profession as a journalist. He has a thoughtful expression and a gentle demeanor. His eyes reflect a deep understanding of the world and a commitment to truth., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
-    "pose": "standing",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766482528334.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766482528334.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man in his late 50s, salt-and-pepper beard neatly trimmed, receding hairline with gray hair, round glasses with thin black frames, warm brown eyes, olive skin tone, wearing dark navy business suit with white dress shirt, full body character, upper body portrait, shoulders up, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "portrait",
     "background": "solid_gray",
-    "generation_time": 2.593705177307129
+    "generation_time": 2.561795473098755,
+    "api_provider": "Together.ai FLUX"
   },
   "예언자 무함마드": {
     "success": true,
@@ -62,11 +64,188 @@
   "족장": {
     "success": true,
     "character_name": "족장",
-    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_족장_standing_1766062565328.png",
-    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_족장_standing_1766062565328.png",
-    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, A strong and weathered man, late 40s, of indeterminate ethnicity, with a muscular build and a stern face marked by the elements. He wears simple, animal-hide clothing adorned with tribal markings and feathers. He carries a spear or club, symbolizing his authority and protection of his tribe. His eyes reflect wisdom, experience, and a deep connection to the land., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_족장_standing_1766281642650.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_족장_standing_1766281642650.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Muscular Middle Eastern man in his 40s, long hair, wearing animal skins, holding a spear, strong and commanding expression, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
     "pose": "standing",
     "background": "solid_gray",
-    "generation_time": 2.6163170337677
+    "generation_time": 8.292380094528198,
+    "api_provider": "Together.ai FLUX"
+  },
+  "왕": {
+    "success": true,
+    "character_name": "왕",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_왕_standing_left_1766282414921.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_왕_standing_left_1766282414921.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Elderly Middle Eastern man in his 80s, white beard, regal appearance, wearing traditional Saudi Arabian royal attire, holding a scepter, wise and authoritative expression, full body character, standing pose, facing slightly left, three-quarter view, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing_left",
+    "background": "solid_gray",
+    "generation_time": 7.83140230178833,
+    "api_provider": "Together.ai FLUX"
+  },
+  "왕세자": {
+    "success": true,
+    "character_name": "왕세자",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_왕세자_standing_1766281625300.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_왕세자_standing_1766281625300.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man in his mid 30s, clean-shaven face, short dark hair, intense dark eyes, olive skin tone, athletic build, wearing modern business attire, confident and ambitious demeanor, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 9.688200235366821,
+    "api_provider": "Together.ai FLUX"
+  },
+  "예언자": {
+    "success": true,
+    "character_name": "예언자",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_예언자_standing_1766281632356.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_예언자_standing_1766281632356.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man in his 40s, long dark beard, wearing simple robes, holding a staff, wise and compassionate expression, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 7.541989803314209,
+    "api_provider": "Together.ai FLUX"
+  },
+  "종교 지도자": {
+    "success": true,
+    "character_name": "종교 지도자",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_종교_지도자_standing_1766281634093.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_종교_지도자_standing_1766281634093.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man in his 60s, white beard, wearing traditional Islamic attire, holding prayer beads, pious and devout expression, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 7.292522668838501,
+    "api_provider": "Together.ai FLUX"
+  },
+  "브랜드이": {
+    "success": true,
+    "character_name": "브랜드이",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_브랜드이_standing_1766463674650.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_브랜드이_standing_1766463674650.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Person characterized as 스크립트에서 추출된 인물: 브랜드이, appropriate historical or cultural attire, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 2.807854175567627,
+    "api_provider": "Together.ai FLUX"
+  },
+  "대표": {
+    "success": true,
+    "character_name": "대표",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_대표_standing_1766463674833.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_대표_standing_1766463674833.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Person characterized as 스크립트에서 추출된 인물: 대표, appropriate historical or cultural attire, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 2.4898202419281006,
+    "api_provider": "Together.ai FLUX"
+  },
+  "김민석": {
+    "success": true,
+    "character_name": "김민석",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_김민석_standing_1766476838388.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_김민석_standing_1766476838388.png",
+    "prompt": "animation style character,, Person characterized as 스크립트에서 추출된 인물: 김민석, appropriate historical or cultural attire, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 2.337913990020752,
+    "api_provider": "Together.ai FLUX"
+  },
+  "회사의": {
+    "success": true,
+    "character_name": "회사의",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_회사의_standing_1766463683286.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_회사의_standing_1766463683286.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Person characterized as 스크립트에서 추출된 인물: 회사의, appropriate historical or cultural attire, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 6.9510276317596436,
+    "api_provider": "Together.ai FLUX"
+  },
+  "아기상어": {
+    "success": true,
+    "character_name": "아기상어",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_아기상어_standing_1766476839088.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_아기상어_standing_1766476839088.png",
+    "prompt": "animation style character,, Person characterized as 스크립트에서 추출된 인물: 아기상어 (등장인물), appropriate historical or cultural attire, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 2.5373384952545166,
+    "api_provider": "Together.ai FLUX"
+  },
+  "핑크퐁": {
+    "success": true,
+    "character_name": "핑크퐁",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_핑크퐁_standing_1766476847053.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_핑크퐁_standing_1766476847053.png",
+    "prompt": "animation style character,, Person characterized as 스크립트에서 추출된 인물: 핑크퐁 (등장인물), appropriate historical or cultural attire, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 7.664416790008545,
+    "api_provider": "Together.ai FLUX"
+  },
+  "베베핀": {
+    "success": true,
+    "character_name": "베베핀",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_베베핀_standing_1766476846888.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_베베핀_standing_1766476846888.png",
+    "prompt": "animation style character,, Person characterized as 스크립트에서 추출된 인물: 베베핀 (등장인물), appropriate historical or cultural attire, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 6.2993323802948,
+    "api_provider": "Together.ai FLUX"
+  },
+  "베이비샤크": {
+    "success": true,
+    "character_name": "베이비샤크",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_베이비샤크_standing_1766476855012.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_베이비샤크_standing_1766476855012.png",
+    "prompt": "animation style character,, Cute Baby Shark animal character, cartoon style, friendly expression, bright vibrant colors, kawaii aesthetic, no text, no letters, no words, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 6.122122287750244,
+    "api_provider": "Together.ai FLUX"
+  },
+  "뽀로로": {
+    "success": true,
+    "character_name": "뽀로로",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_뽀로로_standing_1766476855051.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_뽀로로_standing_1766476855051.png",
+    "prompt": "animation style character,, Cute little penguin character in aviator helmet and goggles, blue and white colors, round body, friendly eyes, cartoon style, no text, no letters, no words, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 5.49650502204895,
+    "api_provider": "Together.ai FLUX"
+  },
+  "올리": {
+    "success": true,
+    "character_name": "올리",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_올리_standing_1766476862718.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_올리_standing_1766476862718.png",
+    "prompt": "animation style character,, Cute Ollie animal character, cartoon style, friendly expression, bright vibrant colors, kawaii aesthetic, no text, no letters, no words, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 4.704315185546875,
+    "api_provider": "Together.ai FLUX"
+  },
+  "헬로키티": {
+    "success": true,
+    "character_name": "헬로키티",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_헬로키티_standing_1766476863630.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_헬로키티_standing_1766476863630.png",
+    "prompt": "animation style character,, Cute Hello Kitty mascot character, brand mascot style, friendly smile, bright colors, cartoon aesthetic, no text, no letters, no words, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 5.076327562332153,
+    "api_provider": "Together.ai FLUX"
+  },
+  "가족을": {
+    "success": true,
+    "character_name": "가족을",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_가족을_standing_1766476871411.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_가족을_standing_1766476871411.png",
+    "prompt": "animation style character,, Person characterized as 스크립트에서 추출된 캐릭터, appropriate historical or cultural attire, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 4.691422939300537,
+    "api_provider": "Together.ai FLUX"
   }
 }

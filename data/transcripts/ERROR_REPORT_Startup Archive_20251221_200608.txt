@@ -1,0 +1,166 @@
+트랜스크립트 다운로드 에러 리포트
+채널: Startup Archive
+시간: 2025-12-21T20:06:08.398838
+================================================================================
+
+통계
+- 총 영상: 100개
+- 성공: 0개
+- no_caption: 100개
+
+사용 방식: API 0개, yt-dlp 100개
+
+================================================================================
+
+상세 목록 (처음 50개)
+
+1. [yt-dlp] Ben Horowitz explains why courage is the most important trait for startup founders
+   에러: 자막을 찾을 수 없습니다.
+
+2. [yt-dlp] Patrick Collison on the importance of beauty and craftsmanship when building products
+   에러: 자막을 찾을 수 없습니다.
+
+3. [yt-dlp] Mark Zuckerberg: “I don’t believe in delegating”
+   에러: 자막을 찾을 수 없습니다.
+
+4. [yt-dlp] Keith Rabois on how to delegate effectively
+   에러: 자막을 찾을 수 없습니다.
+
+5. [yt-dlp] Sam Altman: Treat your idea as a project rather than a company at first
+   에러: 자막을 찾을 수 없습니다.
+
+6. [yt-dlp] John Carmack: The code for AGI could conceivably be written by one individual
+   에러: 자막을 찾을 수 없습니다.
+
+7. [yt-dlp] Marc Andreessen: “The best entrepreneurs of the future will be quite skilled at 6-8 things”
+   에러: 자막을 찾을 수 없습니다.
+
+8. [yt-dlp] John Carmack on what he admires about Elon Musk
+   에러: 자막을 찾을 수 없습니다.
+
+9. [yt-dlp] Peter Thiel: “Vertical integration is an under-explored modality of technological progress”
+   에러: 자막을 찾을 수 없습니다.
+
+10. [yt-dlp] John Carmack on dealing with the dark times of a startup
+   에러: 자막을 찾을 수 없습니다.
+
+11. [yt-dlp] John Carmack on dealing with the dark times of a startup
+   에러: 자막을 찾을 수 없습니다.
+
+12. [yt-dlp] Elon Musk on what it means to work “super hard”
+   에러: 자막을 찾을 수 없습니다.
+
+13. [yt-dlp] John Carmack on the importance hard work: “For decades, I worked 60 hours a week”
+   에러: 자막을 찾을 수 없습니다.
+
+14. [yt-dlp] Reid Hoffman: “It’ll take somewhere between three and five companies to be successful”
+   에러: 자막을 찾을 수 없습니다.
+
+15. [yt-dlp] Jeff Bezos: “Thinking small is a self-fulfilling prophecy”
+   에러: 자막을 찾을 수 없습니다.
+
+16. [yt-dlp] Steve Wozniak explains why he gave $10 million of his shares to early Apple employees after the IPO
+   에러: 자막을 찾을 수 없습니다.
+
+17. [yt-dlp] Naval Ravikant: “Networking is overrated… Do something great and your network will instantly emerge"
+   에러: 자막을 찾을 수 없습니다.
+
+18. [yt-dlp] Peter Thiel on what most founders don’t understand about differentiation
+   에러: 자막을 찾을 수 없습니다.
+
+19. [yt-dlp] Ben Horowitz on the 1 reason founders fail as CEO
+   에러: 자막을 찾을 수 없습니다.
+
+20. [yt-dlp] Ben Horowitz on the 1 reason founders fail as CEO
+   에러: 자막을 찾을 수 없습니다.
+
+21. [yt-dlp] Ryan Petersen on what Paul Graham told him when he stepped down as Flexport CEO
+   에러: 자막을 찾을 수 없습니다.
+
+22. [yt-dlp] Sam Altman on what startup ideas actually work
+   에러: 자막을 찾을 수 없습니다.
+
+23. [yt-dlp] Sam Altman on what startup ideas actually work
+   에러: 자막을 찾을 수 없습니다.
+
+24. [yt-dlp] Jeff Bezos on raising Amazon’s seed round: “It was the hardest thing I’ve ever done”
+   에러: 자막을 찾을 수 없습니다.
+
+25. [yt-dlp] Coinbase founder Brian Armstrong on common startup hiring mistakes
+   에러: 자막을 찾을 수 없습니다.
+
+26. [yt-dlp] Coinbase founder Brian Armstrong on common startup hiring mistakes
+   에러: 자막을 찾을 수 없습니다.
+
+27. [yt-dlp] Snowflake CEO Frank Slootman explains why your company priorities are wrong
+   에러: 자막을 찾을 수 없습니다.
+
+28. [yt-dlp] Patrick Collison on prioritizing fulfillment over happiness
+   에러: 자막을 찾을 수 없습니다.
+
+29. [yt-dlp] Patrick Collison on prioritizing fulfillment over happiness
+   에러: 자막을 찾을 수 없습니다.
+
+30. [yt-dlp] Paul Graham on rage-bait startups: “Scammers don’t make the giant companies”
+   에러: 자막을 찾을 수 없습니다.
+
+31. [yt-dlp] Paul Graham on rage-bait startups: “Scammers don’t make the giant companies”
+   에러: 자막을 찾을 수 없습니다.
+
+32. [yt-dlp] Mark Zuckerberg: “Start off trying to make something cool, not build a company.”
+   에러: 자막을 찾을 수 없습니다.
+
+33. [yt-dlp] Jeff Bezos: “Stress comes from ignoring things that you shouldn’t be ignoring”
+   에러: 자막을 찾을 수 없습니다.
+
+34. [yt-dlp] Keith Rabois explains why Founders Fund doesn’t invest in remote startups
+   에러: 자막을 찾을 수 없습니다.
+
+35. [yt-dlp] Jony Ive explains the Steve Jobs product philosophy that saved Apple from bankruptcy in 1998
+   에러: 자막을 찾을 수 없습니다.
+
+36. [yt-dlp] Ben Horowitz shares 4 principles for choosing a cofounder
+   에러: 자막을 찾을 수 없습니다.
+
+37. [yt-dlp] Ben Horowitz shares 4 principles for choosing a cofounder
+   에러: 자막을 찾을 수 없습니다.
+
+38. [yt-dlp] Elon Musk on the key to achieving word-of-mouth growth
+   에러: 자막을 찾을 수 없습니다.
+
+39. [yt-dlp] Jason Citron on the growth hack that got Discord its first few thousand users
+   에러: 자막을 찾을 수 없습니다.
+
+40. [yt-dlp] Jason Citron on the growth hack that got Discord its first few thousand users
+   에러: 자막을 찾을 수 없습니다.
+
+41. [yt-dlp] Vinod Khosla on the two most important things to get right when building a company
+   에러: 자막을 찾을 수 없습니다.
+
+42. [yt-dlp] Dropbox founder Drew Houston on why distribution is more important than product
+   에러: 자막을 찾을 수 없습니다.
+
+43. [yt-dlp] Dropbox founder Drew Houston on why distribution is more important than product
+   에러: 자막을 찾을 수 없습니다.
+
+44. [yt-dlp] NVIDIA founder Jensen Huang: "We never talk about market share”
+   에러: 자막을 찾을 수 없습니다.
+
+45. [yt-dlp] Jeff Bezos on the 4 principles that differentiated Amazon from other companies
+   에러: 자막을 찾을 수 없습니다.
+
+46. [yt-dlp] Jeff Bezos on the 4 principles that differentiated Amazon from other companies
+   에러: 자막을 찾을 수 없습니다.
+
+47. [yt-dlp] Airbnb founder Brian Chesky on “living your product” and why slow growth can be invaluable
+   에러: 자막을 찾을 수 없습니다.
+
+48. [yt-dlp] Elon Musk: “Anyone who wants to make more than they take has my respect”
+   에러: 자막을 찾을 수 없습니다.
+
+49. [yt-dlp] Elon Musk: “Anyone who wants to make more than they take has my respect”
+   에러: 자막을 찾을 수 없습니다.
+
+50. [yt-dlp] Google founder Larry Page explains how he decides what to work on
+   에러: 자막을 찾을 수 없습니다.
+

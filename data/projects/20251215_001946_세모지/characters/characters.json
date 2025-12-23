@@ -1,178 +1,38 @@
 [
   {
     "id": "jamal_khashoggi",
-    "name": "자말 카슈크지",
+    "name": "자말 카슈끄지",
     "name_en": "Jamal Khashoggi",
-    "description": "사우디 왕세자를 비판하던 언론인",
+    "description": "사우디아라비아 출신 언론인, 사우디 왕세자를 비판",
     "role": "주연",
     "nationality": "",
     "era": "",
     "appearance": "",
-    "character_prompt": "Middle Eastern man, late 50s, with a neatly trimmed beard and mustache, wearing glasses with a dark frame. He has a kind but serious expression. He is dressed in a professional attire, such as a suit or a collared shirt. The lighting should be natural and highlight his features. His appearance should reflect his role as a respected journalist. He has slightly wrinkled skin, indicating his age and experience. His hair is neatly combed and slightly graying.",
+    "character_prompt": "Middle Eastern man in his late 50s, salt-and-pepper beard neatly trimmed, receding hairline with gray hair, round glasses with thin black frames, warm brown eyes, olive skin tone, wearing dark navy business suit with white dress shirt",
     "reference_urls": [],
     "generated_images": [
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\jamal_khashoggi.png",
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈크지_standing_1765808657859.png",
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈크지_standing_1765843234217.png"
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_left_1766482446106.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766482528334.png"
     ],
-    "created_at": "2025-12-15T22:31:18.600823",
-    "updated_at": "2025-12-18T21:55:45.341156"
+    "created_at": "2025-12-23T18:33:47.593651",
+    "updated_at": "2025-12-23T18:35:25.735034"
   },
   {
     "id": "mohammed_bin_salman",
     "name": "무함마드 빈 살만",
     "name_en": "Mohammed bin Salman",
-    "description": "사우디 왕세자",
-    "role": "주연",
-    "nationality": "",
-    "era": "",
-    "appearance": "",
-    "character_prompt": "Middle Eastern man, early 30s, clean-shaven with a strong jawline. He has dark, intense eyes and a confident expression. He is wearing traditional Saudi Arabian attire, such as a white thobe and a dark bisht. His posture is upright and authoritative. The lighting should be strong and highlight his power and influence. He has a well-groomed appearance, reflecting his status as a crown prince. He may be wearing a luxury watch or other subtle accessories.",
-    "reference_urls": [],
-    "generated_images": [
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\mohammed_bin_salman.png",
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1765843243588.png"
-    ],
-    "created_at": "2025-12-15T22:31:18.602753",
-    "updated_at": "2025-12-18T21:55:45.341164"
-  },
-  {
-    "id": "islamic_prophet",
-    "name": "이슬람 예언자",
-    "name_en": "Islamic Prophet",
-    "description": "이슬람교의 창시자",
+    "description": "사우디아라비아 왕세자",
     "role": "조연",
     "nationality": "",
     "era": "",
     "appearance": "",
-    "character_prompt": "Middle Eastern man, middle-aged, with a long, flowing beard and kind eyes. He is wearing simple, traditional robes. His expression is wise and compassionate. The lighting should be soft and ethereal, conveying a sense of spirituality and reverence. He has a gentle demeanor and a peaceful aura. His appearance should reflect his role as a spiritual leader and a prophet. He is depicted with a serene and calming presence.",
+    "character_prompt": "Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or a modern business suit, confident expression",
     "reference_urls": [],
     "generated_images": [
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\islamic_prophet.png"
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_left_1766482446984.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766482528785.png"
     ],
-    "created_at": "2025-12-15T22:31:18.603727",
-    "updated_at": "2025-12-18T21:55:45.341174"
-  },
-  {
-    "id": "ancient_tribal_leader",
-    "name": "고대 부족장",
-    "name_en": "Ancient Tribal Leader",
-    "description": "고대 부족의 지도자",
-    "role": "조연",
-    "nationality": "",
-    "era": "",
-    "appearance": "",
-    "character_prompt": "Indigenous man, middle-aged, with a strong and weathered face. He has long, dark hair and is wearing tribal clothing made of animal skins and natural materials. He carries a spear or a staff, symbolizing his authority. His expression is stern and commanding. The lighting should be dramatic and highlight his strength and resilience. He has tribal markings or tattoos on his face and body. His appearance should reflect his role as a leader and a warrior.",
-    "reference_urls": [],
-    "generated_images": [
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\ancient_tribal_leader.png",
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_고대_부족장_standing_1765808665987.png",
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_고대_부족장_standing_1765843252099.png"
-    ],
-    "created_at": "2025-12-15T22:31:18.604320",
-    "updated_at": "2025-12-18T21:55:45.341177"
-  },
-  {
-    "id": "shaman",
-    "name": "주술사",
-    "name_en": "Shaman",
-    "description": "원시 사회의 주술사",
-    "role": "조연",
-    "nationality": "",
-    "era": "",
-    "appearance": "",
-    "character_prompt": "Indigenous person, gender-neutral, with a mystical and enigmatic appearance. They are wearing clothing made of natural materials, adorned with feathers, bones, and other symbolic objects. Their face is painted with tribal markings. They are holding a staff or a rattle, used for rituals. Their expression is intense and focused. The lighting should be mysterious and highlight their connection to the spiritual world. They have a wild and untamed aura.",
-    "reference_urls": [],
-    "generated_images": [
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\shaman.png"
-    ],
-    "created_at": "2025-12-15T22:31:18.605790",
-    "updated_at": "2025-12-18T21:55:45.341180"
-  },
-  {
-    "id": "priest",
-    "name": "제사장",
-    "name_en": "Priest",
-    "description": "고대 사회의 제사장",
-    "role": "조연",
-    "nationality": "",
-    "era": "",
-    "appearance": "",
-    "character_prompt": "Middle Eastern man, middle-aged, with a dignified and authoritative appearance. He is wearing elaborate robes and a headdress, symbolizing his religious authority. He is holding a sacred object, such as a scroll or a chalice. His expression is solemn and reverent. The lighting should be bright and highlight his importance and connection to the divine. He has a calm and composed demeanor. His appearance should reflect his role as a religious leader and a mediator between humans and the gods.",
-    "reference_urls": [],
-    "generated_images": [
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\priest.png"
-    ],
-    "created_at": "2025-12-15T22:31:18.606499",
-    "updated_at": "2025-12-18T21:55:45.341182"
-  },
-  {
-    "id": "saudi_royal_family",
-    "name": "사우디 왕가",
-    "name_en": "Saudi Royal Family",
-    "description": "사우디 아라비아의 왕족",
-    "role": "엑스트라",
-    "nationality": "",
-    "era": "",
-    "appearance": "",
-    "character_prompt": "A group of Middle Eastern men, ranging in age, dressed in traditional Saudi Arabian attire, such as white thobes and dark bishts. They have well-groomed appearances and confident expressions. They are standing in a formal setting, such as a palace or a government building. The lighting should be bright and highlight their wealth and power. They may be wearing luxury watches or other subtle accessories. Their posture is upright and authoritative, reflecting their status as members of the royal family.",
-    "reference_urls": [],
-    "generated_images": [
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\images\\saudi_royal_family.png",
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_사우디_왕가_standing_1765808674599.png"
-    ],
-    "created_at": "2025-12-15T22:31:18.607632",
-    "updated_at": "2025-12-18T21:55:45.341185"
-  },
-  {
-    "id": "jamal_khashoggi_7",
-    "name": "자말 카슈끄지",
-    "name_en": "Jamal Khashoggi",
-    "description": "사우디 왕세자를 비판하던 언론인",
-    "role": "주연",
-    "nationality": "",
-    "era": "",
-    "appearance": "",
-    "character_prompt": "Middle Eastern man, late 50s, with a neatly trimmed salt-and-pepper beard, a kind and intelligent face, wearing a dark-colored blazer over a collared shirt, often seen with a pen in his hand, suggesting his profession as a journalist. He has a thoughtful expression and a gentle demeanor. His eyes reflect a deep understanding of the world and a commitment to truth.",
-    "reference_urls": [],
-    "generated_images": [
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766062548160.png"
-    ],
-    "created_at": "2025-12-18T21:55:30.078100",
-    "updated_at": "2025-12-18T21:55:45.341187"
-  },
-  {
-    "id": "prophet_muhammad",
-    "name": "예언자 무함마드",
-    "name_en": "Prophet Muhammad",
-    "description": "이슬람교의 창시자",
-    "role": "조연",
-    "nationality": "",
-    "era": "",
-    "appearance": "",
-    "character_prompt": "Middle Eastern man, 50s, with a long, flowing dark beard, wearing a simple white robe and turban, radiating wisdom and serenity. His eyes are deep and compassionate, reflecting his spiritual leadership. He carries a staff as a symbol of his authority and guidance. His presence evokes a sense of reverence and respect.",
-    "reference_urls": [],
-    "generated_images": [
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_예언자_무함마드_standing_1766062556711.png"
-    ],
-    "created_at": "2025-12-18T21:55:30.079778",
-    "updated_at": "2025-12-18T21:55:45.341190"
-  },
-  {
-    "id": "tribal_chief",
-    "name": "족장",
-    "name_en": "Tribal Chief",
-    "description": "고대 부족 사회의 지도자",
-    "role": "조연",
-    "nationality": "",
-    "era": "",
-    "appearance": "",
-    "character_prompt": "A strong and weathered man, late 40s, of indeterminate ethnicity, with a muscular build and a stern face marked by the elements. He wears simple, animal-hide clothing adorned with tribal markings and feathers. He carries a spear or club, symbolizing his authority and protection of his tribe. His eyes reflect wisdom, experience, and a deep connection to the land.",
-    "reference_urls": [],
-    "generated_images": [
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_족장_standing_1766062565328.png"
-    ],
-    "created_at": "2025-12-18T21:55:30.081873",
-    "updated_at": "2025-12-18T21:55:45.341192"
+    "created_at": "2025-12-23T18:33:47.595398",
+    "updated_at": "2025-12-23T18:35:25.735042"
   }
 ]

@@ -1,0 +1,471 @@
+⚠️ 트랜스크립트 다운로드 에러 리포트
+채널: Startup Archive
+시간: 2025-12-21T18:54:31.582539
+================================================================================
+
+📊 통계
+- 총 영상: 50개
+- 성공: 0개
+- other: 50개
+
+================================================================================
+
+📋 상세 에러 목록 (처음 50개)
+
+1. Ben Horowitz explains why courage is the most important trait for startup founders
+   영상 ID: 87wpPDLtZws
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=87wpPDLtZws&ei=f8NHaarHPM6e0-kP4-STyAE&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766335984&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=B5E9D997913CA396E459B6368C845FF75C40E592.4DB4A735B3F9DE0D3ACC3994C642F8F1431251D7&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: 87wpPDLtZws
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+2. Patrick Collison on the importance of beauty and craftsmanship when building products
+   영상 ID: fUlQYBiixo4
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=fUlQYBiixo4&ei=gcNHab3uJsPrpt8P-a3iiQY&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766335985&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=7ACAD1319994DDFFFDB595EB8C617014B3868DCE.CF11C96024B5763569766850B4410C2B3AF5BF02&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: fUlQYBiixo4
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+3. Mark Zuckerberg: “I don’t believe in delegating”
+   영상 ID: -hq3zcEA0ew
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=-hq3zcEA0ew&ei=g8NHaemtJ-Cw2roPncmmqQs&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766335987&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=DD65E2AC071D387E10155678A3632F79DDA4399A.ED188F9160B2C1DF79BCE58AF4BD5BE6D9069FB5&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: -hq3zcEA0ew
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+4. Keith Rabois on how to delegate effectively
+   영상 ID: 38zREeGwya8
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=38zREeGwya8&ei=hcNHafLGDYCz1d8PyMbV0Qk&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766335989&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=D6BB58D309475A7083CFAA25665B63E65E3155C8.53C0A4D59FF45A1F3FCACBB28292F0C25440C699&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: 38zREeGwya8
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+5. Sam Altman: Treat your idea as a project rather than a company at first
+   영상 ID: -Ib6S5FMVZQ
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=-Ib6S5FMVZQ&ei=hsNHaYmZO5DK0-kPhduRkAE&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766335990&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=204C9019B4746BD2B499B785025670ACC203F554.70630D28ABE3F311D750E5A100EB4DAB02451BB6&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: -Ib6S5FMVZQ
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+6. John Carmack: The code for AGI could conceivably be written by one individual
+   영상 ID: 6gi8TGNpS_E
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=6gi8TGNpS_E&ei=iMNHabvOKLOKqL8PjrmNiAk&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766335992&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=04876320B891A5C1972C89076FC5E7127293F80A.92ADA7A69159D0B2A6FD76E8FDA0015586A9030B&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: 6gi8TGNpS_E
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+7. Marc Andreessen: “The best entrepreneurs of the future will be quite skilled at 6-8 things”
+   영상 ID: NbIRHDXBBoI
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=NbIRHDXBBoI&ei=isNHaYTEHZjM2roPu4Xi6QE&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766335994&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=4A7C150F19DD2D248267EC79C84B76920BEED54D.4777C760723C8FCC42C70FAFCB2AEB0BC7688A79&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: NbIRHDXBBoI
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+8. John Carmack on what he admires about Elon Musk
+   영상 ID: gzstxPEifVU
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=gzstxPEifVU&ei=jMNHaemAEaaMqL8P2Jm9kA0&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766335996&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=4349B7C5C58F8E650D75A06CD78E6BEE7A86DFAB.5B6CC6999CF19E7EFD36DCE01941BA6E106AFE16&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: gzstxPEifVU
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+9. Peter Thiel: “Vertical integration is an under-explored modality of technological progress”
+   영상 ID: VWdp38MNXGs
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=VWdp38MNXGs&ei=jsNHaZ63ArSV1d8Pgq-GkA8&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766335998&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=DAC9B6F24978CBDEFB33ED6AB77552E38D7A2A57.75A48D650F829B883682FE2332F886F105A02F69&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: VWdp38MNXGs
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+10. John Carmack on dealing with the dark times of a startup
+   영상 ID: aqmHq7PAaTg
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=aqmHq7PAaTg&ei=j8NHad7uL9GFpt8Pro2F6Q8&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766335999&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=7CBF88CF1786477D515548AA72E12A8F9BE6B8F2.EB393D4168920CD2E1E93E627E5C159F608E5A53&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: aqmHq7PAaTg
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+11. John Carmack on dealing with the dark times of a startup
+   영상 ID: MyPSZFsyknk
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=MyPSZFsyknk&ei=kcNHaaq3H8612roP-4vKgA8&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336001&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=0BFB7C6290B98ED3B82CF5959B02C65608C2010D.CF8196088B8C791C9EB8AD5A261AFC6D8F44C522&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: MyPSZFsyknk
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+12. Elon Musk on what it means to work “super hard”
+   영상 ID: mJ7hD81S6xQ
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=mJ7hD81S6xQ&ei=k8NHaYbDC6Cy2roPqsX3sAU&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336003&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=E963EBA8A844436F8EDF7B4B73B6AFDA5E156ECD.0DA5A3BE8839A6749B98AC87BE3C1ECAF6C222BA&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: mJ7hD81S6xQ
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+13. John Carmack on the importance hard work: “For decades, I worked 60 hours a week”
+   영상 ID: TSgKtbHyR5M
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=TSgKtbHyR5M&ei=lMNHafaiL8e32roPmY77sAo&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336004&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=B29CEE9B206D84F8C2C5C75F13CACA0D9A5AEC00.A36FD244F5313C881CFD7D2367533DD373694FE5&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: TSgKtbHyR5M
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+14. Reid Hoffman: “It’ll take somewhere between three and five companies to be successful”
+   영상 ID: 4RqeO2bE6SQ
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=4RqeO2bE6SQ&ei=lsNHaeq4H5Kz2roP8c_ViAs&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336006&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=C7CA5B6D64E64DD3B679A94896147C7272C4A9A4.77A19C82981FE1590CAD0C96F9680342BDD83018&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: 4RqeO2bE6SQ
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+15. Jeff Bezos: “Thinking small is a self-fulfilling prophecy”
+   영상 ID: QLF1HOOuujg
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=QLF1HOOuujg&ei=l8NHabjBOtSNqL8Pw9b08Qg&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336007&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=E78622350856CF2C3AD2F047CA18E7293F8D76CC.80933DC7DE4737AA47EA30A26694B6286144AC3B&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: QLF1HOOuujg
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+16. Steve Wozniak explains why he gave $10 million of his shares to early Apple employees after the IPO
+   영상 ID: s0xz88jXPlE
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=s0xz88jXPlE&ei=mcNHacH8GtSj1d8P15Td4A4&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336009&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=E8716A595670368D38EB01DAE575CE5471D2C61A.AA34052708C34AFEF7291E7E0C726418416B8B02&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: s0xz88jXPlE
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+17. Naval Ravikant: “Networking is overrated… Do something great and your network will instantly emerge"
+   영상 ID: 6t0GWWo8-Fw
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=6t0GWWo8-Fw&ei=m8NHabKVFdC10-kP8dye4AE&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336011&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=1799A412EBB97BB28A41D67D74995E581D50699D.721DB37AC8E929EF21DE19D0EAEA6B1D37335056&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: 6t0GWWo8-Fw
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+18. Peter Thiel on what most founders don’t understand about differentiation
+   영상 ID: i8dOsInf7fw
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=i8dOsInf7fw&ei=ncNHaZ7nBN2N2roPuoGAkQU&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336013&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=945FEF9EAAB55BDAECF1F406A64767FD077037A0.C38749916C3BD109897DC3A839163A3BCCCC9030&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: i8dOsInf7fw
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+19. Ben Horowitz on the 1 reason founders fail as CEO
+   영상 ID: d_elkHVfNAs
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=d_elkHVfNAs&ei=nsNHaejePN70pt8P8uyl6A8&caps=asr&opi=112496729&exp=xpe&xoaf=4&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336015&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=920EE91E950C558B9840FDC737026D4858D89CE1.88CC6265EAAF067983A6961653F93DCDB4F12F1E&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: d_elkHVfNAs
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+20. Ben Horowitz on the 1 reason founders fail as CEO
+   영상 ID: cTJumqB1DRU
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=cTJumqB1DRU&ei=ocNHabaZBMyEpt8PyODBgAU&caps=asr&opi=112496729&exp=xpe&xoaf=4&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336017&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=C155E002DF856DCAB0095A05751FA46C03114CA7.9D30042FD57EF2407F28F67222A8470AF5E8A8&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: cTJumqB1DRU
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+21. Ryan Petersen on what Paul Graham told him when he stepped down as Flexport CEO
+   영상 ID: RU2r4eu-e2c
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=RU2r4eu-e2c&ei=o8NHacHbA8yB2roPgfyOsAo&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336019&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=1157407C8BA0CB8D5DD2A476B9578783666AC0F8.02C24549F5D2DDA56969358D65271C379DAF3425&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: RU2r4eu-e2c
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+22. Sam Altman on what startup ideas actually work
+   영상 ID: zHa3E_rb-LU
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=zHa3E_rb-LU&ei=pMNHaY7ZL6Ph1d8P4sbwgAk&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336020&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=C933C1A785EB260AF021A89FD3E1774FF443FB92.C8AD9C3DDC17C3CCBFED2FA99E6ED7FE95200EE8&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: zHa3E_rb-LU
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+23. Sam Altman on what startup ideas actually work
+   영상 ID: 8Xdt5ZrUB_4
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=8Xdt5ZrUB_4&ei=psNHadqAEs-evcAPp83EWQ&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336022&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=B2608CAC118873DFBA6A5CD92B783121D4D6BF1D.C75B9D1A5B686044E3FC30BD39D2785A67DD06FD&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: 8Xdt5ZrUB_4
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+24. Jeff Bezos on raising Amazon’s seed round: “It was the hardest thing I’ve ever done”
+   영상 ID: PXegA_B9pbE
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=PXegA_B9pbE&ei=p8NHadzyMOzN2roPn9aa-Qo&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336023&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=6578DD2B33A204E0736BE78B42357AEC6B5600A1.88D5E7302ADB1BF0088268CB43C133FE3539AE34&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: PXegA_B9pbE
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+25. Coinbase founder Brian Armstrong on common startup hiring mistakes
+   영상 ID: vekrapaWuAE
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=vekrapaWuAE&ei=qcNHabmcJrTPpt8Pu5q7kAo&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336025&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=33573E978EDC7F20EC85AF96B40BD47593C5BD63.0C22720B38155117AA9B7E2178FF7FB82BEFB68E&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: vekrapaWuAE
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+26. Coinbase founder Brian Armstrong on common startup hiring mistakes
+   영상 ID: yoCestQ-njQ
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=yoCestQ-njQ&ei=q8NHafPTEcnX1d8P3faF0A4&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336027&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=ED72145E70E425D502BC5DEE7A918ECE748FBB1A.387DBE0F2FA9AB040B16248E34EC3504D6B6200E&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: yoCestQ-njQ
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+27. Snowflake CEO Frank Slootman explains why your company priorities are wrong
+   영상 ID: r43GqFwulSc
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=r43GqFwulSc&ei=rcNHaZFDgorV3w_l7YygDw&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336029&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=D40A29C58ACD29FCB1D900F231F773579AA80661.E1CFAFFA2A0CA132EFA908953EBF3D110D544840&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: r43GqFwulSc
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+28. Patrick Collison on prioritizing fulfillment over happiness
+   영상 ID: KGqEEr8lZF8
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=KGqEEr8lZF8&ei=rsNHac7CI9S32roPsdf9oAo&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336030&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=E1EA20C17F1CC9A8FA2FC8BF883844B25725C7B1.3E986AA932AD762DBEF1C495778057AB752CCB8B&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: KGqEEr8lZF8
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+29. Patrick Collison on prioritizing fulfillment over happiness
+   영상 ID: LkehdpqUZaU
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=LkehdpqUZaU&ei=sMNHacidC7js2roP0o_z8Q4&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336032&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=6738275D6453FC5D149290F37784C6898ECCFD97.095F7A5F96B36061B208E9E9852B1D1BAF946E39&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: LkehdpqUZaU
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+30. Paul Graham on rage-bait startups: “Scammers don’t make the giant companies”
+   영상 ID: BjO4w5Uhgkg
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=BjO4w5Uhgkg&ei=scNHaeb1KoGFpt8Pts33sAU&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336033&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=CEAA56ED6D84D8C12932559AA9758A39DBED6191.6C3D4EA32D8020E207E0F185B617F11E54272FCD&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: BjO4w5Uhgkg
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+31. Paul Graham on rage-bait startups: “Scammers don’t make the giant companies”
+   영상 ID: 54WGc9cTXH0
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=54WGc9cTXH0&ei=s8NHab-hHJiI1d8PvsOi8Qc&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336035&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=4D3273270B2B796B0F10BEA80ED95F3288842BF7.98C2C49409050681C50B30DA6E7460DC2E962354&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: 54WGc9cTXH0
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+32. Mark Zuckerberg: “Start off trying to make something cool, not build a company.”
+   영상 ID: czvBmrdiNWE
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=czvBmrdiNWE&ei=tcNHaevLB7yX1d8Pu_e8iAg&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336037&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=A02F5F0D2C86C745C6FBF0186390CCC6B23EE85E.52A0BB505E844B45970BF4E0F29672A90008C7DD&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: czvBmrdiNWE
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+33. Jeff Bezos: “Stress comes from ignoring things that you shouldn’t be ignoring”
+   영상 ID: g-TPJD3esxQ
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=g-TPJD3esxQ&ei=t8NHabSuG_SI1d8P9biH-A4&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336039&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=25E426BE98D761EE85373FDFE91D9ED29E530157.02CE690EEB1A7AAD241B291AF68B7807B4FC2420&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: g-TPJD3esxQ
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+34. Keith Rabois explains why Founders Fund doesn’t invest in remote startups
+   영상 ID: EC-z34lYQ-8
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=EC-z34lYQ-8&ei=ucNHaauxBrz5pt8Plqnn0Aw&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336041&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=37D9201CB379036E52FA4855A09491576FC14236.2EC044E5E83376045170552F407CB41868190D7D&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: EC-z34lYQ-8
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+35. Jony Ive explains the Steve Jobs product philosophy that saved Apple from bankruptcy in 1998
+   영상 ID: Ln7ogDtTI_k
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=Ln7ogDtTI_k&ei=usNHaYm3OYKe2roP6cmUmA8&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336042&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=43C532749CCA697F98DD7ABA92DF7CC3015B8F23.EFA724DF3DD0D74639C3E03270482CF9D16DB73F&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: Ln7ogDtTI_k
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+36. Ben Horowitz shares 4 principles for choosing a cofounder
+   영상 ID: EYBXK-kr5GI
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=EYBXK-kr5GI&ei=vMNHadLYLdDM2roPxrKfmAE&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336044&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=78CE6AE470CFBB8F23054BC16618151A8A577FE6.A2F77358C222272215D0FFB65E6567DAA000DB61&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: EYBXK-kr5GI
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+37. Ben Horowitz shares 4 principles for choosing a cofounder
+   영상 ID: FLZXj9HBbZw
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=FLZXj9HBbZw&ei=vsNHaeGpGd7rpskPlPPTyQI&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336046&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=47B226833853162626CA1E0D1EAC2C9D82082363.9A1311A37DDA99FD27744D8E18D6D12231B05BC7&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: FLZXj9HBbZw
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+38. Elon Musk on the key to achieving word-of-mouth growth
+   영상 ID: SDAnmi5otYk
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=SDAnmi5otYk&ei=wMNHae_UAe3L2roP946kiQU&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336048&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=225D843BECECB8CCCCE90FD149A676ACADAECF5E.4A0FD902AB3AFCBE7FFAF6807C4601A2B9D2A668&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: SDAnmi5otYk
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+39. Jason Citron on the growth hack that got Discord its first few thousand users
+   영상 ID: WJ55DbMCogk
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=WJ55DbMCogk&ei=wcNHaYu3LZGS1d8Puve38Qc&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336049&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=5A97BE175EEBAAEB5003528C079BDC31E5916104.79D5D1C642D1E52E6C4F90A1BF5477CB5FBBE2E1&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: WJ55DbMCogk
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+40. Jason Citron on the growth hack that got Discord its first few thousand users
+   영상 ID: Dx8bw2tlbn4
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=Dx8bw2tlbn4&ei=w8NHaZyFJeyA2roPy8epqAo&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336051&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=0D2B674325F36CB5A09352651E87A3D01CC16EAB.77B5BE6F9E2F38D879E695859047541596C551C7&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: Dx8bw2tlbn4
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+41. Vinod Khosla on the two most important things to get right when building a company
+   영상 ID: LP4ljlxZ2G8
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=LP4ljlxZ2G8&ei=xcNHab2qFuvCrfcP-JezmA8&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336053&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=97FFB82047F5C1D474FC5FE75649E2B15110A792.9EE111733AED55B4EBBA76B0D0D3FCE31E5A3786&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: LP4ljlxZ2G8
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+42. Dropbox founder Drew Houston on why distribution is more important than product
+   영상 ID: CaZDTlnKXPo
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=CaZDTlnKXPo&ei=x8NHadfiGJWN0-kP9ceacQ&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336055&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=DF753D15826FE5846685E39565C5135FE981A67F.E78C3854CB785B6BC367C7BC5624B571C51E1959&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: CaZDTlnKXPo
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+43. Dropbox founder Drew Houston on why distribution is more important than product
+   영상 ID: gC7WzywidbI
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=gC7WzywidbI&ei=ycNHafD5FaCy2roPqsX3sAU&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336057&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=4A5D79872F6D76F43D532C22F06EC21DD2ABDF31.A347496B08FE5F579F73306EAE0A8B512E7A48A5&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: gC7WzywidbI
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+44. NVIDIA founder Jensen Huang: "We never talk about market share”
+   영상 ID: okISbilKFWc
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=okISbilKFWc&ei=y8NHafP3FsK31d8PzqjH4Qg&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336059&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=16D1F016E8EC7C92A153CD77D3735B4B8F89788F.47958A31C9A043AC9BD24E891B0312B82B3C6B97&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: okISbilKFWc
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+45. Jeff Bezos on the 4 principles that differentiated Amazon from other companies
+   영상 ID: d342bSKXgaI
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=d342bSKXgaI&ei=zcNHafKiJpmnvcAPwuHMwQI&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336061&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=A42FFA692D06A8EA27948CF759136E2BC977BC48.AEFBC396ADC66DD4FE0E7380CE7807B51909FE76&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: d342bSKXgaI
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+46. Jeff Bezos on the 4 principles that differentiated Amazon from other companies
+   영상 ID: CoXt8kD3_Uc
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=CoXt8kD3_Uc&ei=z8NHadn9Fv-32roP0prW2Ao&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336063&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=44BEF4A0B5F7DB42683427937571F058B99EFF9B.B94652E6E564EA2D4E84CDA398531DF2D21ABB29&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: CoXt8kD3_Uc
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+47. Airbnb founder Brian Chesky on “living your product” and why slow growth can be invaluable
+   영상 ID: CJ6dcu7ZF3c
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=CJ6dcu7ZF3c&ei=0cNHafu2A9Sy2roPvMK10AU&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336065&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=5ADE1AD70C58CEFFD3626C1A20E10B18FFB85D63.30464003E468F69A1317D84E47D19A2004B3CB7A&key=yt8&kind=asr&lang=en&variant=ec! This is most likely caused by:
+
+Request to YouTube failed: CJ6dcu7ZF3c
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+48. Elon Musk: “Anyone who wants to make more than they take has my respect”
+   영상 ID: TwxA2vDkB7w
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=TwxA2vDkB7w&ei=0sNHaaTxNNKw2roP4rLZ4Qo&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336066&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=41EE234F598383824E65991F38CB247B9709109D.85C6C5CE9726159417D1A1F2F8691EA7CF5F470C&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: TwxA2vDkB7w
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+49. Elon Musk: “Anyone who wants to make more than they take has my respect”
+   영상 ID: elNWNsiD7aU
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=elNWNsiD7aU&ei=1MNHaYG_MPWW1d8PzaWDwQM&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336068&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=7E02F60A33F24A4AE1B6FEFC7F7F1D13AF637F22.D1B5F340C5B26482E85A4F4023120E2514F270F2&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: elNWNsiD7aU
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+50. Google founder Larry Page explains how he decides what to work on
+   영상 ID: 3LWZCRKNAJ0
+   에러: 다운로드 실패: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=429 Client Error: Too Many Requests for url: https://www.youtube.com/api/timedtext?v=3LWZCRKNAJ0&ei=1sNHabqSMeanvcAPwe3pwQI&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1766336070&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=BD412D49B6757FC41F44DF2B79C68F7F2A0AA71E.4B3AD97B9A14F66DC5AA27A2119233610994789E&key=yt8&kind=asr&lang=en! This is most likely caused by:
+
+Request to YouTube failed: 3LWZCRKNAJ0
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+
+
+================================================================================
+
+💡 해결 방법:
+1. '자동 감지(auto)' 언어 옵션을 사용해보세요.
+2. '자동생성 자막 포함' 옵션을 활성화하세요.
+3. 영어(en) 자막을 시도해보세요 (가장 많이 제공됨).

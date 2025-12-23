@@ -2,86 +2,181 @@
   {
     "scene_id": 1,
     "filename": "scene_001.png",
-    "script_text": "2018년 언론인 자말 카슈크지가 튜르키의 이스탄불의 사우디아라비아 총영사관에서 살해되었습니다.",
-    "characters": [
-      "자말 카슈끄지"
-    ],
-    "direction_guide": "총영사관 건물 외경을 보여주며 시작",
-    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Exterior of the Saudi Arabian consulate in Istanbul, Turkey, overcast day, no characters, single character, Middle Eastern man, late 50s, with a neatly trimmed salt-and-pepper beard, a kind and intelligent face, wearing a dark-colored blazer over a collared shirt, often seen with a pen in his hand, suggesting his profession as a journalist. He has a thoughtful expression and a gentle demeanor. His eyes reflect a deep understanding of the world and a commitment to truth., 비극적인 mood",
+    "script_text": "2020년, 하나의 영상이 유튜브 역사를 새로 썼습니다. 누적 조회수 1위. 전 세계 244개국, 25개 언어로 퍼져나간 이 콘텐츠의 주인공은 다름 아닌 아기상어였습니다.",
+    "characters": [],
+    "direction_guide": "아기상어 영상 클립 삽입",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Modern YouTube studio background, Baby Shark character, vibrant lighting, no characters, no people, 흥미로운 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 5
+    "duration_estimate": 10
   },
   {
     "scene_id": 2,
     "filename": "scene_002.png",
-    "script_text": "그는 사우디 왕세자 무함마드 빈 살만을 비판하던 기자였는데요. 튜르키의 정부와 국제 사회에서는 이 사건의 배우로 사우디의 왕세자 무함마드 빈 살만을 지목했지만 정작 사우디 안에서는 그 누구도 왕세자를 향해 질문조차 던질 수 없었습니다.",
-    "characters": [
-      "자말 카슈끄지",
-      "무함마드 빈 살만"
-    ],
-    "direction_guide": "뉴스 보도 화면처럼 연출",
-    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, News studio background, serious atmosphere, no characters, multiple characters, Middle Eastern man, late 50s, with a neatly trimmed salt-and-pepper beard, a kind and intelligent face, wearing a dark-colored blazer over a collared shirt, often seen with a pen in his hand, suggesting his profession as a journalist. He has a thoughtful expression and a gentle demeanor. His eyes reflect a deep understanding of the world and a commitment to truth., Middle Eastern man, early 30s, clean-shaven with a strong jawline. He has dark, intense eyes and a confident expression. He is wearing traditional Saudi Arabian attire, such as a white thobe and a dark bisht. His posture is upright and authoritative. The lighting should be strong and highlight his power and influence. He has a well-groomed appearance, reflecting his status as a crown prince. He may be wearing a luxury watch or other subtle accessories., 심각한 mood",
+    "script_text": "\"뚜루루뚜루~\". 이 단순한 멜로디가 어떻게 전 세계 아이들의 마음을 사로잡았을까요? 그리고 이 노래를 만든 회사는 어떻게 5억 원으로 시작해서 시가총액 5,000억 원의 상장 기업이 되었을까요?",
+    "characters": [],
+    "direction_guide": "5억에서 5,000억으로 성장하는 그래프 강조",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Dramatic city skyline, animated growth chart from 500 million to 5 trillion Korean Won, no characters, no people, 궁금증 유발 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 17
+    "duration_estimate": 12
   },
   {
     "scene_id": 3,
     "filename": "scene_003.png",
-    "script_text": "법과 인권 언론의 자유보다 왕의 권력이 절대적으로 강하다는 것을 전 세계에 보여준 사건이죠. 뿐만 아니라 사우디아라비아를 대표하는 석유 회사 아람코는 사실상 왕가의 재산으로 취급됩니다.",
+    "script_text": "2025년 11월 18일, 더 핑크퐁 컴퍼니가 코스닥에 상장했습니다. 공모가 38,000원, 공모 자금 760억 원. 설립 15년 만의 IPO 성공이었습니다.",
     "characters": [],
-    "direction_guide": "아람코 건물 보여주기",
-    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Aerial view of Saudi Aramco headquarters, clear day, no characters, 권위적인 mood",
+    "direction_guide": "주식 차트와 함께 IPO 정보 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, KOSDAQ stock exchange scene, stock chart, The Pinkfong Company logo, no characters, no people, 성공적인 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 13
+    "duration_estimate": 8
   },
   {
     "scene_id": 4,
     "filename": "scene_004.png",
-    "script_text": "구강과 왕세자가 이 회사의 이익을 직접 통제하며 정치뿐 아니라 경제마저 왕가 중심으로 운영되고 있죠.",
+    "script_text": "오늘은 아기상어 하나로 글로벌 패밀리 엔터테인먼트 기업이 된 더 핑크퐁 컴퍼니의 사업 구조, 재무 분석, 그리고 IPO 과정에서 기업 가치가 어떻게 산정되었는지까지 낱낱이 파헤쳐 보겠습니다.",
     "characters": [],
-    "direction_guide": "왕궁 내부 모습 보여주기",
-    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Interior of the Saudi Arabian royal palace, luxurious and grand atmosphere, no characters, 지배적인 mood",
+    "direction_guide": "사업 구조, 재무 분석, IPO 과정 키워드 강조",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Analytical meeting room atmosphere, business structure, financial analysis, IPO process keywords, no characters, no people, 분석적인 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 6
+    "duration_estimate": 11
   },
   {
     "scene_id": 5,
     "filename": "scene_005.png",
-    "script_text": "그렇다면 오랜 세월이 흐르는 동안 어떻게 사우디의 절대 군주 체제는 더 강력해졌을까요?",
+    "script_text": "더 핑크퐁 컴퍼니의 시작은 2010년 6월로 거슬러 올라갑니다. 당시 회사 이름은 스마트 스터디였습니다. 창업자는 김민석 대표. 넥슨과 네이버 출신의 IT 개발자 세 명이 강남 역삼동에서 시작한 스타트업이었죠.",
     "characters": [],
-    "direction_guide": "역사적 사건 나열",
-    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Timeline of Saudi Arabian history, from ancient times to the present, no characters, 궁금증 유발 mood",
+    "direction_guide": "2010년부터 현재까지 연혁 타임라인 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, 2010 Gangnam Yeoksam-dong startup office, Kim Min-seok CEO photo, no characters, no people, 역사적인 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 5
+    "duration_estimate": 12
   },
   {
     "scene_id": 6,
     "filename": "scene_006.png",
-    "script_text": "놀랍게도 이 나라를 이끄는 왕가의 절대적 권위는 1400년 전 예언자의 가르침에 기반합니다.",
+    "script_text": "그런데 흥미로운 점이 있습니다. 이 회사는 처음부터 완전한 독립 창업이 아니었습니다. 김민석 대표의 가족이 운영하는 회사가 있었습니다. 바로 삼성출판사. 1970년대에 설립된 유명 출판사로, 2010년 스마트 스터디는 이 삼성출판사의 100% 자회사로 출발했습니다.",
     "characters": [],
-    "direction_guide": "경전 보여주기",
-    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Ancient Islamic scripture, sacred atmosphere, no characters, 신성한 mood",
+    "direction_guide": "삼성출판사와 스마트 스터디 관계 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Samsung Publishing logo, Smart Study subsidiary relationship diagram, no characters, no people, 흥미로운 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 5
+    "duration_estimate": 16
   },
   {
     "scene_id": 7,
     "filename": "scene_007.png",
-    "script_text": "사우디아라비아를 비롯한 중동의 국가들은 여전히 종교가 굉장히 중요한 사회적 가치를 가지고 있습니다. 이들의 권력 기반이 여전히 이슬람 성지의 수호자라고 하는 종교적 권위에 있다는 것도 과언이 아닙니다.",
+    "script_text": "초기 투자금은 단 5억 원이었습니다. 2011년 4월, 김민석 대표가 지분 50%를 인수하면서 독립적인 경영을 본격적으로 시작합니다. 삼성출판사와 김민석 대표가 반반씩 지분을 나눠 가진 구조가 된 것이죠.",
     "characters": [],
-    "direction_guide": "메카 성지 보여주기",
-    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Mecca, with many pilgrims gathered, no characters, 종교적인 mood",
+    "direction_guide": "지분 구조 변화 파이 차트 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, 500 million Korean Won image, Samsung Publishing, Kim Min-seok CEO equity structure, no characters, no people, 중립적인 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
     "duration_estimate": 12
   },
   {
     "scene_id": 8,
     "filename": "scene_008.png",
-    "script_text": "오랜 세월이 흐르는 동안 어떻게이 국가들은 절대군주 체제를 유지할 수 있었을까요? 일부에서 우리는 인류 최초의 리더가 신체적 능력과 지혜로 권력을 획득했던 족장이었음을 보았습니다. 하지만 시간이 흐르면서 권력의 원천은 힘을 넘어선 곳에서 찾기 시작했습니다.",
+    "script_text": "그로부터 15년이 지난 지금, 5억 원으로 시작한 회사의 시가총액은 약 5,000억 원. 무려 1,000배의 성장입니다. 삼성출판사의 현재 지분율은 약 16.77%로 희석되었지만, 여전히 주요 주주로 남아 있습니다.",
     "characters": [],
-    "direction_guide": "고대 부족 사회 모습 보여주기",
-    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Scene of an ancient tribal society, with the chieftain leading the tribe, no characters, 역사적인 mood",
+    "direction_guide": "1,000배 성장 강조",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, 5 trillion Korean Won image, 1000x growth chart, no characters, no people, 성공적인 mood",
     "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
-    "duration_estimate": 17
+    "duration_estimate": 12
+  },
+  {
+    "scene_id": 9,
+    "filename": "scene_009.png",
+    "script_text": "참고로 삼성출판사 자체도 시가총액 1,500억 원 규모의 상장 회사입니다.",
+    "characters": [],
+    "direction_guide": "삼성출판사 시가총액 정보 제공",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Samsung Publishing logo, 150 billion Korean Won image, no characters, no people, 정보 제공 mood",
+    "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+    "duration_estimate": 3
+  },
+  {
+    "scene_id": 10,
+    "filename": "scene_010.png",
+    "script_text": "자, 그렇다면 이 회사의 핵심 자산은 무엇일까요? 바로 IP, 지식재산권입니다. 더 핑크퐁 컴퍼니가 보유한 메인 IP는 세 가지입니다.",
+    "characters": [],
+    "direction_guide": "IP, 지식재산권 강조",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, IP, intellectual property image, The Pinkfong Company logo, no characters, no people, 핵심 강조 mood",
+    "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+    "duration_estimate": 6
+  },
+  {
+    "scene_id": 11,
+    "filename": "scene_011.png",
+    "script_text": "첫 번째, 핑크퐁. 분홍색 여우 캐릭터로, 회사의 대표 브랜드이자 얼굴입니다. 2012년 이 캐릭터의 디자인과 로고가 확정되면서 브랜드 정체성이 확립되었습니다.",
+    "characters": [],
+    "direction_guide": "핑크퐁 캐릭터, 핑크퐁 로고 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Pinkfong character, Pinkfong logo, no characters, no people, 브랜드 소개 mood",
+    "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+    "duration_estimate": 8
+  },
+  {
+    "scene_id": 12,
+    "filename": "scene_012.png",
+    "script_text": "두 번째, 상어 가족. 그 유명한 아기상어가 바로 이 IP에 속합니다. 아기상어의 이름은 올리입니다. 2015년 유튜브를 통해 공개된 이 콘텐츠는 회사의 운명을 완전히 바꿔놓았습니다.",
+    "characters": [],
+    "direction_guide": "아기상어 캐릭터, 아기상어 영상 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Baby Shark character, Baby Shark video, no characters, no people, 브랜드 소개 mood",
+    "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+    "duration_estimate": 10
+  },
+  {
+    "scene_id": 13,
+    "filename": "scene_013.png",
+    "script_text": "2019년에는 빌보드 핫100에 20주 연속 진입하며 K-콘텐츠의 글로벌 파워를 증명했죠.",
+    "characters": [],
+    "direction_guide": "빌보드 핫100 차트 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Billboard Hot 100 chart, Baby Shark character, no characters, no people, 성공적인 mood",
+    "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+    "duration_estimate": 4
+  },
+  {
+    "scene_id": 14,
+    "filename": "scene_014.png",
+    "script_text": "세 번째, 베베핀. 5인 가족을 캐릭터화한 3D 애니메이션입니다. 아기상어보다 타겟 연령대가 조금 높고, 사람 캐릭터가 등장한다는 점이 특징입니다.",
+    "characters": [],
+    "direction_guide": "베베핀 캐릭터, 3D 애니메이션 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Bebefinn character, 3D animation, no characters, no people, 브랜드 소개 mood",
+    "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+    "duration_estimate": 7
+  },
+  {
+    "scene_id": 15,
+    "filename": "scene_015.png",
+    "script_text": "이 세 가지 IP를 중심으로 더 핑크퐁 컴퍼니는 콘텐츠 제국을 건설해 나갔습니다.",
+    "characters": [],
+    "direction_guide": "콘텐츠 제국 이미지 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Content empire image, Pinkfong, Baby Shark, Bebefinn characters, no characters, no people, 성공적인 mood",
+    "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+    "duration_estimate": 4
+  },
+  {
+    "scene_id": 16,
+    "filename": "scene_016.png",
+    "script_text": "그렇다면 이 IP들이 실제로 어떻게 돈을 벌어다 줄까요? 사업 부문을 하나씩 뜯어보겠습니다.",
+    "characters": [],
+    "direction_guide": "사업 부문 키워드 강조",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, Business sector keywords, money image, no characters, no people, 분석적인 mood",
+    "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+    "duration_estimate": 4
+  },
+  {
+    "scene_id": 17,
+    "filename": "scene_017.png",
+    "script_text": "가장 핵심적인 수익원입니다. 영상, 음원, 앱, 공연 등이 여기에 포함됩니다. 특히 유튜브의 파워가 압도적입니다.",
+    "characters": [],
+    "direction_guide": "유튜브, 영상, 음원, 앱, 공연 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, YouTube logo, video, music, app, concert images, no characters, no people, 핵심 강조 mood",
+    "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+    "duration_estimate": 5
+  },
+  {
+    "scene_id": 18,
+    "filename": "scene_018.png",
+    "script_text": "2025년 9월 말 기준, 더 핑크퐁 컴퍼니가 운영하는 유튜브 채널의 총 구독자 수는 2억 8천만 명. 누적 조회수는 1,700억 회입니다.",
+    "characters": [],
+    "direction_guide": "유튜브 채널 현황 시각화",
+    "prompt": "infographic animation style, educational illustration, clean simple lines, bright cheerful colors, solid background, professional quality, no text, informative visual, Korean YouTube style, YouTube channel, subscriber count, cumulative views image, no characters, no people, 정보 제공 mood",
+    "negative_prompt": "no text, no words, no letters, no numbers, no watermark, no signature, no writing",
+    "duration_estimate": 6
   }
 ]

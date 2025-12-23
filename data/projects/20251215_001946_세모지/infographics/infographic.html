@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>더 핑크퐁 컴퍼니 성공 방정식</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --canvas-width: 1280px;
+            --canvas-height: 720px;
+            --bg-color: #ffffff;
+            --text-color: #222222;
+            --point-red: #ef4444;
+            --point-yellow: #facc15;
+            --point-blue: #3b82f6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Nanum Pen Script', cursive;
+            overflow: hidden;
+        }
+
+        /* 뷰어 레이아웃 */
+        .viewer-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #video-canvas {
+            width: var(--canvas-width);
+            height: var(--canvas-height);
+            background: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        .safe-area {
+            width: 100%;
+            height: 100%;
+            padding: 72px; /* Safe Zone */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 씬 관리 */
+        .scene {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 72px;
+        }
+        .scene.active { display: flex; }
+
+        /* 공통 스타일 */
+        h1 { font-size: 80px; line-height: 1.1; margin-bottom: 20px; text-align: center; color: var(--text-color); }
+        h2 { font-size: 56px; margin-bottom: 15px; color: var(--text-color); }
+        p { font-size: 44px; line-height: 1.4; color: #444; text-align: center; }
+        span.highlight { background: var(--point-yellow); padding: 0 10px; border-radius: 10px; }
+        
+        /* 손그림 요소 */
+        .rough-filter { filter: url(#rough-edge); }
+        .rough-strong { filter: url(#rough-strong); }
+        .rough-line { filter: url(#rough-line); }
+
+        .hand-drawn-box {
+            border: 5px solid var(--text-color);
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            padding: 40px 60px;
+            background: white;
+            position: relative;
+            filter: url(#rough-edge);
+        }
+
+        .note-bubble {
+            position: absolute;
+            background: #fef9c3;
+            border: 4px solid var(--text-color);
+            padding: 15px 25px;
+            font-size: 36px;
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            transform: rotate(-3deg);
+            filter: url(#rough-edge);
+        }
+
+        /* 애니메이션 */
+        @keyframes bounce-subtle {
+            0%, 100% { transform: translateY(0) rotate(-0.5deg); }
+            50% { transform: translateY(-10px) rotate(0.5deg); }
+        }
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulse-red {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        @keyframes draw-line {
+            from { stroke-dashoffset: 1000; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        .animate-subtle { animation: bounce-subtle 4s ease-in-out infinite; }
+        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+        .animate-pulse-red { animation: pulse-red 2s infinite; }
+        .animate-draw { animation: draw-line 2s ease-out forwards; }
+
+        /* 네비게이션 UI */
+        .nav-btn {
+            background: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 24px;
+        }
+        .progress-outer {
+            width: var(--canvas-width);
+            height: 8px;
+            background: #d1d5db;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            height: 100%;
+            background: var(--point-red);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .scene-counter { margin-top: 10px; font-size: 24px; color: #666; }
+
+        /* 패턴 전용 스타일 */
+        .timeline-container { position: relative; height: 250px; width: 1000px; margin-top: 50px; }
+        .timeline-item { position: absolute; transform: translateX(-50%); text-align: center; }
+        .timeline-dot { width: 24px; height: 24px; background: var(--text-color); border-radius: 50% 45% 55% 50%; margin: 20px auto; filter: url(#rough-edge); }
+        
+        .kpi-grid { display: grid; grid-template-columns: repeat(2, 350px); gap: 30px; }
+        .kpi-card { border: 4px solid var(--text-color); border-radius: 20px 50px; padding: 30px; text-align: center; filter: url(#rough-edge); }
+
+        .chart-bar { background: var(--text-color); filter: url(#rough-strong); border-radius: 5px 5px 0 0; }
+        
+        .matrix-grid { display: grid; grid-template-columns: 250px 250px; grid-template-rows: 180px 180px; border: 4px solid #222; filter: url(#rough-strong); }
+        .matrix-cell { border: 2px solid #222; display: flex; flex-direction: column; align-items: center; justify-content: center; filter: url(#rough-edge); }
+
+        .vs-container { display: flex; align-items: center; gap: 50px; }
+        .vs-box { border: 4px solid #222; padding: 30px; border-radius: 30px; width: 300px; filter: url(#rough-edge); text-align: center; }
+    </style>
+</head>
+<body>
+
+    <!-- SVG 필터 정의 -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="rough-edge">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" />
+        </filter>
+        <filter id="rough-strong">
+            <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" />
+        </filter>
+        <filter id="rough-line">
+            <feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="2" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+        </filter>
+    </svg>
+
+    <div class="viewer-container">
+        <button class="nav-btn" onclick="move(-1)"><i class="fa-solid fa-arrow-left"></i></button>
+        
+        <div id="video-canvas">
+            
+            <!-- 씬 1: 브랜드 오프닝 -->
+            <div class="scene active" id="scene1">
+                <div class="animate-subtle" style="font-size: 120px; color: var(--point-red); font-weight: bold; margin-bottom: 20px;">PINKFONG</div>
+                <div class="hand-drawn-box">
+                    <p style="font-size: 36px;">[유튜브 역사]</p>
+                    <h1>조회수 <span class="highlight">전 세계 1위</span></h1>
+                    <p>244개국을 뒤흔든 아기상어의 위엄</p>
+                </div>
+            </div>
+
+            <!-- 씬 2: 대형 키워드 -->
+            <div class="scene" id="scene2">
+                <h1 style="font-size: 110px;">뚜루루 <span style="color: var(--point-red);">뚜루~</span></h1>
+                <div class="hand-drawn-box" style="background: var(--point-yellow); margin-top: 30px;">
+                    <p>5억 원으로 시작한 꿈</p>
+                    <p>시총 <span style="font-size: 60px; font-weight: bold;">5,000억 원</span>이 되다</p>
+                </div>
+                <i class="fa-solid fa-music animate-subtle" style="position: absolute; top: 100px; right: 150px; font-size: 80px; opacity: 0.2;"></i>
+            </div>
+
+            <!-- 씬 3: 타임라인 -->
+            <div class="scene" id="scene3">
+                <h2>성장의 마일스톤: <span class="highlight">IPO</span></h2>
+                <div class="timeline-container">
+                    <svg style="position: absolute; top: 30px; width: 100%; height: 20px; filter: url(#rough-line);">
+                        <path d="M0,10 Q250,5 500,12 Q750,8 1000,10" stroke="#222" stroke-width="5" fill="none"/>
+                    </svg>
+                    <div class="timeline-item" style="left: 0%;">
+                        <div class="timeline-dot"></div>
+                        <p style="font-size: 36px;">2010</p>
+                        <p style="font-size: 32px;">설립</p>
+                    </div>
+                    <div class="timeline-item animate-subtle" style="left: 100%;">
+                        <div class="timeline-dot" style="background: var(--point-red);"></div>
+                        <p style="font-size: 44px; color: var(--point-red); font-weight: bold;">2025.11</p>
+                        <p style="font-size: 36px; color: var(--point-red);">코스닥 상장</p>
+                    </div>
+                </div>
+                <p style="margin-top: 50px;">공모가 38,000원 | 760억 원 확보</p>
+            </div>
+
+            <!-- 씬 4: 단계별 프로세스 -->
+            <div class="scene" id="scene4">
+                <h2>분석의 <span class="highlight">3단계</span> 루프</h2>
+                <div style="display: flex; align-items: center; gap: 40px; margin-top: 40px;">
+                    <div class="kpi-card">
+                        <p style="font-size: 32px;">STEP 1</p>
+                        <p style="font-weight: bold;">사업 구조</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="font-size: 40px; opacity: 0.3;"></i>
+                    <div class="kpi-card animate-subtle" style="border-color: var(--point-red);">
+                        <p style="font-size: 32px;">STEP 2</p>
+                        <p style="font-weight: bold; color: var(--point-red);">재무 분석</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="font-size: 40px; opacity: 0.3;"></i>
+                    <div class="kpi-card">
+                        <p style="font-size: 32px;">STEP 3</p>
+                        <p style="font-weight: bold;">가치 산정</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 씬 5: 프로필 카드 -->
+            <div class="scene" id="scene5">
+                <div class="hand-drawn-box" style="display: flex; gap: 50px; align-items: center;">
+                    <div style="width: 150px; height: 150px; border: 4px solid #222; border-radius: 50% 40% 60% 45%; display: flex; align-items: center; justify-content: center; filter: url(#rough-edge);">
+                        <i class="fa-solid fa-user" style="font-size: 80px;"></i>
+                    </div>
+                    <div style="text-align: left;">
+                        <h1 style="text-align: left; margin: 0; font-size: 64px;">김민석 <small style="font-size: 32px;">대표</small></h1>
+                        <p style="text-align: left; font-size: 36px;">넥슨·네이버 출신 개발자</p>
+                        <p style="text-align: left; font-size: 36px; color: var(--point-blue);">강남 역삼동 스타트업의 시작</p>
+                    </div>
+                </div>
+                <p style="margin-top: 30px;">2010년 6월, <span class="highlight">'스마트 스터디'</span> 탄생</p>
+            </div>
+
+            <!-- 씬 6: 박스 + 아이콘 -->
+            <div class="scene" id="scene6">
+                <h2>든든한 뿌리: <span style="color: var(--point-blue);">삼성출판사</span></h2>
+                <div style="display: flex; gap: 40px; align-items: center; margin-top: 30px;">
+                    <div class="hand-drawn-box">
+                        <p>1970년대 설립된 유명 출판사</p>
+                        <p>스마트 스터디는 <span class="highlight">100% 자회사</span>로 시작</p>
+                    </div>
+                    <i class="fa-solid fa-book animate-spin-slow" style="font-size: 150px; color: #aaa;"></i>
+                </div>
+            </div>
+
+            <!-- 씬 7: VS 대결 구도 -->
+            <div class="scene" id="scene7">
+                <h2>초기 독립 경영의 구조</h2>
+                <div class="vs-container">
+                    <div class="vs-box">
+                        <p style="font-size: 32px;">삼성출판사</p>
+                        <p style="font-size: 60px; font-weight: bold;">50%</p>
+                    </div>
+                    <div style="font-size: 60px; color: var(--point-red); font-weight: bold;">:</div>
+                    <div class="vs-box animate-subtle" style="border-color: var(--point-red);">
+                        <p style="font-size: 32px;">김민석 대표</p>
+                        <p style="font-size: 60px; font-weight: bold; color: var(--point-red);">50%</p>
+                    </div>
+                </div>
+                <p style="margin-top: 30px;">단 <span class="highlight">5억 원</span>의 투자금으로 일군 기적</p>
+            </div>
+
+            <!-- 씬 8: Big Number -->
+            <div class="scene" id="scene8">
+                <div style="text-align: center;">
+                    <p style="font-size: 52px;">15년 만의 변화</p>
+                    <h1 style="font-size: 200px; color: var(--point-red); margin: 0;">1,000<span style="font-size: 80px;">배</span></h1>
+                    <p style="font-size: 52px;">5억 → <span class="highlight">5,000억</span> 성장</p>
+                </div>
+                <div class="note-bubble" style="bottom: 50px; right: 100px;">
+                    "숫자는 거짓말을 안 한다"
+                </div>
+            </div>
+
+            <!-- 씬 9: KPI 카드 그리드 -->
+            <div class="scene" id="scene9">
+                <h2>핵심 자산: <span style="color: var(--point-blue);">IP (지식재산권)</span></h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <i class="fa-solid fa-lightbulb" style="font-size: 50px; color: var(--point-yellow);"></i>
+                        <p>창의성</p>
+                    </div>
+                    <div class="kpi-card animate-pulse-red">
+                        <i class="fa-solid fa-copyright" style="font-size: 50px; color: var(--point-red);"></i>
+                        <p>독점적 가치</p>
+                    </div>
+                </div>
+                <p style="margin-top: 30px;">무형의 가치가 실질적인 <span class="highlight">현금 흐름</span>을 만든다</p>
+            </div>
+
+            <!-- 씬 10: 텍스트 계층형 -->
+            <div class="scene" id="scene10">
+                <p style="color: #888;">대표 브랜드이자 회사의 얼굴</p>
+                <h1 style="font-size: 150px; color: var(--point-red); margin: 10px 0;">핑크퐁</h1>
+                <p>2012년, 브랜드 정체성 <span class="highlight">확립</span></p>
+                <i class="fa-solid fa-face-smile animate-subtle" style="position: absolute; bottom: 50px; left: 100px; font-size: 100px; opacity: 0.1;"></i>
+            </div>
+
+            <!-- 씬 11: 박스 + 아이콘 -->
+            <div class="scene" id="scene11">
+                <h2>전설의 시작: <span style="color: var(--point-blue);">상어 가족</span></h2>
+                <div style="display: flex; gap: 40px; align-items: center;">
+                    <i class="fa-solid fa-fish-fins animate-subtle" style="font-size: 150px; color: var(--point-blue);"></i>
+                    <div class="hand-drawn-box" style="background: #eff6ff;">
+                        <p>주인공: <span class="highlight">올리 (Ollie)</span></p>
+                        <p>2015년 유튜브 공개</p>
+                        <p>회사의 운명을 바꾼 <span style="color: var(--point-red);">신의 한 수</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 씬 12: 선 그래프 추세 -->
+            <div class="scene" id="scene12">
+                <h2>글로벌 파워: <span class="highlight">빌보드 핫 100</span></h2>
+                <svg viewBox="0 0 600 200" style="width: 800px; height: 250px; margin: 20px 0; filter: url(#rough-edge);">
+                    <path d="M50,180 Q150,170 250,150 Q350,120 450,80 Q550,40 550,20" stroke="var(--point-red)" stroke-width="8" fill="none" class="animate-draw" stroke-dasharray="1000"/>
+                    <text x="500" y="50" font-size="40" fill="var(--point-red)" font-family="Nanum Pen Script">20주 연속!</text>
+                </svg>
+                <p>베베핀(Bebefinn): 3D로 확장하는 <span class="highlight">콘텐츠 제국</span></p>
+            </div>
+
+            <!-- 씬 13: SVG 순환 다이어그램 -->
+            <div class="scene" id="scene13">
+                <h1 style="font-size: 64px;">콘텐츠 수익 <span style="color: var(--point-red);">무한 루프</span></h1>
+                <svg viewBox="0 0 400 400" style="width: 400px; height: 400px; filter: url(#rough-edge);">
+                    <ellipse cx="200" cy="200" rx="150" ry="140" fill="none" stroke="#222" stroke-width="4" stroke-dasharray="10 5" class="animate-spin-slow"/>
+                    <text x="200" y="80" text-anchor="middle" font-size="36" font-family="Nanum Pen Script">영상/음원</text>
+                    <text x="340" y="200" text-anchor="middle" font-size="36" font-family="Nanum Pen Script">라이선스</text>
+                    <text x="200" y="340" text-anchor="middle" font-size="36" font-family="Nanum Pen Script">머천다이즈</text>
+                    <text x="60" y="200" text-anchor="middle" font-size="36" font-family="Nanum Pen Script">공연/앱</text>
+                    <text x="200" y="215" text-anchor="middle" font-size="60" fill="var(--point-red)" font-family="Nanum Pen Script" font-weight="bold">IP 제국</text>
+                </svg>
+            </div>
+
+            <!-- 씬 14: 도넛 차트 -->
+            <div class="scene" id="scene14">
+                <h2>유튜브 압도적 수치</h2>
+                <div style="display: flex; align-items: center; gap: 60px;">
+                    <svg viewBox="0 0 200 200" style="width: 300px; height: 300px; filter: url(#rough-edge);">
+                        <ellipse cx="100" cy="100" rx="80" ry="75" fill="none" stroke="#eee" stroke-width="30"/>
+                        <ellipse cx="100" cy="100" rx="80" ry="75" fill="none" stroke="var(--point-red)" stroke-width="30" stroke-dasharray="400 500" stroke-dashoffset="100" class="animate-draw"/>
+                        <text x="100" y="115" text-anchor="middle" font-size="44" fill="var(--point-red)" font-family="Nanum Pen Script" font-weight="bold">1,700억</text>
+                    </svg>
+                    <div class="hand-drawn-box">
+                        <p>구독자: <span class="highlight">2.8억 명</span></p>
+                        <p>조회수: <span style="color: var(--point-red);">1,700억 회</span></p>
+                        <p style="font-size: 32px;">(2025.09 기준)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 씬 15: 막대 차트 -->
+            <div class="scene" id="scene15">
+                <h2>채널 분할 전략 (Segmentation)</h2>
+                <div style="display: flex; align-items: flex-end; gap: 30px; height: 300px; padding-bottom: 50px;">
+                    <div class="chart-bar" style="height: 30%; width: 80px;"></div>
+                    <div class="chart-bar" style="height: 50%; width: 80px;"></div>
+                    <div class="chart-bar animate-subtle" style="height: 90%; width: 80px; background: var(--point-red);"></div>
+                    <div style="text-align: left; margin-left: 20px;">
+                        <p style="font-size: 36px;">메인 채널: <span class="highlight">8,400만</span></p>
+                        <p style="font-size: 36px;">언어별/캐릭터별 <span style="color: var(--point-blue);">초세분화</span></p>
+                    </div>
+                </div>
+                <p>구독자 100만 넘는 서브 채널이 수두룩</p>
+            </div>
+
+            <!-- 씬 16: 좌우 대비형 -->
+            <div class="scene" id="scene16">
+                <h1 style="font-size: 64px;">콘텐츠의 <span class="highlight">무한 재구매</span> 구조</h1>
+                <div style="display: flex; align-items: center; gap: 50px; margin-top: 30px;">
+                    <div style="text-align: center;">
+                        <i class="fa-solid fa-baby" style="font-size: 80px; opacity: 0.3;"></i>
+                        <p style="font-size: 32px;">지속적 탄생</p>
+                    </div>
+                    <i class="fa-solid fa-rotate animate-spin-slow" style="font-size: 60px; color: var(--point-red);"></i>
+                    <div class="hand-drawn-box animate-subtle">
+                        <p style="font-size: 60px; font-weight: bold; color: var(--point-red);">100%</p>
+                        <p>사실상 <span class="highlight">재구매율</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 씬 17: 인용문 중심형 -->
+            <div class="scene" id="scene17">
+                <div class="hand-drawn-box" style="padding: 60px;">
+                    <h1 style="font-size: 64px;">"음원 플랫폼을 <span style="color: var(--point-red);">도배</span>하다"</h1>
+                    <p>국내외 수백 곡의 동요 스트리밍</p>
+                    <p>특히 <span class="highlight">베베핀</span>의 무서운 상승세</p>
+                </div>
+                <i class="fa-solid fa-compact-disc animate-spin-slow" style="position: absolute; bottom: 50px; right: 80px; font-size: 100px; opacity: 0.1;"></i>
+            </div>
+
+            <!-- 씬 18: 삭제선 비교 박스 -->
+            <div class="scene" id="scene18">
+                <h2>라이선스 비즈니스의 <span class="highlight">확장성</span></h2>
+                <div style="display: flex; gap: 20px; margin-top: 40px;">
+                    <div class="vs-box" style="opacity: 0.5; text-decoration: line-through;">자체 생산</div>
+                    <div class="vs-box animate-subtle" style="background: var(--point-yellow);">로열티 모델</div>
+                </div>
+                <p style="margin-top: 30px;">칫솔, 기저귀, 과자... <span style="color: var(--point-red);">아기상어</span>가 없는 곳이 없다</p>
+            </div>
+
+            <!-- 씬 19: 4분면 매트릭스 -->
+            <div class="scene" id="scene19">
+                <h2>사업 포트폴리오 분석</h2>
+                <div class="matrix-grid">
+                    <div class="matrix-cell"><p style="font-size: 32px;">인형/장난감</p></div>
+                    <div class="matrix-cell animate-subtle" style="background: #fffbeb;"><p style="font-size: 32px; color: var(--point-red); font-weight: bold;">게임 사업</p></div>
+                    <div class="matrix-cell"><p style="font-size: 32px;">의류/잡화</p></div>
+                    <div class="matrix-cell"><p style="font-size: 32px;">기타 IP 상품</p></div>
+                </div>
+                <p style="margin-top: 20px;">자회사 <span class="highlight">'스마트스터디게임즈'</span>의 전개</p>
+            </div>
+
+            <!-- 씬 20: 수평 막대 비교 -->
+            <div class="scene" id="scene20">
+                <h2>2021년 매출 구성 (830억)</h2>
+                <div style="width: 80%; display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; align-items: center;">
+                        <p style="width: 150px; font-size: 32px;">콘텐츠</p>
+                        <div style="flex: 1; height: 40px; background: var(--point-red); width: 40%; border-radius: 0 20px 20px 0; filter: url(#rough-strong);"></div>
+                        <p style="width: 100px; font-size: 32px;">40%</p>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <p style="width: 150px; font-size: 32px;">라이선스</p>
+                        <div style="flex: 1; height: 40px; background: #888; width: 26%; border-radius: 0 20px 20px 0; filter: url(#rough-strong);"></div>
+                        <p style="width: 100px; font-size: 32px;">26%</p>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <p style="width: 150px; font-size: 32px;">머천다이즈</p>
+                        <div style="flex: 1; height: 40px; background: #888; width: 26%; border-radius: 0 20px 20px 0; filter: url(#rough-strong);"></div>
+                        <p style="width: 100px; font-size: 32px;">26%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 씬 21: 도넛 차트 -->
+            <div class="scene" id="scene21">
+                <h2>2025년 3Q: <span style="color: var(--point-red);">콘텐츠 올인</span></h2>
+                <div style="display: flex; align-items: center; gap: 50px;">
+                    <svg viewBox="0 0 200 200" style="width: 300px; height: 300px; filter: url(#rough-edge);">
+                        <ellipse cx="100" cy="100" rx="80" ry="80" fill="none" stroke="#ddd" stroke-width="25"/>
+                        <ellipse cx="100" cy="100" rx="80" ry="80" fill="none" stroke="var(--point-red)" stroke-width="25" stroke-dasharray="340 500" class="animate-draw"/>
+                    </svg>
+                    <div class="hand-drawn-box" style="border-color: var(--point-red);">
+                        <p style="font-size: 64px; color: var(--point-red); font-weight: bold;">67.6%</p>
+                        <p>매출의 핵심은 <span class="highlight">영상/음원</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 씬 22: 막대 차트 -->
+            <div class="scene" id="scene22">
+                <h2>머천다이즈 매출의 <span style="color: var(--point-red);">급감</span></h2>
+                <div style="display: flex; align-items: flex-end; gap: 100px; height: 250px;">
+                    <div style="text-align: center;">
+                        <div class="chart-bar" style="height: 200px; width: 100px; background: #aaa;"></div>
+                        <p style="font-size: 32px;">2022 (432억)</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="font-size: 40px; padding-bottom: 100px; opacity: 0.3;"></i>
+                    <div style="text-align: center;">
+                        <div class="chart-bar animate-subtle" style="height: 50px; width: 100px; background: var(--point-red);"></div>
+                        <p style="font-size: 32px; color: var(--point-red);">2025 (100억대)</p>
+                    </div>
+                </div>
+                <p style="margin-top: 30px;">"의도된 <span class="highlight">사업 구조 전환</span>의 결과"</p>
+            </div>
+
+            <!-- 씬 23: 대형 키워드 -->
+            <div class="scene" id="scene23">
+                <h1 style="font-size: 100px;">BEYOND <span style="color: var(--point-blue);">GOOD</span></h1>
+                <div class="hand-drawn-box-rough animate-subtle" style="background: var(--point-yellow);">
+                    <p>매출 규모는 유지, 체질은 개선</p>
+                    <p>저수익 상품 대신 <span class="highlight">고수익 콘텐츠</span>로</p>
+                </div>
+            </div>
+
+            <!-- 씬 24: VS 대결 구도 -->
+            <div class="scene" id="scene24">
+                <h2>라이벌 비교: <span class="highlight">삼지 엔터</span> (뽀로로)</h2>
+                <div class="vs-container">
+                    <div class="vs-box">
+                        <p>핑크퐁</p>
+                        <p style="color: var(--point-red); font-weight: bold;">콘텐츠 중심</p>
+                    </div>
+                    <div class="vs-center">VS</div>
+                    <div class="vs-box">
+                        <p>뽀로로</p>
+                        <p style="color: var(--point-blue); font-weight: bold;">상품/라이선스 중심</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 씬 25: 수평 막대 비교 -->
+            <div class="scene" id="scene25">
+                <h2>전략의 차이가 만드는 <span style="color: var(--point-red);">숫자</span></h2>
+                <div class="hand-drawn-box">
+                    <p style="text-align: left;"><span style="color: var(--point-red);">●</span> 핑크퐁: 유튜브 기반 글로벌 IP 확산</p>
+                    <p style="text-align: left; margin-top: 10px;"><span style="color: var(--point-blue);">●</span> 삼지: 전통적 오프라인 라이선스 강점</p>
+                </div>
+                <p style="margin-top: 30px;">어느 쪽이 <span class="highlight">미래 가치</span>가 높은가?</p>
+            </div>
+
+            <!-- 씬 26: 아이콘 대비형 -->
+            <div class="scene" id="scene26">
+                <div style="display: flex; gap: 80px; font-size: 150px;">
+                    <div style="text-align: center;">
+                        <i class="fa-brands fa-youtube" style="color: var(--point-red);"></i>
+                        <p style="font-size: 36px;">디지털 네이티브</p>
+                    </div>
+                    <div style="text-align: center; opacity: 0.3;">
+                        <i class="fa-solid fa-store"></i>
+                        <p style="font-size: 36px;">전통적 유통</p>
+                    </div>
+                </div>
+                <h1 style="margin-top: 30px;">글로벌 <span class="highlight">IP 사업자</span>로의 진화</h1>
+            </div>
+
+            <!-- 씬 27: SVG 순환 다이어그램 -->
+            <div class="scene" id="scene27">
+                <h2>성공의 선순환 루프</h2>
+                <svg viewBox="0 0 500 300" style="width: 600px; height: 350px; filter: url(#rough-edge);">
+                    <path d="M50,150 Q150,50 250,150 Q350,250 450,150" stroke="#222" stroke-width="4" fill="none" stroke-dasharray="10 5"/>
+                    <text x="100" y="80" font-size="36" font-family="Nanum Pen Script">콘텐츠 제작</text>
+                    <text x="250" y="180" font-size="36" fill="var(--point-red)" font-family="Nanum Pen Script" font-weight="bold">광고 수익↑</text>
+                    <text x="400" y="80" font-size="36" font-family="Nanum Pen Script">IP 라이선스</text>
+                </svg>
+            </div>
+
+            <!-- 씬 28: KPI 카드 그리드 -->
+            <div class="scene" id="scene28">
+                <h2>2023년 성적표 (재무 요약)</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <p style="font-size: 32px;">매출액</p>
+                        <h1 style="font-size: 64px; margin: 0;">787<span style="font-size: 32px;">억</span></h1>
+                    </div>
+                    <div class="kpi-card animate-subtle" style="border-color: var(--point-red);">
+                        <p style="font-size: 32px; color: var(--point-red);">영업이익</p>
+                        <h1 style="font-size: 64px; margin: 0; color: var(--point-red);">157<span style="font-size: 32px;">억</span></h1>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 씬 29: Big Number -->
+            <div class="scene" id="scene29">
+                <p style="font-size: 44px;">압도적인 효율성</p>
+                <h1 style="font-size: 180px; color: var(--point-red); line-height: 1;">20%</h1>
+                <p style="font-size: 44px;"><span class="highlight">영업이익률</span>: 업계 평균 상회</p>
+                <div class="note-bubble" style="top: 50px; right: 50px;">
+                    "IP의 힘은 곧 이익이다"
+                </div>
+            </div>
+
+            <!-- 씬 30: 박스 + 아이콘 -->
+            <div class="scene" id="scene30">
+                <h2>확장하는 제국: <span style="color: var(--point-red);">NETFLIX</span></h2>
+                <div style="display: flex; gap: 40px; align-items: center;">
+                    <div class="hand-drawn-box animate-subtle">
+                        <p>'베베핀' 오리지널 시리즈</p>
+                        <p>2025년 상반기 공개</p>
+                        <p><span class="highlight">글로벌 OTT</span>로 영토 확장</p>
+                    </div>
+                    <i class="fa-solid fa-tv" style="font-size: 150px; color: #333;"></i>
+                </div>
+            </div>
+
+            <!-- 씬 31: 타임라인 -->
+            <div class="scene" id="scene31">
+                <h2>드디어 찾아온 <span class="highlight">D-DAY</span></h2>
+                <div class="timeline-container">
+                    <div class="timeline-item animate-subtle" style="left: 50%;">
+                        <div class="timeline-dot" style="background: var(--point-red); width: 40px; height: 40px;"></div>
+                        <p style="font-size: 64px; color: var(--point-red); font-weight: bold;">IPO 성공</p>
+                        <p style="font-size: 44px;">코스닥 상장</p>
+                    </div>
+                </div>
+                <p style="margin-top: 30px;">공모가 38,000원 | 공모 자금 760억</p>
+            </div>
+
+            <!-- 씬 32: 인용문 중심형 -->
+            <div class="scene" id="scene32">
+                <div class="hand-drawn-box-rough">
+                    <h1 style="font-size: 64px;">"시장은 이 회사를<br><span style="color: var(--point-red);">어떻게</span> 평가했나?"</h1>
+                    <p style="margin-top: 20px;">기업 가치 산정의 <span class="highlight">비밀</span></p>
+                </div>
+                <i class="fa-solid fa-magnifying-glass-chart animate-subtle" style="position: absolute; bottom: 50px; left: 80px; font-size: 100px; opacity: 0.1;"></i>
+            </div>
+
+            <!-- 씬 33: 텍스트 계층형 -->
+            <div class="scene" id="scene33">
+                <p style="color: #666;">가장 보편적인 잣대</p>
+                <h1 style="font-size: 120px; color: var(--point-blue);">PER</h1>
+                <p><span class="highlight">주가수익비율</span>을 활용한 가치 평가</p>
+                <p style="font-size: 32px; margin-top: 10px;">(Price Earnings Ratio)</p>
+            </div>
+
+            <!-- 씬 34: 단계별 프로세스 -->
+            <div class="scene" id="scene34">
+                <h2>가치 산정 <span class="highlight">프로세스</span></h2>
+                <div style="display: flex; gap: 30px; margin-top: 30px;">
+                    <div class="vs-box"><p style="font-size: 32px;">유사 기업 선정</p></div>
+                    <div class="vs-box"><p style="font-size: 32px;">평균 PER 산출</p></div>
+                    <div class="vs-box animate-subtle" style="border-color: var(--point-red);"><p style="font-size: 32px; font-weight: bold;">적정 주가 추정</p></div>
+                </div>
+            </div>
+
+            <!-- 씬 35: 4분면 매트릭스 -->
+            <div class="scene" id="scene35">
+                <h2>주가를 결정하는 <span class="highlight">4요소</span></h2>
+                <div class="matrix-grid">
+                    <div class="matrix-cell"><p style="font-size: 32px;">성장 가능성</p></div>
+                    <div class="matrix-cell"><p style="font-size: 32px;">브랜드 인지도</p></div>
+                    <div class="matrix-cell"><p style="font-size: 32px;">경쟁 환경</p></div>
+                    <div class="matrix-cell"><p style="font-size: 32px;">재무 건전성</p></div>
+                </div>
+            </div>
+
+            <!-- 씬 36: 대형 키워드 -->
+            <div class="scene" id="scene36">
+                <h1 style="font-size: 120px; color: var(--point-red);">FINISH <span style="color: #222;">LINE</span></h1>
+                <div class="hand-drawn-box animate-subtle" style="background: var(--point-yellow);">
+                    <p>IP 경쟁력을 바탕으로 한 성공적 상장</p>
+                    <p>글로벌 패밀리 엔터 기업의 <span class="highlight">공인</span></p>
+                </div>
+            </div>
+
+            <!-- 씬 37: 브랜드 클로징 -->
+            <div class="scene" id="scene37">
+                <div class="animate-subtle" style="font-size: 100px; color: var(--point-red); font-weight: bold;">APRIL SHARK?</div>
+                <h1 style="font-size: 80px;">아니, <span class="highlight">PINKFONG</span></h1>
+                <p>상어 한 마리가 만든 5,000억의 가치</p>
+                <i class="fa-solid fa-rocket animate-subtle" style="position: absolute; top: 100px; right: 100px; font-size: 80px; color: var(--point-red);"></i>
+            </div>
+
+            <!-- 씬 38: 박스 + 말풍선 -->
+            <div class="scene" id="scene38">
+                <div class="hand-drawn-box-rough">
+                    <h1 style="font-size: 64px;">NEXT <span style="color: var(--point-blue);">CHAPTER</span></h1>
+                    <p>새로운 IP, 새로운 비즈니스 모델</p>
+                    <p>더 핑크퐁 컴퍼니의 <span class="highlight">혁신</span>은 계속된다</p>
+                </div>
+                <div class="note-bubble" style="bottom: -20px; right: 50px;">
+                    "기대해도 좋다"
+                </div>
+            </div>
+
+            <!-- 씬 39: 브랜드 클로징 -->
+            <div class="scene" id="scene39">
+                <h1 style="font-size: 100px; margin-bottom: 40px;">THANK YOU</h1>
+                <div style="display: flex; gap: 40px; justify-content: center;">
+                    <div class="kpi-card animate-pulse-red" style="width: 250px;">
+                        <i class="fa-solid fa-heart"></i>
+                        <p style="font-size: 32px;">좋아요</p>
+                    </div>
+                    <div class="kpi-card animate-subtle" style="width: 250px;">
+                        <i class="fa-solid fa-bell"></i>
+                        <p style="font-size: 32px;">구독/알림</p>
+                    </div>
+                </div>
+                <p style="margin-top: 40px; color: #888;">다음 성공 방정식에서 만나요!</p>
+            </div>
+
+        </div>
+
+        <button class="nav-btn" onclick="move(1)"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+    
+    <div class="progress-outer">
+        <div id="progress-bar"></div>
+    </div>
+    <div class="scene-counter"><span id="current-idx">1</span> / 39</div>
+
+    <script>
+        let currentIdx = 0;
+        const scenes = document.querySelectorAll('.scene');
+        const progressBar = document.getElementById('progress-bar');
+        const counterText = document.getElementById('current-idx');
+
+        function update() {
+            scenes.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
+            progressBar.style.width = ((currentIdx + 1) / scenes.length * 100) + '%';
+            counterText.innerText = currentIdx + 1;
+        }
+
+        function move(n) {
+            currentIdx += n;
+            if (currentIdx < 0) currentIdx = 0;
+            if (currentIdx >= scenes.length) currentIdx = scenes.length - 1;
+            update();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') move(1);
+            if (e.key === 'ArrowLeft') move(-1);
+        });
+
+        update();
+    </script>
+</body>
+</html>

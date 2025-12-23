@@ -43,7 +43,7 @@ def call_api_with_retry(
             "cfg_weight": params.get("cfg_weight", 0.5),
             "temperature": params.get("temperature", 0.8),
             "speed": params.get("speed", 1.0),
-            "repetition_penalty": params.get("repetition_penalty", 1.3),
+            "repetition_penalty": params.get("repetition_penalty", 1.4),  # 1.3→1.4 토큰 반복 감소
             "seed": params.get("seed"),
         }
     }

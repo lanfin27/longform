@@ -3,24 +3,37 @@
     "name": "자말 카슈끄지",
     "name_ko": "자말 카슈끄지",
     "name_en": "Jamal Khashoggi",
+    "type": "person",
+    "category": "",
+    "owner_company": "",
     "role": "주연",
-    "description": "사우디아라비아 출신 언론인, 사우디 왕세자를 비판함",
+    "description": "사우디아라비아 출신 언론인, 사우디 왕세자를 비판",
     "appearance": "",
     "nationality": "",
     "era": "",
     "character_prompt": "Middle Eastern man in his late 50s, salt-and-pepper beard neatly trimmed, receding hairline with gray hair, round glasses with thin black frames, warm brown eyes, olive skin tone, wearing dark navy business suit with white dress shirt",
-    "visual_prompt": "Middle Eastern man in his late 50s, salt-and-pepper beard neatly trimmed, receding hairline with gray hair, round glasses with thin black frames, warm brown eyes, olive skin tone, wearing dark navy business suit with white dress shirt"
+    "visual_prompt": "Middle Eastern man in his late 50s, salt-and-pepper beard neatly trimmed, receding hairline with gray hair, round glasses with thin black frames, warm brown eyes, olive skin tone, wearing dark navy business suit with white dress shirt",
+    "appearance_scenes": [
+      1
+    ]
   },
   {
     "name": "무함마드 빈 살만",
     "name_ko": "무함마드 빈 살만",
     "name_en": "Mohammed bin Salman",
+    "type": "person",
+    "category": "",
+    "owner_company": "",
     "role": "조연",
     "description": "사우디아라비아 왕세자",
     "appearance": "",
     "nationality": "",
     "era": "",
-    "character_prompt": "Middle Eastern man in his mid-30s, short dark hair, clean-shaven, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi Arabian clothing or a modern business suit.",
-    "visual_prompt": "Middle Eastern man in his mid-30s, short dark hair, clean-shaven, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi Arabian clothing or a modern business suit."
+    "character_prompt": "Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or a modern business suit, confident expression",
+    "visual_prompt": "Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or a modern business suit, confident expression",
+    "appearance_scenes": [
+      1,
+      2
+    ]
   }
 ]

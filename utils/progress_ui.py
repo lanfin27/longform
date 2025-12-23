@@ -163,11 +163,14 @@ def render_api_selector(
 
     selected_api_id = options.get(selected_name, "")
 
-    # 상세 정보
+    # ⭐ 상세 정보 (max_output_tokens 포함)
     if show_details and selected_api_id:
         api = available_apis.get(selected_api_id)
         if api:
             st.caption(f"📝 {api.description}")
+            # 최대 출력 토큰 표시 (텍스트 생성 API인 경우)
+            if api.function == "text_generation" and hasattr(api, 'max_output_tokens'):
+                st.caption(f"📊 최대 출력: {api.max_output_tokens:,} 토큰")
 
     # 설정 저장
     if selected_api_id and selected_api_id != current_api_id:

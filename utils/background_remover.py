@@ -484,3 +484,173 @@ def remove_background_high_quality(
         expand_mask=expand_mask
     )
     return result if result else image_path
+
+
+# ============================================================
+# 편의 함수 (스토리보드 UI용)
+# ============================================================
+
+def is_rembg_available() -> tuple:
+    """
+    rembg 사용 가능 여부 확인
+
+    Returns:
+        (available: bool, message: str)
+    """
+    try:
+        import rembg
+        return True, "✅ rembg 사용 가능"
+    except ImportError:
+        return False, "❌ rembg 미설치. 설치: pip install rembg --break-system-packages"
+
+
+def has_transparency(image_path: str, threshold: float = 0.05) -> bool:
+    """
+    이미지에 투명 배경이 있는지 확인
+
+    Args:
+        image_path: 이미지 경로
+        threshold: 투명 픽셀 비율 임계값 (기본 5%)
+
+    Returns:
+        True if 투명 배경 있음
+    """
+    try:
+        with Image.open(image_path) as img:
+            if img.mode != 'RGBA':
+                return False
+
+            alpha = img.split()[-1]
+            alpha_data = list(alpha.getdata())
+
+            transparent_pixels = sum(1 for a in alpha_data if a < 250)
+            total_pixels = len(alpha_data)
+
+            return (transparent_pixels / total_pixels) > threshold
+
+    except Exception:
+        return False
+
+
+def remove_background_simple(
+    input_path: str,
+    output_path: str = None,
+    force: bool = False
+) -> str:
+    """
+    간단한 배경 제거 API
+
+    Args:
+        input_path: 입력 이미지 경로
+        output_path: 출력 경로 (None이면 캐시 사용)
+        force: 캐시 무시
+
+    Returns:
+        배경 제거된 이미지 경로
+    """
+    remover = get_background_remover()
+    result = remover.remove_background(input_path, force=force)
+
+    if result and output_path:
+        import shutil
+        shutil.copy2(result, output_path)
+        return output_path
+
+    return result if result else input_path
+
+
+def remove_background_batch(
+    image_paths: list,
+    output_dir: str = None,
+    force: bool = False,
+    progress_callback=None
+) -> list:
+    """
+    여러 이미지 배경 일괄 제거
+
+    Args:
+        image_paths: 이미지 경로 목록
+        output_dir: 출력 디렉토리
+        force: 캐시 무시
+        progress_callback: (current, total, filename) 콜백
+
+    Returns:
+        출력 파일 경로 목록
+    """
+    results = []
+    total = len(image_paths)
+    remover = get_background_remover()
+
+    for i, img_path in enumerate(image_paths):
+        filename = Path(img_path).name
+
+        if progress_callback:
+            progress_callback(i + 1, total, filename)
+
+        result = remover.remove_background(img_path, force=force)
+
+        if result:
+            if output_dir:
+                import shutil
+                Path(output_dir).mkdir(parents=True, exist_ok=True)
+                output_path = Path(output_dir) / f"{Path(img_path).stem}_nobg.png"
+                shutil.copy2(result, output_path)
+                results.append(str(output_path))
+            else:
+                results.append(result)
+
+    return results
+
+
+def install_rembg_ui(key_suffix: str = None):
+    """
+    Streamlit UI에서 rembg 설치 안내 및 버튼 제공
+
+    Args:
+        key_suffix: 고유 키 접미사 (중복 호출 시 필수)
+                   예: "auto_match", "manual", "settings"
+    """
+    try:
+        import streamlit as st
+    except ImportError:
+        print("Streamlit이 필요합니다")
+        return
+
+    import subprocess
+    import sys
+    import uuid
+
+    # 고유 키 생성 (중복 방지)
+    if key_suffix:
+        unique_key = f"install_rembg_auto_{key_suffix}"
+    else:
+        # 폴백: UUID 사용 (권장하지 않음 - 매번 다른 키 생성)
+        unique_key = f"install_rembg_auto_{uuid.uuid4().hex[:8]}"
+
+    st.warning("⚠️ 배경 제거 기능을 사용하려면 rembg를 설치해야 합니다.")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("📦 자동 설치", key=unique_key):
+            with st.spinner("rembg 설치 중... (약 1-2분 소요)"):
+                result = subprocess.run(
+                    [sys.executable, "-m", "pip", "install", "rembg", "--break-system-packages"],
+                    capture_output=True,
+                    text=True,
+                    timeout=300
+                )
+
+                if result.returncode == 0:
+                    st.success("✅ 설치 완료! 페이지를 새로고침하세요.")
+                    # 상태 리셋
+                    global _remover
+                    _remover = None
+                    st.rerun()
+                else:
+                    st.error(f"설치 실패: {result.stderr[:200]}")
+                    st.info("터미널에서 직접 설치를 시도하세요")
+
+    with col2:
+        st.code("pip install rembg", language="bash")
+        st.caption("터미널에서 직접 실행")

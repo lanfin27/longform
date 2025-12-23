@@ -1,7 +1,7 @@
 {
   "selected_apis": {
     "script_generation": "claude-sonnet",
-    "scene_analysis": "gemini-flash",
+    "scene_analysis": "gemini-2.0-flash-exp",
     "character_extraction": "claude-sonnet",
     "image_prompt_generation": "claude-haiku",
     "image_generation": "flux-free",

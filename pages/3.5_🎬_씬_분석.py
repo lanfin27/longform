@@ -272,381 +272,677 @@ with tab1:
 
 # === 탭 2: 씬 분석 ===
 with tab2:
-    st.subheader("🎬 씬 자동 분석")
+    st.subheader("🎬 씬 분석")
 
-    # 세션에서 스크립트 가져오기
-    script = st.session_state.get("scene_analysis_script")
-
-    if not script:
-        st.warning("⚠️ 분석할 스크립트가 없습니다.")
-        st.info("'스크립트 입력' 탭에서 스크립트를 선택하거나 입력하세요.")
-        st.stop()
-
-    st.info("""
-    **씬 분석이란?**
-    - 스크립트를 장면(씬) 단위로 자동 분할
-    - 각 씬에 대한 연출가이드 생성
-    - 등장 캐릭터 자동 추출
-    - 이미지 프롬프트 자동 생성
-
-    세모지 스타일의 고품질 콘텐츠를 위한 핵심 단계입니다.
-    """)
-
-    # API 선택
-    st.markdown("### ⚙️ AI 설정")
-
-    # API 상태 확인
-    api_status = check_api_availability()
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        selected_api = render_api_selector(
-            task="scene_analysis",
-            label="씬 분석 AI",
-            key_prefix="scene_analysis"
-        )
-
-        # 선택된 API 상태 표시
-        if selected_api:
-            selected_lower = selected_api.lower() if isinstance(selected_api, str) else ""
-            if "gemini" in selected_lower or "google" in selected_lower:
-                status = api_status.get("gemini", {})
-                if not status.get("installed"):
-                    st.error("❌ google-generativeai 패키지가 설치되지 않았습니다. `pip install google-generativeai` 실행 후 재시작하세요.")
-                elif not status.get("api_key"):
-                    st.warning("⚠️ GOOGLE_API_KEY 또는 GEMINI_API_KEY가 설정되지 않았습니다.")
-            elif "gpt" in selected_lower or "openai" in selected_lower:
-                status = api_status.get("openai", {})
-                if not status.get("installed"):
-                    st.error("❌ openai 패키지가 설치되지 않았습니다.")
-                elif not status.get("api_key"):
-                    st.warning("⚠️ OPENAI_API_KEY가 설정되지 않았습니다.")
-
-    with col2:
-        # 프롬프트 템플릿 선택 (Content Type 대체)
-        scene_templates = template_manager.get_templates_by_category("scene_analysis")
-        template_map = {t.name: t.id for t in scene_templates}
-        
-        # 기본값 설정 ("기본 씬 분석" 또는 첫 번째)
-        default_idx = 0
-        default_keys = [k for k, v in template_map.items() if v == "scene_analysis"]
-        if default_keys:
-            default_idx = list(template_map.keys()).index(default_keys[0])
-
-        selected_template_name = st.selectbox(
-            "분석 프롬프트",
-            list(template_map.keys()),
-            index=default_idx,
-            help="분석에 사용할 AI 프롬프트 스타일을 선택하세요."
-        )
-        selected_template_id = template_map[selected_template_name]
-
-        # API 상태 요약
-        with st.expander("🔌 API 상태", expanded=False):
-            for api_name, info in api_status.items():
-                status_icon = info.get("status", "❓")
-                st.caption(f"{api_name}: {status_icon}")
+    # ⭐ 분석 방식 선택 (자동/수동)
+    analysis_mode = st.radio(
+        "분석 방식",
+        options=["auto", "manual"],
+        format_func=lambda x: {
+            "auto": "🤖 AI 자동 분석",
+            "manual": "📝 수동 입력 (외부 AI 결과)"
+        }[x],
+        horizontal=True,
+        help="외부 AI(ChatGPT, Claude 등)에서 분석한 JSON 결과를 직접 입력할 수 있습니다.",
+        key="scene_analysis_mode"
+    )
 
     st.divider()
 
-    # 분석 버튼
-    if st.button("🎬 씬 분석 시작", type="primary", use_container_width=True):
-        api_manager = get_api_manager()
+    # ═══════════════════════════════════════════════════════════════════
+    # 수동 입력 모드
+    # ═══════════════════════════════════════════════════════════════════
+    if analysis_mode == "manual":
+        st.markdown("#### 📝 외부 AI 분석 결과 입력")
 
-        # 프로그레스 UI
-        progress = StreamlitProgressUI(
-            task_name="씬 분석",
-            total_steps=4,
-            show_logs=True
-        )
+        # 사용 방법 안내
+        with st.expander("💡 사용 방법", expanded=False):
+            st.markdown("""
+            **1단계**: 외부 AI (ChatGPT, Claude, Gemini 등)에 아래 프롬프트와 스크립트를 입력하세요.
 
-        try:
-            from core.script.scene_analyzer import SceneAnalyzer
+            **2단계**: AI가 생성한 JSON 결과를 복사하세요.
 
-            progress.update(1, "AI 분석기 초기화...")
-            progress.info("스크립트 분석을 시작합니다.")
+            **3단계**: 아래 입력창에 붙여넣고 "적용" 버튼을 누르세요.
+            """)
 
-            # 디버그: 스크립트 정보 출력
-            print(f"[씬 분석 페이지] 스크립트 로드됨: {len(script)} 문자")
-            print(f"[씬 분석 페이지] 스크립트 미리보기: {script[:100]}...")
-            progress.info(f"로드된 스크립트: {len(script)}자")
+            st.markdown("---")
+            st.markdown("**📋 외부 AI용 프롬프트 (복사해서 사용)**")
 
-            # 선택된 API에 따라 provider 결정
-            provider = "anthropic"  # 기본값
-            if selected_api:
-                selected_lower = selected_api.lower() if isinstance(selected_api, str) else ""
+            prompt_template = '''다음 스크립트를 씬 단위로 분석해서 JSON 형식으로 출력해주세요.
 
-                # 키워드 기반으로 provider 결정
-                if "gemini" in selected_lower or "google" in selected_lower:
-                    provider = "google"
-                elif "gpt" in selected_lower or "openai" in selected_lower:
-                    provider = "openai"
-                elif "claude" in selected_lower or "anthropic" in selected_lower:
-                    provider = "anthropic"
-                else:
-                    provider = "anthropic"  # 기본값
+각 씬은 다음 정보를 포함해야 합니다:
+- scene_id: 씬 번호 (1부터 시작)
+- script_text: 해당 씬의 대사/나레이션 텍스트
+- duration_estimate: 예상 재생 시간 (초)
+- characters: 등장 캐릭터 목록
+- visual_elements: 시각적 요소 목록
+- mood: 분위기 (exciting, calm, dramatic 등)
+- image_prompt: 이미지 생성용 영어 프롬프트
 
-                print(f"[씬 분석 페이지] 선택된 API: {selected_api} -> provider: {provider}")
+출력 형식:
+```json
+{
+  "scenes": [
+    {
+      "scene_id": 1,
+      "script_text": "...",
+      "duration_estimate": 10,
+      "characters": ["캐릭터1"],
+      "visual_elements": ["요소1", "요소2"],
+      "mood": "exciting",
+      "image_prompt": "A dramatic scene showing..."
+    }
+  ],
+  "characters": [
+    {
+      "name": "캐릭터1",
+      "description": "캐릭터 설명",
+      "visual_prompt": "캐릭터 외모 프롬프트"
+    }
+  ]
+}
+```
 
-            analyzer = SceneAnalyzer(provider=provider)
+스크립트:
+[여기에 스크립트 붙여넣기]'''
 
-            progress.update(2, "스크립트 분석 중...")
-            progress.update(2, "스크립트 분석 중...")
-            progress.info(f"사용 프롬프트: {selected_template_name}")
-            progress.info(f"스크립트 길이: {len(script):,}자")
-
-            # 실제 사용되는 모델 표시
-            if provider == "google" and hasattr(analyzer, 'gemini_model_name'):
-                progress.info(f"사용 AI: Gemini ({analyzer.gemini_model_name})")
-            else:
-                progress.info(f"사용 AI: {provider}")
-
-            start_time = time.time()
-            start_time = time.time()
-            result = analyzer.analyze_script(script, language, template_id=selected_template_id)
-            elapsed = time.time() - start_time
-
-            # 디버그: 결과 확인
-            print(f"[씬 분석 페이지] 분석 결과: 씬 {len(result.get('scenes', []))}개, 캐릭터 {len(result.get('characters', []))}개")
-            if result.get('error'):
-                print(f"[씬 분석 페이지] 오류: {result.get('error')}")
-                progress.info(f"분석 오류: {result.get('error')}")
-
-            progress.update(3, "결과 저장 중...")
-
-            # 결과 저장
-            analysis_dir = project_path / "analysis"
-            analysis_dir.mkdir(parents=True, exist_ok=True)
-
-            with open(analysis_dir / "scenes.json", "w", encoding="utf-8") as f:
-                json.dump(result.get("scenes", []), f, ensure_ascii=False, indent=2)
-
-            with open(analysis_dir / "characters.json", "w", encoding="utf-8") as f:
-                json.dump(result.get("characters", []), f, ensure_ascii=False, indent=2)
-
-            with open(analysis_dir / "full_analysis.json", "w", encoding="utf-8") as f:
-                json.dump(result, f, ensure_ascii=False, indent=2)
-
-            # === 세션에도 저장 (캐릭터 관리 페이지 연동용) ===
-            scenes = result.get("scenes", [])
-            characters = result.get("characters", [])
-
-            st.session_state["scene_analysis_result"] = result
-            st.session_state["scenes"] = scenes
-            st.session_state["characters"] = characters
-            # 캐릭터 관리 페이지 호환용 키
-            st.session_state["scene_characters"] = characters
-            st.session_state["extracted_characters"] = characters
-
-            print(f"[씬 분석 페이지] 세션 저장 완료: 씬 {len(scenes)}개, 캐릭터 {len(characters)}개")
-
-            # 캐릭터 visual_prompt 디버그 출력
-            for char in characters[:3]:  # 처음 3개만
-                name = char.get("name", "Unknown")
-                has_prompt = bool(char.get("visual_prompt"))
-                print(f"  - {name}: visual_prompt={'있음' if has_prompt else '없음'}")
-
-            # 사용량 기록 (provider에 따른 모델 ID 결정)
-            model_id_map = {
-                "anthropic": "claude-sonnet-4-20250514",
-                "google": "gemini-1.5-flash",
-                "openai": "gpt-4o"
-            }
-            record_model_id = model_id_map.get(provider, "claude-sonnet-4-20250514")
-
-            api_manager.record_usage(
-                provider=provider,
-                model_id=record_model_id,
-                function="text_generation",
-                tokens_input=len(script) // 4,
-                tokens_output=len(json.dumps(result)) // 4,
-                duration_seconds=elapsed,
-                success=True,
-                project_name=project_path.name,
-                step_name="scene_analysis"
-            )
-
-            progress.update(4, "완료!")
-
-            scene_count = result.get("total_scenes", len(result.get("scenes", [])))
-            char_count = len(result.get("characters", []))
-            progress.complete(f"씬 {scene_count}개, 캐릭터 {char_count}명 추출 완료!")
-
-            time.sleep(1)
-            st.rerun()
-
-        except Exception as e:
-            elapsed = time.time() - start_time if 'start_time' in dir() else 0
-            progress.fail(str(e))
-
-            # 에러 기록 (provider에 따른 모델 ID 결정)
-            model_id_map = {
-                "anthropic": "claude-sonnet-4-20250514",
-                "google": "gemini-1.5-flash",
-                "openai": "gpt-4o"
-            }
-            record_model_id = model_id_map.get(provider, "claude-sonnet-4-20250514")
-
-            api_manager.record_usage(
-                provider=provider,
-                model_id=record_model_id,
-                function="text_generation",
-                duration_seconds=elapsed,
-                success=False,
-                error_message=str(e),
-                project_name=project_path.name,
-                step_name="scene_analysis"
-            )
-
-            import traceback
-            st.code(traceback.format_exc())
-
-    # 기존 분석 결과 로드
-    analysis_path = project_path / "analysis" / "full_analysis.json"
-    if analysis_path.exists():
-        with open(analysis_path, "r", encoding="utf-8") as f:
-            saved_analysis = json.load(f)
+            st.code(prompt_template, language="text")
+            st.caption("💡 위 프롬프트를 복사(Ctrl+C)하여 외부 AI에 붙여넣으세요.")
 
         st.divider()
-        st.subheader("📊 분석 결과")
 
-        scenes = saved_analysis.get("scenes", [])
-        characters = saved_analysis.get("characters", [])
+        # JSON 입력 영역
+        st.markdown("#### 📥 JSON 결과 입력")
 
-        # 통계 계산
-        total_chars = sum(len(s.get("script_text", "")) for s in scenes) if scenes else 0
-        avg_chars = total_chars // len(scenes) if scenes else 0
-        max_chars = max(len(s.get("script_text", "")) for s in scenes) if scenes else 0
-        over_250_count = sum(1 for s in scenes if len(s.get("script_text", "")) > 250)
+        json_input = st.text_area(
+            label="JSON 입력",
+            height=400,
+            placeholder='''{
+  "scenes": [
+    {
+      "scene_id": 1,
+      "script_text": "씬 1의 텍스트...",
+      "duration_estimate": 10,
+      "characters": [],
+      "visual_elements": ["요소1"],
+      "mood": "exciting",
+      "image_prompt": "A dramatic scene..."
+    }
+  ],
+  "characters": []
+}''',
+            help="외부 AI에서 생성한 JSON 결과를 붙여넣으세요.",
+            label_visibility="collapsed",
+            key="manual_json_input"
+        )
 
-        col1, col2, col3, col4 = st.columns(4)
+        # 검증 및 적용 버튼
+        col1, col2, col3 = st.columns([1, 1, 2])
+
         with col1:
-            st.metric("총 씬 수", len(scenes))
+            validate_btn = st.button("✅ JSON 검증", type="secondary", use_container_width=True, key="validate_json_btn")
+
         with col2:
-            char_count_label = f"{len(characters)}" if characters else "0 ⚠️"
-            st.metric("캐릭터 수", char_count_label)
-        with col3:
-            total_duration = sum(s.get("duration_estimate", 10) for s in scenes)
-            st.metric("예상 길이", f"{total_duration // 60}분 {total_duration % 60}초")
-        with col4:
-            avg_label = f"{avg_chars}자" if avg_chars <= 250 else f"{avg_chars}자 ⚠️"
-            st.metric("평균 글자수", avg_label)
+            apply_btn = st.button("🚀 적용하기", type="primary", use_container_width=True, key="apply_json_btn")
 
-        # 경고 메시지
-        if not characters:
-            st.warning("⚠️ 캐릭터가 추출되지 않았습니다. 분석 프롬프트를 확인하거나 씬 분석을 다시 실행하세요.")
+        # JSON 검증 함수
+        def validate_scene_json(json_str: str):
+            """씬 분석 JSON 검증 및 정규화"""
+            import json as json_module
 
-        if over_250_count > 0:
-            st.warning(f"⚠️ {over_250_count}개 씬이 250자를 초과합니다. Chatterbox TTS 최적화를 위해 씬을 더 나눠주세요.")
+            # 빈 입력 체크
+            if not json_str or not json_str.strip():
+                return False, {}, "입력이 비어있습니다."
 
-        # 씬 목록 표시
-        st.subheader("🎬 씬 목록")
+            # ```json ... ``` 블록 추출
+            cleaned = json_str.strip()
 
-        for i, scene in enumerate(scenes):
-            scene_id = scene.get('scene_id', i+1)
-            script_text = scene.get('script_text', '')
-            script_preview = script_text[:50]
-            char_count = len(script_text)
+            if "```json" in cleaned:
+                start = cleaned.find("```json") + 7
+                end = cleaned.rfind("```")
+                if end > start:
+                    cleaned = cleaned[start:end].strip()
+                else:
+                    cleaned = cleaned[start:].strip()
+            elif "```" in cleaned:
+                start = cleaned.find("```") + 3
+                end = cleaned.rfind("```")
+                if end > start:
+                    cleaned = cleaned[start:end].strip()
 
-            # 글자 수 경고 표시
-            char_warning = " ⚠️" if char_count > 250 else ""
+            # JSON 파싱 시도
+            try:
+                result = json_module.loads(cleaned)
+            except json_module.JSONDecodeError as e:
+                return False, {}, f"JSON 파싱 오류: {e}"
 
-            with st.expander(f"씬 {scene_id}: {script_preview}...{char_warning}", expanded=False):
-                # === 상단: 기본 정보 ===
-                col_info1, col_info2, col_info3, col_info4 = st.columns(4)
-                with col_info1:
-                    st.metric("글자 수", f"{char_count}자")
-                with col_info2:
-                    duration = scene.get("duration_estimate", 0)
-                    st.metric("예상 시간", f"{duration}초")
-                with col_info3:
-                    chars = scene.get("characters", [])
-                    st.metric("캐릭터", f"{len(chars)}명")
-                with col_info4:
-                    st.metric("분위기", scene.get("mood", "-"))
+            # 필수 필드 검증
+            if not isinstance(result, dict):
+                return False, {}, "최상위가 객체({})여야 합니다."
 
-                if char_count > 250:
-                    st.warning(f"⚠️ 씬이 {char_count}자입니다. TTS 최적화를 위해 250자 이하로 분할을 권장합니다.")
+            if "scenes" not in result:
+                return False, {}, "'scenes' 필드가 없습니다."
 
-                st.divider()
+            if not isinstance(result["scenes"], list):
+                return False, {}, "'scenes'는 배열이어야 합니다."
 
-                col_left, col_right = st.columns([1, 1])
+            # 각 씬 검증 및 정규화
+            normalized_scenes = []
 
-                with col_left:
-                    st.markdown("**📝 스크립트**")
-                    st.write(script_text)
+            for i, scene in enumerate(result["scenes"]):
+                if not isinstance(scene, dict):
+                    return False, {}, f"씬 {i+1}이 객체가 아닙니다."
 
-                    st.markdown("**🎬 연출가이드**")
-                    direction = scene.get("direction_guide", "")
-                    if direction:
-                        st.info(direction)
-                    else:
-                        st.caption("(없음)")
+                # 필수 필드 체크 및 기본값 설정
+                script_text = scene.get("script_text", scene.get("text", scene.get("narration", "")))
 
-                    st.markdown("**👤 등장 캐릭터**")
-                    if chars:
-                        st.write(", ".join(chars))
-                    else:
-                        st.caption("없음")
+                if not script_text:
+                    return False, {}, f"씬 {i+1}에 'script_text'가 없습니다."
 
-                with col_right:
-                    st.markdown("**📐 시각 요소**")
-                    elements = scene.get("visual_elements", [])
-                    if elements:
-                        st.write(", ".join(elements))
-                    else:
-                        st.caption("(없음)")
+                normalized_scene = {
+                    "scene_id": scene.get("scene_id", i + 1),
+                    "script_text": script_text,
+                    "duration_estimate": scene.get("duration_estimate", scene.get("duration", 10)),
+                    "characters": scene.get("characters", []),
+                    "visual_elements": scene.get("visual_elements", scene.get("visuals", [])),
+                    "mood": scene.get("mood", "neutral"),
+                    "image_prompt": scene.get("image_prompt", scene.get("image_prompt_en", "")),
+                    "direction_guide": scene.get("direction_guide", ""),
+                    "camera_suggestion": scene.get("camera_suggestion", ""),
+                    "char_count": len(script_text),
+                }
 
-                    st.markdown("**📷 카메라**")
-                    camera = scene.get("camera_suggestion", "")
-                    if camera:
-                        st.write(camera)
-                    else:
-                        st.caption("(없음)")
+                normalized_scenes.append(normalized_scene)
 
-                st.divider()
+            # 캐릭터 정규화
+            characters = result.get("characters", [])
+            normalized_characters = []
 
-                # === 프롬프트 탭 ===
-                st.markdown("**🎨 AI 프롬프트**")
-                prompt_tab1, prompt_tab2, prompt_tab3, prompt_tab4 = st.tabs([
-                    "🏞️ 이미지",
-                    "🎭 캐릭터",
-                    "🎬 비디오(캐릭터)",
-                    "🎬 비디오(전체)"
-                ])
+            for char in characters:
+                if isinstance(char, str):
+                    normalized_characters.append({
+                        "name": char,
+                        "name_ko": char,
+                        "description": "",
+                        "visual_prompt": ""
+                    })
+                elif isinstance(char, dict):
+                    normalized_characters.append({
+                        "name": char.get("name", char.get("name_ko", "Unknown")),
+                        "name_ko": char.get("name_ko", char.get("name", "")),
+                        "name_en": char.get("name_en", ""),
+                        "description": char.get("description", ""),
+                        "visual_prompt": char.get("visual_prompt", char.get("character_prompt", "")),
+                        "role": char.get("role", "등장인물"),
+                    })
 
-                with prompt_tab1:
-                    img_prompt = scene.get("image_prompt_en", "")
-                    if img_prompt:
-                        st.code(img_prompt, language=None)
-                        st.caption("💡 Midjourney, DALL-E, Stable Diffusion에서 사용")
-                    else:
-                        st.caption("(프롬프트 없음)")
+            normalized_result = {
+                "scenes": normalized_scenes,
+                "characters": normalized_characters
+            }
 
-                with prompt_tab2:
-                    char_prompt = scene.get("character_prompt_en", "")
-                    if char_prompt:
-                        st.code(char_prompt, language=None)
-                        st.caption("💡 캐릭터 이미지 생성용 (배경 제거)")
-                    else:
-                        st.caption("(프롬프트 없음)")
+            return True, normalized_result, ""
 
-                with prompt_tab3:
-                    video_char = scene.get("video_prompt_character", "")
-                    if video_char and video_char != "N/A":
-                        st.code(video_char, language=None)
-                        st.caption("💡 D-ID, HeyGen에서 립싱크/표정 연기용")
-                    else:
-                        st.caption("(프롬프트 없음)")
+        # JSON 검증 버튼 클릭
+        if validate_btn and json_input:
+            is_valid, result, error = validate_scene_json(json_input)
 
-                with prompt_tab4:
-                    video_full = scene.get("video_prompt_full", "")
-                    if video_full and video_full != "N/A":
-                        st.code(video_full, language=None)
-                        st.caption("💡 Runway, Pika, Kling에서 시네마틱 연출용")
-                    else:
-                        st.caption("(프롬프트 없음)")
+            if is_valid:
+                st.success(f"✅ JSON 유효! 씬 {len(result.get('scenes', []))}개, 캐릭터 {len(result.get('characters', []))}개 발견")
+
+                # 미리보기
+                with st.expander("📊 미리보기", expanded=True):
+                    for scene in result.get("scenes", [])[:3]:
+                        st.markdown(f"**씬 {scene.get('scene_id')}**: {scene.get('script_text', '')[:100]}...")
+
+                    if len(result.get("scenes", [])) > 3:
+                        st.caption(f"... 외 {len(result.get('scenes', [])) - 3}개 씬")
+            else:
+                st.error(f"❌ JSON 오류: {error}")
+                st.info("💡 JSON 형식을 확인해주세요. 쉼표, 따옴표, 괄호가 올바른지 확인하세요.")
+
+        # 적용 버튼 클릭
+        if apply_btn and json_input:
+            is_valid, result, error = validate_scene_json(json_input)
+
+            if is_valid:
+                # 결과 저장 (파일)
+                analysis_dir = project_path / "analysis"
+                analysis_dir.mkdir(parents=True, exist_ok=True)
+
+                with open(analysis_dir / "scenes.json", "w", encoding="utf-8") as f:
+                    json.dump(result.get("scenes", []), f, ensure_ascii=False, indent=2)
+
+                with open(analysis_dir / "characters.json", "w", encoding="utf-8") as f:
+                    json.dump(result.get("characters", []), f, ensure_ascii=False, indent=2)
+
+                with open(analysis_dir / "full_analysis.json", "w", encoding="utf-8") as f:
+                    json.dump(result, f, ensure_ascii=False, indent=2)
+
+                # 세션에도 저장
+                st.session_state["scene_analysis_result"] = result
+                st.session_state["scenes"] = result.get("scenes", [])
+                st.session_state["characters"] = result.get("characters", [])
+                st.session_state["scene_characters"] = result.get("characters", [])
+                st.session_state["extracted_characters"] = result.get("characters", [])
+                st.session_state["analysis_source"] = "manual"  # 수동 입력 표시
+
+                st.success(f"✅ 적용 완료! 씬 {len(result.get('scenes', []))}개가 로드되었습니다.")
+                st.balloons()
+
+                time.sleep(1)
+                st.rerun()
+            else:
+                st.error(f"❌ 적용 실패: {error}")
+
+        # 현재 로드된 씬 표시
+        analysis_path = project_path / "analysis" / "full_analysis.json"
+        if analysis_path.exists():
+            st.divider()
+            st.markdown("#### 📊 현재 로드된 씬")
+
+            with open(analysis_path, "r", encoding="utf-8") as f:
+                saved_analysis = json.load(f)
+
+            source = st.session_state.get("analysis_source", "auto")
+            source_label = "📝 수동 입력" if source == "manual" else "🤖 AI 자동 분석"
+
+            col1, col2, col3 = st.columns(3)
+            col1.metric("씬 수", len(saved_analysis.get("scenes", [])))
+            col2.metric("캐릭터 수", len(saved_analysis.get("characters", [])))
+            col3.metric("소스", source_label)
+
+    # ═══════════════════════════════════════════════════════════════════
+    # AI 자동 분석 모드
+    # ═══════════════════════════════════════════════════════════════════
+    else:
+        # 세션에서 스크립트 가져오기
+        script = st.session_state.get("scene_analysis_script")
+
+        if not script:
+            st.warning("⚠️ 분석할 스크립트가 없습니다.")
+            st.info("'스크립트 입력' 탭에서 스크립트를 선택하거나 입력하세요.")
+            st.stop()
+
+        st.info("""
+        **씬 분석이란?**
+        - 스크립트를 장면(씬) 단위로 자동 분할
+        - 각 씬에 대한 연출가이드 생성
+        - 등장 캐릭터 자동 추출
+        - 이미지 프롬프트 자동 생성
+
+        세모지 스타일의 고품질 콘텐츠를 위한 핵심 단계입니다.
+        """)
+
+        # API 선택
+        st.markdown("### ⚙️ AI 설정")
+
+        # API 상태 확인
+        api_status = check_api_availability()
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            selected_api = render_api_selector(
+                task="scene_analysis",
+                label="씬 분석 AI",
+                key_prefix="scene_analysis"
+            )
+
+            # 선택된 API 상태 표시
+            if selected_api:
+                selected_lower = selected_api.lower() if isinstance(selected_api, str) else ""
+                if "gemini" in selected_lower or "google" in selected_lower:
+                    status = api_status.get("gemini", {})
+                    if not status.get("installed"):
+                        st.error("❌ google-generativeai 패키지가 설치되지 않았습니다. `pip install google-generativeai` 실행 후 재시작하세요.")
+                    elif not status.get("api_key"):
+                        st.warning("⚠️ GOOGLE_API_KEY 또는 GEMINI_API_KEY가 설정되지 않았습니다.")
+                elif "gpt" in selected_lower or "openai" in selected_lower:
+                    status = api_status.get("openai", {})
+                    if not status.get("installed"):
+                        st.error("❌ openai 패키지가 설치되지 않았습니다.")
+                    elif not status.get("api_key"):
+                        st.warning("⚠️ OPENAI_API_KEY가 설정되지 않았습니다.")
+
+        with col2:
+            # 프롬프트 템플릿 선택 (Content Type 대체)
+            scene_templates = template_manager.get_templates_by_category("scene_analysis")
+            template_map = {t.name: t.id for t in scene_templates}
+
+            # 기본값 설정 ("기본 씬 분석" 또는 첫 번째)
+            default_idx = 0
+            default_keys = [k for k, v in template_map.items() if v == "scene_analysis"]
+            if default_keys:
+                default_idx = list(template_map.keys()).index(default_keys[0])
+
+            selected_template_name = st.selectbox(
+                "분석 프롬프트",
+                list(template_map.keys()),
+                index=default_idx,
+                help="분석에 사용할 AI 프롬프트 스타일을 선택하세요."
+            )
+            selected_template_id = template_map[selected_template_name]
+
+            # API 상태 요약
+            with st.expander("🔌 API 상태", expanded=False):
+                for api_name, info in api_status.items():
+                    status_icon = info.get("status", "❓")
+                    st.caption(f"{api_name}: {status_icon}")
+
+        st.divider()
+
+        # 분석 버튼
+        if st.button("🎬 씬 분석 시작", type="primary", use_container_width=True):
+            api_manager = get_api_manager()
+
+            # 프로그레스 UI
+            progress = StreamlitProgressUI(
+                task_name="씬 분석",
+                total_steps=4,
+                show_logs=True
+            )
+
+            try:
+                from core.script.scene_analyzer import SceneAnalyzer
+
+                progress.update(1, "AI 분석기 초기화...")
+                progress.info("스크립트 분석을 시작합니다.")
+
+                # 디버그: 스크립트 정보 출력
+                print(f"[씬 분석 페이지] 스크립트 로드됨: {len(script)} 문자")
+                print(f"[씬 분석 페이지] 스크립트 미리보기: {script[:100]}...")
+                progress.info(f"로드된 스크립트: {len(script)}자")
+
+                # ⭐ API 매니저에서 선택된 API 정보 가져오기
+                api_config = api_manager.get_api_by_id(selected_api) if selected_api else None
+
+                if api_config:
+                    provider = api_config.provider
+                    model_name = api_config.model_id
+                    max_output_tokens = api_config.max_output_tokens
+                    print(f"[씬 분석 페이지] 선택된 API: {selected_api}")
+                    print(f"[씬 분석 페이지]   provider: {provider}")
+                    print(f"[씬 분석 페이지]   model_id: {model_name}")
+                    print(f"[씬 분석 페이지]   max_output_tokens: {max_output_tokens:,}")
+                else:
+                    # 폴백: 키워드 기반으로 provider 결정
+                    provider = "anthropic"  # 기본값
+                    model_name = None
+                    max_output_tokens = 65536
+                    if selected_api:
+                        selected_lower = selected_api.lower() if isinstance(selected_api, str) else ""
+                        if "gemini" in selected_lower or "google" in selected_lower:
+                            provider = "google"
+                        elif "gpt" in selected_lower or "openai" in selected_lower:
+                            provider = "openai"
+                        elif "claude" in selected_lower or "anthropic" in selected_lower:
+                            provider = "anthropic"
+                    print(f"[씬 분석 페이지] 폴백 모드: {selected_api} -> provider: {provider}")
+
+                # ⭐ 모델명과 max_output_tokens를 SceneAnalyzer에 전달
+                analyzer = SceneAnalyzer(
+                    provider=provider,
+                    model_name=model_name,
+                    max_output_tokens=max_output_tokens
+                )
+
+                progress.update(2, "스크립트 분석 중...")
+                progress.info(f"사용 프롬프트: {selected_template_name}")
+                progress.info(f"스크립트 길이: {len(script):,}자")
+
+                # ⭐ 실제 사용되는 모델 상세 표시
+                if provider == "google" and hasattr(analyzer, 'gemini_model_name'):
+                    actual_tokens = getattr(analyzer, 'max_output_tokens', 65536)
+                    progress.info(f"🤖 사용 AI: {analyzer.gemini_model_name}")
+                    progress.info(f"📊 최대 출력: {actual_tokens:,} 토큰")
+                else:
+                    progress.info(f"🤖 사용 AI: {provider}")
+
+                start_time = time.time()
+                result = analyzer.analyze_script(script, language, template_id=selected_template_id)
+                elapsed = time.time() - start_time
+
+                # 디버그: 결과 확인
+                print(f"[씬 분석 페이지] 분석 결과: 씬 {len(result.get('scenes', []))}개, 캐릭터 {len(result.get('characters', []))}개")
+                if result.get('error'):
+                    print(f"[씬 분석 페이지] 오류: {result.get('error')}")
+                    progress.info(f"분석 오류: {result.get('error')}")
+
+                progress.update(3, "결과 저장 중...")
+
+                # 결과 저장
+                analysis_dir = project_path / "analysis"
+                analysis_dir.mkdir(parents=True, exist_ok=True)
+
+                with open(analysis_dir / "scenes.json", "w", encoding="utf-8") as f:
+                    json.dump(result.get("scenes", []), f, ensure_ascii=False, indent=2)
+
+                with open(analysis_dir / "characters.json", "w", encoding="utf-8") as f:
+                    json.dump(result.get("characters", []), f, ensure_ascii=False, indent=2)
+
+                with open(analysis_dir / "full_analysis.json", "w", encoding="utf-8") as f:
+                    json.dump(result, f, ensure_ascii=False, indent=2)
+
+                # === 세션에도 저장 (캐릭터 관리 페이지 연동용) ===
+                scenes = result.get("scenes", [])
+                characters = result.get("characters", [])
+
+                st.session_state["scene_analysis_result"] = result
+                st.session_state["scenes"] = scenes
+                st.session_state["characters"] = characters
+                # 캐릭터 관리 페이지 호환용 키
+                st.session_state["scene_characters"] = characters
+                st.session_state["extracted_characters"] = characters
+
+                print(f"[씬 분석 페이지] 세션 저장 완료: 씬 {len(scenes)}개, 캐릭터 {len(characters)}개")
+
+                # 캐릭터 visual_prompt 디버그 출력
+                for char in characters[:3]:  # 처음 3개만
+                    name = char.get("name", "Unknown")
+                    has_prompt = bool(char.get("visual_prompt"))
+                    print(f"  - {name}: visual_prompt={'있음' if has_prompt else '없음'}")
+
+                # 사용량 기록 (provider에 따른 모델 ID 결정)
+                model_id_map = {
+                    "anthropic": "claude-sonnet-4-20250514",
+                    "google": "gemini-1.5-flash",
+                    "openai": "gpt-4o"
+                }
+                record_model_id = model_id_map.get(provider, "claude-sonnet-4-20250514")
+
+                api_manager.record_usage(
+                    provider=provider,
+                    model_id=record_model_id,
+                    function="text_generation",
+                    tokens_input=len(script) // 4,
+                    tokens_output=len(json.dumps(result)) // 4,
+                    duration_seconds=elapsed,
+                    success=True,
+                    project_name=project_path.name,
+                    step_name="scene_analysis"
+                )
+
+                progress.update(4, "완료!")
+
+                scene_count = result.get("total_scenes", len(result.get("scenes", [])))
+                char_count = len(result.get("characters", []))
+                progress.complete(f"씬 {scene_count}개, 캐릭터 {char_count}명 추출 완료!")
+
+                time.sleep(1)
+                st.rerun()
+
+            except Exception as e:
+                elapsed = time.time() - start_time if 'start_time' in dir() else 0
+                progress.fail(str(e))
+
+                # 에러 기록 (provider에 따른 모델 ID 결정)
+                model_id_map = {
+                    "anthropic": "claude-sonnet-4-20250514",
+                    "google": "gemini-1.5-flash",
+                    "openai": "gpt-4o"
+                }
+                record_model_id = model_id_map.get(provider, "claude-sonnet-4-20250514")
+
+                api_manager.record_usage(
+                    provider=provider,
+                    model_id=record_model_id,
+                    function="text_generation",
+                    duration_seconds=elapsed,
+                    success=False,
+                    error_message=str(e),
+                    project_name=project_path.name,
+                    step_name="scene_analysis"
+                )
+
+                import traceback
+                st.code(traceback.format_exc())
+
+        # 기존 분석 결과 로드
+        analysis_path = project_path / "analysis" / "full_analysis.json"
+        if analysis_path.exists():
+            with open(analysis_path, "r", encoding="utf-8") as f:
+                saved_analysis = json.load(f)
+
+            st.divider()
+            st.subheader("📊 분석 결과")
+
+            scenes = saved_analysis.get("scenes", [])
+            characters = saved_analysis.get("characters", [])
+
+            # 통계 계산
+            total_chars = sum(len(s.get("script_text", "")) for s in scenes) if scenes else 0
+            avg_chars = total_chars // len(scenes) if scenes else 0
+            max_chars = max(len(s.get("script_text", "")) for s in scenes) if scenes else 0
+            over_250_count = sum(1 for s in scenes if len(s.get("script_text", "")) > 250)
+
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("총 씬 수", len(scenes))
+            with col2:
+                char_count_label = f"{len(characters)}" if characters else "0 ⚠️"
+                st.metric("캐릭터 수", char_count_label)
+            with col3:
+                total_duration = sum(s.get("duration_estimate", 10) for s in scenes)
+                st.metric("예상 길이", f"{total_duration // 60}분 {total_duration % 60}초")
+            with col4:
+                avg_label = f"{avg_chars}자" if avg_chars <= 250 else f"{avg_chars}자 ⚠️"
+                st.metric("평균 글자수", avg_label)
+
+            # 경고 메시지
+            if not characters:
+                st.warning("⚠️ 캐릭터가 추출되지 않았습니다. 분석 프롬프트를 확인하거나 씬 분석을 다시 실행하세요.")
+
+            if over_250_count > 0:
+                st.warning(f"⚠️ {over_250_count}개 씬이 250자를 초과합니다. Chatterbox TTS 최적화를 위해 씬을 더 나눠주세요.")
+
+            # 씬 목록 표시
+            st.subheader("🎬 씬 목록")
+
+            for i, scene in enumerate(scenes):
+                scene_id = scene.get('scene_id', i+1)
+                script_text = scene.get('script_text', '')
+                script_preview = script_text[:50]
+                char_count = len(script_text)
+
+                # 글자 수 경고 표시
+                char_warning = " ⚠️" if char_count > 250 else ""
+
+                with st.expander(f"씬 {scene_id}: {script_preview}...{char_warning}", expanded=False):
+                    # === 상단: 기본 정보 ===
+                    col_info1, col_info2, col_info3, col_info4 = st.columns(4)
+                    with col_info1:
+                        st.metric("글자 수", f"{char_count}자")
+                    with col_info2:
+                        duration = scene.get("duration_estimate", 0)
+                        st.metric("예상 시간", f"{duration}초")
+                    with col_info3:
+                        chars = scene.get("characters", [])
+                        st.metric("캐릭터", f"{len(chars)}명")
+                    with col_info4:
+                        st.metric("분위기", scene.get("mood", "-"))
+
+                    if char_count > 250:
+                        st.warning(f"⚠️ 씬이 {char_count}자입니다. TTS 최적화를 위해 250자 이하로 분할을 권장합니다.")
+
+                    st.divider()
+
+                    col_left, col_right = st.columns([1, 1])
+
+                    with col_left:
+                        st.markdown("**📝 스크립트**")
+                        st.write(script_text)
+
+                        st.markdown("**🎬 연출가이드**")
+                        direction = scene.get("direction_guide", "")
+                        if direction:
+                            st.info(direction)
+                        else:
+                            st.caption("(없음)")
+
+                        st.markdown("**👤 등장 캐릭터**")
+                        if chars:
+                            st.write(", ".join(chars))
+                        else:
+                            st.caption("없음")
+
+                    with col_right:
+                        st.markdown("**📐 시각 요소**")
+                        elements = scene.get("visual_elements", [])
+                        if elements:
+                            st.write(", ".join(elements))
+                        else:
+                            st.caption("(없음)")
+
+                        st.markdown("**📷 카메라**")
+                        camera = scene.get("camera_suggestion", "")
+                        if camera:
+                            st.write(camera)
+                        else:
+                            st.caption("(없음)")
+
+                    st.divider()
+
+                    # === 프롬프트 탭 ===
+                    st.markdown("**🎨 AI 프롬프트**")
+                    prompt_tab1, prompt_tab2, prompt_tab3, prompt_tab4 = st.tabs([
+                        "🏞️ 이미지",
+                        "🎭 캐릭터",
+                        "🎬 비디오(캐릭터)",
+                        "🎬 비디오(전체)"
+                    ])
+
+                    with prompt_tab1:
+                        img_prompt = scene.get("image_prompt_en", "")
+                        if img_prompt:
+                            st.code(img_prompt, language=None)
+                            st.caption("💡 Midjourney, DALL-E, Stable Diffusion에서 사용")
+                        else:
+                            st.caption("(프롬프트 없음)")
+
+                    with prompt_tab2:
+                        char_prompt = scene.get("character_prompt_en", "")
+                        if char_prompt:
+                            st.code(char_prompt, language=None)
+                            st.caption("💡 캐릭터 이미지 생성용 (배경 제거)")
+                        else:
+                            st.caption("(프롬프트 없음)")
+
+                    with prompt_tab3:
+                        video_char = scene.get("video_prompt_character", "")
+                        if video_char and video_char != "N/A":
+                            st.code(video_char, language=None)
+                            st.caption("💡 D-ID, HeyGen에서 립싱크/표정 연기용")
+                        else:
+                            st.caption("(프롬프트 없음)")
+
+                    with prompt_tab4:
+                        video_full = scene.get("video_prompt_full", "")
+                        if video_full and video_full != "N/A":
+                            st.code(video_full, language=None)
+                            st.caption("💡 Runway, Pika, Kling에서 시네마틱 연출용")
+                        else:
+                            st.caption("(프롬프트 없음)")
 
 # === 탭 3: 캐릭터 ===
 with tab3:

@@ -1,0 +1,125 @@
+{
+  "version": "1.0",
+  "poses": [
+    {
+      "id": "explaining",
+      "name_ko": "설명하는",
+      "name_en": "explaining",
+      "description": "한 손을 들어 설명하는 포즈",
+      "prompt_modifier": "explaining with one hand raised, professional presentation pose, confident gesture",
+      "suitable_moods": ["informative", "educational", "neutral", "정보 전달"],
+      "weight": 1.0
+    },
+    {
+      "id": "thinking",
+      "name_ko": "생각하는",
+      "name_en": "thinking",
+      "description": "턱을 괴고 생각하는 포즈",
+      "prompt_modifier": "thinking pose with hand on chin, contemplative expression, thoughtful look",
+      "suitable_moods": ["analytical", "curious", "thoughtful", "분석/비교"],
+      "weight": 1.0
+    },
+    {
+      "id": "presenting",
+      "name_ko": "발표하는",
+      "name_en": "presenting",
+      "description": "양손을 펼쳐 발표하는 포즈",
+      "prompt_modifier": "presenting with both hands open, confident stance, professional speaker pose",
+      "suitable_moods": ["confident", "enthusiastic", "promotional", "기대감 조성"],
+      "weight": 1.0
+    },
+    {
+      "id": "surprised",
+      "name_ko": "놀라는",
+      "name_en": "surprised",
+      "description": "놀라서 손을 올린 포즈",
+      "prompt_modifier": "surprised expression with hands raised, amazed look, eyes wide open",
+      "suitable_moods": ["surprising", "exciting", "dramatic", "놀라움"],
+      "weight": 0.8
+    },
+    {
+      "id": "pointing",
+      "name_ko": "가리키는",
+      "name_en": "pointing",
+      "description": "손가락으로 가리키는 포즈",
+      "prompt_modifier": "pointing gesture with index finger, directing attention, focused expression",
+      "suitable_moods": ["informative", "directing", "highlighting", "강조"],
+      "weight": 1.0
+    },
+    {
+      "id": "celebrating",
+      "name_ko": "축하하는",
+      "name_en": "celebrating",
+      "description": "기쁘게 축하하는 포즈",
+      "prompt_modifier": "celebrating pose with raised fists, happy expression, victorious stance",
+      "suitable_moods": ["happy", "successful", "positive", "긍정적"],
+      "weight": 0.7
+    },
+    {
+      "id": "concerned",
+      "name_ko": "걱정하는",
+      "name_en": "concerned",
+      "description": "걱정스러운 표정의 포즈",
+      "prompt_modifier": "concerned expression, worried look with crossed arms, serious demeanor",
+      "suitable_moods": ["worried", "serious", "negative", "부정적"],
+      "weight": 0.6
+    },
+    {
+      "id": "welcoming",
+      "name_ko": "환영하는",
+      "name_en": "welcoming",
+      "description": "양팔을 벌려 환영하는 포즈",
+      "prompt_modifier": "welcoming pose with open arms, friendly smile, inviting gesture",
+      "suitable_moods": ["intro", "greeting", "friendly", "기대감 조성"],
+      "weight": 0.8
+    },
+    {
+      "id": "concluding",
+      "name_ko": "마무리하는",
+      "name_en": "concluding",
+      "description": "양손을 모아 마무리하는 포즈",
+      "prompt_modifier": "concluding pose with hands together, satisfied expression, closure gesture",
+      "suitable_moods": ["outro", "summary", "conclusion", "마무리"],
+      "weight": 0.8
+    },
+    {
+      "id": "standing",
+      "name_ko": "서있는",
+      "name_en": "standing",
+      "description": "기본 서있는 포즈",
+      "prompt_modifier": "standing pose, neutral stance, professional appearance, relaxed posture",
+      "suitable_moods": ["neutral", "default", "기본"],
+      "weight": 1.0
+    },
+    {
+      "id": "arms_crossed",
+      "name_ko": "팔짱 낀",
+      "name_en": "arms crossed",
+      "description": "팔짱을 끼고 자신감 있는 포즈",
+      "prompt_modifier": "arms crossed pose, confident stance, authoritative look",
+      "suitable_moods": ["confident", "serious", "authoritative", "분석/비교"],
+      "weight": 0.9
+    },
+    {
+      "id": "hands_on_hips",
+      "name_ko": "허리에 손",
+      "name_en": "hands on hips",
+      "description": "양손을 허리에 올린 당당한 포즈",
+      "prompt_modifier": "hands on hips pose, confident and assertive stance, power pose",
+      "suitable_moods": ["confident", "assertive", "promotional", "강조"],
+      "weight": 0.8
+    }
+  ],
+  "mood_to_pose_mapping": {
+    "기대감 조성": ["welcoming", "presenting", "explaining"],
+    "정보 전달": ["explaining", "pointing", "presenting", "standing"],
+    "분석/비교": ["thinking", "explaining", "pointing", "arms_crossed"],
+    "놀라움": ["surprised", "presenting"],
+    "긍정적": ["celebrating", "presenting", "welcoming"],
+    "부정적": ["concerned", "thinking", "arms_crossed"],
+    "마무리": ["concluding", "welcoming", "standing"],
+    "강조": ["pointing", "hands_on_hips", "presenting"],
+    "진지함": ["thinking", "arms_crossed", "concerned"],
+    "default": ["explaining", "standing", "presenting"]
+  }
+}

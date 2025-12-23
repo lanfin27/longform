@@ -28,6 +28,7 @@ class Character:
     character_prompt: str = ""
     reference_urls: List[str] = field(default_factory=list)
     generated_images: List[str] = field(default_factory=list)
+    appearance_scenes: List[int] = field(default_factory=list)  # 🔴 v3.12: 등장 씬 목록 추가
     created_at: str = ""
     updated_at: str = ""
 
@@ -54,8 +55,18 @@ class CharacterManager:
             try:
                 with open(self.characters_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                    self.characters = [Character(**c) for c in data]
-            except (json.JSONDecodeError, TypeError):
+
+                    # 🔴 v3.12: 필드 호환성 처리
+                    valid_fields = {f.name for f in Character.__dataclass_fields__.values()}
+                    self.characters = []
+
+                    for c in data:
+                        # 알려진 필드만 사용 (새 필드 추가 시 호환성 유지)
+                        filtered = {k: v for k, v in c.items() if k in valid_fields}
+                        self.characters.append(Character(**filtered))
+
+            except (json.JSONDecodeError, TypeError) as e:
+                print(f"[CharacterManager] 캐릭터 로드 오류: {e}")
                 self.characters = []
 
     def _save_characters(self):
@@ -143,6 +154,11 @@ class CharacterManager:
                 ""
             )
 
+            # 🔴 v3.12: appearance_scenes 추출
+            appearance_scenes = char_data.get("appearance_scenes", [])
+            # 정수 리스트로 변환
+            appearance_scenes = [int(s) for s in appearance_scenes if isinstance(s, (int, str)) and str(s).isdigit()]
+
             character = Character(
                 id=char_id,
                 name=name,
@@ -152,11 +168,12 @@ class CharacterManager:
                 nationality=char_data.get("nationality", ""),
                 era=char_data.get("era", "현대"),
                 appearance=char_data.get("appearance", ""),
-                character_prompt=prompt
+                character_prompt=prompt,
+                appearance_scenes=appearance_scenes  # 🔴 등장 씬 목록 추가
             )
             self.add_character(character)
             imported += 1
-            print(f"[CharacterManager] 캐릭터 '{name}' 가져옴 (prompt={bool(prompt)})")
+            print(f"[CharacterManager] 캐릭터 '{name}' 가져옴 (prompt={bool(prompt)}, scenes={appearance_scenes})")
 
         return imported
 
@@ -180,3 +197,46 @@ class CharacterManager:
     def export_to_dict(self) -> List[Dict]:
         """캐릭터 목록을 딕셔너리로 내보내기"""
         return [asdict(c) for c in self.characters]
+
+    def sync_appearance_scenes(self, analysis_characters: List[Dict]) -> int:
+        """
+        🔴 v3.12: 씬 분석 결과에서 등장 씬 정보 동기화
+
+        기존 캐릭터의 appearance_scenes를 분석 결과에서 업데이트합니다.
+
+        Args:
+            analysis_characters: 분석 결과의 캐릭터 목록
+
+        Returns:
+            업데이트된 캐릭터 수
+        """
+        updated = 0
+
+        # 분석 결과에서 이름 → appearance_scenes 매핑 생성
+        scene_map = {}
+        for char_data in analysis_characters:
+            if isinstance(char_data, str):
+                continue
+
+            name = char_data.get("name", char_data.get("name_ko", ""))
+            scenes = char_data.get("appearance_scenes", [])
+
+            if name and scenes:
+                scene_map[name] = scenes
+
+        # 기존 캐릭터 업데이트
+        for char in self.characters:
+            if char.name in scene_map:
+                new_scenes = [int(s) for s in scene_map[char.name] if isinstance(s, (int, str)) and str(s).isdigit()]
+
+                if new_scenes != char.appearance_scenes:
+                    char.appearance_scenes = new_scenes
+                    char.updated_at = datetime.now().isoformat()
+                    updated += 1
+                    print(f"[CharacterManager] '{char.name}' 등장 씬 업데이트: {new_scenes}")
+
+        if updated > 0:
+            self._save_characters()
+            print(f"[CharacterManager] {updated}명의 캐릭터 등장 씬 동기화 완료")
+
+        return updated

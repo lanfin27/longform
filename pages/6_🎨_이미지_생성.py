@@ -1978,46 +1978,92 @@ def render_gallery_tab():
 
     st.markdown("---")
 
+    # 세션 상태 초기화
+    if "selected_gallery_images" not in st.session_state:
+        st.session_state["selected_gallery_images"] = []
+
+    # 선택된 이미지 수 표시 (다중 선택 모드일 때)
+    if multi_select:
+        selected_count = len(st.session_state.get("selected_gallery_images", []))
+        if selected_count > 0:
+            st.info(f"📌 **{selected_count}개** 이미지 선택됨")
+
     # 이미지 그리드
     cols = st.columns(4)
 
     for i, img in enumerate(images):
         with cols[i % 4]:
-            # 이미지
+            # 다중 선택 모드: 체크박스 표시 (더 명확하게!)
+            if multi_select:
+                is_checked = img["path"] in st.session_state.get("selected_gallery_images", [])
+
+                # 체크박스와 씬 번호를 한 행에 표시
+                cb_col, info_col = st.columns([1, 2])
+                with cb_col:
+                    new_checked = st.checkbox(
+                        "✓",
+                        value=is_checked,
+                        key=f"gallery_select_{i}",
+                        help="이미지 선택"
+                    )
+                with info_col:
+                    scene_id = img.get("scene_id", "?")
+                    st.markdown(f"**씬 {scene_id}**" if is_checked else f"씬 {scene_id}")
+
+                # 상태 업데이트
+                if new_checked and img["path"] not in st.session_state["selected_gallery_images"]:
+                    st.session_state["selected_gallery_images"].append(img["path"])
+                elif not new_checked and img["path"] in st.session_state["selected_gallery_images"]:
+                    st.session_state["selected_gallery_images"].remove(img["path"])
+
+                is_selected = img["path"] in st.session_state.get("selected_gallery_images", [])
+            else:
+                is_selected = False
+
+            # 이미지 (선택 시 테두리 표시)
             if os.path.exists(img["path"]):
+                if is_selected:
+                    st.markdown(
+                        '<div style="border: 3px solid #667eea; border-radius: 8px; padding: 2px; background: rgba(102,126,234,0.1);">',
+                        unsafe_allow_html=True
+                    )
                 st.image(img["path"], use_container_width=True)
+                if is_selected:
+                    st.markdown('</div>', unsafe_allow_html=True)
 
-            # 정보
-            type_emoji = {"composited": "🎨", "background": "🏞️", "scene": "🎬"}.get(img.get("type"), "📷")
-            st.caption(f"{type_emoji} 씬 {img.get('scene_id', '?')}")
+            # 정보 (다중 선택 모드가 아닐 때만 표시)
+            if not multi_select:
+                type_emoji = {"composited": "🎨", "background": "🏞️", "scene": "🎬"}.get(img.get("type"), "📷")
+                st.caption(f"{type_emoji} 씬 {img.get('scene_id', '?')}")
 
-            # 버튼들
-            btn_cols = st.columns(3)
+            # 버튼들 (다중 선택 모드가 아닐 때만)
+            if not multi_select:
+                btn_cols = st.columns(3)
 
-            with btn_cols[0]:
-                # 스토리보드 적용
-                scene_id = img.get("scene_id")
-                if scene_id and scene_id.isdigit():
-                    if st.button("📋", key=f"apply_gallery_{i}", help="스토리보드에 적용"):
-                        save_to_storyboard(int(scene_id), img["path"])
-                        st.success(f"씬 {scene_id}에 적용!")
+                with btn_cols[0]:
+                    # 스토리보드 적용
+                    scene_id = img.get("scene_id")
+                    if scene_id and str(scene_id).isdigit():
+                        if st.button("📋", key=f"apply_gallery_{i}", help="스토리보드에 적용"):
+                            save_to_storyboard(int(scene_id), img["path"])
+                            st.success(f"씬 {scene_id}에 적용!")
 
-            with btn_cols[1]:
-                # 다운로드
-                if os.path.exists(img["path"]):
-                    with open(img["path"], "rb") as f:
-                        st.download_button(
-                            "💾",
-                            data=f.read(),
-                            file_name=img["filename"],
-                            key=f"dl_gallery_{i}"
-                        )
+                with btn_cols[1]:
+                    # 다운로드
+                    if os.path.exists(img["path"]):
+                        with open(img["path"], "rb") as f:
+                            st.download_button(
+                                "💾",
+                                data=f.read(),
+                                file_name=img["filename"],
+                                key=f"dl_gallery_{i}"
+                            )
 
-            with btn_cols[2]:
-                # 삭제
-                if st.button("🗑️", key=f"del_gallery_{i}"):
-                    delete_image(img["path"])
-                    st.rerun()
+                with btn_cols[2]:
+                    # 삭제
+                    if st.button("🗑️", key=f"del_gallery_{i}"):
+                        delete_image(img["path"])
+                        st.rerun()
 
             st.markdown("---")
 

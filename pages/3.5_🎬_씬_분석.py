@@ -195,15 +195,21 @@ with tab1:
 
     st.info("씬 분석에 사용할 스크립트를 선택하세요. 이전 단계에서 가져오거나 직접 입력할 수 있습니다.")
 
-    # 입력 소스 선택
+    # 입력 소스 선택 (v3.14: SRT 옵션 추가)
     script_source = st.radio(
         "스크립트 소스",
-        ["🔄 자동: 스크립트 탭에서 가져오기", "✏️ 수동: 직접 입력", "📁 수동: 파일 업로드"],
+        [
+            "🔄 자동: 스크립트 탭에서 가져오기",
+            "✏️ 수동: 직접 입력",
+            "📁 수동: 파일 업로드",
+            "🎬 SRT: 자막 파일 업로드"
+        ],
         horizontal=True,
         key="scene_script_source"
     )
 
     script = None
+    srt_scenes = None  # SRT 파싱 결과 저장용
 
     # === 자동 모드 ===
     if "자동" in script_source:
@@ -233,7 +239,7 @@ with tab1:
             st.success(f"✅ {len(script):,}자 입력됨")
 
     # === 수동: 파일 업로드 ===
-    elif "파일 업로드" in script_source:
+    elif "파일 업로드" in script_source and "SRT" not in script_source:
         uploaded_file = st.file_uploader(
             "스크립트 파일 선택",
             type=["txt", "docx"],
@@ -255,6 +261,122 @@ with tab1:
             except Exception as e:
                 st.error(f"파일 읽기 실패: {e}")
 
+    # === SRT: 자막 파일 업로드 (v3.14 새로 추가) ===
+    elif "SRT" in script_source:
+        st.markdown("##### 🎬 SRT 자막 파일")
+        st.caption("Vrew 등에서 생성된 SRT 파일을 업로드하세요. 시간 코드 기반으로 씬이 자동 구분됩니다.")
+
+        uploaded_srt = st.file_uploader(
+            "SRT 파일 선택",
+            type=["srt"],
+            help="SRT 자막 파일을 업로드하세요 (.srt)",
+            key="scene_srt_file"
+        )
+
+        if uploaded_srt:
+            # SRT 파싱 옵션
+            srt_col1, srt_col2 = st.columns(2)
+
+            with srt_col1:
+                merge_short = st.checkbox(
+                    "짧은 씬 자동 병합",
+                    value=False,
+                    help="지정한 시간 미만의 짧은 씬을 인접 씬과 병합합니다",
+                    key="srt_merge_short"
+                )
+
+            with srt_col2:
+                if merge_short:
+                    min_duration = st.slider(
+                        "최소 씬 길이 (초)",
+                        min_value=1.0,
+                        max_value=10.0,
+                        value=3.0,
+                        step=0.5,
+                        key="srt_min_duration"
+                    )
+                else:
+                    min_duration = 3.0
+
+            # SRT 파싱
+            try:
+                from utils.srt_parser import (
+                    SRTParser,
+                    parse_srt_content,
+                    convert_srt_to_scene_structure,
+                    prepare_srt_for_batch_analysis
+                )
+
+                # 파일 내용 읽기 (여러 인코딩 시도)
+                srt_content = None
+                for enc in ['utf-8-sig', 'utf-8', 'cp949', 'euc-kr']:
+                    try:
+                        uploaded_srt.seek(0)
+                        srt_content = uploaded_srt.read().decode(enc)
+                        break
+                    except UnicodeDecodeError:
+                        continue
+
+                if srt_content is None:
+                    st.error("❌ 파일 인코딩을 인식할 수 없습니다.")
+                else:
+                    # 유효성 검사
+                    is_valid, error_msg, scene_count = SRTParser.validate_srt(srt_content)
+
+                    if not is_valid:
+                        st.error(f"❌ SRT 파싱 오류: {error_msg}")
+                    else:
+                        # 파싱
+                        srt_scenes = parse_srt_content(srt_content, merge_short=merge_short, min_duration=min_duration)
+
+                        if srt_scenes:
+                            # 전체 길이 계산
+                            _, total_duration = SRTParser.get_total_duration(srt_scenes)
+
+                            st.success(f"✅ SRT 파싱 완료: **{len(srt_scenes)}개 씬** (총 길이: {total_duration})")
+
+                            # 통계
+                            stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
+                            with stat_col1:
+                                st.metric("씬 수", f"{len(srt_scenes)}개")
+                            with stat_col2:
+                                total_chars = sum(len(s.get('narration', '')) for s in srt_scenes)
+                                st.metric("총 글자수", f"{total_chars:,}자")
+                            with stat_col3:
+                                avg_duration = sum(s.get('duration', 0) for s in srt_scenes) / len(srt_scenes)
+                                st.metric("평균 길이", f"{avg_duration:.1f}초")
+                            with stat_col4:
+                                st.metric("전체 길이", total_duration)
+
+                            # 파싱 결과 미리보기
+                            with st.expander("📋 SRT 파싱 결과 미리보기", expanded=False):
+                                for scene in srt_scenes[:10]:  # 처음 10개만 표시
+                                    duration_badge = f"({scene['duration']:.1f}초)"
+                                    char_warning = " ⚠️" if len(scene['narration']) > 250 else ""
+                                    st.markdown(f"""
+                                    **씬 {scene['scene_id']}** `{scene['start_time']} → {scene['end_time']}` {duration_badge}{char_warning}
+                                    > {scene['narration'][:100]}{'...' if len(scene['narration']) > 100 else ''}
+                                    """)
+
+                                if len(srt_scenes) > 10:
+                                    st.caption(f"... 외 {len(srt_scenes) - 10}개 씬")
+
+                            # 전체 스크립트 생성 (기존 로직과 호환)
+                            script = SRTParser.to_script_format(srt_scenes, include_time=True)
+
+                            # 세션에 SRT 씬 데이터 저장
+                            st.session_state["srt_scenes"] = srt_scenes
+                            st.session_state["srt_source"] = True
+
+                        else:
+                            st.warning("⚠️ 파싱된 씬이 없습니다. SRT 파일 형식을 확인하세요.")
+
+            except Exception as e:
+                st.error(f"SRT 파싱 오류: {e}")
+                import traceback
+                with st.expander("오류 상세"):
+                    st.code(traceback.format_exc())
+
     # 스크립트 통계
     if script:
         st.session_state["scene_analysis_script"] = script
@@ -274,18 +396,34 @@ with tab1:
 with tab2:
     st.subheader("🎬 씬 분석")
 
-    # ⭐ 분석 방식 선택 (자동/수동)
+    # SRT 데이터가 있는지 확인
+    has_srt_data = st.session_state.get("srt_scenes") is not None and st.session_state.get("srt_source", False)
+
+    # ⭐ 분석 방식 선택 (자동/수동/SRT)
+    analysis_options = ["auto", "manual"]
+    analysis_format_func = {
+        "auto": "🤖 AI 자동 분석",
+        "manual": "📝 수동 입력 (외부 AI 결과)"
+    }
+
+    # SRT 데이터가 있으면 SRT 옵션 추가
+    if has_srt_data:
+        analysis_options.append("srt_direct")
+        analysis_format_func["srt_direct"] = "🎬 SRT 직접 적용"
+
     analysis_mode = st.radio(
         "분석 방식",
-        options=["auto", "manual"],
-        format_func=lambda x: {
-            "auto": "🤖 AI 자동 분석",
-            "manual": "📝 수동 입력 (외부 AI 결과)"
-        }[x],
+        options=analysis_options,
+        format_func=lambda x: analysis_format_func[x],
         horizontal=True,
-        help="외부 AI(ChatGPT, Claude 등)에서 분석한 JSON 결과를 직접 입력할 수 있습니다.",
+        help="SRT 파일을 업로드했다면 'SRT 직접 적용'으로 시간 코드 기반 씬 구분을 유지할 수 있습니다.",
         key="scene_analysis_mode"
     )
+
+    # SRT 안내 메시지
+    if has_srt_data and analysis_mode != "srt_direct":
+        srt_scene_count = len(st.session_state.get("srt_scenes", []))
+        st.info(f"💡 SRT 파일에서 **{srt_scene_count}개 씬**이 감지되었습니다. 'SRT 직접 적용'을 선택하면 시간 코드가 유지됩니다.")
 
     st.divider()
 
@@ -553,9 +691,266 @@ with tab2:
             col3.metric("소스", source_label)
 
     # ═══════════════════════════════════════════════════════════════════
+    # SRT 직접 적용 모드 (v3.14 새로 추가)
+    # ═══════════════════════════════════════════════════════════════════
+    elif analysis_mode == "srt_direct":
+        st.markdown("#### 🎬 SRT 기반 씬 직접 적용")
+
+        srt_scenes = st.session_state.get("srt_scenes", [])
+
+        if not srt_scenes:
+            st.warning("⚠️ SRT 데이터가 없습니다. '스크립트 입력' 탭에서 SRT 파일을 업로드하세요.")
+        else:
+            from utils.srt_parser import SRTParser, convert_srt_to_scene_structure
+
+            st.info(f"""
+            **SRT 직접 적용이란?**
+            - SRT 파일의 **시간 코드(타임스탬프)**를 씬 구분으로 사용
+            - AI 씬 분할 없이 SRT 자막 단위 그대로 적용
+            - 이미지/캐릭터 프롬프트는 별도 AI 분석으로 생성 가능
+
+            **현재 SRT 데이터**: {len(srt_scenes)}개 씬
+            """)
+
+            # SRT 씬 미리보기
+            with st.expander("📋 적용될 씬 목록", expanded=True):
+                for scene in srt_scenes[:5]:
+                    char_count = len(scene.get('narration', ''))
+                    char_warning = " ⚠️" if char_count > 250 else ""
+                    st.markdown(f"""
+                    **씬 {scene['scene_id']}** `{scene['start_time']} → {scene['end_time']}` ({scene['duration']:.1f}초){char_warning}
+                    > {scene['narration'][:80]}{'...' if len(scene['narration']) > 80 else ''}
+                    """)
+
+                if len(srt_scenes) > 5:
+                    st.caption(f"... 외 {len(srt_scenes) - 5}개 씬")
+
+            st.divider()
+
+            # 프롬프트 생성 옵션
+            st.markdown("##### ✨ 프롬프트 생성 옵션")
+
+            generate_prompts = st.checkbox(
+                "AI로 이미지/캐릭터 프롬프트 자동 생성",
+                value=True,
+                help="각 씬에 대해 AI가 이미지 프롬프트와 캐릭터 프롬프트를 생성합니다.",
+                key="srt_generate_prompts"
+            )
+
+            # AI 모델 및 처리 모드 선택 (프롬프트 생성 시에만 표시)
+            selected_model = "claude-sonnet-4-20250514"
+            processing_mode = "batch"
+
+            if generate_prompts:
+                st.markdown("##### ⚙️ AI 분석 설정")
+
+                from utils.ai_model_selector import render_model_selector, render_processing_mode_selector, render_api_key_status
+                from utils.ai_providers import get_available_models, get_model
+
+                # API 키 상태 확인
+                available_models = get_available_models()
+                if not available_models:
+                    st.error("⚠️ 사용 가능한 AI 모델이 없습니다. API 키를 설정해주세요.")
+                    with st.expander("🔑 API 키 상태 확인"):
+                        render_api_key_status()
+                else:
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        selected_model = render_model_selector(
+                            key="srt_model",
+                            task="scene_analysis",
+                            show_provider_filter=True,
+                            show_speed_filter=True,
+                            show_details=True
+                        )
+
+                    with col2:
+                        processing_mode = render_processing_mode_selector(
+                            key="srt_processing_mode"
+                        )
+
+                    # 현재 선택된 모델 정보 표시
+                    model_info = get_model(selected_model) if selected_model else None
+                    if model_info:
+                        provider_icon = {"anthropic": "🟠", "google": "🔵", "openai": "🟢"}.get(model_info.provider.value, "")
+                        st.caption(f"{provider_icon} 선택된 모델: **{model_info.name}** - {model_info.description}")
+
+                    # 속도 예상 표시
+                    speed_info = {
+                        "sequential": f"⏱️ 예상 시간: ~{len(srt_scenes) * 3}초 (순차 처리)",
+                        "batch": f"⚡ 예상 시간: ~{(len(srt_scenes) // 5 + 1) * 5}초 (배치 처리)",
+                        "parallel": f"🚀 예상 시간: ~{max(len(srt_scenes) // 3, 5)}초 (병렬 처리)"
+                    }
+                    st.caption(speed_info.get(processing_mode, ""))
+
+            # 적용 버튼
+            if st.button("🚀 SRT 씬 적용하기", type="primary", use_container_width=True):
+                progress = st.progress(0)
+                status = st.empty()
+
+                try:
+                    import time as time_module
+                    start_time = time_module.time()
+
+                    # SRT 씬을 분석 결과 형식으로 변환
+                    status.text("씬 데이터 변환 중...")
+                    analysis_scenes = convert_srt_to_scene_structure(srt_scenes)
+
+                    # 프롬프트 생성 (옵션)
+                    if generate_prompts:
+                        from utils.scene_speed_analyzer import analyze_scenes_with_mode
+                        from utils.character_visual_prompt import post_process_analysis_characters
+                        from utils.ai_providers import get_available_models, get_model
+
+                        available = get_available_models()
+                        if not available:
+                            st.warning("⚠️ 사용 가능한 AI 모델이 없습니다. API 키를 설정해주세요.")
+                        else:
+                            # 선택된 모델 정보 표시
+                            model_info = get_model(selected_model) if selected_model else None
+                            model_display = model_info.name if model_info else selected_model
+                            provider_display = model_info.provider.value if model_info else "unknown"
+                            status.text(f"AI 프롬프트 생성 중... ({model_display})")
+
+                            # 새로운 속도 개선 분석기 사용 (멀티 프로바이더 지원)
+                            analysis_scenes = analyze_scenes_with_mode(
+                                scenes=analysis_scenes,
+                                mode=processing_mode,
+                                model=selected_model,
+                                progress_callback=lambda p: progress.progress(p * 0.8),  # 80%까지
+                                status_callback=lambda s: status.text(s)
+                            )
+
+                            # 캐릭터 visual_prompt 후처리 (빠른 모델 사용)
+                            progress.progress(0.85)
+                            status.text("캐릭터 visual_prompt 생성 중...")
+
+                            # 캐릭터용 모델 선택 (같은 프로바이더의 빠른 모델 우선)
+                            char_model = "claude-3-5-haiku-20241022"  # 기본값
+                            if model_info and model_info.provider.value == "google":
+                                char_model = "gemini-1.5-flash"
+                            elif model_info and model_info.provider.value == "openai":
+                                char_model = "gpt-4o-mini"
+
+                            analysis_scenes, all_characters_with_prompts = post_process_analysis_characters(
+                                analysis_scenes,
+                                model=char_model if char_model in available else list(available.keys())[0]
+                            )
+
+                            progress.progress(0.95)
+
+                    elapsed = time_module.time() - start_time
+                    progress.progress(1.0)
+                    status.text(f"결과 저장 중... ({elapsed:.1f}초 소요)")
+
+                    # 결과 저장
+                    analysis_dir = project_path / "analysis"
+                    analysis_dir.mkdir(parents=True, exist_ok=True)
+
+                    # 캐릭터 추출 (post_process에서 이미 처리된 경우 사용)
+                    if generate_prompts and 'all_characters_with_prompts' in dir():
+                        all_characters = all_characters_with_prompts
+                    else:
+                        # 폴백: 모든 씬에서 characters 수집
+                        all_characters = []
+                        char_names_seen = set()
+                        for scene in analysis_scenes:
+                            for char in scene.get('characters', []):
+                                # 캐릭터가 딕셔너리인 경우
+                                if isinstance(char, dict):
+                                    char_name = char.get('name', '')
+                                    if char_name and char_name not in char_names_seen:
+                                        char_names_seen.add(char_name)
+                                        all_characters.append({
+                                            "name": char_name,
+                                            "name_ko": char.get('name_ko', char_name),
+                                            "role": char.get('role', '등장인물'),
+                                            "visual_prompt": char.get('visual_prompt', '')
+                                        })
+                                # 캐릭터가 문자열인 경우
+                                elif isinstance(char, str) and char not in char_names_seen:
+                                    char_names_seen.add(char)
+                                    all_characters.append({
+                                        "name": char,
+                                        "name_ko": char,
+                                        "role": "등장인물",
+                                        "visual_prompt": ""
+                                    })
+
+                    result = {
+                        "scenes": analysis_scenes,
+                        "characters": all_characters,
+                        "source": "srt",
+                        "srt_metadata": {
+                            "total_scenes": len(srt_scenes),
+                            "total_duration": srt_scenes[-1]['end_seconds'] if srt_scenes else 0,
+                            "has_time_codes": True
+                        }
+                    }
+
+                    with open(analysis_dir / "scenes.json", "w", encoding="utf-8") as f:
+                        json.dump(analysis_scenes, f, ensure_ascii=False, indent=2)
+
+                    with open(analysis_dir / "characters.json", "w", encoding="utf-8") as f:
+                        json.dump(all_characters, f, ensure_ascii=False, indent=2)
+
+                    with open(analysis_dir / "full_analysis.json", "w", encoding="utf-8") as f:
+                        json.dump(result, f, ensure_ascii=False, indent=2)
+
+                    # 세션에도 저장
+                    st.session_state["scene_analysis_result"] = result
+                    st.session_state["scenes"] = analysis_scenes
+                    st.session_state["characters"] = all_characters
+                    st.session_state["scene_characters"] = all_characters
+                    st.session_state["extracted_characters"] = all_characters
+                    st.session_state["analysis_source"] = "srt"
+
+                    status.empty()
+                    st.success(f"✅ SRT 씬 적용 완료! {len(analysis_scenes)}개 씬이 저장되었습니다.")
+                    st.balloons()
+
+                    time.sleep(1)
+                    st.rerun()
+
+                except Exception as e:
+                    st.error(f"❌ 오류 발생: {e}")
+                    import traceback
+                    with st.expander("오류 상세"):
+                        st.code(traceback.format_exc())
+
+            # 현재 로드된 씬 표시
+            analysis_path = project_path / "analysis" / "full_analysis.json"
+            if analysis_path.exists():
+                st.divider()
+                st.markdown("#### 📊 현재 로드된 씬")
+
+                with open(analysis_path, "r", encoding="utf-8") as f:
+                    saved_analysis = json.load(f)
+
+                source = saved_analysis.get("source", st.session_state.get("analysis_source", "auto"))
+                if source == "srt":
+                    source_label = "🎬 SRT"
+                elif source == "manual":
+                    source_label = "📝 수동 입력"
+                else:
+                    source_label = "🤖 AI 자동 분석"
+
+                col1, col2, col3, col4 = st.columns(4)
+                col1.metric("씬 수", len(saved_analysis.get("scenes", [])))
+                col2.metric("캐릭터 수", len(saved_analysis.get("characters", [])))
+                col3.metric("소스", source_label)
+
+                # SRT 메타데이터 표시
+                srt_meta = saved_analysis.get("srt_metadata", {})
+                if srt_meta.get("has_time_codes"):
+                    total_duration = srt_meta.get("total_duration", 0)
+                    col4.metric("전체 길이", f"{int(total_duration // 60)}:{int(total_duration % 60):02d}")
+
+    # ═══════════════════════════════════════════════════════════════════
     # AI 자동 분석 모드
     # ═══════════════════════════════════════════════════════════════════
-    else:
+    elif analysis_mode == "auto":
         # 세션에서 스크립트 가져오기
         script = st.session_state.get("scene_analysis_script")
 

@@ -2,6 +2,7 @@
 YouTube 영상 리서치 클라이언트 - 고도화 버전
 
 롱폼/쇼츠 구분, 상세 채널 정보, 커스텀 필터링 지원
+v3.13: 페이지네이션, relevanceLanguage, 한국어 필터링 추가
 
 사용법:
     from core.youtube.enhanced_search import EnhancedYouTubeSearcher
@@ -12,6 +13,7 @@ YouTube 영상 리서치 클라이언트 - 고도화 버전
     videos, api_calls = searcher.search_videos_enhanced(filters)
 """
 import isodate
+import re
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime, timedelta
 from googleapiclient.discovery import build
@@ -64,8 +66,9 @@ class EnhancedYouTubeSearcher:
                 "part": "snippet",
                 "q": filters.query,
                 "type": "video",
-                "maxResults": min(filters.max_results, 50),
+                "maxResults": 50,  # 페이지당 최대 50개 (API 제한)
                 "regionCode": filters.region_code,
+                "relevanceLanguage": filters.language,  # v3.13: 한국어 우선 검색
             }
 
             # 정렬
@@ -78,20 +81,30 @@ class EnhancedYouTubeSearcher:
             if filters.published_before:
                 search_params["publishedBefore"] = filters.published_before
 
-            # 영상 길이 필터 (YouTube API 기본 옵션)
+            # 🔴 v3.12: 영상 길이 필터 수정
+            # YouTube API videoDuration: short(< 4분), medium(4-20분), long(> 20분)
+            # 롱폼(1분 이상)은 API 필터 없이 후처리로 필터링
             if filters.video_type == "shorts":
                 search_params["videoDuration"] = "short"  # 4분 이하
+                print(f"[YouTube API] 쇼츠 모드: videoDuration=short")
             elif filters.video_type == "long_form":
-                search_params["videoDuration"] = "long"  # 20분 이상
+                # 🔴 수정: long(>20분)이 아닌 medium+long 을 포함하기 위해 필터 제거
+                # 대신 후처리에서 1분 이상만 필터링
+                print(f"[YouTube API] 롱폼 모드: videoDuration 필터 없음 (후처리)")
             elif filters.min_duration and filters.min_duration >= 1200:
                 search_params["videoDuration"] = "long"
+                print(f"[YouTube API] 커스텀 길이: videoDuration=long (>20분)")
             elif filters.max_duration and filters.max_duration <= 240:
                 search_params["videoDuration"] = "short"
+                print(f"[YouTube API] 커스텀 길이: videoDuration=short (<4분)")
 
             # 캐시 확인
             cache_key = filters.to_cache_key()
             cached = self.cache.get("enhanced_search", cache_key)
-            if cached:
+
+            # 🔴 v3.12: 빈 캐시나 잘못된 캐시 무시
+            if cached and len(cached) > 0:
+                print(f"[YouTube API] 캐시 히트! ({len(cached)}개)")
                 # 캐시된 데이터를 VideoInfo 객체로 변환
                 for item in cached:
                     if isinstance(item, dict):
@@ -101,30 +114,79 @@ class EnhancedYouTubeSearcher:
                     elif isinstance(item, VideoInfo):
                         if self._apply_filters(item, filters):
                             videos.append(item)
+                print(f"[YouTube API] 캐시 후 필터링 결과: {len(videos)}개")
                 return videos, 0
+            elif cached is not None:
+                print(f"[YouTube API] ⚠️ 빈 캐시 발견 - 무시하고 재검색")
 
-            # 검색 실행
-            search_response = self.youtube.search().list(**search_params).execute()
-            api_calls += 1
-            self.cache.log_api_call("search")
+            # 🔴 v3.13: 디버그 로깅 추가
+            print(f"[YouTube API] 검색 요청:")
+            print(f"  - 키워드: {filters.query}")
+            print(f"  - 지역: {filters.region_code}")
+            print(f"  - 언어: {filters.language}")
+            print(f"  - 정렬: {filters.sort_by}")
+            print(f"  - 요청 결과 수: {filters.max_results}")
+            if filters.published_after:
+                print(f"  - 게시일 이후: {filters.published_after}")
 
-            video_ids = [item["id"]["videoId"] for item in search_response.get("items", [])]
+            # 🔴 v3.13: 페이지네이션으로 여러 페이지 검색
+            all_video_ids = []
+            next_page_token = None
+            max_pages = 3  # 최대 3페이지 (150개 후보)
+            page_count = 0
 
-            if not video_ids:
+            while page_count < max_pages:
+                # 페이지 토큰 설정
+                if next_page_token:
+                    search_params["pageToken"] = next_page_token
+                elif "pageToken" in search_params:
+                    del search_params["pageToken"]
+
+                # 검색 실행
+                search_response = self.youtube.search().list(**search_params).execute()
+                api_calls += 1
+                self.cache.log_api_call("search")
+                page_count += 1
+
+                # 응답 디버깅
+                total_results = search_response.get("pageInfo", {}).get("totalResults", 0)
+                items_count = len(search_response.get("items", []))
+                print(f"[YouTube API] 검색 응답 (페이지 {page_count}): 총 {total_results}개 중 {items_count}개 반환")
+
+                # 영상 ID 수집
+                page_video_ids = [item["id"]["videoId"] for item in search_response.get("items", [])]
+                all_video_ids.extend(page_video_ids)
+
+                # 충분한 결과를 얻었거나 더 이상 페이지가 없으면 종료
+                next_page_token = search_response.get("nextPageToken")
+                if not next_page_token or len(all_video_ids) >= filters.max_results:
+                    break
+
+            print(f"[YouTube API] 총 {len(all_video_ids)}개 영상 ID 수집 (페이지 {page_count}개 검색)")
+
+            if not all_video_ids:
+                print(f"[YouTube API] ⚠️ 검색 결과 없음!")
+                print(f"[YouTube API] 사용된 파라미터: {search_params}")
                 return [], api_calls
 
-            # 영상 상세 정보 조회
-            videos_response = self.youtube.videos().list(
-                part="snippet,statistics,contentDetails",
-                id=",".join(video_ids)
-            ).execute()
-            api_calls += 1
-            self.cache.log_api_call("videos")
+            # 🔴 v3.13: 50개씩 배치로 영상 상세 정보 조회
+            all_video_items = []
+            for i in range(0, len(all_video_ids), 50):
+                batch_ids = all_video_ids[i:i+50]
+                videos_response = self.youtube.videos().list(
+                    part="snippet,statistics,contentDetails",
+                    id=",".join(batch_ids)
+                ).execute()
+                api_calls += 1
+                self.cache.log_api_call("videos")
+                all_video_items.extend(videos_response.get("items", []))
+
+            print(f"[YouTube API] 영상 상세 정보: {len(all_video_items)}개 조회")
 
             # 채널 ID 수집 (중복 제거)
             channel_ids = list(set(
                 item["snippet"]["channelId"]
-                for item in videos_response.get("items", [])
+                for item in all_video_items
             ))
 
             # 채널 정보 조회
@@ -132,9 +194,11 @@ class EnhancedYouTubeSearcher:
             api_calls += 1
 
             # VideoInfo 객체 생성
-            total = len(videos_response.get("items", []))
+            total = len(all_video_items)
+            filtered_count = 0
+            korean_filtered = 0
 
-            for i, item in enumerate(videos_response.get("items", [])):
+            for i, item in enumerate(all_video_items):
                 if progress_callback:
                     progress_callback(i + 1, total)
 
@@ -143,10 +207,31 @@ class EnhancedYouTubeSearcher:
                 # 커스텀 필터 적용
                 if self._apply_filters(video, filters):
                     videos.append(video)
+                else:
+                    filtered_count += 1
+                    # 한국어 필터로 제외된 경우 카운트
+                    if filters.korean_only and filters.language == "ko":
+                        if not self._has_korean_characters(video.title) and \
+                           not self._has_korean_characters(video.channel_name):
+                            korean_filtered += 1
 
-            # 캐시 저장 (딕셔너리로 변환하여 저장)
-            cache_data = [v.to_dict() for v in videos]
-            self.cache.set("enhanced_search", cache_key, cache_data)
+                # 원하는 결과 수에 도달하면 중단
+                if len(videos) >= filters.max_results:
+                    break
+
+            print(f"[YouTube API] 필터 적용 후: {len(videos)}개 영상")
+            if korean_filtered > 0:
+                print(f"[YouTube API]   - 한국어 필터 제외: {korean_filtered}개")
+            if filtered_count > korean_filtered:
+                print(f"[YouTube API]   - 기타 필터 제외: {filtered_count - korean_filtered}개")
+
+            # 🔴 v3.12: 빈 결과는 캐시하지 않음 (문제 해결 후 재검색 가능)
+            if videos:
+                cache_data = [v.to_dict() for v in videos]
+                self.cache.set("enhanced_search", cache_key, cache_data)
+                print(f"[YouTube API] 캐시 저장: {len(videos)}개")
+            else:
+                print(f"[YouTube API] ⚠️ 빈 결과 - 캐시 저장 안함")
 
         except HttpError as e:
             raise Exception(f"YouTube API 오류: {e}")
@@ -322,8 +407,26 @@ class EnhancedYouTubeSearcher:
             return f"{hours}:{minutes:02d}:{secs:02d}"
         return f"{minutes}:{secs:02d}"
 
+    @staticmethod
+    def _has_korean_characters(text: str) -> bool:
+        """텍스트에 한국어가 포함되어 있는지 확인"""
+        if not text:
+            return False
+        # 한글 유니코드 범위: 가-힣 (완성형), ㄱ-ㅎ (자음), ㅏ-ㅣ (모음)
+        korean_pattern = re.compile(r'[가-힣ㄱ-ㅎㅏ-ㅣ]')
+        return bool(korean_pattern.search(text))
+
     def _apply_filters(self, video: VideoInfo, filters: SearchFilters) -> bool:
         """커스텀 필터 적용"""
+
+        # 🔴 v3.13: 한국어 필터 (제목 또는 채널명에 한국어 포함)
+        if filters.korean_only and filters.language == "ko":
+            title_has_korean = self._has_korean_characters(video.title)
+            channel_has_korean = self._has_korean_characters(video.channel_name)
+            desc_has_korean = self._has_korean_characters(video.description[:100] if video.description else "")
+
+            if not (title_has_korean or channel_has_korean or desc_has_korean):
+                return False
 
         # 영상 길이 필터
         if filters.min_duration and video.duration_seconds < filters.min_duration:

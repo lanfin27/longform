@@ -23,7 +23,7 @@ class BackgroundImageConfig:
     include_extras: bool = True  # 엑스트라/보조 인물 포함 여부
     width: int = 1280
     height: int = 720
-    model: str = "black-forest-labs/FLUX.1-schnell-Free"
+    model: str = "black-forest-labs/FLUX.2-dev"
     style_prefix: str = ""  # 스타일 프롬프트 앞에 추가
     style_suffix: str = ""  # 스타일 프롬프트 뒤에 추가
 

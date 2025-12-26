@@ -32,23 +32,23 @@
   "무함마드 빈 살만": {
     "success": true,
     "character_name": "무함마드 빈 살만",
-    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766482528785.png",
-    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766482528785.png",
-    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or a modern business suit, confident expression, full body character, upper body portrait, shoulders up, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
-    "pose": "portrait",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766767428317.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766767428317.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or a modern business suit, confident expression, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
     "background": "solid_gray",
-    "generation_time": 2.5124642848968506,
+    "generation_time": 8.929195642471313,
     "api_provider": "Together.ai FLUX"
   },
   "자말 카슈끄지": {
     "success": true,
     "character_name": "자말 카슈끄지",
-    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766482528334.png",
-    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766482528334.png",
-    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man in his late 50s, salt-and-pepper beard neatly trimmed, receding hairline with gray hair, round glasses with thin black frames, warm brown eyes, olive skin tone, wearing dark navy business suit with white dress shirt, full body character, upper body portrait, shoulders up, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
-    "pose": "portrait",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766767425977.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766767425977.png",
+    "prompt": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere, Middle Eastern man in his late 50s, salt-and-pepper beard neatly trimmed, receding hairline with gray hair, round glasses with thin black frames, warm brown eyes, olive skin tone, wearing dark navy business suit with white dress shirt, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
     "background": "solid_gray",
-    "generation_time": 2.561795473098755,
+    "generation_time": 7.089130401611328,
     "api_provider": "Together.ai FLUX"
   },
   "예언자 무함마드": {

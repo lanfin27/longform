@@ -27,13 +27,24 @@ from enum import Enum
 
 
 class PositionPreset(Enum):
-    """캐릭터 위치 프리셋"""
-    LEFT = "left"
-    CENTER = "center"
-    RIGHT = "right"
+    """캐릭터 위치 프리셋 (3x3 그리드 + 커스텀)"""
+    # 상단 행
+    TOP_LEFT = "top_left"
+    TOP_CENTER = "top_center"
+    TOP_RIGHT = "top_right"
+    # 중간 행
+    MIDDLE_LEFT = "middle_left"
+    MIDDLE_CENTER = "middle_center"
+    MIDDLE_RIGHT = "middle_right"
+    # 하단 행
     BOTTOM_LEFT = "bottom_left"
     BOTTOM_CENTER = "bottom_center"
     BOTTOM_RIGHT = "bottom_right"
+    # 레거시 호환
+    LEFT = "left"
+    CENTER = "center"
+    RIGHT = "right"
+    # 커스텀
     CUSTOM = "custom"
 
 
@@ -53,34 +64,61 @@ class CharacterPosition:
         scaled_w = int(char_width * self.scale)
         scaled_h = int(char_height * self.scale)
 
+        # 여백 계산
+        margin_x = int(video_width * 0.03)
+        margin_y = int(video_height * 0.03)
+
         # 프리셋별 좌표 계산
         preset = self.preset.lower()
 
-        if preset == "left":
-            x = int(video_width * 0.05)
-            y = video_height - scaled_h - int(video_height * 0.05)
-        elif preset == "center":
+        # === 상단 행 ===
+        if preset == "top_left":
+            x = margin_x
+            y = margin_y
+        elif preset == "top_center":
             x = (video_width - scaled_w) // 2
-            y = video_height - scaled_h - int(video_height * 0.05)
-        elif preset == "right":
-            x = video_width - scaled_w - int(video_width * 0.05)
-            y = video_height - scaled_h - int(video_height * 0.05)
+            y = margin_y
+        elif preset == "top_right":
+            x = video_width - scaled_w - margin_x
+            y = margin_y
+        # === 중간 행 ===
+        elif preset == "middle_left":
+            x = margin_x
+            y = (video_height - scaled_h) // 2
+        elif preset == "middle_center":
+            x = (video_width - scaled_w) // 2
+            y = (video_height - scaled_h) // 2
+        elif preset == "middle_right":
+            x = video_width - scaled_w - margin_x
+            y = (video_height - scaled_h) // 2
+        # === 하단 행 ===
         elif preset == "bottom_left":
-            x = int(video_width * 0.02)
-            y = video_height - scaled_h
+            x = margin_x
+            y = video_height - scaled_h - margin_y
         elif preset == "bottom_center":
             x = (video_width - scaled_w) // 2
-            y = video_height - scaled_h
+            y = video_height - scaled_h - margin_y
         elif preset == "bottom_right":
-            x = video_width - scaled_w - int(video_width * 0.02)
-            y = video_height - scaled_h
+            x = video_width - scaled_w - margin_x
+            y = video_height - scaled_h - margin_y
+        # === 레거시 호환 (하단 중심) ===
+        elif preset == "left":
+            x = margin_x
+            y = video_height - scaled_h - margin_y
+        elif preset == "center":
+            x = (video_width - scaled_w) // 2
+            y = video_height - scaled_h - margin_y
+        elif preset == "right":
+            x = video_width - scaled_w - margin_x
+            y = video_height - scaled_h - margin_y
+        # === 커스텀 ===
         elif preset == "custom":
             x = self.x
             y = self.y
         else:
             # 기본값: 오른쪽 하단
-            x = video_width - scaled_w - int(video_width * 0.05)
-            y = video_height - scaled_h - int(video_height * 0.05)
+            x = video_width - scaled_w - margin_x
+            y = video_height - scaled_h - margin_y
 
         return str(x), str(y)
 
@@ -538,25 +576,134 @@ class CharacterCompositor:
 # ============================================
 
 def get_position_presets() -> Dict[str, Dict]:
-    """위치 프리셋 목록 반환"""
+    """위치 프리셋 목록 반환 (3x3 그리드)"""
     return {
-        "left": {"name": "왼쪽 하단", "desc": "화면 왼쪽 하단에 배치"},
-        "center": {"name": "가운데 하단", "desc": "화면 가운데 하단에 배치"},
-        "right": {"name": "오른쪽 하단", "desc": "화면 오른쪽 하단에 배치 (기본)"},
-        "bottom_left": {"name": "좌측 끝", "desc": "화면 좌측 끝에 배치"},
-        "bottom_center": {"name": "중앙 끝", "desc": "화면 중앙 끝에 배치"},
-        "bottom_right": {"name": "우측 끝", "desc": "화면 우측 끝에 배치"},
+        # 상단 행
+        "top_left": {"name": "↖️ 좌상단", "desc": "화면 왼쪽 상단에 배치", "row": 0, "col": 0},
+        "top_center": {"name": "⬆️ 상단 중앙", "desc": "화면 상단 중앙에 배치", "row": 0, "col": 1},
+        "top_right": {"name": "↗️ 우상단", "desc": "화면 오른쪽 상단에 배치", "row": 0, "col": 2},
+        # 중간 행
+        "middle_left": {"name": "⬅️ 좌측 중앙", "desc": "화면 왼쪽 중앙에 배치", "row": 1, "col": 0},
+        "middle_center": {"name": "⏺️ 정중앙", "desc": "화면 정중앙에 배치", "row": 1, "col": 1},
+        "middle_right": {"name": "➡️ 우측 중앙", "desc": "화면 오른쪽 중앙에 배치", "row": 1, "col": 2},
+        # 하단 행
+        "bottom_left": {"name": "↙️ 좌하단", "desc": "화면 왼쪽 하단에 배치", "row": 2, "col": 0},
+        "bottom_center": {"name": "⬇️ 하단 중앙", "desc": "화면 하단 중앙에 배치", "row": 2, "col": 1},
+        "bottom_right": {"name": "↘️ 우하단", "desc": "화면 오른쪽 하단에 배치 (기본)", "row": 2, "col": 2},
     }
+
+
+def get_position_grid() -> list:
+    """위치 프리셋을 3x3 그리드로 반환"""
+    return [
+        ["top_left", "top_center", "top_right"],
+        ["middle_left", "middle_center", "middle_right"],
+        ["bottom_left", "bottom_center", "bottom_right"],
+    ]
 
 
 def get_scale_presets() -> Dict[str, float]:
-    """크기 프리셋 목록 반환"""
+    """크기 프리셋 목록 반환 (10-60%)"""
     return {
-        "작게": 0.25,
-        "보통": 0.35,
-        "크게": 0.45,
-        "아주 크게": 0.55,
+        "아주 작게 (10%)": 0.10,
+        "작게 (20%)": 0.20,
+        "보통 (30%)": 0.30,
+        "크게 (40%)": 0.40,
+        "아주 크게 (50%)": 0.50,
+        "최대 (60%)": 0.60,
     }
+
+
+def get_smart_position(
+    background_image,
+    char_width: int,
+    char_height: int,
+    prefer_side: str = "right"
+) -> Tuple[int, int]:
+    """
+    배경 이미지를 분석하여 가장 적합한 캐릭터 배치 위치 반환
+
+    Args:
+        background_image: PIL Image 또는 numpy array
+        char_width: 캐릭터 너비
+        char_height: 캐릭터 높이
+        prefer_side: 선호하는 측면 ("left", "right", "any")
+
+    Returns:
+        (x, y) 최적 좌표
+    """
+    try:
+        import numpy as np
+        from PIL import Image
+
+        # PIL Image로 변환
+        if hasattr(background_image, 'shape'):  # numpy array
+            img = Image.fromarray(background_image)
+        else:
+            img = background_image
+
+        # 그레이스케일로 변환
+        gray = img.convert('L')
+        img_array = np.array(gray)
+
+        height, width = img_array.shape
+
+        # 후보 영역 생성 (3x3 그리드)
+        candidates = []
+        margin = 20
+
+        for row in range(3):
+            for col in range(3):
+                # 영역 좌표 계산
+                x = margin + (col * (width - char_width - 2 * margin)) // 2
+                y = margin + (row * (height - char_height - 2 * margin)) // 2
+
+                # 해당 영역의 밝기 분석
+                x1 = max(0, x)
+                y1 = max(0, y)
+                x2 = min(width, x + char_width)
+                y2 = min(height, y + char_height)
+
+                if x2 > x1 and y2 > y1:
+                    region = img_array[y1:y2, x1:x2]
+
+                    # 밝기 분산 계산 (낮을수록 균일한 영역)
+                    variance = np.var(region)
+                    mean_brightness = np.mean(region)
+
+                    # 점수 계산 (낮은 분산 + 적절한 밝기 = 좋은 위치)
+                    score = variance
+
+                    # 측면 선호도 반영
+                    if prefer_side == "right" and col == 2:
+                        score *= 0.7  # 오른쪽 선호
+                    elif prefer_side == "left" and col == 0:
+                        score *= 0.7  # 왼쪽 선호
+
+                    # 하단 선호 (보통 캐릭터는 하단에 배치)
+                    if row == 2:
+                        score *= 0.8
+
+                    candidates.append({
+                        'x': x,
+                        'y': y,
+                        'score': score,
+                        'row': row,
+                        'col': col
+                    })
+
+        # 최적 위치 선택 (가장 낮은 점수)
+        if candidates:
+            best = min(candidates, key=lambda c: c['score'])
+            return best['x'], best['y']
+
+        # 기본값: 오른쪽 하단
+        return width - char_width - margin, height - char_height - margin
+
+    except Exception as e:
+        print(f"[SmartPosition] 스마트 배치 실패: {e}")
+        # 기본값: 오른쪽 하단
+        return 100, 100
 
 
 if __name__ == "__main__":

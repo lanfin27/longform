@@ -12,10 +12,14 @@
     "reference_urls": [],
     "generated_images": [
       "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_left_1766482446106.png",
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766482528334.png"
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766482528334.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766767425977.png"
+    ],
+    "appearance_scenes": [
+      1
     ],
     "created_at": "2025-12-23T18:33:47.593651",
-    "updated_at": "2025-12-23T18:35:25.735034"
+    "updated_at": "2025-12-27T01:43:38.821239"
   },
   {
     "id": "mohammed_bin_salman",
@@ -30,9 +34,14 @@
     "reference_urls": [],
     "generated_images": [
       "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_left_1766482446984.png",
-      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766482528785.png"
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766482528785.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766767428317.png"
+    ],
+    "appearance_scenes": [
+      1,
+      2
     ],
     "created_at": "2025-12-23T18:33:47.595398",
-    "updated_at": "2025-12-23T18:35:25.735042"
+    "updated_at": "2025-12-27T01:43:38.821251"
   }
 ]

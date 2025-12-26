@@ -65,57 +65,103 @@ class SceneCharacterMapper:
         if not self.characters_dir.exists():
             return self._name_index
 
-        # 캐릭터 폴더 순회
-        for char_path in self.characters_dir.iterdir():
-            if not char_path.is_dir():
-                continue
+        # 🔴 v3.12: characters.json 파일에서 먼저 로드 (CharacterManager 형식)
+        characters_json = self.characters_dir / "characters.json"
+        if characters_json.exists():
+            try:
+                with open(characters_json, 'r', encoding='utf-8') as f:
+                    characters = json.load(f)
 
-            char_folder = char_path.name
+                if isinstance(characters, list):
+                    for char in characters:
+                        char_id = char.get('id', char.get('name', ''))
+                        char_name = char.get('name', '')
 
-            # 캐릭터 메타데이터 로드
-            meta_file = char_path / "metadata.json"
+                        if not char_name:
+                            continue
 
-            if meta_file.exists():
-                try:
-                    with open(meta_file, 'r', encoding='utf-8') as f:
-                        meta = json.load(f)
+                        # generated_images에서 첫 번째 이미지 사용
+                        image_path = None
+                        gen_images = char.get('generated_images', [])
+                        if gen_images and isinstance(gen_images, list):
+                            for img in gen_images:
+                                if img and Path(img).exists():
+                                    image_path = img
+                                    break
 
-                    char_id = char_folder
-                    char_name = meta.get('name', char_folder)
+                        char_info = {
+                            'id': char_id,
+                            'name': char_name,
+                            'image_path': image_path,
+                            'aliases': [],
+                            'metadata': char
+                        }
 
-                    # 대표 이미지 찾기
-                    image_path = self._find_character_image(char_path, meta)
+                        # 이름 변형 등록
+                        self._register_name_variants(char_name, char_info)
+
+                        # 영어 이름도 등록
+                        name_en = char.get('name_en', '')
+                        if name_en:
+                            self._register_name_variants(name_en, char_info)
+
+                    logger.info(f"캐릭터 인덱스 (characters.json): {len(set(c['id'] for c in self._name_index.values()))}명")
+
+            except Exception as e:
+                logger.warning(f"characters.json 로드 실패: {e}")
+
+        # 기존 폴더 구조도 지원 (폴백)
+        if not self._name_index:
+            for char_path in self.characters_dir.iterdir():
+                if not char_path.is_dir():
+                    continue
+
+                char_folder = char_path.name
+
+                # 캐릭터 메타데이터 로드
+                meta_file = char_path / "metadata.json"
+
+                if meta_file.exists():
+                    try:
+                        with open(meta_file, 'r', encoding='utf-8') as f:
+                            meta = json.load(f)
+
+                        char_id = char_folder
+                        char_name = meta.get('name', char_folder)
+
+                        # 대표 이미지 찾기
+                        image_path = self._find_character_image(char_path, meta)
+
+                        char_info = {
+                            'id': char_id,
+                            'name': char_name,
+                            'image_path': image_path,
+                            'aliases': meta.get('aliases', []),
+                            'metadata': meta
+                        }
+
+                        # 이름 변형 등록
+                        self._register_name_variants(char_name, char_info)
+
+                        # 별칭도 등록
+                        for alias in meta.get('aliases', []):
+                            self._register_name_variants(alias, char_info)
+
+                    except Exception as e:
+                        logger.warning(f"캐릭터 메타 로드 실패 ({char_folder}): {e}")
+                else:
+                    # 메타데이터 없으면 폴더명 사용
+                    image_path = self._find_character_image(char_path, {})
 
                     char_info = {
-                        'id': char_id,
-                        'name': char_name,
+                        'id': char_folder,
+                        'name': char_folder,
                         'image_path': image_path,
-                        'aliases': meta.get('aliases', []),
-                        'metadata': meta
+                        'aliases': [],
+                        'metadata': {}
                     }
 
-                    # 이름 변형 등록
-                    self._register_name_variants(char_name, char_info)
-
-                    # 별칭도 등록
-                    for alias in meta.get('aliases', []):
-                        self._register_name_variants(alias, char_info)
-
-                except Exception as e:
-                    logger.warning(f"캐릭터 메타 로드 실패 ({char_folder}): {e}")
-            else:
-                # 메타데이터 없으면 폴더명 사용
-                image_path = self._find_character_image(char_path, {})
-
-                char_info = {
-                    'id': char_folder,
-                    'name': char_folder,
-                    'image_path': image_path,
-                    'aliases': [],
-                    'metadata': {}
-                }
-
-                self._register_name_variants(char_folder, char_info)
+                    self._register_name_variants(char_folder, char_info)
 
         logger.info(f"캐릭터 인덱스: {len(set(c['id'] for c in self._name_index.values()))}명, {len(self._name_index)}개 키워드")
         return self._name_index
@@ -597,6 +643,10 @@ class SceneCharacterMapper:
 
     def get_available_characters(self) -> List[dict]:
         """등록된 캐릭터 목록 반환"""
+        # 인덱스가 비어있으면 다시 빌드
+        if not self._name_index:
+            self._build_name_index()
+
         # 중복 제거 (id 기준)
         seen_ids = set()
         characters = []
@@ -608,8 +658,12 @@ class SceneCharacterMapper:
                 characters.append({
                     'id': char_id,
                     'name': char_info['name'],
-                    'image_path': char_info['image_path']
+                    'image_path': char_info['image_path'],
+                    'metadata': char_info.get('metadata', {})
                 })
+
+        # 🔴 v3.12: 이름순 정렬
+        characters.sort(key=lambda x: x.get('name', ''))
 
         return characters
 

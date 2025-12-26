@@ -112,19 +112,50 @@ class InfographicCharacterCompositor:
             사용할 이미지 경로 (원본 또는 배경 제거된 버전)
         """
         if not os.path.exists(image_path):
+            print(f"[Compositor] ⚠️ 이미지 파일 없음: {image_path}")
             return image_path
 
         # 자동 배경 제거 비활성화면 원본 반환
         if not self.auto_remove_bg and not force_remove_bg:
+            print(f"[Compositor] ℹ️ 배경 제거 비활성화 - 원본 사용: {os.path.basename(image_path)}")
             return image_path
 
-        # 배경 제거 모듈 없으면 원본 반환
-        if not BG_REMOVER_AVAILABLE:
+        # 🔴 v3.14: rembg 사용 가능 여부 실시간 확인 및 자동 설치 시도
+        rembg_available = False
+        try:
+            import rembg
+            rembg_available = True
+        except ImportError:
+            print(f"[Compositor] ⚠️ rembg 미설치 - 자동 설치 시도 중...")
+            try:
+                import subprocess
+                import sys
+                # rembg 자동 설치
+                result = subprocess.run(
+                    [sys.executable, "-m", "pip", "install", "rembg", "--quiet"],
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    errors='ignore',
+                    timeout=120
+                )
+                if result.returncode == 0:
+                    import rembg
+                    rembg_available = True
+                    print(f"[Compositor] ✅ rembg 자동 설치 완료!")
+                else:
+                    print(f"[Compositor] ❌ rembg 설치 실패: {result.stderr[:100]}")
+            except Exception as install_err:
+                print(f"[Compositor] ❌ rembg 설치 실패: {install_err}")
+
+        if not rembg_available:
+            print(f"[Compositor] ⚠️ 배경 제거 불가 - 원본 이미지 사용")
+            print(f"[Compositor] 💡 수동 설치: pip install rembg")
             return image_path
 
         # 이미 투명 배경이면 원본 사용
-        if has_transparency(image_path):
-            print(f"[Compositor] 이미 투명 배경: {os.path.basename(image_path)}")
+        if BG_REMOVER_AVAILABLE and has_transparency(image_path):
+            print(f"[Compositor] ✅ 이미 투명 배경: {os.path.basename(image_path)}")
             return image_path
 
         # 캐시 경로 계산
@@ -142,16 +173,34 @@ class InfographicCharacterCompositor:
             print(f"[Compositor] 캐시된 배경제거 이미지 사용: {os.path.basename(cached_path)}")
             return cached_path
 
-        # 배경 제거 실행
+        # 🔴 v3.14: 직접 rembg 호출 (모듈 임포트 문제 우회)
         print(f"[Compositor] 배경 제거 중: {os.path.basename(image_path)}")
 
         try:
-            result_path = remove_background_simple(image_path, cached_path)
-            if result_path and os.path.exists(result_path):
-                print(f"[Compositor] 배경 제거 완료: {os.path.basename(result_path)}")
-                return result_path
+            from rembg import remove
+            from PIL import Image
+
+            # 이미지 로드 및 배경 제거
+            with Image.open(image_path) as img:
+                img_rgba = img.convert('RGBA')
+                result_img = remove(img_rgba)
+
+                # 결과 저장
+                result_img.save(cached_path, 'PNG')
+                print(f"[Compositor] ✅ 배경 제거 완료: {os.path.basename(cached_path)}")
+                return cached_path
+
         except Exception as e:
-            print(f"[Compositor] 배경 제거 실패: {e}")
+            print(f"[Compositor] ❌ 배경 제거 실패: {e}")
+            # 폴백: 기존 remove_background_simple 시도
+            if BG_REMOVER_AVAILABLE:
+                try:
+                    result_path = remove_background_simple(image_path, cached_path)
+                    if result_path and os.path.exists(result_path):
+                        print(f"[Compositor] ✅ 배경 제거 완료 (폴백): {os.path.basename(result_path)}")
+                        return result_path
+                except Exception as e2:
+                    print(f"[Compositor] ❌ 폴백도 실패: {e2}")
 
         return image_path
 
@@ -244,7 +293,14 @@ class InfographicCharacterCompositor:
                 output_path
             ]
 
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            # v3.14: 인코딩 명시 (cp949 오류 방지)
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='ignore'
+            )
 
             if result.returncode == 0:
                 print(f"✅ 씬 {scene_id} 캐릭터 합성 완료: {output_path}")
@@ -254,7 +310,7 @@ class InfographicCharacterCompositor:
 
                 return output_path
             else:
-                print(f"❌ FFmpeg 오류: {result.stderr[:500]}")
+                print(f"❌ FFmpeg 오류: {result.stderr[:500] if result.stderr else 'Unknown error'}")
                 return None
 
         except FileNotFoundError:
@@ -275,7 +331,14 @@ class InfographicCharacterCompositor:
                 video_path
             ]
 
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            # v3.14: 인코딩 명시
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='ignore'
+            )
             width, height = result.stdout.strip().split(",")
             return int(width), int(height)
 
@@ -298,7 +361,13 @@ class InfographicCharacterCompositor:
                 thumb_path
             ]
 
-            subprocess.run(cmd, capture_output=True)
+            # v3.14: 인코딩 명시
+            subprocess.run(
+                cmd,
+                capture_output=True,
+                encoding='utf-8',
+                errors='ignore'
+            )
             return thumb_path
 
         except Exception:
@@ -556,3 +625,80 @@ def is_bg_removal_available() -> Tuple[bool, str]:
 def is_mapper_available() -> bool:
     """씬-캐릭터 매퍼 사용 가능 여부"""
     return MAPPER_AVAILABLE
+
+
+def get_bg_removal_diagnostic() -> dict:
+    """
+    🔴 v3.12: 배경 제거 기능 진단 정보
+
+    Returns:
+        {
+            'available': bool,
+            'module_loaded': bool,
+            'rembg_installed': bool,
+            'message': str,
+            'install_cmd': str
+        }
+    """
+    result = {
+        'available': False,
+        'module_loaded': BG_REMOVER_AVAILABLE,
+        'rembg_installed': False,
+        'message': '',
+        'install_cmd': 'pip install rembg --break-system-packages'
+    }
+
+    if not BG_REMOVER_AVAILABLE:
+        result['message'] = "배경 제거 모듈(utils.background_remover)을 불러올 수 없습니다"
+        return result
+
+    try:
+        import rembg
+        result['rembg_installed'] = True
+        result['available'] = True
+        result['message'] = "✅ 배경 제거 기능 사용 가능"
+    except ImportError:
+        result['message'] = "❌ rembg 라이브러리가 설치되지 않았습니다"
+    except Exception as e:
+        result['message'] = f"❌ 오류: {e}"
+
+    return result
+
+
+def test_bg_removal(image_path: str = None) -> Tuple[bool, str]:
+    """
+    배경 제거 테스트
+
+    Args:
+        image_path: 테스트할 이미지 경로 (None이면 간단한 테스트만)
+
+    Returns:
+        (성공 여부, 메시지)
+    """
+    diag = get_bg_removal_diagnostic()
+
+    if not diag['available']:
+        return False, diag['message']
+
+    if image_path is None:
+        return True, "배경 제거 기능 사용 가능"
+
+    try:
+        from PIL import Image
+        from rembg import remove
+
+        img = Image.open(image_path).convert('RGBA')
+        result = remove(img)
+
+        # 투명 픽셀 확인
+        alpha = result.split()[-1]
+        alpha_data = list(alpha.getdata())
+        transparent_count = sum(1 for a in alpha_data if a < 10)
+
+        if transparent_count > 0:
+            return True, f"✅ 배경 제거 성공 (투명 픽셀: {transparent_count})"
+        else:
+            return False, "⚠️ 배경 제거 실행됨, 그러나 투명 픽셀이 생성되지 않음"
+
+    except Exception as e:
+        return False, f"❌ 배경 제거 테스트 실패: {e}"

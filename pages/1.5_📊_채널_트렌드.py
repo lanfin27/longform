@@ -59,6 +59,14 @@ try:
 except ImportError:
     TRANSCRIPT_DOWNLOADER_AVAILABLE = False
 
+# v2.0: 보관함 및 YouTube 서비스 모듈
+try:
+    from utils.bookmark_storage import BookmarkStorage
+    from utils.youtube_service import YouTubeService
+    BOOKMARK_AVAILABLE = True
+except ImportError:
+    BOOKMARK_AVAILABLE = False
+
 # 페이지 설정
 st.set_page_config(
     page_title="채널 트렌드 분석",

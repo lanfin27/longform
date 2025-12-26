@@ -654,3 +654,119 @@ def install_rembg_ui(key_suffix: str = None):
     with col2:
         st.code("pip install rembg", language="bash")
         st.caption("터미널에서 직접 실행")
+
+
+def auto_install_rembg(progress_callback=None) -> tuple:
+    """
+    rembg 자동 설치 (백그라운드)
+
+    Args:
+        progress_callback: (step, total, message) 콜백
+
+    Returns:
+        (success: bool, message: str)
+    """
+    import subprocess
+    import sys
+
+    steps = [
+        ("pip 업그레이드", [sys.executable, "-m", "pip", "install", "--upgrade", "pip"]),
+        ("rembg 설치", [sys.executable, "-m", "pip", "install", "rembg", "--break-system-packages"]),
+    ]
+
+    for i, (step_name, cmd) in enumerate(steps):
+        if progress_callback:
+            progress_callback(i + 1, len(steps), step_name)
+
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=300
+            )
+            if result.returncode != 0 and "rembg" in step_name:
+                return False, f"{step_name} 실패: {result.stderr[:200]}"
+        except subprocess.TimeoutExpired:
+            return False, f"{step_name} 시간 초과"
+        except Exception as e:
+            return False, f"{step_name} 오류: {e}"
+
+    # 설치 확인
+    try:
+        import importlib
+        importlib.invalidate_caches()
+        import rembg
+        return True, "✅ rembg 설치 완료!"
+    except ImportError:
+        return False, "설치는 되었으나 import 실패. 앱을 재시작하세요."
+
+
+def get_rembg_diagnostic() -> dict:
+    """
+    rembg 상세 진단 정보 반환
+
+    Returns:
+        {
+            'available': bool,
+            'message': str,
+            'version': str or None,
+            'models': list,
+            'onnx_available': bool,
+            'install_command': str
+        }
+    """
+    result = {
+        'available': False,
+        'message': '',
+        'version': None,
+        'models': [],
+        'onnx_available': False,
+        'install_command': 'pip install rembg --break-system-packages'
+    }
+
+    # ONNX Runtime 확인
+    try:
+        import onnxruntime
+        result['onnx_available'] = True
+    except ImportError:
+        result['onnx_available'] = False
+
+    # rembg 확인
+    try:
+        import rembg
+        result['available'] = True
+        result['version'] = getattr(rembg, '__version__', 'unknown')
+        result['message'] = f"✅ rembg v{result['version']} 사용 가능"
+        result['models'] = SUPPORTED_MODELS
+    except ImportError as e:
+        result['message'] = f"❌ rembg 미설치: {e}"
+
+    return result
+
+
+def ensure_rembg_installed() -> bool:
+    """
+    rembg가 설치되어 있는지 확인하고, 없으면 설치 시도
+
+    Returns:
+        bool: 사용 가능 여부
+    """
+    try:
+        import rembg
+        return True
+    except ImportError:
+        pass
+
+    # 자동 설치 시도
+    success, msg = auto_install_rembg()
+    if success:
+        try:
+            import importlib
+            importlib.invalidate_caches()
+            import rembg
+            return True
+        except ImportError:
+            pass
+
+    return False

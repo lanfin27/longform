@@ -293,14 +293,35 @@ def _get_scene_preview_text(scene: Dict, max_len: int = 100) -> str:
 
 
 def get_composited_for_scene(scene_id: int) -> Optional[str]:
-    """씬의 합성 이미지 가져오기"""
+    """
+    씬의 합성 이미지 가져오기
+
+    v3.14: 파일 유효성 검사 추가 (빈 파일/손상된 파일 제외)
+    """
     comp_dir = project_path / "images" / "composited"
     if comp_dir.exists():
         # 최신 합성 이미지 찾기
         pattern = f"scene_{scene_id:03d}_*"
         files = sorted(comp_dir.glob(pattern), key=lambda x: x.stat().st_mtime, reverse=True)
-        if files:
-            return str(files[0])
+
+        for file_path in files:
+            # v3.14: 파일 유효성 검사
+            try:
+                # 파일 크기 체크 (최소 1KB 이상이어야 유효한 이미지)
+                if file_path.stat().st_size < 1024:
+                    continue
+
+                # 이미지 파일 유효성 체크
+                if file_path.suffix.lower() in ['.png', '.jpg', '.jpeg', '.webp']:
+                    from PIL import Image
+                    with Image.open(file_path) as img:
+                        img.verify()  # 이미지 유효성 검증
+                    return str(file_path)
+
+            except Exception:
+                # 손상된 파일 무시
+                continue
+
     return None
 
 
@@ -1204,6 +1225,93 @@ def render_batch_generation_tab():
 
     with batch_tabs[1]:
         _render_batch_composite_only(scenes)
+
+
+def _render_imagefx_cookie_settings():
+    """Google ImageFX 인증 설정 UI (Authorization 토큰 권장)"""
+    from config.settings import IMAGEFX_COOKIE, SECRETS_DIR, save_imagefx_auth_token, load_imagefx_auth_token
+
+    # 현재 인증 상태 확인
+    current_token = st.session_state.get("imagefx_auth_token", "") or load_imagefx_auth_token()
+    current_cookie = st.session_state.get("imagefx_cookie") or IMAGEFX_COOKIE
+    has_auth = bool(current_token) or bool(current_cookie)
+
+    with st.expander("🔑 Google ImageFX 인증 설정", expanded=not has_auth):
+        st.warning("""
+        ⚠️ **주의사항**
+        - ImageFX는 비공식 API입니다
+        - **Authorization 토큰**이 필요합니다 (쿠키만으로는 부족)
+        - 토큰은 일정 시간 후 만료됩니다
+        """)
+
+        # 현재 인증 상태 표시
+        if current_token:
+            preview = current_token[:30] + "..." if len(current_token) > 30 else current_token
+            st.success(f"✅ Authorization 토큰 설정됨: `{preview}`")
+        elif current_cookie:
+            st.warning("⚠️ 쿠키만 설정됨 - Authorization 토큰 사용을 권장합니다")
+        else:
+            st.error("❌ 인증 정보가 설정되지 않았습니다")
+
+        # Authorization 토큰 입력
+        st.markdown("""
+        ### Authorization 토큰 추출 방법
+        1. [labs.google/fx/tools/image-fx](https://labs.google/fx/tools/image-fx) 접속 후 **로그인**
+        2. `F12` → **Network** 탭 열기
+        3. 이미지 생성 후 `runImageFx` 요청 찾기
+        4. **Request Headers**에서 `Authorization:` 값 복사
+        """)
+
+        token_input = st.text_area(
+            "Authorization 토큰",
+            value="",
+            height=80,
+            placeholder="Bearer ya29.a0ARrdaM8xYz... 또는 토큰 값만",
+            key="imagefx_token_input_page6"
+        )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🔑 토큰 저장", key="save_imagefx_token_page6"):
+                if token_input.strip():
+                    if save_imagefx_auth_token(token_input.strip()):
+                        st.session_state["imagefx_auth_token"] = token_input.strip()
+                        st.success("✅ 토큰이 저장되었습니다!")
+                        st.rerun()
+                    else:
+                        st.error("토큰 저장 실패")
+                else:
+                    st.warning("토큰을 입력해주세요")
+
+        with col2:
+            if st.button("✅ 토큰 테스트", key="test_imagefx_token_page6"):
+                test_token = token_input.strip() or current_token
+                if test_token:
+                    from utils.imagefx_client import ImageFXClient, ImagenModel, AspectRatio
+                    is_valid, message, _ = ImageFXClient.validate_credentials(authorization_token=test_token)
+
+                    if not is_valid:
+                        st.error(f"❌ {message}")
+                    else:
+                        st.info(f"✓ {message}")
+                        with st.spinner("API 테스트 중... (최대 60초)"):
+                            try:
+                                client = ImageFXClient(authorization_token=test_token)
+                                images = client.generate_image(
+                                    prompt="A simple red circle on white background",
+                                    model=ImagenModel.IMAGEN_4,
+                                    aspect_ratio=AspectRatio.SQUARE,
+                                    num_images=1,
+                                    timeout=60
+                                )
+                                if images:
+                                    st.success("✅ 토큰이 유효합니다!")
+                                else:
+                                    st.error("❌ 이미지 생성 실패")
+                            except Exception as e:
+                                st.error(f"❌ 테스트 실패: {e}")
+                else:
+                    st.warning("테스트할 토큰이 없습니다")
 
 
 def _render_batch_background_and_composite(scenes: List[Dict]):
@@ -2120,8 +2228,9 @@ def render_settings_tab():
     with col1:
         image_api = st.selectbox(
             "이미지 생성 API",
-            options=["Together.ai FLUX", "OpenAI DALL-E", "Stability AI"],
-            key="image_api"
+            options=["Together.ai FLUX", "Google ImageFX", "OpenAI DALL-E", "Stability AI"],
+            key="image_api",
+            help="🆓 Google ImageFX: 무료 (쿠키 필요)\n💰 Together.ai FLUX: ~20원/장\n💰 OpenAI DALL-E: ~60원/장"
         )
 
     with col2:
@@ -2129,12 +2238,33 @@ def render_settings_tab():
             model = st.selectbox(
                 "모델",
                 options=[
-                    "black-forest-labs/FLUX.1-schnell-Free",
-                    "black-forest-labs/FLUX.1-schnell",
-                    "black-forest-labs/FLUX.1-dev"
+                    "black-forest-labs/FLUX.2-dev",
+                    "black-forest-labs/FLUX.2-flex",
+                    "black-forest-labs/FLUX.2-pro"
                 ],
+                format_func=lambda x: {
+                    "black-forest-labs/FLUX.2-dev": "FLUX.2 Dev (권장, ~20원)",
+                    "black-forest-labs/FLUX.2-flex": "FLUX.2 Flex (~40원)",
+                    "black-forest-labs/FLUX.2-pro": "FLUX.2 Pro (고품질, ~40원)"
+                }.get(x, x),
                 key="flux_model"
             )
+        elif image_api == "Google ImageFX":
+            model = st.selectbox(
+                "모델",
+                options=["IMAGEN_4", "IMAGEN_3_5", "IMAGEN_3_1", "IMAGEN_3"],
+                format_func=lambda x: {
+                    "IMAGEN_4": "Imagen 4 (최신, 무료)",
+                    "IMAGEN_3_5": "Imagen 3.5 (무료)",
+                    "IMAGEN_3_1": "Imagen 3.1 (무료)",
+                    "IMAGEN_3": "Imagen 3.0 (무료)"
+                }.get(x, x),
+                key="imagefx_model"
+            )
+
+    # Google ImageFX 쿠키 설정 (ImageFX 선택 시)
+    if image_api == "Google ImageFX":
+        _render_imagefx_cookie_settings()
 
     st.markdown("---")
 
@@ -2203,8 +2333,13 @@ def render_settings_tab():
 def generate_background_image(scene_id: int, prompt: str, style: str, width: int, height: int):
     """배경 이미지 생성 - StyleManager의 스타일 프롬프트 적용"""
     try:
-        from core.image.together_client import TogetherImageClient
+        from core.image.together_client import TogetherImageClient, get_model_price_info
         from utils.style_manager import get_style_by_id, get_styles_by_segment, build_prompt
+        from config.settings import TOGETHER_DEFAULT_MODEL
+
+        # 사용할 모델 (설정에서 가져옴)
+        model = TOGETHER_DEFAULT_MODEL or "black-forest-labs/FLUX.2-dev"
+        model_info = get_model_price_info(model)
 
         client = TogetherImageClient()
 
@@ -2256,16 +2391,36 @@ def generate_background_image(scene_id: int, prompt: str, style: str, width: int
         # 디버그 로그 출력
         print("=" * 60)
         print(f"[배경 생성] 씬 {scene_id}")
-        print(f"[배경 생성] 원본 프롬프트: {prompt[:150]}..." if len(prompt) > 150 else f"[배경 생성] 원본 프롬프트: {prompt}")
+        print(f"[배경 생성] 📌 API: Together.ai FLUX")
+        print(f"[배경 생성] 📌 모델: {model}")
+        print(f"[배경 생성] 📌 모델명: {model_info['name']}")
+        if model_info['price'] > 0:
+            print(f"[배경 생성] 📌 예상 비용: ${model_info['price']:.4f}/장 (~{int(model_info['price'] * 1400)}원)")
+        else:
+            print(f"[배경 생성] 📌 예상 비용: 무료")
+        print(f"[배경 생성] 📌 크기: {width}x{height}")
         print(f"[배경 생성] 적용 스타일: {style}")
+        print(f"[배경 생성] 원본 프롬프트: {prompt[:100]}..." if len(prompt) > 100 else f"[배경 생성] 원본 프롬프트: {prompt}")
         print(f"[배경 생성] 최종 프롬프트 길이: {len(full_prompt)}자")
-        print(f"[배경 생성] 최종 프롬프트: {full_prompt[:300]}..." if len(full_prompt) > 300 else f"[배경 생성] 최종 프롬프트: {full_prompt}")
         if negative_prompt:
-            print(f"[배경 생성] 네거티브: {negative_prompt[:100]}..." if len(negative_prompt) > 100 else f"[배경 생성] 네거티브: {negative_prompt}")
-        print("=" * 60)
+            print(f"[배경 생성] 네거티브: {negative_prompt[:80]}..." if len(negative_prompt) > 80 else f"[배경 생성] 네거티브: {negative_prompt}")
+        print("-" * 60)
 
         # UI에 프롬프트 표시
         with st.expander("🔍 생성에 사용된 프롬프트", expanded=True):
+            # API/모델 정보 표시
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("API", "Together.ai FLUX")
+            with col2:
+                st.metric("모델", model_info['name'])
+            with col3:
+                if model_info['price'] > 0:
+                    st.metric("예상 비용", f"${model_info['price']:.4f} (~{int(model_info['price'] * 1400)}원)")
+                else:
+                    st.metric("예상 비용", "무료")
+
+            st.markdown("---")
             st.markdown("**원본 (씬 분석):**")
             st.code(prompt, language=None)
 

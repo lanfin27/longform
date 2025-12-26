@@ -4,7 +4,8 @@
 지원 API:
 - Together.ai (FLUX)
 - OpenAI (DALL-E 3, DALL-E 2)
-- Google (Imagen 3)
+- Google (Imagen 3 via Vertex AI)
+- Google ImageFX (Imagen via Cookie)
 """
 import os
 import base64
@@ -65,9 +66,15 @@ class ImageGenerator:
     # 제공자별 모델 목록
     MODELS = {
         "together": {
-            "FLUX.1 Schnell (Free)": "black-forest-labs/FLUX.1-schnell-Free",
-            "FLUX.1 Schnell": "black-forest-labs/FLUX.1-schnell",
-            "FLUX.1 Dev": "black-forest-labs/FLUX.1-dev",
+            "FLUX.2 Dev": "black-forest-labs/FLUX.2-dev",
+            "FLUX.2 Flex": "black-forest-labs/FLUX.2-flex",
+            "FLUX.2 Pro": "black-forest-labs/FLUX.2-pro",
+        },
+        "imagefx": {
+            "Imagen 4": "IMAGEN_4",
+            "Imagen 3.5": "IMAGEN_3_5",
+            "Imagen 3.1": "IMAGEN_3_1",
+            "Imagen 3.0": "IMAGEN_3",
         },
         "openai": {
             "DALL-E 3": "dall-e-3",
@@ -113,6 +120,11 @@ class ImageGenerator:
         if google_key:
             self._clients["google_key"] = google_key
 
+        # Google ImageFX (Cookie-based)
+        imagefx_cookie = os.environ.get("IMAGEFX_COOKIE")
+        if imagefx_cookie:
+            self._clients["imagefx_cookie"] = imagefx_cookie
+
     def generate(
         self,
         prompt: str,
@@ -151,6 +163,8 @@ class ImageGenerator:
         try:
             if cfg.provider == "together":
                 result = self._generate_together(prompt, output_path, cfg)
+            elif cfg.provider == "imagefx":
+                result = self._generate_imagefx(prompt, output_path, cfg)
             elif cfg.provider == "openai":
                 result = self._generate_openai(prompt, output_path, cfg)
             elif cfg.provider == "google":
@@ -525,6 +539,111 @@ class ImageGenerator:
                 error=f"Google Imagen error: {str(e)}"
             )
 
+    def _generate_imagefx(
+        self,
+        prompt: str,
+        output_path: str,
+        config: ImageConfig
+    ) -> ImageResult:
+        """Google ImageFX (Imagen) 이미지 생성 - 쿠키 기반"""
+
+        # === 디버깅: 받은 프롬프트 확인 ===
+        print("\n" + "=" * 60)
+        print("[ImageGenerator._generate_imagefx] 호출됨")
+        print(f"받은 프롬프트 (앞 300자): {prompt[:300] if len(prompt) > 300 else prompt}")
+        print(f"프롬프트 전체 길이: {len(prompt)} 문자")
+        print(f"모델: {config.model}")
+        print("=" * 60)
+
+        cookie = self._clients.get("imagefx_cookie") or os.environ.get("IMAGEFX_COOKIE")
+
+        if not cookie:
+            return ImageResult(
+                success=False,
+                prompt=prompt,
+                model=config.model,
+                provider="imagefx",
+                error="IMAGEFX_COOKIE가 설정되지 않았습니다. "
+                      "labs.google에서 쿠키를 추출해주세요."
+            )
+
+        try:
+            from utils.imagefx_client import (
+                ImageFXClient,
+                ImagenModel,
+                get_aspect_ratio_for_size
+            )
+
+            client = ImageFXClient(cookie)
+
+            # 모델 설정
+            try:
+                model_enum = ImagenModel[config.model] if config.model else ImagenModel.IMAGEN_4
+            except KeyError:
+                model_enum = ImagenModel.IMAGEN_4
+
+            # 비율 설정 (크기 기반 자동 선택)
+            aspect_ratio = get_aspect_ratio_for_size(config.width, config.height)
+
+            print(f"[ImageFX] 이미지 생성 시작")
+            print(f"  모델: {model_enum.value}")
+            print(f"  비율: {aspect_ratio.value}")
+
+            # 이미지 생성
+            images = client.generate_image(
+                prompt=prompt,
+                model=model_enum,
+                aspect_ratio=aspect_ratio,
+                num_images=1
+            )
+
+            if not images:
+                return ImageResult(
+                    success=False,
+                    prompt=prompt,
+                    model=config.model,
+                    provider="imagefx",
+                    error="이미지가 생성되지 않았습니다."
+                )
+
+            # 이미지 저장
+            image_data = images[0].get_bytes()
+            Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+            with open(output_path, "wb") as f:
+                f.write(image_data)
+
+            print(f"[ImageFX] ✅ 이미지 저장 완료: {output_path}")
+
+            return ImageResult(
+                success=True,
+                image_path=output_path,
+                path=output_path,
+                prompt=prompt,
+                model=config.model,
+                provider="imagefx"
+            )
+
+        except ImportError:
+            return ImageResult(
+                success=False,
+                prompt=prompt,
+                model=config.model,
+                provider="imagefx",
+                error="ImageFX 클라이언트 모듈을 찾을 수 없습니다. "
+                      "utils/imagefx_client.py 파일을 확인해주세요."
+            )
+        except Exception as e:
+            import traceback
+            print(f"[ImageFX] ❌ 오류: {str(e)}")
+            return ImageResult(
+                success=False,
+                prompt=prompt,
+                model=config.model,
+                provider="imagefx",
+                error=f"ImageFX error: {str(e)}",
+                metadata={"traceback": traceback.format_exc()}
+            )
+
     def generate_batch(
         self,
         prompts: List[str],
@@ -584,9 +703,16 @@ class ImageGenerator:
         if provider == "together":
             return ImageConfig(
                 provider="together",
-                model="black-forest-labs/FLUX.1-schnell-Free",
+                model="black-forest-labs/FLUX.2-dev",
                 width=1024,
                 height=1024
+            )
+        elif provider == "imagefx":
+            return ImageConfig(
+                provider="imagefx",
+                model="IMAGEN_4",
+                width=1280,
+                height=720
             )
         elif provider == "openai":
             return ImageConfig(
@@ -609,6 +735,8 @@ class ImageGenerator:
         """API 키 확인"""
         if provider == "together":
             return bool(os.environ.get("TOGETHER_API_KEY"))
+        elif provider == "imagefx":
+            return bool(os.environ.get("IMAGEFX_COOKIE"))
         elif provider == "openai":
             return bool(os.environ.get("OPENAI_API_KEY"))
         elif provider == "google":

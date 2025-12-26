@@ -4,21 +4,21 @@
       "scene_id": 1,
       "script_text": "2018년 언론인 자말 카슈크지가 튜르키의 이스탄불의 사우디아라비아 총영사관에서 살해되었습니다. 그는 사우디 왕세자 무한마드 빈살만을 비판하던 기자였는데요.",
       "char_count": 87,
-      "duration_estimate": 10,
+      "duration_estimate": 9,
       "characters": [
         "자말 카슈끄지",
         "무함마드 빈 살만"
       ],
       "visual_elements": [
         "사우디아라비아 총영사관",
-        "뉴스 보도 화면"
+        "뉴스 스튜디오"
       ],
       "mood": "비극적",
-      "direction_guide": "뉴스 속보 스타일로 긴장감을 조성한다.",
-      "camera_suggestion": "클로즈업, 줌 아웃",
-      "image_prompt_ko": "밤의 이스탄불에 위치한 사우디아라비아 총영사관, 어두운 분위기, 굳은 표정의 경비병들",
-      "image_prompt_en": "Saudi Arabian consulate in Istanbul at night, dark atmosphere, stern-faced guards, no characters, cinematic style",
-      "character_prompt_ko": "근엄한 표정의 자말 카슈끄지",
+      "direction_guide": "뉴스 보도 형식으로 시작, 긴장감을 유지",
+      "camera_suggestion": "클로즈업, 미디엄 샷",
+      "image_prompt_ko": "밤의 이스탄불에 위치한 사우디아라비아 총영사관, 어두운 분위기, 굳은 표정의 기자 사진",
+      "image_prompt_en": "Saudi Arabian consulate in Istanbul at night, dark atmosphere, serious journalist photo, no characters",
+      "character_prompt_ko": "심각한 표정의 자말 카슈끄지",
       "character_prompt_en": "Jamal Khashoggi with a serious expression, white background",
       "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
       "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
@@ -32,16 +32,16 @@
         "무함마드 빈 살만"
       ],
       "visual_elements": [
-        "국제 뉴스 회의",
-        "사우디 아라비아"
+        "사우디아라비아",
+        "왕궁"
       ],
-      "mood": "긴장감, 억압",
-      "direction_guide": "국제 사회의 비판과 사우디 내부의 침묵을 대비시킨다.",
-      "camera_suggestion": "와이드 샷, 오버 숄더 샷",
-      "image_prompt_ko": "사우디 아라비아의 웅장한 궁전, 황금빛 조명, 고급스러운 분위기, 캐릭터 없음",
-      "image_prompt_en": "Grand palace in Saudi Arabia, golden lighting, luxurious atmosphere, no characters, cinematic style",
-      "character_prompt_ko": "심각한 표정의 무함마드 빈 살만",
-      "character_prompt_en": "Mohammed bin Salman with a serious expression, white background",
+      "mood": "억압적",
+      "direction_guide": "사우디 왕궁의 위압적인 모습 강조",
+      "camera_suggestion": "와이드 샷, 로우 앵글",
+      "image_prompt_ko": "사우디아라비아 왕궁의 웅장한 모습, 황금빛 조명, 권위적인 분위기",
+      "image_prompt_en": "Grand view of the Saudi Arabian royal palace, golden lighting, authoritative atmosphere, no characters",
+      "character_prompt_ko": "근엄한 표정의 무함마드 빈 살만 왕세자",
+      "character_prompt_en": "Crown Prince Mohammed bin Salman with a stern expression, white background",
       "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
       "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
     },
@@ -53,15 +53,15 @@
       "characters": [],
       "visual_elements": [
         "사우디 아람코",
-        "법전"
+        "석유 시추 시설"
       ],
-      "mood": "권위주의",
-      "direction_guide": "법과 왕권의 대비, 아람코의 위엄을 보여준다.",
-      "camera_suggestion": "로우 앵글, 익스트림 와이드 샷",
-      "image_prompt_ko": "사우디 아람코의 거대한 석유 시설, 석양이 지는 시간, 웅장한 분위기, 캐릭터 없음",
-      "image_prompt_en": "Massive oil facilities of Saudi Aramco, sunset time, grand atmosphere, no characters, cinematic style",
+      "mood": "권력",
+      "direction_guide": "아람코의 거대한 규모와 영향력 강조",
+      "camera_suggestion": "항공 샷, 익스트림 와이드 샷",
+      "image_prompt_ko": "사우디 아람코의 석유 시추 시설, 광활한 사막, 석유 굴착 장비",
+      "image_prompt_en": "Saudi Aramco oil drilling facilities, vast desert landscape, oil drilling equipment, no characters",
       "character_prompt_ko": "없음",
-      "character_prompt_en": "No character, white background",
+      "character_prompt_en": "No character, transparent background",
       "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
       "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
     },
@@ -73,15 +73,15 @@
       "characters": [],
       "visual_elements": [
         "사우디 왕가",
-        "경제 그래프"
+        "돈"
       ],
       "mood": "지배",
-      "direction_guide": "왕가의 권력과 경제력을 시각적으로 연결한다.",
-      "camera_suggestion": "탑 뷰, 아이 레벨 샷",
-      "image_prompt_ko": "사우디 왕가의 문장, 금색과 검은색, 고급스러운 분위기, 캐릭터 없음",
-      "image_prompt_en": "Coat of arms of the Saudi royal family, gold and black, luxurious atmosphere, no characters, cinematic style",
+      "direction_guide": "왕가의 부와 권력을 시각적으로 표현",
+      "camera_suggestion": "아이 레벨 샷",
+      "image_prompt_ko": "사우디 왕가의 초상화, 화려한 보석, 왕좌",
+      "image_prompt_en": "Portraits of the Saudi royal family, luxurious jewelry, throne, no characters",
       "character_prompt_ko": "없음",
-      "character_prompt_en": "No character, white background",
+      "character_prompt_en": "No character, transparent background",
       "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
       "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
     },
@@ -95,13 +95,13 @@
         "이슬람 사원",
         "코란"
       ],
-      "mood": "종교적",
-      "direction_guide": "종교적 권위의 근원을 보여준다.",
-      "camera_suggestion": "버즈 아이 뷰, 틸트 업",
-      "image_prompt_ko": "메카의 그랜드 모스크, 황금빛 조명, 신성한 분위기, 캐릭터 없음",
-      "image_prompt_en": "Grand Mosque in Mecca, golden lighting, sacred atmosphere, no characters, cinematic style",
+      "mood": "신성함",
+      "direction_guide": "종교적인 분위기를 연출",
+      "camera_suggestion": "하이 앵글 샷",
+      "image_prompt_ko": "웅장한 이슬람 사원, 신성한 분위기, 코란",
+      "image_prompt_en": "Grand Islamic mosque, sacred atmosphere, Quran, no characters",
       "character_prompt_ko": "없음",
-      "character_prompt_en": "No character, white background",
+      "character_prompt_en": "No character, transparent background",
       "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
       "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
     },
@@ -112,16 +112,16 @@
       "duration_estimate": 10,
       "characters": [],
       "visual_elements": [
-        "종교 지도자",
-        "역사적 문서"
+        "메카",
+        "카바"
       ],
-      "mood": "신성함",
-      "direction_guide": "종교적 권위와 정치적 권력의 연결을 강조한다.",
-      "camera_suggestion": "미디엄 샷, 줌 인",
-      "image_prompt_ko": "고대 이슬람 서적, 양피지, 촛불 조명, 캐릭터 없음",
-      "image_prompt_en": "Ancient Islamic texts, parchment, candlelight, no characters, cinematic style",
+      "mood": "숭고함",
+      "direction_guide": "메카의 숭고한 분위기를 강조",
+      "camera_suggestion": "버드 아이 뷰",
+      "image_prompt_ko": "메카의 카바 신전, 순례자들, 숭고한 분위기",
+      "image_prompt_en": "Kaaba in Mecca, pilgrims, sublime atmosphere, no characters",
       "character_prompt_ko": "없음",
-      "character_prompt_en": "No character, white background",
+      "character_prompt_en": "No character, transparent background",
       "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
       "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
     },
@@ -135,13 +135,13 @@
         "고대 부족",
         "족장"
       ],
-      "mood": "역사적",
-      "direction_guide": "권력의 기원과 변화를 보여준다.",
-      "camera_suggestion": "롱 샷, 패닝",
-      "image_prompt_ko": "고대 부족의 마을, 불 피우는 모습, 자연스러운 조명, 캐릭터 없음",
-      "image_prompt_en": "Ancient tribal village, fire burning, natural lighting, no characters, cinematic style",
+      "mood": "원시적",
+      "direction_guide": "고대 부족의 생활 모습 묘사",
+      "camera_suggestion": "로우 앵글 샷",
+      "image_prompt_ko": "고대 부족의 족장, 강인한 모습, 부족민들",
+      "image_prompt_en": "Ancient tribal chieftain, strong appearance, tribesmen, no characters",
       "character_prompt_ko": "없음",
-      "character_prompt_en": "No character, white background",
+      "character_prompt_en": "No character, transparent background",
       "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
       "video_prompt_full": "Camera slowly zooms in, character gestures while speaking, soft lighting changes, atmospheric background movement"
     }
@@ -177,8 +177,8 @@
       "appearance": "",
       "nationality": "",
       "era": "",
-      "character_prompt": "Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or a modern business suit, confident expression",
-      "visual_prompt": "Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or a modern business suit, confident expression",
+      "character_prompt": "Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or modern business suits, confident and assertive expression",
+      "visual_prompt": "Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or modern business suits, confident and assertive expression",
       "appearance_scenes": [
         1,
         2

@@ -77,6 +77,30 @@ from utils.audio_speed_corrector import (
     correct_all_speed_acceleration
 )
 
+# ⭐ 통합 단일 패스 처리기 (FFmpeg 1회만 호출 → 울림/변조 방지)
+from utils.audio_unified_processor import (
+    UnifiedAudioProcessor,
+    process_all_unified
+)
+
+# ⭐ 참조 음성 분석기 v2.0 (텍스트 기반 정확 측정 + 파라미터 자동 추천)
+from utils.voice_analyzer import (
+    VoiceAnalyzer,
+    analyze_voice_and_get_params,
+    analyze_voice_with_text,
+    get_voice_transcript,
+    set_voice_transcript,
+    get_profile_manager,
+    optimize_voice_for_cloning  # ⭐ 참조 음성 최적화 (15~30초 추출)
+)
+
+# ⭐ TTS 자연스러움 최적화 (temperature/repetition_penalty 조정)
+from utils.tts_naturalness import (
+    get_natural_params,
+    get_base_natural_params,
+    TTSNaturalnessOptimizer
+)
+
 # 직접 생성기 (청크 분할 없음 - 속도 최적화)
 from utils.tts_direct_generator import (
     generate_scene_direct,
@@ -317,10 +341,10 @@ def render_chatterbox_generation_options():
                 "반복 억제 강도",
                 min_value=1.0,
                 max_value=2.0,
-                value=st.session_state.get("chatter_rep_penalty", 1.4),  # 1.3→1.4 기본값 상향
+                value=st.session_state.get("chatter_rep_penalty", 1.2),  # ⭐ 1.4→1.2 자연스러움 최적화
                 step=0.1,
                 key="chatter_rep_penalty_slider",
-                help="높을수록 반복을 강하게 억제. 1.4~1.5 권장."
+                help="낮을수록 자연스러움. 1.2 권장 (기존 1.4는 딱딱함)"
             )
             st.session_state["chatter_rep_penalty"] = repetition_penalty
 
@@ -2014,7 +2038,7 @@ def render_voice_clone_manager():
 
 
 def render_reference_voice_selector():
-    """참조 음성 선택 (개선된 버전)"""
+    """참조 음성 선택 (개선된 버전 + 음성 분석)"""
     st.markdown("#### 🎤 참조 음성 선택")
 
     samples_dir = get_voice_samples_dir()
@@ -2060,7 +2084,6 @@ def render_reference_voice_selector():
 
     # 디버그 로깅
     print(f"[VoiceSelector] selected_name: {selected_name}")
-    print(f"[VoiceSelector] sample_paths keys: {list(sample_paths.keys())}")
 
     if selected_name and selected_name != "없음 (기본 음성)":
         selected_path = sample_paths.get(selected_name)
@@ -2077,6 +2100,70 @@ def render_reference_voice_selector():
                     st.success(f"✓ {selected_name}")
 
                 st.session_state["selected_reference_voice"] = selected_path
+
+                # ⭐ 텍스트 입력 UI (정확한 발화속도 측정용)
+                current_transcript = get_voice_transcript(selected_path) or ""
+                has_transcript = bool(current_transcript)
+
+                with st.expander(
+                    f"📝 텍스트 {'편집' if has_transcript else '입력'} (정확한 발화속도 측정)",
+                    expanded=not has_transcript  # 텍스트 없으면 펼쳐서 입력 유도
+                ):
+                    if has_transcript:
+                        st.success(f"✅ 텍스트 등록됨 ({len(current_transcript)}자)")
+                    else:
+                        st.warning("⚠️ 텍스트 없음 - 발화속도 추정 모드 (정확도 ±20%)")
+                        st.caption("참조 음성의 텍스트를 입력하면 정확한 발화속도를 측정할 수 있습니다.")
+
+                    new_transcript = st.text_area(
+                        "참조 음성 텍스트",
+                        value=current_transcript,
+                        height=80,
+                        placeholder="예: 안녕하세요, 오늘은 회계사 시험 준비에 대해 이야기해 보려고 합니다.",
+                        key="transcript_input",
+                        label_visibility="collapsed"
+                    )
+
+                    col_save, col_clear = st.columns(2)
+                    with col_save:
+                        if st.button("💾 텍스트 저장", key="save_transcript", use_container_width=True):
+                            if new_transcript.strip():
+                                set_voice_transcript(selected_path, new_transcript.strip())
+                                # 재분석 강제
+                                st.session_state["_prev_analyzed_voice_path"] = None
+                                st.success("✅ 텍스트 저장 완료! 재분석 중...")
+                                st.rerun()
+                            else:
+                                st.error("텍스트를 입력해주세요")
+                    with col_clear:
+                        if has_transcript:
+                            if st.button("🗑️ 텍스트 삭제", key="delete_transcript", use_container_width=True):
+                                set_voice_transcript(selected_path, "")
+                                st.session_state["_prev_analyzed_voice_path"] = None
+                                st.rerun()
+
+                # ⭐ 음성 분석 및 파라미터 추천
+                prev_analyzed_path = st.session_state.get("_prev_analyzed_voice_path")
+                if selected_path != prev_analyzed_path:
+                    # 새 음성 선택됨 → 분석 실행
+                    _analyze_and_update_params(selected_path, selected_name)
+                    st.session_state["_prev_analyzed_voice_path"] = selected_path
+
+                # ⭐ 분석 결과 표시 (정확/추정 구분)
+                if "voice_analysis" in st.session_state:
+                    analysis = st.session_state["voice_analysis"]
+                    tempo = analysis.get("tempo", "normal")
+                    speech_rate = analysis.get("speech_rate", 8.5)
+                    accurate = analysis.get("speech_rate_accurate", False)
+
+                    tempo_emoji = {"slow": "🐢", "normal": "🚶", "fast": "🏃"}.get(tempo, "🚶")
+                    tempo_kr = {"slow": "느림", "normal": "보통", "fast": "빠름"}.get(tempo, "보통")
+
+                    if accurate:
+                        st.success(f"⭐ **정확한 측정**: {speech_rate:.2f} 글자/초 ({tempo_emoji} {tempo_kr}) → 파라미터 자동 조정됨")
+                    else:
+                        st.info(f"📊 **추정 측정**: {speech_rate:.1f} 글자/초 ({tempo_emoji} {tempo_kr}) → 파라미터 자동 조정됨")
+
                 print(f"[VoiceSelector] ✅ 반환: {selected_path}")
                 return selected_path
             else:
@@ -2086,11 +2173,56 @@ def render_reference_voice_selector():
             st.warning(f"⚠️ 선택된 음성 '{selected_name}'의 경로를 찾을 수 없습니다.")
             print(f"[VoiceSelector] ❌ 경로 매핑 실패: {selected_name}")
 
-    # 기본 음성 선택됨
+    # 기본 음성 선택됨 → 기본 파라미터로 리셋
     st.session_state["selected_reference_voice"] = None
+    st.session_state["voice_analysis"] = None
+    st.session_state["recommended_params"] = None
+    st.session_state["_prev_analyzed_voice_path"] = None
     st.info("기본 Chatterbox 음성이 사용됩니다.")
     print("[VoiceSelector] 기본 음성 반환 (None)")
     return None
+
+
+def _analyze_and_update_params(voice_path: str, voice_name: str):
+    """
+    참조 음성 분석 후 세션 상태의 파라미터 업데이트
+
+    ⭐ 핵심: 음성 특성에 맞는 파라미터 자동 설정
+    """
+    print(f"\n[VoiceAnalysis] 음성 분석 시작: {voice_name}")
+
+    try:
+        result = analyze_voice_and_get_params(voice_path)
+
+        analysis = result.get("analysis", {})
+        params = result.get("recommended_params", {})
+
+        # 세션에 저장
+        st.session_state["voice_analysis"] = analysis
+        st.session_state["recommended_params"] = params
+
+        # ⭐ 파라미터 자동 업데이트 (슬라이더 기본값으로 사용됨)
+        if "speed" in params:
+            st.session_state["chatter_speed"] = params["speed"]
+        if "cfg_weight" in params:
+            st.session_state["chatter_cfg"] = params["cfg_weight"]
+        if "exaggeration" in params:
+            st.session_state["chatter_exag"] = params["exaggeration"]
+        if "temperature" in params:
+            st.session_state["chatter_temp"] = params["temperature"]
+        if "target_speed" in params:
+            st.session_state["target_speech_rate"] = params["target_speed"]
+
+        tempo = analysis.get("tempo", "normal")
+        speech_rate = analysis.get("speech_rate", 8.5)
+        tempo_kr = {"slow": "느림", "normal": "보통", "fast": "빠름"}.get(tempo, "보통")
+
+        print(f"[VoiceAnalysis] 완료: {tempo_kr} ({speech_rate:.1f} 글자/초)")
+        print(f"[VoiceAnalysis] 추천 파라미터: {params}")
+
+    except Exception as e:
+        print(f"[VoiceAnalysis] ⚠️ 분석 실패: {e}")
+        # 기본값 유지
 
 
 # ============================================================
@@ -2267,9 +2399,10 @@ def render_chatterbox_tab():
             "🌡️ Temperature (다양성)",
             min_value=0.3,
             max_value=1.5,
-            value=st.session_state.get("chatter_temp", 0.8),
+            value=st.session_state.get("chatter_temp", 0.85),  # ⭐ 0.8→0.85 자연스러움 최적화
             step=0.05,
-            key="chatter_temp_slider"
+            key="chatter_temp_slider",
+            help="높을수록 다양한 톤. 0.85 권장 (기존 0.8은 단조로움)"
         )
         st.session_state["chatter_temp"] = temperature
 
@@ -2525,6 +2658,25 @@ def _handle_chatterbox_single_generation(text, voice_path, params, gen_options, 
 
         status_text.info(f"🎙️ {mode_label}{norm_label} TTS 생성 준비 중... (참조 음성: {voice_name})")
 
+        # ⭐ 참조 음성 최적화 (긴 음성 → 15~30초 추출)
+        optimized_voice_path = voice_path
+        if voice_path:
+            try:
+                from pydub import AudioSegment
+                voice_audio = AudioSegment.from_file(voice_path)
+                voice_duration = len(voice_audio) / 1000
+
+                if voice_duration > 60:  # 60초 이상이면 최적화
+                    status_text.text(f"🔍 참조 음성 최적화 중... ({voice_duration:.0f}초 → 20초)")
+                    optimized_voice_path = optimize_voice_for_cloning(voice_path)
+
+                    if optimized_voice_path != voice_path:
+                        opt_audio = AudioSegment.from_file(optimized_voice_path)
+                        print(f"[VoiceOptimizer] 최적화 적용: {voice_duration:.0f}초 → {len(opt_audio)/1000:.0f}초")
+            except Exception as e:
+                print(f"[VoiceOptimizer] 최적화 실패: {e}")
+                optimized_voice_path = voice_path
+
         def progress_callback(current, total, message):
             if total > 0:
                 progress_bar.progress((current / total), text=message)
@@ -2533,7 +2685,7 @@ def _handle_chatterbox_single_generation(text, voice_path, params, gen_options, 
         # Robust 생성 함수 호출
         result = generate_chatterbox_tts_robust(
             text=text,
-            voice_ref_path=voice_path,
+            voice_ref_path=optimized_voice_path,  # ⭐ 최적화된 음성 사용
             params=params,
             mode=gen_options["mode"],
             preview_length=gen_options["preview_length"],
@@ -2648,7 +2800,27 @@ def _handle_chatterbox_scenes_generation(scenes, voice_path, params, gen_options
     # params 복사본에 고정 seed 적용
     scene_params = params.copy()
     scene_params["seed"] = scene_seed
-    scene_params["voice_ref_path"] = voice_path
+
+    # ⭐ 참조 음성 최적화 (긴 음성 → 15~30초 추출)
+    optimized_voice_path = voice_path
+    if voice_path:
+        try:
+            from pydub import AudioSegment
+            voice_audio = AudioSegment.from_file(voice_path)
+            voice_duration = len(voice_audio) / 1000
+
+            if voice_duration > 60:  # 60초 이상이면 최적화
+                status_text.text(f"🔍 참조 음성 최적화 중... ({voice_duration:.0f}초 → 20초)")
+                optimized_voice_path = optimize_voice_for_cloning(voice_path)
+
+                if optimized_voice_path != voice_path:
+                    opt_audio = AudioSegment.from_file(optimized_voice_path)
+                    print(f"[VoiceOptimizer] 씬별 생성: 최적화 적용 {voice_duration:.0f}초 → {len(opt_audio)/1000:.0f}초")
+        except Exception as e:
+            print(f"[VoiceOptimizer] 씬별 생성: 최적화 실패 - {e}")
+            optimized_voice_path = voice_path
+
+    scene_params["voice_ref_path"] = optimized_voice_path  # ⭐ 최적화된 음성 사용
 
     # 처리 방식 옵션 확인
     use_sequential = gen_options.get("use_sequential", True)
@@ -2765,90 +2937,58 @@ def _handle_chatterbox_scenes_generation(scenes, voice_path, params, gen_options
     gen_time = time.time() - total_start
 
     # ============================================================
-    # 🎚️ 1단계: 완벽 정규화 (속도/음량 정규화) - 먼저!
+    # ⭐ 통합 단일 패스 처리 (정규화 + 가속보정 + 미세조정)
+    # ============================================================
+    # 기존 파이프라인 (문제):
+    #   1단계: normalize_perfect (FFmpeg 2~3회)
+    #   2단계: correct_all_speed_acceleration (FFmpeg 4회)
+    #   3단계: normalize_segments_all (FFmpeg 1~2회)
+    #   → 총 6~9회 FFmpeg → 울림, 변조, 품질 저하
+    #
+    # 새 파이프라인 (해결):
+    #   process_all_unified (구간당 FFmpeg 1회)
+    #   → 품질 유지, 울림 없음
     # ============================================================
     if norm_options.get("enabled") and generated_files:
-        status_text.text("🎚️ 완벽 정규화 시작... (3-Pass, ±1% 편차 목표)")
+        status_text.text("🔧 통합 처리 중... (정규화 + 가속보정 + 미세조정)")
         print("\n" + "="*60)
-        print("[TTS] 🔧 1단계: 완벽 정규화 시작 - normalize_perfect()")
+        print("[TTS] ⭐ 통합 단일 패스 처리 시작")
+        print("[TTS] ⭐ FFmpeg 최소 호출 → 울림/변조 방지")
+        print("[TTS] ⭐ 적응형 가속 보정 → 정확한 속도 균일화")
         print("="*60)
 
-        def norm_progress(current, total, message):
-            base_progress = 0.75
-            norm_step = (current / total) * 0.10
-            progress_bar.progress(min(base_progress + norm_step, 0.85))
-            status_text.text(f"🎚️ {message}")
-
-        # 정규화 전 상태 분석
+        # 처리 전 상태 분석
         pre_stats = analyze_normalization_stats(generated_files)
         if not pre_stats.get("error"):
-            print(f"[TTS] 정규화 전 발화속도: {pre_stats['rate_min']:.2f} ~ {pre_stats['rate_max']:.2f} (±{pre_stats['rate_deviation_pct']:.1f}%)")
+            print(f"[TTS] 처리 전 발화속도: {pre_stats['rate_min']:.2f} ~ {pre_stats['rate_max']:.2f} (±{pre_stats['rate_deviation_pct']:.1f}%)")
 
-        # 완벽 정규화 적용 (3-Pass)
-        generated_files = normalize_perfect(
-            generated_files,
-            target_speech_rate=8.5,  # 8.5 글자/초 목표
-            target_lufs=-16.0,       # 방송 표준 LUFS
-            progress_callback=norm_progress
-        )
-
-        # 정규화 후 상태 확인
-        post_stats = analyze_normalization_stats(generated_files)
-        if not post_stats.get("error"):
-            print(f"[TTS] 정규화 후 발화속도: {post_stats['rate_min']:.2f} ~ {post_stats['rate_max']:.2f} (±{post_stats['rate_deviation_pct']:.1f}%)")
-            improvement = pre_stats.get('rate_deviation_pct', 0) - post_stats.get('rate_deviation_pct', 0)
-            print(f"[TTS] ✅ 편차 개선: {improvement:.1f}% 감소")
-
-        print("[TTS] 완벽 정규화 완료")
-        print("="*60 + "\n")
-
-    # ============================================================
-    # 🔧 2단계: 발화속도 가속 보정 - 정규화 "후"에! (핵심!)
-    # ============================================================
-    if generated_files:
-        status_text.text("🔧 발화속도 가속 보정 중... (후반부 감속)")
-        print("\n" + "="*60)
-        print("[TTS] 🔧 2단계: 발화속도 가속 보정 시작 (v3.0 - 고정 패턴)")
-        print("[TTS] ⭐ 정규화 후 적용하여 효과 유지!")
-        print("="*60)
-
-        def accel_progress(current, total, message):
-            base_progress = 0.85
-            accel_step = (current / total) * 0.05
-            progress_bar.progress(min(base_progress + accel_step, 0.90))
+        def unified_progress(current, total, message):
+            base_progress = 0.75
+            step = (current / total) * 0.23  # 0.75 ~ 0.98
+            progress_bar.progress(min(base_progress + step, 0.98))
             status_text.text(f"🔧 {message}")
 
-        generated_files = correct_all_speed_acceleration(
+        # ⭐ 통합 단일 패스 처리
+        # 참조 음성 분석 결과 또는 기본값 사용
+        target_speed = st.session_state.get("target_speech_rate", 8.5)
+        print(f"[TTS] 목표 발화속도: {target_speed:.2f} 글자/초 (참조 음성 기반)")
+
+        generated_files = process_all_unified(
             generated_files,
-            correction_profile="moderate",  # ⭐ v3.0: mild/moderate/strong
-            progress_callback=accel_progress
+            target_speed=target_speed,  # ⭐ 참조 음성 기반 목표
+            accel_profile="adaptive",   # 적응형 가속 보정
+            progress_callback=unified_progress
         )
 
-        print("[TTS] 발화속도 가속 보정 완료")
-        print("="*60 + "\n")
+        # 처리 후 상태 확인
+        post_stats = analyze_normalization_stats(generated_files)
+        if not post_stats.get("error"):
+            print(f"[TTS] 처리 후 발화속도: {post_stats['rate_min']:.2f} ~ {post_stats['rate_max']:.2f} (±{post_stats['rate_deviation_pct']:.1f}%)")
+            improvement = pre_stats.get('rate_deviation_pct', 0) - post_stats.get('rate_deviation_pct', 0)
+            if improvement > 0:
+                print(f"[TTS] ✅ 편차 개선: {improvement:.1f}% 감소")
 
-    # ============================================================
-    # 🎚️ 3단계: 구간별 속도 정규화 (미세 조정)
-    # ============================================================
-    if norm_options.get("enabled") and generated_files:
-        status_text.text("🎚️ 구간별 속도 정규화 중... (발화 일관성 개선)")
-        print("\n" + "="*60)
-        print("[TTS] 🔧 3단계: 구간별 속도 정규화 시작")
-        print("="*60)
-
-        def segment_progress(current, total, message):
-            base_progress = 0.90
-            seg_step = (current / total) * 0.08
-            progress_bar.progress(min(base_progress + seg_step, 0.98))
-            status_text.text(f"🎚️ {message}")
-
-        generated_files = normalize_segments_all(
-            generated_files,
-            target_rate=8.5,
-            progress_callback=segment_progress
-        )
-
-        print("[TTS] 구간별 정규화 완료")
+        print("[TTS] 통합 처리 완료")
         print("="*60 + "\n")
 
     total_time = time.time() - total_start

@@ -36,6 +36,16 @@ from utils.api_helper import (
     require_api_key,
     show_api_status_sidebar
 )
+# v2.0: 새로운 모듈 추가
+from utils.bookmark_storage import BookmarkStorage
+from utils.thumbnail_downloader import ThumbnailDownloader
+from utils.excel_export import export_with_metrics, get_excel_filename
+from utils.youtube_service import (
+    YouTubeService,
+    SEARCH_SCOPE_OPTIONS,
+    filter_videos_by_search_scope,
+    get_search_scope_description
+)
 
 # 페이지 설정
 st.set_page_config(
@@ -125,11 +135,38 @@ with st.sidebar:
             st.success("캐시가 초기화되었습니다.")
             st.rerun()
 
+    # 🔴 v3.12: API 테스트 기능
+    with st.expander("🧪 API 테스트"):
+        if st.button("YouTube API 테스트", key="test_api"):
+            try:
+                from googleapiclient.discovery import build
+                youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
+
+                # 간단한 검색 테스트
+                test_response = youtube.search().list(
+                    part="snippet",
+                    q="test",
+                    type="video",
+                    maxResults=1
+                ).execute()
+
+                if test_response.get("items"):
+                    st.success("✅ API 정상 작동!")
+                    st.caption(f"테스트 결과: {test_response['items'][0]['snippet']['title'][:30]}...")
+                else:
+                    st.warning("⚠️ API 응답은 있으나 결과 없음")
+            except Exception as e:
+                st.error(f"❌ API 오류: {e}")
+
+# v2.0: 보관함 초기화
+bookmark_storage = BookmarkStorage()
+
 # === 탭 구성 ===
-tab_search, tab_results, tab_selected = st.tabs([
+tab_search, tab_results, tab_selected, tab_bookmarks = st.tabs([
     "🔎 검색",
     "📊 검색 결과",
-    "✅ 선택된 영상"
+    "✅ 선택된 영상",
+    "📁 보관함"
 ])
 
 # ============================================================
@@ -162,6 +199,33 @@ with tab_search:
             }.get(x, x),
             key="region"
         )
+        # v3.13: 한국어 필터링 옵션
+        if region == "KR":
+            korean_only = st.checkbox(
+                "🇰🇷 한국어 콘텐츠만",
+                value=True,
+                key="korean_only",
+                help="제목/채널명/설명에 한국어가 포함된 영상만 표시"
+            )
+        else:
+            korean_only = False
+
+    # v3.14: 검색 범위 필터링 (채널명 포함 문제 해결)
+    st.markdown('<div class="section-header">🎯 검색 범위</div>', unsafe_allow_html=True)
+
+    search_scope = st.radio(
+        "검색 범위 선택",
+        options=list(SEARCH_SCOPE_OPTIONS.keys()),
+        format_func=lambda x: x,
+        horizontal=True,
+        key="search_scope",
+        index=0,  # "제목만 검색" 기본값
+        help=get_search_scope_description(SEARCH_SCOPE_OPTIONS.get(list(SEARCH_SCOPE_OPTIONS.keys())[0], "title_only"))
+    )
+
+    # 검색 범위 설명 표시
+    selected_scope = SEARCH_SCOPE_OPTIONS.get(search_scope, "title_only")
+    st.caption(f"ℹ️ {get_search_scope_description(selected_scope)}")
 
     st.markdown("---")
 
@@ -402,6 +466,7 @@ with tab_search:
                 published_before=published_before,
                 sort_by=sort_by,
                 region_code=region,
+                korean_only=korean_only,  # v3.13: 한국어 필터
                 max_results=max_results
             )
 
@@ -419,15 +484,34 @@ with tab_search:
                 videos, api_calls = searcher.search_videos_enhanced(filters, update_progress)
 
             if videos:
+                # v3.14: 검색 범위 필터링 적용
+                original_count = len(videos)
+                video_dicts_for_filter = [v.to_dict() for v in videos]
+                filtered_dicts = filter_videos_by_search_scope(
+                    video_dicts_for_filter,
+                    search_query,
+                    selected_scope
+                )
+
+                # 필터링된 video_id 목록
+                filtered_ids = {v.get('video_id') for v in filtered_dicts}
+                videos = [v for v in videos if v.video_id in filtered_ids]
+
                 # 세션에 저장 (VideoInfo 객체 리스트)
                 st.session_state["search_results"] = videos
                 st.session_state["last_search_query"] = search_query
+                st.session_state["last_search_scope"] = selected_scope
 
                 # 파일로 저장 (딕셔너리로 변환)
                 video_dicts = [v.to_dict() for v in videos]
                 save_video_research(project_path, video_dicts)
 
-                st.success(f"✅ {len(videos)}개 영상 검색 완료! (API 호출: {api_calls}회)")
+                # 필터링 결과 표시
+                if original_count != len(videos):
+                    st.success(f"✅ {len(videos)}개 영상 검색 완료! (총 {original_count}개 중 {original_count - len(videos)}개 제외, API 호출: {api_calls}회)")
+                    st.caption(f"🎯 검색 범위: {search_scope} - 채널명만 일치하는 {original_count - len(videos)}개 영상이 제외되었습니다.")
+                else:
+                    st.success(f"✅ {len(videos)}개 영상 검색 완료! (API 호출: {api_calls}회)")
                 st.info("📊 '검색 결과' 탭에서 결과를 확인하세요.")
 
                 # 할당량 표시
@@ -437,10 +521,45 @@ with tab_search:
             else:
                 st.warning("검색 결과가 없습니다. 다른 키워드나 필터를 시도해보세요.")
 
+                # 🔴 v3.12: 진단 정보 표시
+                with st.expander("🔍 문제 진단"):
+                    st.markdown("""
+                    **검색 결과가 없는 이유:**
+
+                    1. **필터가 너무 엄격함**: 조회수/구독자 필터를 낮추거나 0으로 설정
+                    2. **캐시된 빈 결과**: 아래 '캐시 초기화' 버튼 클릭
+                    3. **API 할당량 초과**: 사이드바에서 남은 할당량 확인
+                    4. **키워드 문제**: 다른 키워드로 시도
+
+                    **현재 설정:**
+                    """)
+                    st.write(f"- 키워드: `{search_query}`")
+                    st.write(f"- 영상 유형: `{video_type}`")
+                    st.write(f"- 지역: `{region}`")
+                    st.write(f"- 한국어 필터: `{korean_only}`")
+                    st.write(f"- 검색 범위: `{search_scope}` ({selected_scope})")
+                    st.write(f"- 기간: `{period_preset}`")
+
+                    if st.button("🗑️ 이 검색의 캐시 초기화", key="clear_search_cache"):
+                        try:
+                            cache.clear_all()
+                            st.success("캐시가 초기화되었습니다. 다시 검색해보세요.")
+                        except Exception as ce:
+                            st.error(f"캐시 초기화 실패: {ce}")
+
         except Exception as e:
             st.error(f"검색 오류: {str(e)}")
             import traceback
-            st.code(traceback.format_exc())
+
+            # 🔴 v3.12: 상세 오류 정보
+            with st.expander("🔧 오류 상세 정보"):
+                st.code(traceback.format_exc())
+
+                # API 키 확인
+                if "API" in str(e).upper() or "KEY" in str(e).upper():
+                    st.warning("⚠️ API 키 관련 오류일 수 있습니다. API 키 설정을 확인하세요.")
+                elif "QUOTA" in str(e).upper():
+                    st.warning("⚠️ API 할당량이 초과되었을 수 있습니다.")
 
 
 # ============================================================
@@ -639,6 +758,7 @@ with tab_results:
             "채널": v.channel_name[:20] + ("..." if len(v.channel_name) > 20 else ""),
             "구독자": f"{v.subscriber_count:,}",
             "구독자 대비": f"{v.views_per_subscriber:.1f}x",
+            "일평균": f"{v.views_per_day:,.0f}",  # v3.14: 일일 평균 조회수 추가
             "참여율": f"{v.engagement_rate:.1f}%",
             "급등점수": f"{v.viral_score:.1f}",
             "업로드일": v.published_at[:10] if v.published_at else "",
@@ -654,6 +774,7 @@ with tab_results:
             "조회수": st.column_config.TextColumn("조회수"),
             "좋아요": st.column_config.TextColumn("좋아요"),
             "구독자": st.column_config.TextColumn("구독자"),
+            "일평균": st.column_config.TextColumn("일평균", help="일일 평균 조회수"),
         },
         hide_index=True,
         use_container_width=True,
@@ -678,6 +799,65 @@ with tab_results:
             st.session_state["selected_videos"] = selected_videos
             update_project_step(2)
             st.success(f"✅ {len(selected_videos)}개 영상이 저장되었습니다!")
+
+    # v2.0: 추가 액션 버튼
+    action_col1, action_col2, action_col3, action_col4 = st.columns(4)
+
+    with action_col1:
+        if st.button("📁 보관함에 저장", disabled=len(selected_videos) == 0, use_container_width=True):
+            video_dicts = [v.to_dict() for v in selected_videos]
+            count = bookmark_storage.save_videos(video_dicts)
+            st.success(f"✅ {count}개 영상이 보관함에 저장되었습니다!")
+
+    with action_col2:
+        if st.button("📺 채널 보관함 저장", disabled=len(selected_videos) == 0, use_container_width=True):
+            video_dicts = [v.to_dict() for v in selected_videos]
+            count = bookmark_storage.save_channels_from_videos(video_dicts)
+            st.success(f"✅ {count}개 채널이 보관함에 저장되었습니다!")
+
+    with action_col3:
+        if selected_videos:
+            video_dicts = [v.to_dict() for v in selected_videos]
+            excel_data = export_with_metrics(video_dicts, st.session_state.get("last_search_query", "검색결과"))
+            st.download_button(
+                "📊 Excel 다운로드",
+                data=excel_data,
+                file_name=get_excel_filename(st.session_state.get("last_search_query", "검색결과")),
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
+        else:
+            st.button("📊 Excel 다운로드", disabled=True, use_container_width=True)
+
+    with action_col4:
+        # v3.14: 세션 상태를 사용하여 다운로드 버튼 안정화
+        if "thumbnail_zip_data" not in st.session_state:
+            st.session_state["thumbnail_zip_data"] = None
+            st.session_state["thumbnail_zip_filename"] = None
+
+        if selected_videos:
+            if st.button("🖼️ 썸네일 생성", use_container_width=True, key="create_thumbnail_zip"):
+                downloader = ThumbnailDownloader()
+                video_dicts = [v.to_dict() for v in selected_videos]
+                with st.spinner("썸네일 다운로드 중..."):
+                    st.session_state["thumbnail_zip_data"] = downloader.download_thumbnails_zip(video_dicts)
+                    st.session_state["thumbnail_zip_filename"] = ThumbnailDownloader.get_zip_filename(
+                        st.session_state.get("last_search_query", "검색결과")
+                    )
+                st.success(f"✅ {len(selected_videos)}개 썸네일 준비 완료!")
+                st.rerun()
+
+            # 다운로드 버튼 표시
+            if st.session_state["thumbnail_zip_data"]:
+                st.download_button(
+                    "💾 ZIP 저장",
+                    data=st.session_state["thumbnail_zip_data"],
+                    file_name=st.session_state["thumbnail_zip_filename"],
+                    mime="application/zip",
+                    use_container_width=True
+                )
+        else:
+            st.button("🖼️ 썸네일 ZIP", disabled=True, use_container_width=True)
 
     st.markdown("---")
 
@@ -848,3 +1028,149 @@ with tab_selected:
     # 다음 단계 안내
     st.success("✅ 2단계 완료! 다음 단계로 진행하세요.")
     st.page_link("pages/3_📝_스크립트_생성.py", label="📝 3단계: 스크립트 생성으로 이동", icon="➡️")
+
+# ============================================================
+# 보관함 탭 (v2.0)
+# ============================================================
+with tab_bookmarks:
+    st.subheader("📁 보관함")
+    st.caption("자주 참고하는 영상과 채널을 저장하고 관리합니다.")
+
+    # 보관함 통계
+    bookmark_stats = bookmark_storage.get_stats()
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("📹 저장된 영상", f"{bookmark_stats['videos_count']}개")
+    with col2:
+        st.metric("📺 저장된 채널", f"{bookmark_stats['channels_count']}개")
+
+    st.divider()
+
+    # 영상 보관함
+    st.markdown("### 🎬 저장된 영상")
+
+    saved_videos = bookmark_storage.get_saved_videos()
+
+    if saved_videos:
+        # 액션 버튼
+        action_col1, action_col2, action_col3 = st.columns(3)
+
+        with action_col1:
+            # Excel 내보내기
+            excel_data = export_with_metrics(saved_videos, "보관함")
+            st.download_button(
+                "📊 Excel 다운로드",
+                data=excel_data,
+                file_name=get_excel_filename("보관함"),
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
+
+        with action_col2:
+            # v3.14: 썸네일 다운로드 (세션 상태 사용)
+            if "bookmark_thumbnail_zip" not in st.session_state:
+                st.session_state["bookmark_thumbnail_zip"] = None
+
+            if st.button("🖼️ 썸네일 생성", use_container_width=True, key="bookmark_thumbnail"):
+                downloader = ThumbnailDownloader()
+                with st.spinner("썸네일 다운로드 중..."):
+                    st.session_state["bookmark_thumbnail_zip"] = downloader.download_thumbnails_zip(saved_videos)
+                st.success(f"✅ {len(saved_videos)}개 썸네일 준비 완료!")
+                st.rerun()
+
+            if st.session_state.get("bookmark_thumbnail_zip"):
+                st.download_button(
+                    "💾 ZIP 저장",
+                    data=st.session_state["bookmark_thumbnail_zip"],
+                    file_name=ThumbnailDownloader.get_zip_filename("보관함"),
+                    mime="application/zip",
+                    use_container_width=True
+                )
+
+        with action_col3:
+            if st.button("🗑️ 전체 삭제", use_container_width=True, type="secondary"):
+                bookmark_storage.clear_videos()
+                st.success("영상 보관함이 비워졌습니다.")
+                st.rerun()
+
+        # 영상 목록 테이블
+        df_bookmarks = pd.DataFrame([
+            {
+                "제목": v.get('title', '')[:40] + "...",
+                "채널": v.get('channel_title', '')[:20],
+                "조회수": f"{v.get('view_count', 0):,}",
+                "구독자": f"{v.get('subscriber_count', 0):,}",
+                "저장일": v.get('saved_at', '')[:10],
+            }
+            for v in saved_videos
+        ])
+
+        st.dataframe(
+            df_bookmarks,
+            column_config={
+                "제목": st.column_config.TextColumn("제목", width="large"),
+                "채널": st.column_config.TextColumn("채널"),
+                "조회수": st.column_config.TextColumn("조회수"),
+                "구독자": st.column_config.TextColumn("구독자"),
+                "저장일": st.column_config.TextColumn("저장일"),
+            },
+            hide_index=True,
+            use_container_width=True
+        )
+
+        # 개별 영상 삭제
+        st.markdown("##### 개별 삭제")
+        video_to_delete = st.selectbox(
+            "삭제할 영상 선택",
+            options=[v.get('video_id') for v in saved_videos],
+            format_func=lambda x: next(
+                (v.get('title', '')[:50] for v in saved_videos if v.get('video_id') == x),
+                x
+            ),
+            key="delete_bookmark_video"
+        )
+
+        if st.button("🗑️ 선택한 영상 삭제"):
+            bookmark_storage.delete_video(video_to_delete)
+            st.success("영상이 삭제되었습니다.")
+            st.rerun()
+
+    else:
+        st.info("저장된 영상이 없습니다. '검색 결과' 탭에서 영상을 보관함에 추가하세요.")
+
+    st.divider()
+
+    # 채널 보관함
+    st.markdown("### 📺 저장된 채널")
+
+    saved_channels = bookmark_storage.get_saved_channels()
+
+    if saved_channels:
+        df_channels = pd.DataFrame([
+            {
+                "채널명": c.get('channel_title', ''),
+                "구독자": f"{c.get('subscriber_count', 0):,}",
+                "저장일": c.get('saved_at', '')[:10],
+            }
+            for c in saved_channels
+        ])
+
+        st.dataframe(
+            df_channels,
+            column_config={
+                "채널명": st.column_config.TextColumn("채널명", width="large"),
+                "구독자": st.column_config.TextColumn("구독자"),
+                "저장일": st.column_config.TextColumn("저장일"),
+            },
+            hide_index=True,
+            use_container_width=True
+        )
+
+        if st.button("🗑️ 채널 보관함 비우기"):
+            bookmark_storage.clear_channels()
+            st.success("채널 보관함이 비워졌습니다.")
+            st.rerun()
+
+    else:
+        st.info("저장된 채널이 없습니다.")

@@ -104,15 +104,30 @@ with tab1:
             "placeholder": "AIza...",
             "required_for": ["YouTube 검색", "자막 추출"]
         },
+        {
+            "id": "imagefx",
+            "name": "Google ImageFX",
+            "description": "Imagen 4 이미지 생성 (무료, 쿠키 필요)",
+            "signup_url": "https://labs.google/fx/tools/image-fx",
+            "env_var": "IMAGEFX_COOKIE",
+            "placeholder": "__Secure-1PSID=...; __Secure-1PSIDTS=...",
+            "required_for": ["Imagen 4", "Imagen 3.5", "Imagen 3.1", "Imagen 3"],
+            "is_cookie": True
+        },
     ]
 
     # API 키 상태 요약
     st.markdown("### 현재 상태")
 
-    status_cols = st.columns(6)
+    status_cols = st.columns(7)
     for i, provider in enumerate(providers):
         with status_cols[i]:
-            has_key = api_manager.has_api_key(provider["id"])
+            # ImageFX 특별 처리: 세션 쿠키 또는 환경변수 확인
+            if provider.get("is_cookie"):
+                from config.settings import IMAGEFX_COOKIE
+                has_key = bool(st.session_state.get("imagefx_cookie") or IMAGEFX_COOKIE)
+            else:
+                has_key = api_manager.has_api_key(provider["id"])
             if has_key:
                 st.success(f"✅ {provider['name'][:6]}")
             else:
@@ -123,78 +138,203 @@ with tab1:
     # 각 API 설정
     for provider in providers:
         with st.expander(f"**{provider['name']}** - {provider['description']}", expanded=False):
-            col1, col2 = st.columns([3, 1])
+            # ImageFX 인증 (v6.0 - 쿠키 기반)
+            if provider.get("is_cookie"):
+                from config.settings import IMAGEFX_COOKIE, SECRETS_DIR
 
-            with col1:
-                # 현재 키 상태
-                current_key = api_manager.get_api_key(provider["id"])
-                has_key = bool(current_key)
+                st.warning("""
+                ⚠️ **v6.0 변경사항: 쿠키 기반 인증**
+                - ImageFX는 비공식 API입니다
+                - **Node.js + imagefx-api 패키지** 사용
+                - Cookie Editor로 쿠키 추출 필요
+                """)
 
-                if has_key:
-                    # 마스킹된 키 표시
-                    if len(current_key) > 12:
-                        masked = f"{current_key[:6]}...{current_key[-4:]}"
-                    else:
-                        masked = "***"
-                    st.info(f"현재 키: {masked}")
+                # 사전 요구사항 확인
+                st.markdown("### ⚙️ 사전 요구사항")
+                col_node, col_npm = st.columns(2)
+
+                with col_node:
+                    if st.button("🔍 Node.js 확인", key="check_nodejs", use_container_width=True):
+                        from utils.imagefx_client import check_node_installation
+                        ok, msg = check_node_installation()
+                        if ok:
+                            st.success(f"✅ {msg}")
+                        else:
+                            st.error(f"❌ {msg}")
+                            st.info("https://nodejs.org 에서 Node.js 설치 필요")
+
+                with col_npm:
+                    if st.button("📦 패키지 설치", key="install_npm", use_container_width=True):
+                        from utils.imagefx_client import install_npm_package
+                        with st.spinner("imagefx-api 패키지 설치 중..."):
+                            ok, msg = install_npm_package()
+                            if ok:
+                                st.success(msg)
+                            else:
+                                st.error(msg)
+
+                st.markdown("---")
+
+                # 쿠키 추출 안내
+                st.markdown("""
+                ### 🍪 쿠키 추출 방법
+
+                1. **[Cookie Editor](https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm)** 확장 프로그램 설치
+                2. [labs.google/fx/tools/image-fx](https://labs.google/fx/tools/image-fx) 접속
+                3. **Google 계정으로 로그인**
+                4. Cookie Editor 아이콘 클릭 → **Export** → **Header String**
+                5. 아래 입력란에 붙여넣기
+                """)
+
+                # 현재 쿠키 상태
+                current_cookie = st.session_state.get("imagefx_cookie") or IMAGEFX_COOKIE
+                if current_cookie:
+                    preview = current_cookie[:50] + "..." if len(current_cookie) > 50 else current_cookie
+                    st.success(f"✅ 쿠키 저장됨: `{preview}`")
                 else:
-                    st.warning("API 키가 설정되지 않았습니다.")
+                    st.info("ℹ️ 쿠키가 설정되지 않았습니다")
 
-                # 키 입력
-                new_key = st.text_input(
-                    f"새 API 키 입력",
+                # 쿠키 입력
+                new_cookie = st.text_area(
+                    "🔑 Google 쿠키 (필수)",
                     value="",
-                    type="password",
-                    placeholder=provider["placeholder"],
-                    key=f"key_input_{provider['id']}",
+                    height=120,
+                    placeholder="Cookie Editor → Export → Header String으로 복사한 전체 쿠키",
+                    key="imagefx_cookie_input_v6"
                 )
 
-                # 필요한 기능 표시
+                col_save, col_test = st.columns(2)
+
+                with col_save:
+                    if st.button("💾 쿠키 저장", key="save_imagefx_v6", use_container_width=True):
+                        if new_cookie.strip():
+                            cookie_value = new_cookie.strip()
+                            if cookie_value.lower().startswith("cookie:"):
+                                cookie_value = cookie_value[7:].strip()
+
+                            st.session_state["imagefx_cookie"] = cookie_value
+                            try:
+                                cookie_file = SECRETS_DIR / "imagefx_cookie.txt"
+                                cookie_file.write_text(cookie_value, encoding="utf-8")
+                                st.success("✅ 쿠키가 저장되었습니다!")
+                                st.rerun()
+                            except Exception as e:
+                                st.warning(f"파일 저장 실패: {e}")
+                        else:
+                            st.warning("쿠키를 입력해주세요")
+
+                with col_test:
+                    if st.button("🧪 테스트", key="test_imagefx_v6", use_container_width=True):
+                        test_cookie = new_cookie.strip() or current_cookie
+                        if test_cookie:
+                            from utils.imagefx_client import ImageFXClient, AspectRatio
+
+                            # 1단계: 검증
+                            with st.spinner("1/2 쿠키 검증 중..."):
+                                is_valid, message, _ = ImageFXClient.validate_credentials(cookie=test_cookie)
+                                if not is_valid:
+                                    st.error(f"❌ {message}")
+                                else:
+                                    st.success(f"✓ {message}")
+
+                                    # 2단계: API 테스트
+                                    with st.spinner("2/2 API 테스트 중... (최대 2분)"):
+                                        try:
+                                            client = ImageFXClient(cookie=test_cookie)
+                                            images = client.generate_image(
+                                                prompt="A cute cat sitting on a red cushion",
+                                                aspect_ratio=AspectRatio.SQUARE,
+                                                num_images=1,
+                                                timeout=120
+                                            )
+
+                                            if images:
+                                                st.success("✅ API 테스트 성공!")
+                                                with st.expander("테스트 이미지 보기"):
+                                                    st.image(images[0].get_bytes(), caption="테스트 이미지", width=200)
+                                            else:
+                                                st.warning("이미지 생성 실패")
+                                        except Exception as e:
+                                            st.error(f"❌ API 테스트 실패: {str(e)}")
+                        else:
+                            st.warning("쿠키를 먼저 입력해주세요")
+
                 st.caption(f"사용 가능 기능: {', '.join(provider['required_for'])}")
+                st.markdown(f"[🔗 ImageFX 사이트 방문]({provider['signup_url']})")
+            else:
+                # 일반 API 키 처리
+                col1, col2 = st.columns([3, 1])
 
-                # 가입 링크
-                st.markdown(f"[🔗 API 키 발급받기]({provider['signup_url']})")
+                with col1:
+                    # 현재 키 상태
+                    current_key = api_manager.get_api_key(provider["id"])
+                    has_key = bool(current_key)
 
-            with col2:
-                # 현재 상태 표시
-                if has_key:
-                    st.success("✅ 설정됨")
-                else:
-                    st.warning("⚠️ 미설정")
-
-            # 버튼들
-            st.markdown("---")
-            col_save, col_verify, col_clear = st.columns(3)
-
-            with col_save:
-                if st.button("💾 저장", key=f"save_{provider['id']}", use_container_width=True):
-                    if new_key:
-                        if api_manager.set_api_key(provider["id"], new_key):
-                            st.success("✅ 저장되었습니다!")
-                            st.rerun()
+                    if has_key:
+                        # 마스킹된 키 표시
+                        if len(current_key) > 12:
+                            masked = f"{current_key[:6]}...{current_key[-4:]}"
                         else:
-                            st.error("저장 실패")
+                            masked = "***"
+                        st.info(f"현재 키: {masked}")
                     else:
-                        st.warning("키를 입력하세요")
+                        st.warning("API 키가 설정되지 않았습니다.")
 
-            with col_verify:
-                if st.button("🔍 검증", key=f"verify_{provider['id']}", use_container_width=True):
-                    with st.spinner("검증 중..."):
-                        result = api_manager.validate_api_key(provider["id"])
-                        if result.valid:
-                            st.success(f"✅ {result.message}")
-                            if result.details:
-                                st.info(result.details)
+                    # 키 입력
+                    new_key = st.text_input(
+                        f"새 API 키 입력",
+                        value="",
+                        type="password",
+                        placeholder=provider["placeholder"],
+                        key=f"key_input_{provider['id']}",
+                    )
+
+                    # 필요한 기능 표시
+                    st.caption(f"사용 가능 기능: {', '.join(provider['required_for'])}")
+
+                    # 가입 링크
+                    st.markdown(f"[🔗 API 키 발급받기]({provider['signup_url']})")
+
+                with col2:
+                    # 현재 상태 표시
+                    if has_key:
+                        st.success("✅ 설정됨")
+                    else:
+                        st.warning("⚠️ 미설정")
+
+                # 버튼들
+                st.markdown("---")
+                col_save, col_verify, col_clear = st.columns(3)
+
+                with col_save:
+                    if st.button("💾 저장", key=f"save_{provider['id']}", use_container_width=True):
+                        if new_key:
+                            if api_manager.set_api_key(provider["id"], new_key):
+                                st.success("✅ 저장되었습니다!")
+                                st.rerun()
+                            else:
+                                st.error("저장 실패")
                         else:
-                            st.error(f"❌ {result.message}")
-                            if result.details:
-                                st.code(result.details)
+                            st.warning("키를 입력하세요")
 
-            with col_clear:
-                if st.button("🗑️ 삭제", key=f"clear_{provider['id']}", use_container_width=True):
-                    if api_manager.set_api_key(provider["id"], ""):
-                        st.success("삭제됨")
-                        st.rerun()
+                with col_verify:
+                    if st.button("🔍 검증", key=f"verify_{provider['id']}", use_container_width=True):
+                        with st.spinner("검증 중..."):
+                            result = api_manager.validate_api_key(provider["id"])
+                            if result.valid:
+                                st.success(f"✅ {result.message}")
+                                if result.details:
+                                    st.info(result.details)
+                            else:
+                                st.error(f"❌ {result.message}")
+                                if result.details:
+                                    st.code(result.details)
+
+                with col_clear:
+                    if st.button("🗑️ 삭제", key=f"clear_{provider['id']}", use_container_width=True):
+                        if api_manager.set_api_key(provider["id"], ""):
+                            st.success("삭제됨")
+                            st.rerun()
 
     # .env 파일 직접 편집
     st.markdown("---")

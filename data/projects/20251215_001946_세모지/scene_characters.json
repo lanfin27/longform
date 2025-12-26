@@ -1,0 +1,34 @@
+{
+  "1": {
+    "characters": {
+      "자말 카슈끄지": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766767425977.png",
+            "updated_at": "2025-12-27T01:43:48.348013"
+          }
+        }
+      },
+      "무함마드 빈 살만": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766767428317.png",
+            "updated_at": "2025-12-27T01:43:48.378323"
+          }
+        }
+      }
+    }
+  },
+  "2": {
+    "characters": {
+      "무함마드 빈 살만": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766767428317.png",
+            "updated_at": "2025-12-27T01:43:48.378334"
+          }
+        }
+      }
+    }
+  }
+}

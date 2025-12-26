@@ -15,6 +15,24 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from config.settings import TOGETHER_API_KEY, IMAGE_MODELS
 
+# 모델별 가격 정보 (USD/장)
+MODEL_PRICING = {
+    "black-forest-labs/FLUX.2-dev": {"price": 0.0154, "name": "FLUX.2 Dev"},
+    "black-forest-labs/FLUX.2-flex": {"price": 0.03, "name": "FLUX.2 Flex"},
+    "black-forest-labs/FLUX.2-pro": {"price": 0.03, "name": "FLUX.2 Pro"},
+    "black-forest-labs/FLUX.1-schnell": {"price": 0.02, "name": "FLUX.1 Schnell"},
+    "black-forest-labs/FLUX.1.1-pro": {"price": 0.04, "name": "FLUX 1.1 Pro"},
+    "black-forest-labs/FLUX.1-schnell-Free": {"price": 0.0, "name": "FLUX.1 Schnell Free"},
+}
+
+
+def get_model_price_info(model_id: str) -> dict:
+    """모델 가격 정보 반환"""
+    return MODEL_PRICING.get(model_id, {
+        "price": 0.0,
+        "name": model_id.split("/")[-1] if "/" in model_id else model_id
+    })
+
 
 class TogetherImageClient:
     """
@@ -71,7 +89,7 @@ class TogetherImageClient:
     def generate_image(
         self,
         prompt: str,
-        model: str = "black-forest-labs/FLUX.1-schnell-Free",
+        model: str = "black-forest-labs/FLUX.2-dev",
         width: int = 1280,
         height: int = 720,
         steps: int = 4,
@@ -97,9 +115,30 @@ class TogetherImageClient:
         # 크기 조정
         width, height = self._clamp_size(width, height)
 
-        # Free 모델은 steps=4 고정
+        # FLUX.2 모델은 기본 20 steps 권장 (Free 모델 호환 유지)
         if "Free" in model:
             steps = 4
+        elif "FLUX.2" in model or "FLUX-2" in model:
+            steps = max(steps, 20)  # FLUX.2는 20 steps 권장
+
+        # 모델 정보 조회
+        model_info = get_model_price_info(model)
+
+        # 로그: 생성 시작
+        print("=" * 60)
+        print(f"[이미지 생성] 🚀 시작")
+        print(f"[이미지 생성] 📌 API: Together.ai FLUX")
+        print(f"[이미지 생성] 📌 모델: {model}")
+        print(f"[이미지 생성] 📌 모델명: {model_info['name']}")
+        if model_info['price'] > 0:
+            print(f"[이미지 생성] 📌 예상 비용: ${model_info['price']:.4f}/장 (~{int(model_info['price'] * 1400)}원)")
+        else:
+            print(f"[이미지 생성] 📌 예상 비용: 무료")
+        print(f"[이미지 생성] 📌 크기: {width}x{height}")
+        print(f"[이미지 생성] 📌 프롬프트: {prompt[:80]}..." if len(prompt) > 80 else f"[이미지 생성] 📌 프롬프트: {prompt}")
+        print("-" * 60)
+
+        start_time = time.time()
 
         kwargs = {
             "model": model,
@@ -120,18 +159,45 @@ class TogetherImageClient:
 
             # b64_json 우선 사용
             if response.data and response.data[0].b64_json:
-                return base64.b64decode(response.data[0].b64_json)
+                image_data = base64.b64decode(response.data[0].b64_json)
+
+                # 로그: 성공
+                elapsed = time.time() - start_time
+                print("-" * 60)
+                print(f"[이미지 생성] ✅ 성공!")
+                print(f"[이미지 생성]    ⏱️ 소요: {elapsed:.2f}초")
+                print(f"[이미지 생성]    📦 크기: {len(image_data):,} bytes")
+                if model_info['price'] > 0:
+                    print(f"[이미지 생성]    💰 비용: ${model_info['price']:.4f} (~{int(model_info['price'] * 1400)}원)")
+                else:
+                    print(f"[이미지 생성]    💰 비용: 무료")
+                print("=" * 60)
+
+                return image_data
             else:
+                elapsed = time.time() - start_time
+                print("-" * 60)
+                print(f"[이미지 생성] ❌ 실패!")
+                print(f"[이미지 생성]    ⏱️ 소요: {elapsed:.2f}초")
+                print(f"[이미지 생성]    🚫 오류: 이미지 데이터를 받지 못했습니다 (b64_json=None)")
+                print("=" * 60)
                 raise Exception("이미지 데이터를 받지 못했습니다 (b64_json=None)")
 
         except Exception as e:
+            elapsed = time.time() - start_time
+            print("-" * 60)
+            print(f"[이미지 생성] ❌ 실패!")
+            print(f"[이미지 생성]    ⏱️ 소요: {elapsed:.2f}초")
+            print(f"[이미지 생성]    📌 모델: {model}")
+            print(f"[이미지 생성]    🚫 오류: {str(e)}")
+            print("=" * 60)
             raise Exception(f"이미지 생성 실패: {str(e)}")
 
     def generate_batch(
         self,
         prompts: List[Dict],
         output_dir: str,
-        model: str = "black-forest-labs/FLUX.1-schnell-Free",
+        model: str = "black-forest-labs/FLUX.2-dev",
         style_prefix: str = "",
         width: int = 1280,
         height: int = 720,
@@ -165,11 +231,22 @@ class TogetherImageClient:
         is_free_model = "Free" in model
         batch_start_time = time.time()
 
-        print(f"\n{'='*50}")
-        print(f"이미지 생성 시작: {total}개")
-        print(f"모델: {model}")
-        print(f"크기: {width}x{height}")
-        print(f"{'='*50}\n")
+        # 모델 가격 정보
+        model_info = get_model_price_info(model)
+
+        print(f"\n{'='*60}")
+        print(f"[배치 생성] 🚀 시작")
+        print(f"[배치 생성] 📌 API: Together.ai FLUX")
+        print(f"[배치 생성] 📌 모델: {model}")
+        print(f"[배치 생성] 📌 모델명: {model_info['name']}")
+        if model_info['price'] > 0:
+            total_cost = model_info['price'] * total
+            print(f"[배치 생성] 📌 예상 비용: ${total_cost:.4f} (~{int(total_cost * 1400)}원) ({total}개 x ${model_info['price']:.4f})")
+        else:
+            print(f"[배치 생성] 📌 예상 비용: 무료")
+        print(f"[배치 생성] 📌 크기: {width}x{height}")
+        print(f"[배치 생성] 📌 총 이미지: {total}개")
+        print(f"{'='*60}\n")
 
         for i, p in enumerate(prompts):
             item_start_time = time.time()
@@ -236,11 +313,17 @@ class TogetherImageClient:
         batch_total_time = time.time() - batch_start_time
         success_count = sum(1 for r in results if r["status"] == "success")
 
-        print(f"\n{'='*50}")
-        print(f"완료: {success_count}/{total} 성공")
-        print(f"총 소요 시간: {batch_total_time:.1f}초")
-        print(f"평균: {batch_total_time/total:.1f}초/개")
-        print(f"{'='*50}\n")
+        print(f"\n{'='*60}")
+        print(f"[배치 생성] ✅ 완료")
+        print(f"[배치 생성]    📊 결과: {success_count}/{total} 성공")
+        print(f"[배치 생성]    ⏱️ 총 소요: {batch_total_time:.1f}초")
+        print(f"[배치 생성]    📈 평균: {batch_total_time/total:.1f}초/개")
+        if model_info['price'] > 0:
+            actual_cost = model_info['price'] * success_count
+            print(f"[배치 생성]    💰 실제 비용: ${actual_cost:.4f} (~{int(actual_cost * 1400)}원)")
+        else:
+            print(f"[배치 생성]    💰 비용: 무료")
+        print(f"{'='*60}\n")
 
         return results
 

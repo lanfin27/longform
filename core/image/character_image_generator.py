@@ -37,7 +37,7 @@ class CharacterImageConfig:
     background: str = "solid_gray"
     width: int = 1024
     height: int = 1024
-    model: str = "black-forest-labs/FLUX.1-schnell-Free"
+    model: str = "black-forest-labs/FLUX.2-dev"
     style_prefix: str = ""  # 스타일 프롬프트 앞에 추가
     style_suffix: str = ""  # 스타일 프롬프트 뒤에 추가
 
@@ -559,8 +559,9 @@ class CharacterImageGenerator:
         except ImportError:
             if api_provider == "Together.ai FLUX":
                 return [
-                    ("black-forest-labs/FLUX.1-schnell-Free", "FLUX Schnell (무료, 빠름)"),
-                    ("black-forest-labs/FLUX.1-schnell", "FLUX Schnell (유료)"),
+                    ("black-forest-labs/FLUX.2-dev", "FLUX.2 Dev (권장, ~20원)"),
+                    ("black-forest-labs/FLUX.2-flex", "FLUX.2 Flex (~40원)"),
+                    ("black-forest-labs/FLUX.2-pro", "FLUX.2 Pro (고품질, ~40원)"),
                 ]
             return []
 

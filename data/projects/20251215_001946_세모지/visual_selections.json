@@ -1491,13 +1491,13 @@
         "first_frame_path": null,
         "video_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\infographics\\videos\\infographic_scene_001.mp4",
         "video_duration": 10.0,
-        "composite_video_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\infographics\\composites\\composite_scene_001.mp4",
-        "composite_thumbnail_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\infographics\\composites\\composite_scene_001_thumb.png",
+        "composite_video_path": null,
+        "composite_thumbnail_path": null,
         "keywords": [],
         "chart_type": null,
         "is_thumbnail_ready": false,
         "is_video_ready": true,
-        "is_composite_ready": true,
+        "is_composite_ready": false,
         "render_error": null
       },
       {
@@ -2283,8 +2283,8 @@
         "html_content": "<div class=\"scene\" id=\"scene26\">\n<div style=\"display: flex; gap: 80px; font-size: 150px;\">\n<div style=\"text-align: center;\">\n<i class=\"fa-brands fa-youtube\" style=\"color: var(--point-red);\"></i>\n<p style=\"font-size: 36px;\">디지털 네이티브</p>\n</div>\n<div style=\"text-align: center; opacity: 0.3;\">\n<i class=\"fa-solid fa-store\"></i>\n<p style=\"font-size: 36px;\">전통적 유통</p>\n</div>\n</div>\n<h1 style=\"margin-top: 30px;\">글로벌 <span class=\"highlight\">IP 사업자</span>로의 진화</h1>\n</div>",
         "has_animation": false,
         "icons": [
-          "fa-youtube",
-          "fa-store"
+          "fa-store",
+          "fa-youtube"
         ],
         "comment": "아이콘 대비형",
         "thumbnail_path": null,
@@ -2695,8 +2695,8 @@
         "html_content": "<div class=\"scene\" id=\"scene39\">\n<h1 style=\"font-size: 100px; margin-bottom: 40px;\">THANK YOU</h1>\n<div style=\"display: flex; gap: 40px; justify-content: center;\">\n<div class=\"kpi-card animate-pulse-red\" style=\"width: 250px;\">\n<i class=\"fa-solid fa-heart\"></i>\n<p style=\"font-size: 32px;\">좋아요</p>\n</div>\n<div class=\"kpi-card animate-subtle\" style=\"width: 250px;\">\n<i class=\"fa-solid fa-bell\"></i>\n<p style=\"font-size: 32px;\">구독/알림</p>\n</div>\n</div>\n<p style=\"margin-top: 40px; color: #888;\">다음 성공 방정식에서 만나요!</p>\n</div>",
         "has_animation": true,
         "icons": [
-          "fa-heart",
-          "fa-bell"
+          "fa-bell",
+          "fa-heart"
         ],
         "comment": "브랜드 클로징",
         "thumbnail_path": null,
@@ -2717,10 +2717,10 @@
     "video_fps": 30,
     "video_width": 1280,
     "video_height": 720,
-    "parsed_at": "2025-12-23T18:36:24.000732",
+    "parsed_at": "2025-12-24T10:16:51.756744",
     "parse_format": "format_b_html_elements",
     "version": "2.0"
   },
   "last_updated": "2025-12-23T18:38:15.368870",
-  "is_dirty": true
+  "is_dirty": false
 }

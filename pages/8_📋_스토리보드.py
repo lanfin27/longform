@@ -39,13 +39,16 @@ try:
         batch_composite_sync,
         get_compositor,
         is_bg_removal_available,
-        is_mapper_available
+        is_mapper_available,
+        get_bg_removal_diagnostic,
+        test_bg_removal
     )
     from utils.scene_character_mapper import (
         get_scene_character_matcher,
         get_mapping_summary
     )
     from utils.background_remover import install_rembg_ui
+    from utils.character_editor import render_character_editor, render_character_preview_only
     INFOGRAPHIC_AVAILABLE = True
 except ImportError as e:
     INFOGRAPHIC_AVAILABLE = False
@@ -1053,6 +1056,17 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
                         st.warning("등록된 캐릭터가 없습니다.")
                         st.info("👉 **캐릭터 관리** 페이지에서 캐릭터를 먼저 추가하세요.")
                     else:
+                        # 🔴 v3.12: 로드된 캐릭터 디버그 정보 표시
+                        available_chars = matcher.get_available_characters()
+                        with st.expander(f"👤 매칭 가능 캐릭터 ({len(available_chars)}명)", expanded=False):
+                            if available_chars:
+                                for c in available_chars:
+                                    has_image = "✅" if c.get('image_path') else "❌"
+                                    st.caption(f"- {c['name']} ({c['id']}) {has_image}")
+                            else:
+                                st.warning("캐릭터가 로드되지 않았습니다.")
+                                st.info("캐릭터 관리 페이지에서 캐릭터 이미지를 생성하세요.")
+
                         # 현재 매핑 미리보기
                         existing_mappings = matcher.load_mappings()
 
@@ -1091,8 +1105,7 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
                         auto_col1, auto_col2 = st.columns(2)
 
                         with auto_col1:
-                            # 기본 캐릭터 선택
-                            available_chars = matcher.get_available_characters()
+                            # 기본 캐릭터 선택 (available_chars는 위에서 이미 로드됨)
                             default_options = ["없음 (매칭된 것만)"] + [c['name'] for c in available_chars]
                             default_select = st.selectbox(
                                 "기본 캐릭터 (매칭 실패 시)",
@@ -1160,40 +1173,49 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
                             auto_c1, auto_c2, auto_c3 = st.columns(3)
 
                             with auto_c1:
+                                # v2.0: 9개 위치 프리셋 (3x3 그리드)
                                 position_options_auto = {
-                                    "오른쪽 (기본)": "오른쪽",
-                                    "왼쪽": "왼쪽",
-                                    "중앙-오른쪽": "중앙-오른쪽",
-                                    "중앙-왼쪽": "중앙-왼쪽"
+                                    "↘️ 우하단 (기본)": "bottom_right",
+                                    "↙️ 좌하단": "bottom_left",
+                                    "⬇️ 하단 중앙": "bottom_center",
+                                    "➡️ 우측 중앙": "middle_right",
+                                    "⬅️ 좌측 중앙": "middle_left",
+                                    "⏺️ 정중앙": "middle_center",
+                                    "↗️ 우상단": "top_right",
+                                    "↖️ 좌상단": "top_left",
+                                    "⬆️ 상단 중앙": "top_center",
                                 }
                                 auto_pos_label = st.selectbox(
-                                    "📍 위치",
+                                    "📍 위치 (3x3 그리드)",
                                     list(position_options_auto.keys()),
                                     key="auto_compose_pos"
                                 )
                                 auto_position = position_options_auto[auto_pos_label]
 
                             with auto_c2:
+                                # v2.0: 10-60% 크기 범위
                                 auto_scale = st.slider(
-                                    "📏 크기",
-                                    min_value=0.3,
-                                    max_value=1.0,
-                                    value=0.7,
-                                    step=0.05,
-                                    key="auto_compose_scale"
-                                )
+                                    "📏 크기 (%)",
+                                    min_value=10,
+                                    max_value=60,
+                                    value=35,
+                                    step=5,
+                                    key="auto_compose_scale",
+                                    help="배경 높이 대비 캐릭터 높이 비율 (10-60%)"
+                                ) / 100  # 백분율을 비율로 변환
 
                             with auto_c3:
                                 bg_available, bg_msg = is_bg_removal_available()
+                                # v3.14: 배경 제거 기본값 True, 체크박스 항상 활성화
                                 auto_remove_bg_opt = st.checkbox(
                                     "🎭 배경 제거",
-                                    value=bg_available,
-                                    disabled=not bg_available,
-                                    key="auto_remove_bg_opt"
+                                    value=True,  # 항상 기본값 True
+                                    key="auto_remove_bg_opt",
+                                    help="캐릭터 배경을 자동으로 제거합니다"
                                 )
                                 if not bg_available:
-                                    st.caption("⚠️ rembg 미설치")
-                                    with st.expander("🔧 rembg 설치하기"):
+                                    st.caption("⚠️ rembg 미설치 (합성 시 자동 설치 시도)")
+                                    with st.expander("🔧 수동 설치하기"):
                                         install_rembg_ui(key_suffix="auto_match")
 
                             st.info(f"📊 합성 대상: **{len(mappings_with_video)}개** 씬")
@@ -1257,6 +1279,46 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
                                     import traceback
                                     st.code(traceback.format_exc())
 
+                        st.divider()
+
+                        # ========================================
+                        # 합성 결과 미리보기 (자동 매핑)
+                        # ========================================
+                        st.markdown("##### 👁️ 합성 결과 미리보기")
+
+                        # 합성된 파일 확인
+                        composites_dir = project_path / "infographics" / "composites"
+                        composite_thumbs = list(composites_dir.glob("composite_scene_*_thumb.png")) if composites_dir.exists() else []
+
+                        if composite_thumbs:
+                            st.success(f"✅ {len(composite_thumbs)}개 합성 완료된 씬")
+
+                            # 그리드로 미리보기
+                            preview_cols_per_row = 4
+                            composite_thumbs_sorted = sorted(composite_thumbs, key=lambda x: x.stem)
+
+                            for i in range(0, len(composite_thumbs_sorted), preview_cols_per_row):
+                                cols = st.columns(preview_cols_per_row)
+                                for j, col in enumerate(cols):
+                                    idx = i + j
+                                    if idx < len(composite_thumbs_sorted):
+                                        thumb_path = composite_thumbs_sorted[idx]
+                                        # 씬 번호 추출
+                                        try:
+                                            scene_num = int(thumb_path.stem.split('_')[2])
+                                        except:
+                                            scene_num = idx + 1
+
+                                        with col:
+                                            st.image(str(thumb_path), caption=f"씬 {scene_num}", use_container_width=True)
+
+                            # 개별 씬 편집 버튼
+                            with st.expander("✏️ 개별 씬 위치/크기 조정"):
+                                st.caption("특정 씬의 캐릭터 위치나 크기를 수정하려면 '수동 선택' 탭에서 개별 편집을 사용하세요.")
+                                st.info("👉 '수동 선택' 탭 → 씬 선택 → 캐릭터 에디터에서 위치/크기 조정")
+                        else:
+                            st.info("합성된 결과가 없습니다. 위에서 '일괄 합성'을 실행하세요.")
+
                 # ========================================
                 # 탭 2: 수동 선택 (기존 코드)
                 # ========================================
@@ -1277,46 +1339,53 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
                         selected_char_info = character_options[selected_char_idx]
                         selected_char = selected_char_info['path']
 
-                        # 위치 설정
+                        # v2.0: 위치 설정 (9개 프리셋)
                         position_options = {
-                            "오른쪽 (기본)": "오른쪽",
-                            "왼쪽": "왼쪽",
-                            "중앙-오른쪽": "중앙-오른쪽",
-                            "중앙-왼쪽": "중앙-왼쪽",
-                            "중앙": "중앙"
+                            "↘️ 우하단 (기본)": "bottom_right",
+                            "↙️ 좌하단": "bottom_left",
+                            "⬇️ 하단 중앙": "bottom_center",
+                            "➡️ 우측 중앙": "middle_right",
+                            "⬅️ 좌측 중앙": "middle_left",
+                            "⏺️ 정중앙": "middle_center",
+                            "↗️ 우상단": "top_right",
+                            "↖️ 좌상단": "top_left",
+                            "⬆️ 상단 중앙": "top_center",
                         }
                         char_position_label = st.selectbox(
-                            "위치",
+                            "📍 위치 (3x3 그리드)",
                             list(position_options.keys()),
                             key="char_position_select"
                         )
                         char_position = position_options[char_position_label]
 
-                        # 크기 설정
+                        # v2.0: 크기 설정 (10-60%)
                         scale_options = {
-                            "작게 (50%)": 0.5,
-                            "보통 (70%)": 0.7,
-                            "크게 (85%)": 0.85,
-                            "매우 크게 (100%)": 1.0
+                            "아주 작게 (10%)": 0.10,
+                            "작게 (20%)": 0.20,
+                            "보통 (30%)": 0.30,
+                            "크게 (40%)": 0.40,
+                            "아주 크게 (50%)": 0.50,
+                            "최대 (60%)": 0.60
                         }
                         scale_label = st.selectbox(
-                            "크기",
+                            "📏 크기",
                             list(scale_options.keys()),
-                            index=1,  # 기본: 보통
+                            index=2,  # 기본: 보통 (30%)
                             key="char_scale_select"
                         )
                         char_scale = scale_options[scale_label]
 
                         # 고급 설정
-                        with st.expander("고급 설정"):
+                        with st.expander("⚙️ 고급 설정"):
                             char_scale_custom = st.slider(
-                                "세부 크기 조정",
-                                min_value=0.3,
-                                max_value=1.2,
-                                value=char_scale,
-                                step=0.05,
-                                key="char_scale_custom"
-                            )
+                                "세부 크기 조정 (%)",
+                                min_value=10,
+                                max_value=60,
+                                value=int(char_scale * 100),
+                                step=5,
+                                key="char_scale_custom",
+                                help="배경 높이 대비 캐릭터 높이 비율 (10-60%)"
+                            ) / 100  # 백분율을 비율로 변환
                             if char_scale_custom != char_scale:
                                 char_scale = char_scale_custom
 
@@ -1326,19 +1395,20 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
                             st.markdown("##### 🎭 배경 제거")
                             rembg_available, rembg_msg = is_bg_removal_available()
 
+                            # v3.14: 배경 제거 항상 활성화, 기본값 True
+                            auto_remove_bg = st.checkbox(
+                                "🎭 자동 배경 제거",
+                                value=True,  # 항상 기본값 True
+                                help="캐릭터 이미지에 배경이 있으면 자동으로 제거합니다",
+                                key="auto_remove_bg_checkbox"
+                            )
+
                             if rembg_available:
                                 st.success(rembg_msg)
-                                auto_remove_bg = st.checkbox(
-                                    "자동 배경 제거",
-                                    value=True,
-                                    help="캐릭터 이미지에 배경이 있으면 자동으로 제거합니다 (rembg 사용)",
-                                    key="auto_remove_bg_checkbox"
-                                )
                             else:
-                                st.warning(rembg_msg)
-                                with st.expander("🔧 rembg 설치하기"):
+                                st.warning(f"{rembg_msg} (합성 시 자동 설치 시도)")
+                                with st.expander("🔧 수동 설치하기"):
                                     install_rembg_ui(key_suffix="manual_select")
-                                auto_remove_bg = False
 
                     with char_col2:
                         if selected_char and selected_char.exists():
@@ -1373,6 +1443,90 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
                         compositable_scenes = [s for s in video_ready_scenes if s.scene_id in selected_comp_ids]
 
                     st.info(f"📊 합성 대상: {len(compositable_scenes)}개 씬")
+
+                    st.divider()
+
+                    # ========================================
+                    # 🔴 v3.12: 시각적 캐릭터 에디터 (위치/크기 조정)
+                    # ========================================
+                    st.markdown("#### 🎨 시각적 위치/크기 조정 (미리보기)")
+
+                    # 개별 씬 선택해서 시각적 편집
+                    if video_ready_scenes and selected_char and selected_char.exists():
+                        edit_scene_options = [f"씬 {s.scene_id}" for s in video_ready_scenes]
+
+                        use_visual_editor = st.checkbox(
+                            "🖼️ 시각적 에디터 사용 (개별 씬)",
+                            value=False,
+                            key="use_visual_editor",
+                            help="선택한 씬의 인포그래픽에 캐릭터를 미리 배치하고 위치/크기를 조정합니다."
+                        )
+
+                        if use_visual_editor:
+                            selected_edit_scene = st.selectbox(
+                                "편집할 씬 선택",
+                                edit_scene_options,
+                                key="visual_edit_scene_select"
+                            )
+                            edit_scene_id = int(selected_edit_scene.replace("씬 ", ""))
+
+                            # 해당 씬의 인포그래픽 찾기
+                            infographic_thumb_path = project_path / "infographics" / "thumbnails" / f"infographic_{edit_scene_id:03d}.png"
+                            video_frame_path = project_path / "infographics" / "composites" / f"composite_scene_{edit_scene_id:03d}_thumb.png"
+
+                            # 썸네일 없으면 동영상 첫 프레임 추출 시도
+                            if not infographic_thumb_path.exists():
+                                # 동영상에서 첫 프레임 추출
+                                video_path = project_path / "infographics" / "videos" / f"infographic_scene_{edit_scene_id:03d}.mp4"
+                                if video_path.exists():
+                                    temp_frame = project_path / "infographics" / "thumbnails" / f"temp_frame_{edit_scene_id:03d}.png"
+                                    temp_frame.parent.mkdir(parents=True, exist_ok=True)
+                                    try:
+                                        subprocess.run([
+                                            "ffmpeg", "-y", "-i", str(video_path),
+                                            "-vframes", "1", str(temp_frame)
+                                        ], capture_output=True)
+                                        if temp_frame.exists():
+                                            infographic_thumb_path = temp_frame
+                                    except:
+                                        pass
+
+                            if infographic_thumb_path.exists():
+                                st.caption(f"씬 {edit_scene_id}에 캐릭터 배치 미리보기")
+
+                                # 캐릭터 에디터 호출
+                                editor_result = render_character_editor(
+                                    background_path=str(infographic_thumb_path),
+                                    character_path=str(selected_char),
+                                    initial_size=int(char_scale * 100),
+                                    remove_background=auto_remove_bg if 'auto_remove_bg' in dir() else True,
+                                    key=f"char_editor_scene_{edit_scene_id}"
+                                )
+
+                                if editor_result:
+                                    st.success(f"✅ 캐릭터 위치: ({editor_result['position_x']}, {editor_result['position_y']}), 크기: {editor_result['size_percent']}%")
+
+                                    # 이 설정으로 합성 버튼
+                                    if st.button(
+                                        f"📸 씬 {edit_scene_id}에 이 설정으로 합성",
+                                        key=f"apply_editor_scene_{edit_scene_id}",
+                                        type="secondary"
+                                    ):
+                                        # 결과 이미지 저장
+                                        output_path = project_path / "infographics" / "composites" / f"composite_scene_{edit_scene_id:03d}_preview.png"
+                                        output_path.parent.mkdir(parents=True, exist_ok=True)
+                                        editor_result['composite_image'].save(str(output_path), 'PNG')
+                                        st.success(f"미리보기 저장: {output_path.name}")
+
+                                        # 동영상 합성은 별도로 실행해야 함
+                                        st.info("💡 동영상 합성은 아래 '캐릭터 합성 시작' 버튼을 사용하세요.")
+                            else:
+                                st.warning(f"씬 {edit_scene_id}의 인포그래픽 이미지를 찾을 수 없습니다.")
+                                st.caption("동영상을 먼저 생성하거나, 인포그래픽 썸네일이 필요합니다.")
+                    else:
+                        st.caption("캐릭터를 선택하고 동영상이 있는 씬이 있어야 시각적 에디터를 사용할 수 있습니다.")
+
+                    st.divider()
 
                     # 합성 실행 버튼
                     can_composite = ffmpeg_ok and len(compositable_scenes) > 0 and selected_char
@@ -1435,16 +1589,45 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
                 with comp_tab_settings:
                     st.markdown("#### ⚙️ 캐릭터 합성 설정")
 
-                    # 배경 제거 설정
-                    st.markdown("##### 🎭 배경 제거")
-                    bg_available, bg_msg = is_bg_removal_available()
+                    # 🔴 v3.12: 배경 제거 상세 진단
+                    st.markdown("##### 🎭 배경 제거 상태")
 
-                    if bg_available:
-                        st.success(bg_msg)
-                        st.info("캐릭터 이미지에 배경이 있으면 합성 시 자동으로 제거됩니다.")
-                    else:
-                        st.error(bg_msg)
-                        install_rembg_ui(key_suffix="settings")
+                    try:
+                        diag = get_bg_removal_diagnostic()
+
+                        diag_col1, diag_col2 = st.columns([2, 1])
+
+                        with diag_col1:
+                            if diag['available']:
+                                st.success(diag['message'])
+                                st.info("✅ 캐릭터 이미지에 배경이 있으면 합성 시 자동으로 제거됩니다.")
+                            else:
+                                st.error(diag['message'])
+                                st.warning("⚠️ 배경 제거 없이 합성되면 캐릭터 배경이 보일 수 있습니다!")
+
+                                # 상세 상태
+                                with st.expander("🔍 상세 진단"):
+                                    st.write(f"- 모듈 로드: {'✅' if diag['module_loaded'] else '❌'}")
+                                    st.write(f"- rembg 설치: {'✅' if diag['rembg_installed'] else '❌'}")
+                                    st.code(diag['install_cmd'], language="bash")
+
+                                install_rembg_ui(key_suffix="settings")
+
+                        with diag_col2:
+                            if diag['available']:
+                                if st.button("🧪 테스트", key="test_bg_removal"):
+                                    success, msg = test_bg_removal()
+                                    if success:
+                                        st.success(msg)
+                                    else:
+                                        st.error(msg)
+                    except Exception as e:
+                        bg_available, bg_msg = is_bg_removal_available()
+                        if bg_available:
+                            st.success(bg_msg)
+                        else:
+                            st.error(bg_msg)
+                            install_rembg_ui(key_suffix="settings")
 
                     st.divider()
 

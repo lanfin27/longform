@@ -468,22 +468,28 @@ with tab3:
 
     with col_api1:
         # API 제공자 선택
-        api_options = ["Together.ai FLUX", "OpenAI DALL-E", "Stability AI", "Replicate SDXL"]
+        api_options = ["Together.ai FLUX", "Google ImageFX", "OpenAI DALL-E", "Stability AI", "Replicate SDXL"]
         char_api_provider = st.selectbox(
             "🔧 이미지 생성 API",
             options=api_options,
             index=0,
             key="char_api_provider",
-            help="⚡ 빠른 생성: Together.ai FLUX\n🎨 고품질: OpenAI DALL-E\n🚀 초고속: Replicate Lightning"
+            help="⚡ 빠른 생성: Together.ai FLUX\n🆓 무료: Google ImageFX\n🎨 고품질: OpenAI DALL-E\n🚀 초고속: Replicate Lightning"
         )
 
     with col_api2:
         # API별 모델 옵션
         model_options_map = {
             "Together.ai FLUX": [
-                ("black-forest-labs/FLUX.1-schnell-Free", "FLUX Schnell (무료, 빠름)"),
-                ("black-forest-labs/FLUX.1-schnell", "FLUX Schnell (유료)"),
-                ("black-forest-labs/FLUX.1.1-pro", "FLUX Pro (고품질)"),
+                ("black-forest-labs/FLUX.2-dev", "FLUX.2 Dev (권장, ~20원)"),
+                ("black-forest-labs/FLUX.2-flex", "FLUX.2 Flex (~40원)"),
+                ("black-forest-labs/FLUX.2-pro", "FLUX.2 Pro (고품질, ~40원)"),
+            ],
+            "Google ImageFX": [
+                ("IMAGEN_4", "Imagen 4 (최신, 무료)"),
+                ("IMAGEN_3_5", "Imagen 3.5 (무료)"),
+                ("IMAGEN_3_1", "Imagen 3.1 (무료)"),
+                ("IMAGEN_3", "Imagen 3.0 (무료)"),
             ],
             "OpenAI DALL-E": [
                 ("dall-e-3", "DALL-E 3 (최신)"),
@@ -525,6 +531,10 @@ with tab3:
         if char_api_provider == "Together.ai FLUX":
             from config.settings import TOGETHER_API_KEY
             api_key_status = "✅ 설정됨" if TOGETHER_API_KEY else "❌ 미설정"
+        elif char_api_provider == "Google ImageFX":
+            from config.settings import IMAGEFX_COOKIE
+            imagefx_cookie = st.session_state.get("imagefx_cookie") or IMAGEFX_COOKIE
+            api_key_status = "✅ 쿠키 설정됨" if imagefx_cookie else "❌ 쿠키 미설정"
         elif char_api_provider == "OpenAI DALL-E":
             openai_key = os.getenv("OPENAI_API_KEY")
             api_key_status = "✅ 설정됨" if openai_key else "❌ 미설정"
@@ -715,9 +725,10 @@ with tab3:
     # ⭐ 예상 시간 (API + 병렬 처리 반영)
     total_chars = len(selected_chars)
 
-    # API별 예상 시간
+    # API별 예상 시간 (FLUX.2 모델 기준)
     time_per_char_map = {
-        "Together.ai FLUX": 15 if "Free" in char_model else 8,
+        "Together.ai FLUX": 8,  # FLUX.2 유료 모델 기준
+        "Google ImageFX": 10,  # Imagen 모델 (무료)
         "OpenAI DALL-E": 10,
         "Stability AI": 12,
         "Replicate SDXL": 3 if "lightning" in char_model.lower() else 10
@@ -931,7 +942,8 @@ with tab3:
                             )
 
                     # 사용량 기록
-                    provider_name = "together" if char_api_provider == "Together.ai FLUX" else char_api_provider.lower().replace(" ", "_")
+                    provider_name_map = {"Together.ai FLUX": "together", "Google ImageFX": "imagefx"}
+                    provider_name = provider_name_map.get(char_api_provider, char_api_provider.lower().replace(" ", "_"))
                     api_manager.record_usage(
                         provider=provider_name,
                         model_id=config.model,
@@ -946,7 +958,8 @@ with tab3:
                     fail_count += 1
 
                     # 에러 기록
-                    provider_name = "together" if char_api_provider == "Together.ai FLUX" else char_api_provider.lower().replace(" ", "_")
+                    provider_name_map = {"Together.ai FLUX": "together", "Google ImageFX": "imagefx"}
+                    provider_name = provider_name_map.get(char_api_provider, char_api_provider.lower().replace(" ", "_"))
                     api_manager.record_usage(
                         provider=provider_name,
                         model_id=config.model,
@@ -1250,6 +1263,72 @@ with tab5:
 
             if chars_without_prompt > 0:
                 st.warning(f"⚠️ {chars_without_prompt}명의 캐릭터에 visual_prompt가 없습니다.")
+
+                # Visual Prompt 일괄 생성 버튼
+                st.markdown("---")
+                st.markdown("##### 🎨 Visual Prompt 자동 생성")
+
+                col_model, col_btn = st.columns([2, 1])
+
+                with col_model:
+                    from utils.ai_model_config import AVAILABLE_MODELS
+                    model_options = {
+                        "⚡ 빠름 (Haiku)": "claude-3-5-haiku-20241022",
+                        "⚖️ 균형 (Sonnet)": "claude-sonnet-4-20250514"
+                    }
+                    selected_label = st.selectbox(
+                        "AI 모델 선택",
+                        options=list(model_options.keys()),
+                        index=0,
+                        key="visual_prompt_model",
+                        help="Haiku가 빠르고 저렴합니다"
+                    )
+                    selected_model = model_options[selected_label]
+
+                with col_btn:
+                    st.write("")  # 정렬용 빈 공간
+                    if st.button("🎨 Visual Prompt 생성", type="primary", key="gen_visual_prompts"):
+                        from utils.character_visual_prompt import generate_character_visual_prompts
+
+                        # 스크립트 컨텍스트 수집
+                        context = ""
+                        script_path = project_path / "scripts" / "full_script.txt"
+                        if script_path.exists():
+                            try:
+                                context = script_path.read_text(encoding="utf-8")[:2000]
+                            except:
+                                pass
+
+                        # visual_prompt가 없는 캐릭터만 추출
+                        chars_to_process = [
+                            c for c in analysis_chars
+                            if not c.get('visual_prompt') and not c.get('character_prompt')
+                        ]
+
+                        with st.spinner(f"Visual Prompt 생성 중... ({len(chars_to_process)}명)"):
+                            updated_chars = generate_character_visual_prompts(
+                                chars_to_process,
+                                context=context,
+                                model=selected_model
+                            )
+
+                            # 원본 리스트에 결과 반영
+                            result_map = {c['name']: c.get('visual_prompt', '') for c in updated_chars}
+                            for char in analysis_chars:
+                                name = char.get('name', '')
+                                if name in result_map and result_map[name]:
+                                    char['visual_prompt'] = result_map[name]
+
+                            # 파일에 저장
+                            try:
+                                with open(analysis_path, "w", encoding="utf-8") as f:
+                                    json.dump(analysis_chars, f, ensure_ascii=False, indent=2)
+                                st.success(f"✅ {len(chars_to_process)}명의 visual_prompt 생성 완료!")
+                                time.sleep(1)
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"저장 실패: {e}")
+                st.markdown("---")
             else:
                 st.info(f"✅ 모든 캐릭터에 visual_prompt가 있습니다.")
 

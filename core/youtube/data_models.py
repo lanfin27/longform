@@ -155,6 +155,7 @@ class SearchFilters:
     # 지역/언어
     region_code: str = "KR"
     language: str = "ko"
+    korean_only: bool = True  # v3.13: 한국어 콘텐츠만 필터링
 
     # 결과 수
     max_results: int = 50
@@ -169,5 +170,7 @@ class SearchFilters:
             "published_after": self.published_after,
             "sort_by": self.sort_by,
             "region_code": self.region_code,
+            "language": self.language,
+            "korean_only": self.korean_only,
             "max_results": self.max_results,
         }

@@ -119,7 +119,8 @@ CLAUDE_MODEL = "claude-sonnet-4-20250514"
 CLAUDE_MAX_TOKENS = 8000
 
 # === Together.ai 설정 ===
-TOGETHER_DEFAULT_MODEL = "black-forest-labs/FLUX.1-schnell-Free"
+# FLUX.2 모델 (합리적 가격) - 2024년 12월 기준
+TOGETHER_DEFAULT_MODEL = "black-forest-labs/FLUX.2-dev"  # $0.0154/장 (~20원)
 # FLUX 모델 제한: width/height 64~1792
 TOGETHER_IMAGE_WIDTH = 1792  # max 1792
 TOGETHER_IMAGE_HEIGHT = 1024  # 16:9 비율에 가까움
@@ -157,12 +158,118 @@ TTS_VOICES = {
     ]
 }
 
-# === 이미지 생성 모델 목록 ===
+# === 이미지 생성 모델 목록 (FLUX.2 - 합리적 가격) ===
 IMAGE_MODELS = [
-    {"id": "black-forest-labs/FLUX.1-schnell-Free", "name": "FLUX Free", "price": 0},
-    {"id": "black-forest-labs/FLUX.1-schnell", "name": "FLUX Schnell", "price": 0.003},
-    {"id": "black-forest-labs/FLUX.1.1-pro", "name": "FLUX Pro", "price": 0.04},
+    {"id": "black-forest-labs/FLUX.2-dev", "name": "FLUX.2 Dev (권장)", "price": 0.0154},  # ~20원/장
+    {"id": "black-forest-labs/FLUX.2-flex", "name": "FLUX.2 Flex", "price": 0.03},  # ~40원/장
+    {"id": "black-forest-labs/FLUX.2-pro", "name": "FLUX.2 Pro (고품질)", "price": 0.03},  # ~40원/장
 ]
+
+# === 보안 저장소 경로 ===
+SECRETS_DIR = DATA_DIR / ".secrets"
+SECRETS_DIR.mkdir(parents=True, exist_ok=True)
+
+# === Google ImageFX (Imagen) 설정 ===
+# 쿠키는 환경변수 또는 보안 저장소 파일에서 로드
+def _load_imagefx_cookie() -> str:
+    """ImageFX 쿠키 로드 (환경변수 > 파일 순서)"""
+    # 1. 환경변수에서 먼저 확인
+    env_cookie = get_api_key("IMAGEFX_COOKIE")
+    if env_cookie:
+        return env_cookie
+
+    # 2. 저장된 파일에서 확인
+    cookie_file = SECRETS_DIR / "imagefx_cookie.txt"
+    if cookie_file.exists():
+        try:
+            cookie_value = cookie_file.read_text(encoding="utf-8").strip()
+            if cookie_value:
+                return cookie_value
+        except Exception:
+            pass
+
+    return None
+
+IMAGEFX_COOKIE = _load_imagefx_cookie()
+
+# ImageFX 모델 목록
+IMAGEFX_MODELS = [
+    {"id": "IMAGEN_4", "name": "Imagen 4 (최신)", "description": "가장 높은 품질", "price": 0},
+    {"id": "IMAGEN_3_5", "name": "Imagen 3.5", "description": "빠른 생성", "price": 0},
+    {"id": "IMAGEN_3_1", "name": "Imagen 3.1", "description": "안정적", "price": 0},
+    {"id": "IMAGEN_3", "name": "Imagen 3.0", "description": "기본", "price": 0},
+]
+
+# ImageFX 비율 목록
+IMAGEFX_ASPECT_RATIOS = [
+    {"id": "LANDSCAPE_16_9", "name": "16:9 (가로)", "resolution": "1280x720", "width": 1280, "height": 720},
+    {"id": "PORTRAIT_16_9", "name": "9:16 (세로)", "resolution": "720x1280", "width": 720, "height": 1280},
+    {"id": "LANDSCAPE", "name": "4:3 (가로)", "resolution": "1024x768", "width": 1024, "height": 768},
+    {"id": "PORTRAIT", "name": "3:4 (세로)", "resolution": "768x1024", "width": 768, "height": 1024},
+    {"id": "SQUARE", "name": "1:1 (정사각형)", "resolution": "1024x1024", "width": 1024, "height": 1024},
+]
+
+# ImageFX 기본 설정
+IMAGEFX_DEFAULT_MODEL = "IMAGEN_4"
+IMAGEFX_DEFAULT_ASPECT_RATIO = "LANDSCAPE_16_9"
+IMAGEFX_DEFAULT_NUM_IMAGES = 4
+IMAGEFX_TIMEOUT = 120
+IMAGEFX_RETRY_COUNT = 3
+
+# ImageFX 쿠키 관련 설정 (NextAuth 지원)
+# NextAuth 세션 토큰 (labs.google에서 사용) - 권장
+IMAGEFX_REQUIRED_COOKIES = [
+    "__Secure-next-auth.session-token",  # NextAuth 세션 (주요)
+]
+
+IMAGEFX_OPTIONAL_COOKIES = [
+    "__Host-next-auth.csrf-token",       # CSRF 토큰
+    "__Secure-next-auth.callback-url",   # 콜백 URL
+]
+
+# 대체 인증 (Google 계정 쿠키) - 일부 환경에서 사용
+IMAGEFX_FALLBACK_COOKIES = [
+    "__Secure-1PSID",
+    "__Secure-3PSID",
+]
+
+# ImageFX Authorization 토큰 파일 경로
+IMAGEFX_TOKEN_FILE = SECRETS_DIR / "imagefx_token.txt"
+
+
+def save_imagefx_auth_token(token: str) -> bool:
+    """ImageFX Authorization 토큰 저장"""
+    try:
+        SECRETS_DIR.mkdir(parents=True, exist_ok=True)
+        # Bearer 접두사 제거 후 저장
+        clean_token = token.strip()
+        if clean_token.lower().startswith("bearer "):
+            clean_token = clean_token[7:].strip()
+        IMAGEFX_TOKEN_FILE.write_text(clean_token, encoding="utf-8")
+        return True
+    except Exception as e:
+        print(f"[Settings] 토큰 저장 실패: {e}")
+        return False
+
+
+def load_imagefx_auth_token() -> str:
+    """ImageFX Authorization 토큰 로드"""
+    # 1. 환경 변수 먼저 확인
+    env_token = os.getenv("IMAGEFX_AUTH_TOKEN", "").strip()
+    if env_token:
+        return env_token
+
+    # 2. 파일에서 로드
+    if IMAGEFX_TOKEN_FILE.exists():
+        try:
+            token = IMAGEFX_TOKEN_FILE.read_text(encoding="utf-8").strip()
+            if token:
+                return token
+        except Exception:
+            pass
+
+    return ""
+
 
 # === 씬 분석 설정 ===
 SCENE_MIN_DURATION = 5  # 최소 씬 길이 (초)

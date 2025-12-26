@@ -314,9 +314,9 @@ def render_test_style(manager: StyleManager, segment: str):
     # 모델 선택
     st.markdown("**이미지 생성 AI**")
     model_options = {
-        "FLUX.1 Schnell Free (무료)": {"provider": "together", "model": "black-forest-labs/FLUX.1-schnell-Free"},
-        "FLUX.1 Schnell ($0.003)": {"provider": "together", "model": "black-forest-labs/FLUX.1-schnell"},
-        "FLUX.1 Dev ($0.025)": {"provider": "together", "model": "black-forest-labs/FLUX.1-dev"},
+        "FLUX.2 Dev (권장, ~20원)": {"provider": "together", "model": "black-forest-labs/FLUX.2-dev"},
+        "FLUX.2 Flex (~40원)": {"provider": "together", "model": "black-forest-labs/FLUX.2-flex"},
+        "FLUX.2 Pro (고품질, ~40원)": {"provider": "together", "model": "black-forest-labs/FLUX.2-pro"},
         "DALL-E 3 ($0.04)": {"provider": "openai", "model": "dall-e-3"},
     }
     selected_model_name = st.selectbox("모델", list(model_options.keys()), key=f"test_model_{segment}")

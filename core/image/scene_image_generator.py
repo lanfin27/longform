@@ -25,7 +25,7 @@ class SceneImageConfig:
     style_prefix: str = "animation style, infographic illustration, clean lines, vibrant colors, no text"
     width: int = 1280
     height: int = 720
-    model: str = "black-forest-labs/FLUX.1-schnell-Free"
+    model: str = "black-forest-labs/FLUX.2-dev"
     include_characters: bool = True
     character_style: str = "full body, standing"
     negative_prompt: str = "text, words, letters, watermark, low quality, blurry"

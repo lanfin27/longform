@@ -71,6 +71,17 @@ for name, exists in checks.items():
 
 st.divider()
 
+# === 데이터 동기화 ===
+st.subheader("🔄 데이터 동기화")
+st.caption("이미지 생성과 TTS 결과를 Vrew Export에 동기화합니다.")
+
+from utils.sync_manager import ProcessType
+from utils.sync_ui import render_sync_buttons, render_manual_sync_panel
+render_sync_buttons(ProcessType.VREW_EXPORT)
+render_manual_sync_panel()
+
+st.divider()
+
 # === Export 설정 ===
 st.subheader("⚙️ Export 설정")
 

@@ -61,13 +61,27 @@
       "name": "세모지",
       "name_ko": "세모지",
       "segment": "character",
-      "prompt_prefix": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\n\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\n\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\n\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere",
+      "prompt_prefix": "Full body character, centered, motion graphics style flat vector art, shapes filled with solid colors only, absolutely no strokes no outlines no lines\nBig rounded head, compact short body, simple tube arms down at sides, small hands, short legs, dark rounded shoes\nFace: tiny simple black oval eyes, NO eyebrows at all, NO forehead lines, NO wrinkles, small subtle nose bump, gentle closed smile, completely smooth clean skin same color throughout\nMuted warm beige tones, flat solid colors, subtle grain texture, plain light beige background, no shadows anywhere ",
       "prompt_suffix": "",
       "negative_prompt": "outlines, lineart, strokes, black lines, eyebrows, forehead lines, wrinkles, blush, rosy cheeks, red cheeks, ground shadow, drop shadow, detailed face",
       "description": "",
       "preview_image": "",
       "created_at": "2025-12-16T08:38:31.433924",
-      "updated_at": "2025-12-16T09:01:13.798567",
+      "updated_at": "2025-12-27T21:29:28.169909",
+      "is_default": false
+    },
+    {
+      "id": "재훍_영상툰",
+      "name": "재훍 영상툰",
+      "name_ko": "재훍 영상툰",
+      "segment": "character",
+      "prompt_prefix": "Korean webtoon manhwa background illustration,\nclean bold black outlines on all elements,\nflat solid color fills with minimal shading,\nsimplified shapes with clear silhouettes,\n2D digital illustration style,\nconsistent 2-3px black lineart throughout",
+      "prompt_suffix": "Muted desaturated color palette,\nsoft atmospheric perspective with distant elements lighter,\nsubtle depth through value shifts only,\nclean cel-shaded look with minimal gradients,\nteal-gray and warm beige neutral tones,\nmuted accent colors for focal points,\nsimplified architectural details,\nclear foreground midground background separation",
+      "negative_prompt": "no outlines, missing lineart, gradient only no lines,\nhyper detailed architecture, realistic photograph, 3D render,\nfantasy setting, western city style, anime background style,\npainterly watercolor, sketchy rough lines,\ncomplex cluttered details, bright saturated colors,\ntext, readable letters, readable signs, readable Korean text, readable numbers,\nphotorealistic, soft shading, blurry lines",
+      "description": "한국 웹툰 스타일 배경. 명확한 검은 외곽선과 플랫 컬러 채색. \n채도 낮은 차분한 색감. 대기 원근법으로 깊이 표현. \n단순화된 형태와 깔끔한 실루엣. 모든 장면에 적용 가능한 범용 스타일.",
+      "preview_image": "",
+      "created_at": "2025-12-27T21:30:04.419878",
+      "updated_at": "2026-01-01T22:44:02.448051",
       "is_default": false
     }
   ],
@@ -141,6 +155,20 @@
       "created_at": "2025-12-16T08:38:56.690327",
       "updated_at": "2025-12-16T08:38:56.690327",
       "is_default": false
+    },
+    {
+      "id": "재훍_영상툰",
+      "name": "재훍 영상툰",
+      "name_ko": "재훍 영상툰",
+      "segment": "background",
+      "prompt_prefix": "Korean webtoon manhwa background illustration, clean bold black outlines defining all architectural elements, flat solid color fills with minimal shading, simplified urban environment",
+      "prompt_suffix": "Simplified Korean cityscape details, glass storefronts with teal-gray reflections, bus stop shelters with metal frames, bus interior with orange handrails and blue plastic seats, concrete sidewalks with grid pattern, commercial building facades, sliding glass doors, store awnings\nMuted desaturated color palette, teal-gray glass tones #8FA5A5 to #B5C7C7, warm beige concrete #D4CCC4 to #C9C0B5, muted red accents #A65555 for signage, soft atmospheric perspective with distant elements lighter, clean 2-3px black outlines throughout, subtle depth through value shifts",
+      "negative_prompt": "no outlines, missing lineart, gradient only no lines, hyper detailed architecture, realistic photograph, 3D render, fantasy setting, western city style, anime background style, painterly watercolor, sketchy rough lines, complex cluttered details, bright saturated colors, text, readable letters, readable signs, readable Korean text, readable numbers",
+      "description": "",
+      "preview_image": "",
+      "created_at": "2025-12-27T21:26:35.388733",
+      "updated_at": "2025-12-27T21:26:35.388733",
+      "is_default": false
     }
   ],
   "scene_composite": [
@@ -211,7 +239,51 @@
       "description": "세모지 스타일 통합 씬 생성용. 엄격한 스타일 규칙 적용으로 모든 이미지가 동일한 플랫 벡터 스타일, 동일한 캐릭터 비율, 동일한 색상 팔레트를 유지함. 모든 언어의 텍스트/글자 생성 방지.",
       "preview_image": "",
       "created_at": "2025-12-18T22:37:46.595552",
-      "updated_at": "2025-12-18T22:57:07.075539",
+      "updated_at": "2025-12-27T21:21:23.635912",
+      "is_default": false
+    },
+    {
+      "id": "재훍_영상툰",
+      "name": "재훍 영상툰",
+      "name_ko": "재훍 영상툰",
+      "segment": "scene_composite",
+      "prompt_prefix": "Korean webtoon manhwa illustration style, semi-realistic character design with clean bold black outlines, flat color fills with minimal cel-shading, adult Korean characters with realistic body proportions, detailed faces with visible eyebrows thick black eyebrows, small simplified nose, thin lips, subtle facial wrinkles and expression lines, small pupils with visible white sclera, warm beige skin tone, everyday casual Korean urban setting, muted desaturated color palette, simple geometric background elements, Korean city aesthetic with glass buildings bus stops convenience stores, flat perspective minimal depth, digital illustration clean linework,",
+      "prompt_suffix": "MANDATORY CHARACTER FEATURES: realistic adult proportions with head 1/7 to 1/8 of body height, visible thick black eyebrows, small simplified triangular or line nose, thin neutral lips, subtle wrinkle lines on forehead and around mouth for older characters, small dot pupils centered in almond-shaped eyes with white sclera visible, warm skin tones #D4A574 to #C9956C, MANDATORY LINEART: clean bold black outlines 2-3px weight defining all shapes and forms, MANDATORY COLORING: flat solid color fills with minimal soft shadows, muted dusty color palette - grays #4A4A4A to #6B6B6B, browns #8B7355 to #6B5344, navy #3D4A5C, burgundy #8B4557, olive #5C6B4A, MANDATORY BACKGROUND: simplified Korean urban environment, glass storefronts, bus interiors with orange handrails and blue seats, concrete sidewalks, muted teal and gray tones, Korean signage style shapes without readable text, COMPOSITION: character focused medium shot or close-up, clean minimal background, subtle ground shadows allowed,",
+      "negative_prompt": "text, letters, words, writing, typography, readable signs, readable billboards, labels, captions, subtitles, watermark, logo, numbers, alphabet, characters, English text, Arabic text, Korean text, Chinese text, Japanese text, any language text, no outlines, missing lineart, gradient only no lines, oversized head, chibi style, Kurzgesagt style, geometric simple shapes, dot eyes only, no nose, no eyebrows, mitten hands, stubby body, cartoon proportions, childish style, anime style, manga style, realistic photograph, 3D render, painterly, watercolor, sketch, rough lines, thick chunky outlines, glossy shiny skin, complex detailed background, cluttered composition, multiple characters overlapping, western cartoon style, pixar style, disney style,",
+      "description": "한국 웹툰 스타일 일러스트 생성용. 명확한 검은 외곽선과 플랫 컬러 채색, 현실적인 성인 캐릭터 비율, 눈썹/코/주름 등 얼굴 디테일 포함. 한국 도시 일상 배경(버스, 편의점, 사무실 등). 채도 낮은 따뜻한 톤의 색상 팔레트.",
+      "preview_image": "",
+      "created_at": "2025-12-27T21:22:30.089977",
+      "updated_at": "2025-12-27T21:22:30.089977",
+      "is_default": false
+    }
+  ],
+  "infographic": [
+    {
+      "id": "재훍_영상툰",
+      "name": "재훍 영상툰",
+      "name_ko": "재훍 영상툰",
+      "segment": "infographic",
+      "prompt_prefix": "Korean webtoon manhwa background illustration, clean bold black outlines defining all architectural elements, flat solid color fills with minimal shading, simplified urban environment",
+      "prompt_suffix": "Simplified Korean cityscape details, glass storefronts with teal-gray reflections, bus stop shelters with metal frames, bus interior with orange handrails and blue plastic seats, concrete sidewalks with grid pattern, commercial building facades, sliding glass doors, store awnings\nMuted desaturated color palette, teal-gray glass tones #8FA5A5 to #B5C7C7, warm beige concrete #D4CCC4 to #C9C0B5, muted red accents #A65555 for signage, soft atmospheric perspective with distant elements lighter, clean 2-3px black outlines throughout, subtle depth through value shifts",
+      "negative_prompt": "no outlines, missing lineart, gradient only no lines, hyper detailed architecture, realistic photograph, 3D render, fantasy setting, western city style, anime background style, painterly watercolor, sketchy rough lines, complex cluttered details, bright saturated colors, text, readable letters, readable signs, readable Korean text, readable numbers",
+      "description": "한국 웹툰 스타일 배경 생성용. 명확한 검은 외곽선과 플랫 컬러 채색. 한국 도시 일상 환경 - 버스 내부, 버스 정류장, 상가 건물, 편의점 등. 유리창은 청록-회색 톤으로 표현. 채도 낮은 따뜻한 도시 색상 팔레트.",
+      "preview_image": "",
+      "created_at": "2025-12-28T00:08:08.032292",
+      "updated_at": "2025-12-28T00:08:08.032292",
+      "is_default": false
+    },
+    {
+      "id": "재훍_영상툰1",
+      "name": "재훍 영상툰",
+      "name_ko": "재훍 영상툰",
+      "segment": "infographic",
+      "prompt_prefix": "Korean webtoon manhwa background illustration, clean bold black outlines defining all architectural elements, flat solid color fills with minimal shading, simplified urban environment",
+      "prompt_suffix": "Simplified Korean cityscape details, glass storefronts with teal-gray reflections, bus stop shelters with metal frames, bus interior with orange handrails and blue plastic seats, concrete sidewalks with grid pattern, commercial building facades, sliding glass doors, store awnings\nMuted desaturated color palette, teal-gray glass tones #8FA5A5 to #B5C7C7, warm beige concrete #D4CCC4 to #C9C0B5, muted red accents #A65555 for signage, soft atmospheric perspective with distant elements lighter, clean 2-3px black outlines throughout, subtle depth through value shifts",
+      "negative_prompt": "no outlines, missing lineart, gradient only no lines, hyper detailed architecture, realistic photograph, 3D render, fantasy setting, western city style, anime background style, painterly watercolor, sketchy rough lines, complex cluttered details, bright saturated colors, text, readable letters, readable signs, readable Korean text, readable numbers",
+      "description": "한국 웹툰 스타일 배경 생성용. 명확한 검은 외곽선과 플랫 컬러 채색. 한국 도시 일상 환경 - 버스 내부, 버스 정류장, 상가 건물, 편의점 등. 유리창은 청록-회색 톤으로 표현. 채도 낮은 따뜻한 도시 색상 팔레트.",
+      "preview_image": "",
+      "created_at": "2025-12-28T00:08:17.987424",
+      "updated_at": "2025-12-28T00:08:17.987424",
       "is_default": false
     }
   ]

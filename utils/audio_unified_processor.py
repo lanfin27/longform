@@ -49,7 +49,7 @@ class UnifiedAudioProcessor:
     def __init__(
         self,
         target_speed: float = 8.5,        # 목표 발화속도
-        target_lufs: float = -16.0,       # 목표 음량
+        target_lufs: float = -18.0,       # 목표 음량 (⭐ -16→-18: 잡음 증폭 방지)
         accel_profile: str = "adaptive",  # adaptive, strong, moderate
         num_segments: int = 8,            # 구간 수 (정밀도)
         crossfade_ms: int = 30,           # 크로스페이드 (울림 방지)
@@ -150,8 +150,15 @@ class UnifiedAudioProcessor:
         base_speed_factor = max(0.80, min(1.25, base_speed_factor))
 
         # 음량 조정 (dB)
+        # ⭐⭐⭐ 과도한 음량 조정 방지 ⭐⭐⭐
+        # 🔴 이전: max(-12, min(15, ...)) → +5~6dB 증폭 시 잡음도 증폭
+        # ✅ 수정: ±3dB 제한 → 잡음 증폭 최소화
         volume_db = self.target_lufs - current_lufs
-        volume_db = max(-12, min(15, volume_db))
+        original_volume_db = volume_db
+        volume_db = max(-3, min(3, volume_db))
+
+        if abs(original_volume_db) > 3:
+            print(f"  ⚠️ 과도한 음량 조정 방지: {original_volume_db:+.1f}dB → {volume_db:+.1f}dB")
 
         print(f"  정규화: 속도 {base_speed_factor:.3f}x, 음량 {volume_db:+.1f}dB")
 
@@ -457,7 +464,8 @@ class UnifiedAudioProcessor:
 
         current_lufs = self._measure_lufs(audio)
         volume_db = self.target_lufs - current_lufs
-        volume_db = max(-10, min(12, volume_db))
+        # ⭐ 과도한 음량 조정 방지 (±3dB 제한)
+        volume_db = max(-3, min(3, volume_db))
 
         return audio + volume_db
 

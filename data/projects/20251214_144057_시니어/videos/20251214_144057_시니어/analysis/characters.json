@@ -1,0 +1,19 @@
+[
+  {
+    "name": "이재용",
+    "name_ko": "이재용",
+    "name_en": "",
+    "type": "person",
+    "role": "회장",
+    "description": "스크립트에서 추출된 인물: 이재용 (회장)",
+    "appearance": "",
+    "nationality": "",
+    "era": "",
+    "character_prompt": "Modern professional, business attire, contemporary appearance",
+    "visual_prompt": "Modern professional, business attire, contemporary appearance",
+    "appearance_scenes": [
+      34,
+      35
+    ]
+  }
+]

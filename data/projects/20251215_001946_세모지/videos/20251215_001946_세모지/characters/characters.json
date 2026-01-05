@@ -1,0 +1,96 @@
+[
+  {
+    "id": "jamal_khashoggi",
+    "name": "자말 카슈끄지",
+    "name_en": "Jamal Khashoggi",
+    "description": "사우디아라비아 출신 언론인, 사우디 왕세자를 비판",
+    "role": "주연",
+    "nationality": "",
+    "era": "",
+    "appearance": "",
+    "character_prompt": "Middle Eastern man in his late 50s, salt-and-pepper beard neatly trimmed, receding hairline with gray hair, round glasses with thin black frames, warm brown eyes, olive skin tone, wearing dark navy business suit with white dress shirt",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\jamal_khashoggi.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_left_1766482446106.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766482528334.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766767425977.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766771420278.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766800099746.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766800257504.png"
+    ],
+    "appearance_scenes": [
+      1
+    ],
+    "created_at": "2025-12-23T18:33:47.593651",
+    "updated_at": "2025-12-27T20:20:53.629623"
+  },
+  {
+    "id": "mohammed_bin_salman",
+    "name": "무함마드 빈 살만",
+    "name_en": "Mohammed bin Salman",
+    "description": "사우디아라비아 왕세자",
+    "role": "조연",
+    "nationality": "",
+    "era": "",
+    "appearance": "",
+    "character_prompt": "Middle Eastern man in his mid-30s, clean-shaven, short dark hair, sharp features, dark brown eyes, olive skin tone, often seen wearing traditional Saudi attire or a modern business suit, confident expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\characters\\mohammed_bin_salman.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_left_1766482446984.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766482528785.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766767428317.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766771423788.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766800101286.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766800257535.png"
+    ],
+    "appearance_scenes": [
+      1,
+      2
+    ],
+    "created_at": "2025-12-23T18:33:47.595398",
+    "updated_at": "2025-12-27T20:20:53.629774"
+  },
+  {
+    "id": "the_prophet",
+    "name": "예언자",
+    "name_en": "The Prophet",
+    "description": "이슬람교의 예언자",
+    "role": "조연",
+    "nationality": "",
+    "era": "",
+    "appearance": "",
+    "character_prompt": "Middle Eastern man in his 40s, long dark beard, dark hair, deep-set eyes, olive skin, wearing simple robes, wise and serene expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_예언자_standing_right_1766800075902.png"
+    ],
+    "appearance_scenes": [
+      9
+    ],
+    "created_at": "2025-12-27T10:47:37.058067",
+    "updated_at": "2025-12-27T20:20:53.628974"
+  },
+  {
+    "id": "tribal_chief",
+    "name": "족장",
+    "name_en": "Tribal Chief",
+    "description": "고대 사회의 족장",
+    "role": "조연",
+    "nationality": "",
+    "era": "",
+    "appearance": "",
+    "character_prompt": "Strong and imposing man, muscular build, weathered face, wearing animal skins and tribal jewelry, holding a staff or weapon, commanding presence",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_족장_standing_right_1766800074366.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_족장_portrait_1766800109980.png"
+    ],
+    "appearance_scenes": [
+      13
+    ],
+    "created_at": "2025-12-27T10:47:37.059397",
+    "updated_at": "2025-12-27T20:20:53.628979"
+  }
+]

@@ -1,0 +1,122 @@
+{
+  "1": {
+    "characters": {
+      "김정빈": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_standing_1766839327329.png",
+            "updated_at": "2025-12-27T21:42:07.395030"
+          },
+          "talking": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_talking_1766838629558.png",
+            "updated_at": "2025-12-27T21:30:50.388361"
+          }
+        }
+      }
+    }
+  },
+  "2": {
+    "characters": {
+      "김정빈": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_standing_1766839327329.png",
+            "updated_at": "2025-12-27T21:42:07.395036"
+          },
+          "surprised": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_surprised_1766838636212.png",
+            "updated_at": "2025-12-27T21:30:50.453897"
+          }
+        }
+      }
+    }
+  },
+  "3": {
+    "characters": {
+      "김정빈": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_standing_1766839327329.png",
+            "updated_at": "2025-12-27T21:42:07.395037"
+          },
+          "talking": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_talking_1766838629558.png",
+            "updated_at": "2025-12-27T21:30:50.388373"
+          }
+        }
+      }
+    }
+  },
+  "4": {
+    "characters": {
+      "김정빈": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_standing_1766839327329.png",
+            "updated_at": "2025-12-27T21:42:07.395038"
+          },
+          "happy": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_happy_1766838643104.png",
+            "updated_at": "2025-12-27T21:30:50.477192"
+          }
+        }
+      }
+    }
+  },
+  "5": {
+    "characters": {
+      "김정빈": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_standing_1766839327329.png",
+            "updated_at": "2025-12-27T21:42:07.395038"
+          },
+          "walking": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_walking_1766838650271.png",
+            "updated_at": "2025-12-27T21:30:50.546438"
+          }
+        }
+      }
+    }
+  },
+  "6": {
+    "characters": {
+      "김정빈": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_standing_1766839327329.png",
+            "updated_at": "2025-12-27T21:42:07.395039"
+          },
+          "talking": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_talking_1766838629558.png",
+            "updated_at": "2025-12-27T21:30:50.388377"
+          }
+        }
+      }
+    }
+  },
+  "28": {
+    "characters": {
+      "이재용": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_이재용_standing_1767348639492.png",
+            "updated_at": "2026-01-02T19:10:39.538233"
+          }
+        }
+      }
+    }
+  },
+  "29": {
+    "characters": {
+      "이재용": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_이재용_standing_1767348639492.png",
+            "updated_at": "2026-01-02T19:10:39.538248"
+          }
+        }
+      }
+    }
+  }
+}

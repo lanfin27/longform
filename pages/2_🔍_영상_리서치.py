@@ -11,7 +11,7 @@ YouTube API를 사용하여 키워드 기반 영상 검색 및 분석
 import streamlit as st
 import pandas as pd
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import sys
 
 # 루트 디렉토리 설정
@@ -46,6 +46,16 @@ from utils.youtube_service import (
     filter_videos_by_search_scope,
     get_search_scope_description
 )
+
+
+# Helper function for safe attribute access (dict or object)
+def safe_get(obj, key, default=None):
+    """dict와 object 모두에서 안전하게 속성/키 접근"""
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    else:
+        return getattr(obj, key, default)
+
 
 # 페이지 설정
 st.set_page_config(
@@ -161,12 +171,25 @@ with st.sidebar:
 # v2.0: 보관함 초기화
 bookmark_storage = BookmarkStorage()
 
+# v3.0: 채널 정체성 및 주제 추천 모듈
+from utils.channel_identity import get_identity_manager, ChannelIdentity
+from utils.topic_recommender import (
+    get_topic_recommender,
+    recommend_topics,
+    VideoData,
+    TopicRecommendation,
+    RecommendationResult,
+    check_api_availability
+)
+
 # === 탭 구성 ===
-tab_search, tab_results, tab_selected, tab_bookmarks = st.tabs([
+tab_search, tab_results, tab_selected, tab_bookmarks, tab_identity, tab_recommend = st.tabs([
     "🔎 검색",
     "📊 검색 결과",
     "✅ 선택된 영상",
-    "📁 보관함"
+    "📁 보관함",
+    "📋 채널 정체성",
+    "🎯 AI 주제 추천"
 ])
 
 # ============================================================
@@ -386,23 +409,23 @@ with tab_search:
             key="period_preset"
         )
 
-    # 기간 계산
-    now = datetime.utcnow()
+    # 기간 계산 (timezone-aware datetime 사용)
+    now = datetime.now(timezone.utc)
     published_after = None
     published_before = None
 
     if period_preset == "hour":
-        published_after = (now - timedelta(hours=1)).isoformat() + "Z"
+        published_after = (now - timedelta(hours=1)).isoformat().replace("+00:00", "Z")
     elif period_preset == "today":
-        published_after = now.replace(hour=0, minute=0, second=0).isoformat() + "Z"
+        published_after = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat().replace("+00:00", "Z")
     elif period_preset == "week":
-        published_after = (now - timedelta(days=7)).isoformat() + "Z"
+        published_after = (now - timedelta(days=7)).isoformat().replace("+00:00", "Z")
     elif period_preset == "month":
-        published_after = (now - timedelta(days=30)).isoformat() + "Z"
+        published_after = (now - timedelta(days=30)).isoformat().replace("+00:00", "Z")
     elif period_preset == "3months":
-        published_after = (now - timedelta(days=90)).isoformat() + "Z"
+        published_after = (now - timedelta(days=90)).isoformat().replace("+00:00", "Z")
     elif period_preset == "year":
-        published_after = (now - timedelta(days=365)).isoformat() + "Z"
+        published_after = (now - timedelta(days=365)).isoformat().replace("+00:00", "Z")
     elif period_preset == "custom":
         with col2:
             date_range = st.date_input(
@@ -411,8 +434,8 @@ with tab_search:
                 key="date_range"
             )
             if len(date_range) == 2:
-                published_after = datetime.combine(date_range[0], datetime.min.time()).isoformat() + "Z"
-                published_before = datetime.combine(date_range[1], datetime.max.time()).isoformat() + "Z"
+                published_after = datetime.combine(date_range[0], datetime.min.time(), tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
+                published_before = datetime.combine(date_range[1], datetime.max.time(), tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
 
     st.markdown("---")
 
@@ -686,7 +709,7 @@ with tab_results:
     if min_sub_filter > 0:
         filtered_videos = [v for v in filtered_videos if v.subscriber_count >= min_sub_filter]
 
-    # 정렬
+    # ✅ 정렬 (단일 소스 - 한 번만 정렬하고 세션에 저장)
     sort_key_map = {
         "viral_score_desc": (lambda v: v.viral_score, True),
         "view_count_desc": (lambda v: v.view_count, True),
@@ -701,6 +724,22 @@ with tab_results:
 
     sort_func, reverse = sort_key_map.get(result_sort, (lambda v: v.viral_score, True))
     filtered_videos.sort(key=sort_func, reverse=reverse)
+
+    # ✅ 정렬된 결과를 세션에 저장 (상세 보기와 동기화용) - 즉시 저장
+    # 중요: 여기서 저장한 데이터를 상세 보기에서 동일하게 사용
+    st.session_state["_sorted_filtered_videos"] = filtered_videos  # copy 제거 - 동일 참조 사용
+    st.session_state["_current_sort"] = result_sort
+    st.session_state["_current_sort_label"] = {
+        "viral_score_desc": "🔥 급등점수 높은순",
+        "view_count_desc": "👀 조회수 높은순",
+        "view_count_asc": "👀 조회수 낮은순",
+        "like_count_desc": "👍 좋아요 높은순",
+        "subscriber_desc": "👥 구독자 높은순",
+        "views_per_sub_desc": "📈 구독자 대비 조회수",
+        "engagement_desc": "💬 참여율 높은순",
+        "date_desc": "📅 최신순",
+        "date_asc": "📅 오래된순"
+    }.get(result_sort, result_sort)
 
     st.caption(f"필터링 후: {len(filtered_videos)}개")
 
@@ -745,10 +784,16 @@ with tab_results:
     # === 결과 테이블 ===
     st.markdown("#### 📋 영상 목록")
 
-    # DataFrame으로 표시
+    # ✅ 현재 정렬 상태 표시
+    current_sort_label = st.session_state.get("_current_sort_label", "기본 정렬")
+    st.caption(f"📊 정렬: {current_sort_label} (위 드롭다운에서 정렬 기준 변경)")
+
+    # ✅ DataFrame으로 표시 (이미 정렬된 filtered_videos 사용)
+    # 정렬은 위에서 한 번만 수행됨 - df 재정렬 불필요
     df_data = []
-    for v in filtered_videos:
+    for idx, v in enumerate(filtered_videos):
         df_data.append({
+            "_video_idx": idx,  # ✅ 정렬된 순서의 인덱스 (동기화용)
             "선택": False,
             "유형": "🎬" if v.video_type == "long_form" else "📱",
             "제목": v.title[:50] + ("..." if len(v.title) > 50 else ""),
@@ -758,7 +803,7 @@ with tab_results:
             "채널": v.channel_name[:20] + ("..." if len(v.channel_name) > 20 else ""),
             "구독자": f"{v.subscriber_count:,}",
             "구독자 대비": f"{v.views_per_subscriber:.1f}x",
-            "일평균": f"{v.views_per_day:,.0f}",  # v3.14: 일일 평균 조회수 추가
+            "일평균": f"{v.views_per_day:,.0f}",
             "참여율": f"{v.engagement_rate:.1f}%",
             "급등점수": f"{v.viral_score:.1f}",
             "업로드일": v.published_at[:10] if v.published_at else "",
@@ -766,24 +811,34 @@ with tab_results:
 
     df = pd.DataFrame(df_data)
 
+    # ✅ 표시할 컬럼만 선택 (숨김 컬럼 제외)
+    display_columns = [col for col in df.columns if not col.startswith("_")]
+
     # 편집 가능한 테이블
     edited_df = st.data_editor(
-        df,
+        df[display_columns],
         column_config={
             "선택": st.column_config.CheckboxColumn("선택", default=False),
             "조회수": st.column_config.TextColumn("조회수"),
             "좋아요": st.column_config.TextColumn("좋아요"),
             "구독자": st.column_config.TextColumn("구독자"),
             "일평균": st.column_config.TextColumn("일평균", help="일일 평균 조회수"),
+            "구독자 대비": st.column_config.TextColumn("구독자 대비", help="구독자 대비 조회수 배율"),
         },
         hide_index=True,
         use_container_width=True,
         key="result_table"
     )
 
-    # 선택된 영상 처리
-    selected_indices = edited_df[edited_df["선택"] == True].index.tolist()
-    selected_videos = [filtered_videos[i] for i in selected_indices]
+    # ✅ 선택된 영상 처리 (정렬 후에도 올바르게 매핑)
+    # filtered_videos가 이미 df와 동기화되어 있으므로 인덱스로 직접 접근
+    selected_rows = edited_df[edited_df["선택"] == True]
+    selected_videos = []
+
+    for idx in selected_rows.index:
+        # filtered_videos가 df와 동일한 순서이므로 직접 인덱스 사용
+        if idx < len(filtered_videos):
+            selected_videos.append(filtered_videos[idx])
 
     st.divider()
 
@@ -864,21 +919,61 @@ with tab_results:
     # === 상세 카드 뷰 ===
     st.markdown("#### 🎴 상세 보기")
 
-    # 페이지네이션
-    items_per_page = 5
-    total_pages = max(1, (len(filtered_videos) + items_per_page - 1) // items_per_page)
+    # ✅ 핵심 수정: filtered_videos를 직접 사용 (이미 위에서 정렬됨)
+    # 세션 상태 대신 동일 스코프의 변수 사용으로 동기화 보장
+    sorted_videos_for_detail = filtered_videos  # 영상 목록 테이블과 동일한 데이터
 
-    current_page = st.number_input(
-        "페이지",
-        min_value=1,
-        max_value=total_pages,
-        value=1,
-        key="result_page"
-    )
+    # ✅ 현재 정렬 상태 표시 (동기화 확인용)
+    current_sort_label = st.session_state.get("_current_sort_label", "기본 정렬")
+    st.info(f"📊 **현재 정렬:** {current_sort_label} | 총 {len(sorted_videos_for_detail)}개 영상")
 
-    start_idx = (current_page - 1) * items_per_page
-    end_idx = start_idx + items_per_page
-    page_videos = filtered_videos[start_idx:end_idx]
+    # ✅ 표시 모드 선택
+    detail_col1, detail_col2 = st.columns([2, 1])
+
+    with detail_col1:
+        display_mode = st.radio(
+            "표시 모드",
+            options=["all", "pagination"],
+            format_func=lambda x: {
+                "all": f"📋 전체 표시 ({len(sorted_videos_for_detail)}개)",
+                "pagination": "📄 페이지 단위"
+            }.get(x, x),
+            horizontal=True,
+            key="detail_display_mode"
+        )
+
+    with detail_col2:
+        if display_mode == "pagination":
+            items_per_page = st.selectbox(
+                "페이지당 영상 수",
+                options=[5, 10, 20, 50],
+                index=1,  # 기본값 10개
+                key="items_per_page_select"
+            )
+        else:
+            items_per_page = len(sorted_videos_for_detail)  # 전체 표시
+
+    # ✅ 페이지네이션 (세션에 저장된 정렬 순서 사용)
+    if display_mode == "pagination" and items_per_page < len(sorted_videos_for_detail):
+        total_pages = max(1, (len(sorted_videos_for_detail) + items_per_page - 1) // items_per_page)
+
+        current_page = st.number_input(
+            "페이지",
+            min_value=1,
+            max_value=total_pages,
+            value=1,
+            key="result_page"
+        )
+
+        start_idx = (current_page - 1) * items_per_page
+        end_idx = start_idx + items_per_page
+        page_videos = sorted_videos_for_detail[start_idx:end_idx]
+        st.caption(f"📍 {start_idx + 1} ~ {min(end_idx, len(sorted_videos_for_detail))} / 총 {len(sorted_videos_for_detail)}개")
+    else:
+        # 전체 표시
+        page_videos = sorted_videos_for_detail
+        if len(sorted_videos_for_detail) > 0:
+            st.caption(f"📍 총 {len(sorted_videos_for_detail)}개 영상 표시")
 
     for video in page_videos:
         type_icon = '🎬' if video.video_type == 'long_form' else '📱'
@@ -1174,3 +1269,433 @@ with tab_bookmarks:
 
     else:
         st.info("저장된 채널이 없습니다.")
+
+# ============================================================
+# 채널 정체성 탭 (v3.0)
+# ============================================================
+with tab_identity:
+    st.subheader("📋 채널 정체성 설정")
+    st.caption("채널의 정체성을 정의하면 AI가 더 적합한 주제를 추천합니다")
+
+    # 현재 프로젝트
+    project_name = project_path.name if project_path else "기본 프로젝트"
+
+    # 정체성 로드
+    identity_manager = get_identity_manager()
+    identity = identity_manager.load(project_name)
+
+    with st.expander("🎯 채널 정체성 편집", expanded=True):
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # 채널명
+            identity_channel_name = st.text_input(
+                "채널명",
+                value=identity.channel_name or project_name,
+                key="identity_channel_name"
+            )
+
+            # 주요 주제
+            identity_main_topics_text = st.text_area(
+                "주요 주제 (줄바꿈으로 구분)",
+                value="\n".join(identity.main_topics) if identity.main_topics else "",
+                height=100,
+                placeholder="IT/테크\n재테크/투자\n건강/의료",
+                key="identity_main_topics"
+            )
+
+            # 타겟 시청자
+            identity_target_audience = st.text_input(
+                "타겟 시청자",
+                value=identity.target_audience,
+                placeholder="50-70대 시니어, IT에 관심있는 중장년층",
+                key="identity_target"
+            )
+
+        with col2:
+            # 콘텐츠 스타일
+            identity_content_style = st.text_area(
+                "콘텐츠 스타일",
+                value=identity.content_style,
+                height=68,
+                placeholder="쉽고 친근한 설명, 실용적인 정보 제공, 자막 필수",
+                key="identity_style"
+            )
+
+            # 톤앤매너
+            identity_tone_voice = st.text_input(
+                "톤앤매너",
+                value=identity.tone_voice,
+                placeholder="친근하고 따뜻한 말투, 존댓말 사용",
+                key="identity_tone"
+            )
+
+            # 참고 채널
+            identity_reference_channels_text = st.text_area(
+                "참고 채널 (줄바꿈으로 구분)",
+                value="\n".join(identity.reference_channels) if identity.reference_channels else "",
+                height=68,
+                placeholder="신사임당\n슈카월드\n세상의모든지식",
+                key="identity_reference"
+            )
+
+        # 제외 주제
+        identity_exclude_topics_text = st.text_area(
+            "제외 주제 (줄바꿈으로 구분)",
+            value="\n".join(identity.exclude_topics) if identity.exclude_topics else "",
+            height=68,
+            placeholder="정치\n종교\n자극적인 낚시성 콘텐츠",
+            key="identity_exclude"
+        )
+
+        # 핵심 키워드
+        identity_keywords_text = st.text_input(
+            "핵심 키워드 (쉼표로 구분)",
+            value=", ".join(identity.keywords) if identity.keywords else "",
+            placeholder="시니어, 실버, 노후, 연금, 건강",
+            key="identity_keywords"
+        )
+
+        # 상세 설명
+        identity_description = st.text_area(
+            "상세 설명 (선택)",
+            value=identity.description,
+            height=100,
+            placeholder="채널에 대한 추가 설명...",
+            key="identity_description"
+        )
+
+        # 저장 버튼
+        if st.button("저장", key="save_identity", type="primary"):
+            # 데이터 파싱
+            main_topics = [t.strip() for t in identity_main_topics_text.split("\n") if t.strip()]
+            reference_channels = [c.strip() for c in identity_reference_channels_text.split("\n") if c.strip()]
+            exclude_topics = [t.strip() for t in identity_exclude_topics_text.split("\n") if t.strip()]
+            keywords = [k.strip() for k in identity_keywords_text.split(",") if k.strip()]
+
+            # 정체성 업데이트
+            new_identity = ChannelIdentity(
+                project_name=project_name,
+                channel_name=identity_channel_name,
+                main_topics=main_topics,
+                target_audience=identity_target_audience,
+                content_style=identity_content_style,
+                tone_voice=identity_tone_voice,
+                reference_channels=reference_channels,
+                exclude_topics=exclude_topics,
+                keywords=keywords,
+                description=identity_description,
+                created_at=identity.created_at
+            )
+
+            if identity_manager.save(new_identity):
+                st.success("채널 정체성이 저장되었습니다!")
+                st.rerun()
+            else:
+                st.error("저장 실패")
+
+    # 미리보기
+    if identity.is_configured():
+        with st.expander("미리보기 (AI 프롬프트 컨텍스트)", expanded=False):
+            st.code(identity.to_prompt_context(), language="markdown")
+
+
+# ============================================================
+# AI 주제 추천 탭 (v3.0)
+# ============================================================
+with tab_recommend:
+    st.subheader("🎯 AI 영상 주제 추천")
+    st.caption("급등 영상을 분석하여 채널에 맞는 주제를 추천합니다")
+
+    # 프로젝트 확인
+    project_name = project_path.name if project_path else "기본 프로젝트"
+
+    # 채널 정체성 로드
+    identity_manager = get_identity_manager()
+    identity = identity_manager.load(project_name)
+
+    # 정체성 요약 표시
+    with st.expander("현재 채널 정체성", expanded=False):
+        if identity.is_configured():
+            st.markdown(identity.to_prompt_context())
+        else:
+            st.warning("채널 정체성이 정의되지 않았습니다. '채널 정체성' 탭에서 먼저 설정해주세요.")
+
+    st.divider()
+
+    # 검색 결과 확인
+    search_results = st.session_state.get("search_results", [])
+
+    if not search_results:
+        st.warning("검색 결과가 없습니다. '검색' 탭에서 먼저 영상을 검색해주세요.")
+    else:
+        # AI 설정 (3가지 제공자 지원)
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            api_availability = check_api_availability()
+
+            # 제공자 옵션 (v4.0: anthropic 제거, Max Plan + Gemini 폴백)
+            all_providers = ["claude_code_agent", "google"]
+
+            def format_provider(x):
+                status = ""
+                if x == "google":
+                    status = " (API 키 없음)" if not api_availability.get("google") else ""
+                    return f"Gemini API{status}"
+                else:  # claude_code_agent
+                    cli_status = " (CLI 없음)" if not api_availability.get("claude_code_agent") else ""
+                    fallback_status = " + Gemini 폴백" if api_availability.get("gemini_fallback") else ""
+                    return f"Claude Max Plan{cli_status}{fallback_status}"
+
+            topic_ai_provider = st.selectbox(
+                "AI 제공자",
+                all_providers,
+                format_func=format_provider,
+                key="topic_ai_provider",
+                help="""
+                - Claude Max Plan: Claude CLI (Max Plan) + Gemini 자동 폴백
+                - Gemini API: Google API 직접 호출 (GOOGLE_API_KEY 필요)
+                """
+            )
+
+            # 제공자별 상태 표시
+            if topic_ai_provider == "claude_code_agent":
+                if api_availability.get("claude_code_agent"):
+                    st.caption("Claude CLI 사용 가능")
+                else:
+                    st.warning("Claude CLI가 설치되지 않았습니다")
+
+        with col2:
+            if topic_ai_provider == "google":
+                model_options = ["gemini-2.0-flash-exp", "gemini-1.5-flash", "gemini-1.5-pro"]
+            else:  # claude_code_agent
+                model_options = ["Max Plan (자동)"]
+
+            topic_ai_model = st.selectbox(
+                "AI 모델",
+                model_options,
+                key="topic_ai_model",
+                disabled=(topic_ai_provider == "claude_code_agent"),
+                help="Claude Max Plan은 자동으로 최적 모델 선택 + Gemini 폴백"
+            )
+
+        with col3:
+            topic_top_n = st.number_input(
+                "분석할 영상 수",
+                min_value=5,
+                max_value=50,
+                value=min(20, len(search_results)),
+                key="topic_top_n"
+            )
+
+        # 추가 지시사항
+        topic_custom_instructions = st.text_area(
+            "추가 지시사항 (선택)",
+            placeholder="예: 최근 AI 관련 주제에 집중해주세요\n예: 10분 이내 숏폼 콘텐츠로 제작 가능한 주제만",
+            height=80,
+            key="topic_custom_instructions"
+        )
+
+        # 프롬프트 편집 (고급)
+        with st.expander("AI 프롬프트 편집 (고급)", expanded=False):
+            recommender = get_topic_recommender(topic_ai_provider, topic_ai_model)
+            template = recommender.get_prompt_template()
+
+            st.caption("시스템 프롬프트")
+            new_system_prompt = st.text_area(
+                "시스템 프롬프트",
+                value=template.system_prompt,
+                height=200,
+                key="topic_system_prompt",
+                label_visibility="collapsed"
+            )
+
+            st.caption("사용자 프롬프트 템플릿")
+            st.info("변수: {channel_identity}, {video_list}")
+            new_user_prompt = st.text_area(
+                "사용자 프롬프트 템플릿",
+                value=template.user_prompt_template,
+                height=300,
+                key="topic_user_prompt",
+                label_visibility="collapsed"
+            )
+
+            if st.button("프롬프트 저장", key="save_prompt"):
+                recommender.update_prompt_template(new_system_prompt, new_user_prompt)
+                st.success("프롬프트가 저장되었습니다!")
+
+        st.divider()
+
+        # 분석 대상 영상 미리보기
+        st.markdown(f"### 분석 대상: 상위 {min(topic_top_n, len(search_results))}개 영상")
+
+        # 급등점수 순 정렬
+        sorted_videos = sorted(
+            search_results,
+            key=lambda x: safe_get(x, "surge_score", 0),
+            reverse=True
+        )[:topic_top_n]
+
+        # 미리보기 테이블
+        preview_data = []
+        for v in sorted_videos[:10]:
+            title = safe_get(v, "title", "")
+            preview_data.append({
+                "제목": title[:50] + ("..." if len(title) > 50 else ""),
+                "채널": safe_get(v, "channel_name", "") or safe_get(v, "channel", ""),
+                "조회수": f"{safe_get(v, 'view_count', 0) or safe_get(v, 'views', 0):,}",
+                "급등점수": f"{safe_get(v, 'surge_score', 0):.1f}"
+            })
+
+        if preview_data:
+            st.dataframe(preview_data, use_container_width=True, hide_index=True)
+
+            if len(sorted_videos) > 10:
+                st.caption(f"... 외 {len(sorted_videos) - 10}개 영상")
+
+        st.divider()
+
+        # 추천 실행 버튼
+        if st.button("AI 주제 추천 시작", key="run_topic_recommendation", type="primary"):
+
+            if not identity.is_configured():
+                st.error("채널 정체성이 정의되지 않았습니다. 먼저 정체성을 설정해주세요.")
+            else:
+                # 제공자별 메시지
+                provider_msgs = {
+                    "google": "Gemini API로 영상을 분석하는 중...",
+                    "claude_code_agent": "Claude Max Plan으로 영상을 분석하는 중 (+ Gemini 폴백 대기)..."
+                }
+                spinner_msg = provider_msgs.get(topic_ai_provider, "AI가 영상을 분석하는 중...")
+
+                with st.spinner(spinner_msg):
+                    try:
+                        # 영상 데이터 변환
+                        videos_for_ai = []
+                        for v in sorted_videos:
+                            videos_for_ai.append({
+                                "title": safe_get(v, "title", ""),
+                                "channel": safe_get(v, "channel_name", "") or safe_get(v, "channel", ""),
+                                "views": safe_get(v, "view_count", 0) or safe_get(v, "views", 0),
+                                "likes": safe_get(v, "like_count", 0) or safe_get(v, "likes", 0),
+                                "subscribers": safe_get(v, "subscriber_count", 0),
+                                "surge_score": safe_get(v, "surge_score", 0),
+                                "published_date": safe_get(v, "published_at", "") or safe_get(v, "published_date", ""),
+                                "video_id": safe_get(v, "video_id", "")
+                            })
+
+                        # Claude Code Agent는 모델이 None
+                        model_to_use = None if topic_ai_provider == "claude_code_agent" else topic_ai_model
+
+                        result = recommend_topics(
+                            project_name=project_name,
+                            videos=videos_for_ai,
+                            provider=topic_ai_provider,
+                            model=model_to_use,
+                            custom_instructions=topic_custom_instructions
+                        )
+
+                        # 결과 저장
+                        st.session_state["topic_recommendations"] = result
+
+                    except Exception as e:
+                        st.error(f"오류: {e}")
+                        import traceback
+                        st.code(traceback.format_exc())
+
+        # 추천 결과 표시
+        if "topic_recommendations" in st.session_state:
+            result = st.session_state["topic_recommendations"]
+
+            st.markdown("---")
+            st.markdown("## AI 추천 결과")
+
+            # 트렌드 분석
+            st.markdown("### 트렌드 분석")
+            st.info(result.trend_analysis)
+
+            # 공통 키워드
+            if result.common_keywords:
+                st.markdown("**공통 키워드:**")
+                st.write(" | ".join([f"`{kw}`" for kw in result.common_keywords]))
+
+            st.divider()
+
+            # 추천 주제 목록
+            st.markdown("### 추천 주제")
+
+            for i, rec in enumerate(result.recommendations, 1):
+                priority_stars = "*" * rec.priority
+
+                with st.expander(f"{i}. {rec.topic} (우선순위: {rec.priority}/5)", expanded=(i <= 3)):
+
+                    col1, col2 = st.columns([3, 1])
+
+                    with col1:
+                        st.markdown(f"**설명:** {rec.description}")
+                        st.markdown(f"**추천 이유:** {rec.reason}")
+                        st.markdown(f"**타겟 시청자:** {rec.target_audience}")
+
+                    with col2:
+                        st.metric("예상 조회수", rec.estimated_views)
+                        st.metric("우선순위", f"{rec.priority}/5")
+
+                    if rec.keywords:
+                        st.markdown("**키워드:** " + ", ".join([f"`{k}`" for k in rec.keywords]))
+
+                    if rec.reference_videos:
+                        st.markdown("**참고 영상:**")
+                        for ref in rec.reference_videos:
+                            st.caption(f"- {ref}")
+
+            # 메타 정보
+            st.divider()
+            model_name = getattr(result, 'model_used', '') or getattr(result, 'provider_used', 'unknown')
+            tokens = getattr(result, 'tokens_used', 0)
+            st.caption(f"AI: {model_name} | 토큰 사용: {tokens:,}")
+
+            # 내보내기
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("결과 복사 (텍스트)", key="copy_recommendations"):
+                    # 텍스트 형식으로 변환
+                    text_output = f"# AI 주제 추천 결과\n\n"
+                    text_output += f"## 트렌드 분석\n{result.trend_analysis}\n\n"
+                    text_output += f"## 추천 주제\n"
+                    for i, rec in enumerate(result.recommendations, 1):
+                        text_output += f"\n### {i}. {rec.topic}\n"
+                        text_output += f"- 설명: {rec.description}\n"
+                        text_output += f"- 추천 이유: {rec.reason}\n"
+                        text_output += f"- 타겟: {rec.target_audience}\n"
+                        text_output += f"- 예상 조회수: {rec.estimated_views}\n"
+
+                    st.code(text_output)
+
+            with col2:
+                import json as json_module
+                recommendations_json = json_module.dumps({
+                    "trend_analysis": result.trend_analysis,
+                    "common_keywords": result.common_keywords,
+                    "recommendations": [
+                        {
+                            "topic": r.topic,
+                            "description": r.description,
+                            "reason": r.reason,
+                            "target_audience": r.target_audience,
+                            "estimated_views": r.estimated_views,
+                            "keywords": r.keywords,
+                            "priority": r.priority
+                        }
+                        for r in result.recommendations
+                    ]
+                }, ensure_ascii=False, indent=2)
+
+                st.download_button(
+                    "JSON 다운로드",
+                    data=recommendations_json,
+                    file_name="topic_recommendations.json",
+                    mime="application/json",
+                    key="download_recommendations"
+                )

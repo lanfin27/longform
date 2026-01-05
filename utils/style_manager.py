@@ -70,6 +70,11 @@ SEGMENTS = {
         "name": "씬 합성 스타일",
         "icon": "🎬",
         "description": "씬 기반 이미지 생성에 사용"
+    },
+    "infographic": {
+        "name": "인포그래픽 스타일",
+        "icon": "📊",
+        "description": "인포그래픽용 이미지 생성에 사용 (모서리/가장자리 배치)"
     }
 }
 
@@ -224,6 +229,74 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "description": "일러스트레이션 스타일의 씬",
                 "is_default": False
             }
+        ],
+        "infographic": [
+            {
+                "id": "infographic_minimal",
+                "name": "Minimal",
+                "name_ko": "미니멀",
+                "segment": "infographic",
+                "prompt_prefix": "minimal clean design, simple geometric shapes, flat colors, modern aesthetic,",
+                "prompt_suffix": "professional infographic background, edge-focused decorative elements, space for text overlay",
+                "negative_prompt": "cluttered, busy, complex patterns, realistic photo, centered subject",
+                "description": "깔끔하고 단순한 인포그래픽 배경",
+                "is_default": True
+            },
+            {
+                "id": "infographic_corporate",
+                "name": "Corporate",
+                "name_ko": "비즈니스",
+                "segment": "infographic",
+                "prompt_prefix": "corporate business style, professional, clean lines, blue and gray tones,",
+                "prompt_suffix": "business presentation background, modern office aesthetic, subtle gradients",
+                "negative_prompt": "casual, playful, bright colors, cartoon, centered elements",
+                "description": "비즈니스/기업용 인포그래픽 배경",
+                "is_default": False
+            },
+            {
+                "id": "infographic_creative",
+                "name": "Creative",
+                "name_ko": "크리에이티브",
+                "segment": "infographic",
+                "prompt_prefix": "creative dynamic style, colorful abstract shapes, artistic elements, vibrant,",
+                "prompt_suffix": "creative infographic background, artistic flair, modern design",
+                "negative_prompt": "boring, monochrome, corporate, plain, centered focus",
+                "description": "창의적이고 역동적인 인포그래픽 배경",
+                "is_default": False
+            },
+            {
+                "id": "infographic_tech",
+                "name": "Tech",
+                "name_ko": "테크/IT",
+                "segment": "infographic",
+                "prompt_prefix": "technology style, digital elements, circuit patterns, futuristic, neon accents,",
+                "prompt_suffix": "tech infographic background, cyber aesthetic, modern digital design",
+                "negative_prompt": "organic, natural, vintage, rustic, centered elements",
+                "description": "기술/IT 관련 인포그래픽 배경",
+                "is_default": False
+            },
+            {
+                "id": "infographic_education",
+                "name": "Education",
+                "name_ko": "교육/학습",
+                "segment": "infographic",
+                "prompt_prefix": "educational style, books, learning icons, friendly approachable design, warm colors,",
+                "prompt_suffix": "educational infographic background, school theme, knowledge elements",
+                "negative_prompt": "dark, scary, complex, corporate, centered subject",
+                "description": "교육/학습 콘텐츠용 인포그래픽 배경",
+                "is_default": False
+            },
+            {
+                "id": "infographic_webtoon",
+                "name": "Webtoon",
+                "name_ko": "웹툰/만화",
+                "segment": "infographic",
+                "prompt_prefix": "Korean webtoon manhwa style, comic illustration, bold outlines, cel shading,",
+                "prompt_suffix": "webtoon style infographic background, cartoon aesthetic, manga influence",
+                "negative_prompt": "realistic, photo, 3D render, dark, cluttered center",
+                "description": "웹툰/만화 스타일 인포그래픽 배경",
+                "is_default": False
+            }
         ]
     }
 
@@ -285,10 +358,12 @@ def load_all_styles() -> Dict[str, List[Style]]:
     """
     data = _load_all_data()
 
+    # ✅ 모든 세그먼트 포함 (infographic 추가)
     result = {
         "character": [],
         "background": [],
-        "scene_composite": []
+        "scene_composite": [],
+        "infographic": []
     }
 
     for segment in result.keys():
@@ -339,7 +414,7 @@ def get_default_style(segment: str) -> Optional[Style]:
     return styles[0] if styles else None
 
 
-def add_style(style: Style) -> bool:
+def add_style(style: Style) -> tuple:
     """
     스타일 추가
 
@@ -347,19 +422,33 @@ def add_style(style: Style) -> bool:
         style: 추가할 Style 객체
 
     Returns:
-        성공 여부
+        (성공 여부, 메시지)
     """
     data = _load_all_data()
 
     segment = style.segment
+
+    # 세그먼트 유효성 검사
+    if segment not in SEGMENTS:
+        msg = f"유효하지 않은 세그먼트: {segment}. 허용: {list(SEGMENTS.keys())}"
+        print(f"[StyleManager] ❌ {msg}")
+        return False, msg
+
     if segment not in data:
         data[segment] = []
+
+    # ID 유효성 검사
+    if not style.id or not style.id.strip():
+        msg = "스타일 ID가 비어있습니다."
+        print(f"[StyleManager] ❌ {msg}")
+        return False, msg
 
     # 중복 ID 체크
     for s in data[segment]:
         if s.get('id') == style.id:
-            print(f"[StyleManager] 중복 ID: {style.id}")
-            return False
+            msg = f"중복 ID: '{style.id}' (세그먼트: {segment})"
+            print(f"[StyleManager] ❌ {msg}")
+            return False, msg
 
     # 타임스탬프
     now = datetime.now().isoformat()
@@ -371,10 +460,13 @@ def add_style(style: Style) -> bool:
 
     # 저장
     if _save_all_data(data):
-        print(f"[StyleManager] ✅ 스타일 추가됨: {style.name_ko} ({style.id})")
-        return True
+        msg = f"스타일 추가 성공: {style.name_ko} (ID: {style.id})"
+        print(f"[StyleManager] ✅ {msg}")
+        return True, msg
 
-    return False
+    msg = "파일 저장 실패"
+    print(f"[StyleManager] ❌ {msg}")
+    return False, msg
 
 
 def update_style(style_id: str, updates: dict) -> bool:
@@ -567,7 +659,8 @@ class StyleManager:
     def get_default_style(self, segment: str) -> Optional[Style]:
         return get_default_style(segment)
 
-    def add_style(self, style: Style) -> bool:
+    def add_style(self, style: Style) -> tuple:
+        """스타일 추가 - (성공여부, 메시지) 반환"""
         return add_style(style)
 
     def update_style(self, style_id: str, updates: dict) -> bool:
@@ -606,3 +699,84 @@ def invalidate_style_cache():
     호환성을 위해 유지.
     """
     print("[StyleManager] 캐시 무효화 호출됨 (캐시 없음, 무시)")
+
+
+# ========================================
+# 씬 합성 스타일 헬퍼 함수 (Problem 60)
+# ========================================
+
+def get_scene_composite_styles() -> List[Style]:
+    """
+    씬 합성 스타일 목록 반환
+
+    Returns:
+        씬 합성 스타일 Style 객체 리스트
+    """
+    return get_styles_by_segment("scene_composite")
+
+
+def get_scene_composite_style_by_name(name: str) -> Optional[Style]:
+    """
+    이름으로 씬 합성 스타일 조회
+
+    Args:
+        name: 스타일 이름 (한글 또는 영문)
+
+    Returns:
+        Style 객체 또는 None
+    """
+    styles = get_scene_composite_styles()
+
+    for style in styles:
+        if style.name_ko == name or style.name == name or style.id == name:
+            return style
+
+    return None
+
+
+def get_default_scene_composite_style() -> Optional[Style]:
+    """기본 씬 합성 스타일 반환"""
+    return get_default_style("scene_composite")
+
+
+def build_scene_composite_prompt(
+    scene_prompt: str,
+    style: Style,
+    include_negative: bool = True
+) -> Dict[str, str]:
+    """
+    씬 합성 프롬프트 조합
+
+    Args:
+        scene_prompt: 씬별 이미지 프롬프트
+        style: 씬 합성 스타일 Style 객체
+        include_negative: 네거티브 프롬프트 포함 여부
+
+    Returns:
+        {
+            "positive": "Prefix + scene_prompt + Suffix",
+            "negative": "negative prompt..."
+        }
+    """
+    prefix = style.prompt_prefix.strip() if style.prompt_prefix else ""
+    suffix = style.prompt_suffix.strip() if style.prompt_suffix else ""
+    negative = style.negative_prompt.strip() if style.negative_prompt else ""
+
+    # 프롬프트 조합
+    parts = []
+
+    if prefix:
+        parts.append(prefix.rstrip(",").strip())
+
+    if scene_prompt:
+        parts.append(scene_prompt.strip())
+
+    if suffix:
+        parts.append(suffix.lstrip(",").strip())
+
+    positive_prompt = ", ".join(filter(None, parts))
+
+    return {
+        "positive": positive_prompt,
+        "negative": negative if include_negative else ""
+    }

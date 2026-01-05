@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경제 시각화 인포그래픽 보드</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --canvas-width: 1280px;
+            --canvas-height: 720px;
+            --bg: #ffffff;
+            --text: #222222;
+            --red: #ef4444;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --yellow: #facc15;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --gray: #555555;
+            --light-gray: #f5f5f5;
+            --light-pink: #fce4ec;
+            --light-blue: #dbeafe;
+            --light-green: #dcfce7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Nanum Pen Script', cursive;
+        }
+
+        #video-canvas {
+            width: var(--canvas-width);
+            height: var(--canvas-height);
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+
+        .scene {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+            background: #ffffff;
+        }
+        .scene.active { display: flex; }
+
+        /* 타이포그래피 */
+        h1 { font-size: 82px; line-height: 1.2; margin-bottom: 20px; }
+        h2 { font-size: 64px; line-height: 1.3; margin-bottom: 15px; }
+        p { font-size: 48px; line-height: 1.4; }
+        .text-sm { font-size: 38px; }
+        .text-xs { font-size: 32px; }
+
+        /* 색상 */
+        .text-red { color: var(--red); }
+        .text-green { color: var(--green); }
+        .text-blue { color: var(--blue); }
+        .text-purple { color: var(--purple); }
+        .text-orange { color: var(--orange); }
+        .text-gray { color: #757575; }
+
+        /* 하이라이트 */
+        .hl-yellow { background: var(--yellow); padding: 5px 20px; border-radius: 12px; }
+        .hl-pink { background: var(--light-pink); padding: 5px 20px; border-radius: 12px; }
+        .hl-blue { background: var(--light-blue); padding: 5px 20px; border-radius: 12px; }
+
+        /* 박스 */
+        .box {
+            border: 4px solid var(--text);
+            border-radius: 20px;
+            padding: 30px 45px;
+            background: white;
+            filter: url(#rough-edge);
+            white-space: nowrap;
+            width: auto;
+            min-width: fit-content;
+            max-width: 90%;
+        }
+        .box-gray { background: var(--light-gray); border: 4px solid var(--text); border-radius: 20px; padding: 30px 45px; filter: url(#rough-edge); white-space: nowrap; width: auto; min-width: fit-content; }
+        .box-pink { background: var(--light-pink); border: 4px solid var(--text); border-radius: 20px; padding: 30px 45px; filter: url(#rough-edge); white-space: nowrap; width: auto; min-width: fit-content; }
+        .box-blue { background: var(--light-blue); border: 4px solid var(--text); border-radius: 20px; padding: 30px 45px; filter: url(#rough-edge); white-space: nowrap; width: auto; min-width: fit-content; }
+        .box-green { background: var(--light-green); border: 4px solid var(--text); border-radius: 20px; padding: 30px 45px; filter: url(#rough-edge); white-space: nowrap; width: auto; min-width: fit-content; }
+
+        /* 차트 요소 */
+        .bar {
+            background: var(--gray);
+            border: 4px solid var(--text);
+            border-radius: 10px;
+            filter: url(#rough-strong);
+        }
+        .bar-red { background: var(--red); }
+        .bar-green { background: var(--green); }
+        .bar-blue { background: var(--blue); }
+
+        .gauge-track {
+            width: 100%;
+            height: 50px;
+            background: var(--light-gray);
+            border: 4px solid var(--text);
+            border-radius: 30px;
+            overflow: hidden;
+            filter: url(#rough-edge);
+        }
+        .gauge-fill { height: 100%; border-radius: 25px; filter: url(#rough-strong); }
+
+        .line-chart {
+            position: relative;
+            border-left: 4px solid var(--text);
+            border-bottom: 4px solid var(--text);
+            filter: url(#rough-edge);
+            overflow: hidden;
+        }
+
+        .data-point { width: 20px; height: 20px; border-radius: 50%; border: 4px solid var(--text); position: absolute; }
+
+        /* 애니메이션 */
+        @keyframes bounce-subtle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse-red { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: 0.9; } }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-12px) rotate(2deg); } }
+        
+        .animate-subtle { animation: bounce-subtle 4s ease-in-out infinite; }
+        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+        .animate-pulse-red { animation: pulse-red 2s infinite; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+        /* 컨트롤러 */
+        #controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        button {
+            padding: 10px 25px;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 28px;
+            cursor: pointer;
+            background: white;
+            border: 3px solid #222;
+            border-radius: 10px;
+        }
+        #progress-container {
+            width: 600px;
+            height: 15px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--blue);
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+<svg style="position: absolute; width: 0; height: 0;">
+    <filter id="rough-edge">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+    </filter>
+    <filter id="rough-strong">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" />
+    </filter>
+</svg>
+
+<div id="video-canvas">
+
+    <!-- 씬 1: 오프닝 -->
+    <div class="scene active" id="scene1">
+        <i class="fa-solid fa-tree animate-float" style="font-size: 150px; color: var(--green); margin-bottom: 40px;"></i>
+        <h1>12월 24일</h1>
+        <p>크리스마스 이브 아침이었습니다</p>
+    </div>
+
+    <!-- 씬 2: 놀라움 -->
+    <div class="scene" id="scene2">
+        <div class="box-blue" style="padding: 50px 70px;">
+            <p class="text-sm text-gray">실시간 환율 차트</p>
+            <div style="display: flex; align-items: center; gap: 40px; margin-top: 20px;">
+                <h1 style="font-size: 120px;">1,4xx</h1>
+                <i class="fa-solid fa-eye animate-pulse-red" style="font-size: 80px; color: var(--red);"></i>
+            </div>
+        </div>
+        <p style="margin-top: 30px;">눈을 의심했습니다</p>
+    </div>
+
+    <!-- 씬 3: 급락 사실 -->
+    <div class="scene" id="scene3">
+        <div style="display: flex; gap: 60px; align-items: center;">
+            <div class="box" style="opacity: 0.6;">
+                <p class="text-sm">기존</p>
+                <h1 style="font-size: 100px;">1,480</h1>
+            </div>
+            <i class="fa-solid fa-arrow-right" style="font-size: 60px;"></i>
+            <div class="box-pink animate-subtle">
+                <p class="text-sm text-red">변동</p>
+                <h1 style="font-size: 100px; color: var(--red);">-30원</h1>
+            </div>
+        </div>
+        <p style="margin-top: 40px;">갑자기 30원 넘게 떨어진 겁니다</p>
+    </div>
+
+    <!-- 씬 4: 도달 수치 -->
+    <div class="scene" id="scene4">
+        <h2 class="text-gray">새로운 환율</h2>
+        <h1 style="font-size: 220px;" class="text-red">1,450원</h1>
+        <p class="animate-pulse-red text-red">격변의 시작</p>
+    </div>
+
+    <!-- 씬 5: 희귀성 -->
+    <div class="scene" id="scene5">
+        <h2 style="margin-bottom: 40px;">일일 환율 변동폭 통계</h2>
+        <div style="display: flex; align-items: flex-end; gap: 30px; height: 300px;">
+            <div class="bar" style="width: 80px; height: 50px;"></div>
+            <div class="bar" style="width: 80px; height: 60px;"></div>
+            <div class="bar" style="width: 80px; height: 45px;"></div>
+            <div class="bar bar-red animate-pulse-red" style="width: 80px; height: 280px;"></div>
+            <div class="bar" style="width: 80px; height: 55px;"></div>
+        </div>
+        <p style="margin-top: 30px;">하루 30원 하락은 <span class="text-red">지극히 이례적</span>입니다</p>
+    </div>
+
+    <!-- 씬 6: 외부 요인 부재 -->
+    <div class="scene" id="scene6">
+        <h2 style="margin-bottom: 40px;">글로벌 이벤트 체크</h2>
+        <div style="display: flex; gap: 40px;">
+            <div class="box" style="opacity: 0.5;">
+                <i class="fa-solid fa-xmark" style="font-size: 60px; color: var(--red);"></i>
+                <p>미국 금리</p>
+            </div>
+            <div class="box" style="opacity: 0.5;">
+                <i class="fa-solid fa-xmark" style="font-size: 60px; color: var(--red);"></i>
+                <p>국제 유가</p>
+            </div>
+            <div class="box" style="opacity: 0.5;">
+                <i class="fa-solid fa-xmark" style="font-size: 60px; color: var(--red);"></i>
+                <p>지정학 위기</p>
+            </div>
+        </div>
+        <p style="margin-top: 30px;">대형 이벤트는 전혀 없었습니다</p>
+    </div>
+
+    <!-- 씬 7: 한국 경제 상황 -->
+    <div class="scene" id="scene7">
+        <h2>한국 경제 지표 현황</h2>
+        <div style="position: relative; width: 600px; height: 250px; border-left: 4px solid #222; border-bottom: 4px solid #222; overflow: hidden;">
+            <svg width="100%" height="100%">
+                <polyline points="30,50 150,80 300,120 450,180 570,220" stroke="var(--red)" stroke-width="6" fill="none" style="filter: url(#rough-edge);"/>
+            </svg>
+        </div>
+        <p style="margin-top: 30px;">지표는 오히려 <span class="text-red">하락세</span>였습니다</p>
+    </div>
+
+    <!-- 씬 8: 갑작스러운 하락 -->
+    <div class="scene" id="scene8">
+        <div style="display: flex; align-items: center; gap: 50px;">
+            <h1 style="font-size: 150px;">갑자기?</h1>
+            <i class="fa-solid fa-bolt animate-subtle" style="font-size: 120px; color: var(--yellow);"></i>
+        </div>
+        <p>설명 불가능한 급락이 발생했습니다</p>
+    </div>
+
+    <!-- 씬 9: 정부 개입 암시 -->
+    <div class="scene" id="scene9">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-landmark" style="font-size: 120px; color: var(--blue);"></i>
+            <span style="font-size: 80px;">+</span>
+            <i class="fa-solid fa-hand-pointer animate-float" style="font-size: 100px; color: var(--orange);"></i>
+        </div>
+        <h2 style="margin-top: 30px;">보이지 않는 손</h2>
+        <p>정부의 개입이 분명해 보였죠</p>
+    </div>
+
+    <!-- 씬 10: 의문의 시점 -->
+    <div class="scene" id="scene10">
+        <div class="box-pink" style="padding: 40px 60px;">
+            <i class="fa-solid fa-calendar-days" style="font-size: 80px; margin-bottom: 20px;"></i>
+            <h1>12월 말</h1>
+        </div>
+        <p style="margin-top: 30px;">왜 하필 <span class="hl-yellow">연말</span>이었을까요?</p>
+    </div>
+
+    <!-- 씬 11: 1월 예측 -->
+    <div class="scene" id="scene11">
+        <h2>1월 환율 전망 시나리오</h2>
+        <div style="position: relative; width: 600px; height: 250px; border-left: 4px solid #222; border-bottom: 4px solid #222; overflow: hidden;">
+            <svg width="100%" height="100%">
+                <polyline points="30,200 150,180 300,50 450,30 570,60" stroke="var(--orange)" stroke-width="5" fill="none" stroke-dasharray="10,5"/>
+            </svg>
+            <div class="data-point" style="left: 290px; top: 40px; background: var(--red);"></div>
+        </div>
+        <p style="margin-top: 30px;">개입 후의 <span class="text-red">반동</span>이 우려됩니다</p>
+    </div>
+
+    <!-- 씬 12: 3단계 비밀 -->
+    <div class="scene" id="scene12">
+        <h2 style="margin-bottom: 30px;">환율 급락의 3단계 비밀</h2>
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 500px;">
+            <div class="box-gray" style="padding: 15px;">3단계: 본격적인 물량 투하</div>
+            <div class="box-blue" style="padding: 15px;">2단계: 시장 반응 테스트</div>
+            <div class="box-pink" style="padding: 15px;">1단계: 구두 개입 및 톱니 형성</div>
+        </div>
+    </div>
+
+    <!-- 씬 13: 레이더 -->
+    <div class="scene" id="scene13">
+        <div style="position: relative; width: 250px; height: 250px;">
+            <div class="animate-spin-slow" style="width: 100%; height: 100%; border: 4px solid #222; border-radius: 50%; border-top-color: var(--blue);"></div>
+            <i class="fa-solid fa-satellite-dish" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 60px;"></i>
+        </div>
+        <p style="margin-top: 30px;">개입을 미리 알아채는 신호</p>
+    </div>
+
+    <!-- 씬 14: 자산 강조 -->
+    <div class="scene" id="scene14">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-money-bill-trend-up" style="font-size: 100px; color: var(--green);"></i>
+            <i class="fa-solid fa-scale-balanced" style="font-size: 100px; color: var(--gray);"></i>
+        </div>
+        <h1 style="margin-top: 30px;">당신의 자산이 걸린 문제</h1>
+    </div>
+
+    <!-- 씬 15: 차트 시작 -->
+    <div class="scene" id="scene15">
+        <div class="box-gray" style="width: 80%; height: 400px; display: flex; flex-direction: column; justify-content: space-between; padding: 40px;">
+            <h2>데이터로 보는 진실</h2>
+            <div style="height: 200px; width: 100%; border-bottom: 3px solid #333; position: relative; overflow: hidden;">
+                <svg width="100%" height="100%">
+                    <polyline points="0,100 100,90 200,110 300,80 400,150 500,50 600,180 700,40" stroke="#333" stroke-width="4" fill="none"/>
+                </svg>
+            </div>
+            <p class="text-sm">실제 환율 차트 분석</p>
+        </div>
+    </div>
+
+    <!-- 씬 16: 톱니 패턴 -->
+    <div class="scene" id="scene16">
+        <h2 style="margin-bottom: 30px;">12/22 ~ 12/23 기괴한 톱니</h2>
+        <div style="width: 700px; height: 200px; border-left: 4px solid #222; border-bottom: 4px solid #222; overflow: hidden; background: #fafafa;">
+            <svg width="100%" height="100%">
+                <polyline points="20,100 60,60 100,100 140,60 180,100 220,60 260,100 300,60 340,100 380,60 420,100 460,60 500,100" stroke="var(--red)" stroke-width="6" fill="none"/>
+            </svg>
+        </div>
+        <p style="margin-top: 25px;">인위적인 <span class="text-red">지그재그</span> 움직임</p>
+    </div>
+
+    <!-- 씬 17: 톱니바퀴 아이콘 -->
+    <div class="scene" id="scene17">
+        <div style="display: flex; gap: 20px;">
+            <i class="fa-solid fa-gear animate-spin-slow" style="font-size: 120px; color: var(--gray);"></i>
+            <i class="fa-solid fa-gear animate-spin-slow" style="font-size: 80px; color: var(--gray); margin-top: 40px; animation-direction: reverse;"></i>
+        </div>
+        <h1 style="margin-top: 30px;">톱니 모양의 정체</h1>
+    </div>
+
+    <!-- 씬 18: 심장 박동 비교 -->
+    <div class="scene" id="scene18">
+        <div style="display: flex; width: 90%; gap: 30px;">
+            <div class="box" style="flex: 1;">
+                <p class="text-xs">심장 박동</p>
+                <svg width="100%" height="100" style="margin-top: 10px;">
+                    <polyline points="0,50 40,50 50,10 60,90 70,50 120,50 130,10 140,90 150,50" stroke="var(--red)" stroke-width="3" fill="none"/>
+                </svg>
+            </div>
+            <div class="box-pink" style="flex: 1;">
+                <p class="text-xs">당시 환율</p>
+                <svg width="100%" height="100" style="margin-top: 10px;">
+                    <polyline points="0,80 30,20 60,80 90,20 120,80 150,20" stroke="var(--text)" stroke-width="3" fill="none"/>
+                </svg>
+            </div>
+        </div>
+        <p style="margin-top: 30px;">시장이 <span class="text-red">숨 가쁘게</span> 충돌하고 있었습니다</p>
+    </div>
+
+    <!-- 씬 19: 물음표 -->
+    <div class="scene" id="scene19">
+        <i class="fa-solid fa-question animate-float" style="font-size: 200px; color: var(--blue);"></i>
+        <h1 style="margin-top: 40px;">이것은 무엇을 의미할까요?</h1>
+    </div>
+
+    <!-- 씬 20: 개입 신호 -->
+    <div class="scene" id="scene20">
+        <div class="box-pink animate-pulse-red" style="padding: 50px 80px; border-color: var(--red);">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 80px; color: var(--red);"></i>
+            <h1 class="text-red">정부 개입 신호</h1>
+        </div>
+    </div>
+
+    <!-- 씬 21: 메모 -->
+    <div class="scene" id="scene21">
+        <div class="box" style="background: #fff9c4; padding: 40px 60px; text-align: left;">
+            <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px;">반드시 기억할 점</h2>
+            <p style="margin-top: 20px;">1. 톱니 모양 발견 시</p>
+            <p>2. 개입이 임박했다는 뜻</p>
+            <p>3. 포트폴리오 재점검</p>
+        </div>
+    </div>
+
+    <!-- 씬 22: 경고등 -->
+    <div class="scene" id="scene22">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <div class="line-chart" style="width: 400px; height: 180px;">
+                <svg width="100%" height="100%">
+                    <polyline points="10,90 40,30 70,90 100,30 130,90 160,30" stroke="var(--red)" stroke-width="5" fill="none"/>
+                </svg>
+            </div>
+            <i class="fa-solid fa-lightbulb animate-pulse-red" style="font-size: 120px; color: var(--yellow);"></i>
+        </div>
+        <p style="margin-top: 30px;">본격적인 개입 전 <span class="text-red">마지막 경고</span></p>
+    </div>
+
+    <!-- 씬 23: 3가지 이유 그리드 -->
+    <div class="scene" id="scene23">
+        <h2 style="margin-bottom: 30px;">왜 이런 현상이 나타나는가?</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 90%;">
+            <div class="box-gray">1. 치열한 전쟁</div>
+            <div class="box-gray">2. 강력한 의지</div>
+            <div class="box-gray">3. 시장 테스트</div>
+        </div>
+    </div>
+
+    <!-- 씬 24: 전쟁 줄다리기 -->
+    <div class="scene" id="scene24">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="box">정부 (하락)</div>
+            <div style="width: 200px; height: 8px; background: #333; position: relative;">
+                <div style="position: absolute; left: 50%; top: -15px; width: 4px; height: 40px; background: var(--red);"></div>
+            </div>
+            <div class="box">시장 (상승)</div>
+        </div>
+        <h1 style="margin-top: 40px;">치열한 공방전</h1>
+    </div>
+
+    <!-- 씬 25: 지저분한 차트 -->
+    <div class="scene" id="scene25">
+        <div class="line-chart" style="width: 600px; height: 300px; background: #f0f0f0;">
+            <svg width="100%" height="100%">
+                <polyline points="0,150 20,140 40,160 60,130 80,170 100,120 120,180 140,110 160,190" stroke="var(--gray)" stroke-width="2" fill="none" opacity="0.5"/>
+                <polyline points="0,155 30,145 60,165 90,135 120,175" stroke="var(--gray)" stroke-width="2" fill="none" opacity="0.5"/>
+                <polyline points="10,140 50,150 100,140 150,160" stroke="var(--red)" stroke-width="5" fill="none"/>
+            </svg>
+        </div>
+        <p style="margin-top: 20px;">힘겨루기가 남긴 <span class="text-red">노이즈</span></p>
+    </div>
+
+    <!-- 씬 26: 톱니 유지 -->
+    <div class="scene" id="scene26">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-hand-fist animate-subtle" style="font-size: 130px; color: var(--orange);"></i>
+            <h1>물러서지 않는 정부</h1>
+        </div>
+    </div>
+
+    <!-- 씬 27: 간달프 인용 -->
+    <div class="scene" id="scene27">
+        <div class="box-pink" style="padding: 60px;">
+            <h1 style="font-size: 100px;">"YOU SHALL NOT PASS!"</h1>
+            <p class="text-sm">시장 앞에 선 간달프처럼</p>
+        </div>
+    </div>
+
+    <!-- 씬 28: 1485 방어선 -->
+    <div class="scene" id="scene28">
+        <h2>심리적 마지노선</h2>
+        <div style="position: relative; width: 600px; height: 150px; border-top: 4px dashed var(--red); margin-top: 50px;">
+            <p style="position: absolute; top: -50px; left: 50%; transform: translateX(-50%); font-size: 50px; color: var(--red);">1,485원</p>
+            <div class="bar bar-blue animate-subtle" style="width: 100px; height: 200px; position: absolute; left: 100px; bottom: 0;"></div>
+            <div class="bar bar-blue animate-subtle" style="width: 100px; height: 240px; position: absolute; left: 300px; bottom: 0;"></div>
+        </div>
+    </div>
+
+    <!-- 씬 29: 자물쇠 비밀 -->
+    <div class="scene" id="scene29">
+        <i class="fa-solid fa-lock animate-float" style="font-size: 150px; color: var(--orange);"></i>
+        <h1 style="margin-top: 30px;">가장 결정적인 비밀</h1>
+    </div>
+
+    <!-- 씬 30: 물량 테스트 -->
+    <div class="scene" id="scene30">
+        <div style="display: flex; align-items: center; gap: 50px;">
+            <div class="box-gray">시장 매수세</div>
+            <i class="fa-solid fa-vial-virus animate-pulse-red" style="font-size: 100px; color: var(--purple);"></i>
+            <div class="box-blue">정부 매도량 계산</div>
+        </div>
+        <p style="margin-top: 30px;">폭격 전의 <span class="hl-yellow">정밀 정찰</span></p>
+    </div>
+
+    <!-- 씬 31: 계산기 KPI -->
+    <div class="scene" id="scene31">
+        <div class="box" style="padding: 50px 70px;">
+            <i class="fa-solid fa-calculator" style="font-size: 60px; margin-bottom: 20px;"></i>
+            <h2 class="text-gray">필요 확보 물량</h2>
+            <h1 style="font-size: 110px;">$$? B</h1>
+        </div>
+    </div>
+
+    <!-- 씬 32: 12/24 행동 -->
+    <div class="scene" id="scene32">
+        <div style="display: flex; gap: 30px; align-items: center;">
+            <div class="box">준비 완료</div>
+            <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
+            <div class="box-pink animate-pulse-red">12/24 행동 개시</div>
+        </div>
+    </div>
+
+    <!-- 씬 33: 30원 폭락 KPI -->
+    <div class="scene" id="scene33">
+        <p class="text-gray">환율 하락폭</p>
+        <h1 style="font-size: 200px;" class="text-red">-30.00</h1>
+        <p class="text-red" style="font-size: 60px;">단 하루 만에</p>
+    </div>
+
+    <!-- 씬 34: 방어선 이동 -->
+    <div class="scene" id="scene34">
+        <h2>방어선 후퇴 및 재구축</h2>
+        <div style="display: flex; gap: 80px; align-items: center;">
+            <div style="text-align: center; opacity: 0.4;">
+                <p>기존</p>
+                <div style="height: 150px; width: 4px; background: var(--gray); margin: 10px auto;"></div>
+                <p>1,485</p>
+            </div>
+            <i class="fa-solid fa-angles-right animate-subtle" style="font-size: 60px;"></i>
+            <div style="text-align: center;">
+                <p class="text-red">신규</p>
+                <div style="height: 150px; width: 8px; background: var(--red); margin: 10px auto;"></div>
+                <p class="text-red">1,460</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 35: 반복 패턴 선 -->
+    <div class="scene" id="scene35">
+        <div class="line-chart" style="width: 600px; height: 250px;">
+            <svg width="100%" height="100%">
+                <polyline points="20,180 100,180 100,50 180,50 180,180 260,180 260,50 340,50" stroke="var(--blue)" stroke-width="5" fill="none"/>
+            </svg>
+        </div>
+        <p style="margin-top: 20px;">치고 올라오면 <span class="text-blue">즉각 대응</span></p>
+    </div>
+
+    <!-- 씬 36: 방패 -->
+    <div class="scene" id="scene36">
+        <i class="fa-solid fa-shield-halved animate-float" style="font-size: 160px; color: var(--blue);"></i>
+        <h1 style="margin-top: 30px;">"1,460원은 절대 안 뚫린다"</h1>
+    </div>
+
+    <!-- 씬 37: 왜 연말? -->
+    <div class="scene" id="scene37">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-calendar-check" style="font-size: 120px; color: var(--orange);"></i>
+            <i class="fa-solid fa-question animate-subtle" style="font-size: 120px;"></i>
+        </div>
+        <p style="margin-top: 30px;">연말 종가 관리에 사활을 거는 이유</p>
+    </div>
+
+    <!-- 씬 38: 비밀 자물쇠 -->
+    <div class="scene" id="scene38">
+        <div class="box-pink" style="padding: 50px;">
+            <i class="fa-solid fa-key" style="font-size: 80px; margin-bottom: 20px;"></i>
+            <h1>장부상의 비밀</h1>
+        </div>
+    </div>
+
+    <!-- 씬 39: 장부 조작 비유 -->
+    <div class="scene" id="scene39">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-book animate-float" style="font-size: 120px; color: var(--gray);"></i>
+            <i class="fa-solid fa-wand-magic-sparkles animate-subtle" style="font-size: 100px; color: var(--yellow);"></i>
+        </div>
+        <p style="margin-top: 30px;">겉모습만이라도 <span class="hl-yellow">멀쩡하게</span></p>
+    </div>
+
+    <!-- 씬 40: 1400 vs 1550 비교 -->
+    <div class="scene" id="scene40">
+        <div style="display: flex; gap: 50px;">
+            <div class="box-green" style="text-align: center;">
+                <p class="text-xs">정부 목표</p>
+                <h2 style="font-size: 80px;">1,400</h2>
+                <p class="text-green">안정적 장부</p>
+            </div>
+            <div class="box-pink" style="text-align: center;">
+                <p class="text-xs">방치 시</p>
+                <h2 style="font-size: 80px;">1,550</h2>
+                <p class="text-red">재무 위기</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 41: 기업 부채 아이콘 -->
+    <div class="scene" id="scene41">
+        <i class="fa-solid fa-building-circle-exclamation animate-pulse-red" style="font-size: 150px; color: var(--orange);"></i>
+        <h1 style="margin-top: 30px;">1. 기업들의 달러 부채</h1>
+    </div>
+
+    <!-- 씬 42: 미국 투자 흐름 -->
+    <div class="scene" id="scene42">
+        <div style="display: flex; gap: 40px; align-items: center;">
+            <div class="box">국내 기업</div>
+            <i class="fa-solid fa-plane-departure" style="font-size: 50px;"></i>
+            <div class="box-blue">미국 공장/인수</div>
+        </div>
+        <p style="margin-top: 30px;">대규모 <span class="text-blue">달러 자금</span> 조달</p>
+    </div>
+
+    <!-- 씬 43: 연말 종가 기준 타임라인 -->
+    <div class="scene" id="scene43">
+        <h2 style="margin-bottom: 40px;">부채 평가 시점</h2>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="text-xs">1월</div>
+            <div style="width: 100px; height: 4px; background: #ddd;"></div>
+            <div class="text-xs">...</div>
+            <div style="width: 100px; height: 4px; background: #ddd;"></div>
+            <div class="box-pink">12/31 (종가)</div>
+        </div>
+        <p style="margin-top: 30px;">이날 하루가 <span class="text-red">1년 성적</span>을 결정합니다</p>
+    </div>
+
+    <!-- 씬 44: 10% 차이 KPI -->
+    <div class="scene" id="scene44">
+        <div class="box" style="padding: 60px;">
+            <p class="text-sm">환율 변동에 따른 부채 차이</p>
+            <h1 style="font-size: 150px;" class="text-red">MAX 10%</h1>
+        </div>
+    </div>
+
+    <!-- 씬 45: 분장 효과 -->
+    <div class="scene" id="scene45">
+        <div style="display: flex; align-items: center; gap: 50px;">
+            <i class="fa-solid fa-masks-theater animate-subtle" style="font-size: 140px; color: var(--purple);"></i>
+            <h1>회계상의 마법</h1>
+        </div>
+    </div>
+
+    <!-- 씬 46: 은행 BIS 비율 -->
+    <div class="scene" id="scene46">
+        <div class="box-blue">
+            <i class="fa-solid fa-bank" style="font-size: 60px; margin-bottom: 20px;"></i>
+            <h1>2. 은행의 BIS 비율</h1>
+        </div>
+    </div>
+
+    <!-- 씬 47: BIS 정의 박스 -->
+    <div class="scene" id="scene47">
+        <div class="box-gray" style="padding: 50px;">
+            <h2 style="margin-bottom: 20px;">BIS 비율 이란?</h2>
+            <h1 style="font-size: 50px;">자기자본 ÷ 위험가중자산 × 100</h1>
+            <p style="margin-top: 20px;">은행의 <span class="hl-yellow">기초 체력</span> 지표</p>
+        </div>
+    </div>
+
+    <!-- 씬 48: 달러 자산 아이콘 -->
+    <div class="scene" id="scene48">
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; width: 300px; justify-content: center;">
+            <i class="fa-solid fa-dollar-sign" style="font-size: 60px; color: var(--green);"></i>
+            <i class="fa-solid fa-dollar-sign" style="font-size: 60px; color: var(--green);"></i>
+            <i class="fa-solid fa-dollar-sign" style="font-size: 60px; color: var(--green);"></i>
+            <i class="fa-solid fa-dollar-sign" style="font-size: 60px; color: var(--green);"></i>
+        </div>
+        <p style="margin-top: 30px;">은행이 보유한 막대한 <span class="text-green">달러 자산</span></p>
+    </div>
+
+    <!-- 씬 49: BIS 급락 게이지 -->
+    <div class="scene" id="scene49">
+        <h2>환율 폭등 시 BIS 비율</h2>
+        <div class="gauge-track" style="width: 70%; margin-top: 30px;">
+            <div class="gauge-fill animate-pulse-red" style="width: 35%; background: var(--red);"></div>
+        </div>
+        <p style="margin-top: 30px;"><span class="text-red">건전성 경고</span> 발생</p>
+    </div>
+
+    <!-- 씬 50: 건전성 하락 바 -->
+    <div class="scene" id="scene50">
+        <div style="display: flex; align-items: flex-end; gap: 50px; height: 250px;">
+            <div class="bar bar-blue" style="width: 120px; height: 200px;"></div>
+            <i class="fa-solid fa-arrow-right-long" style="font-size: 40px; margin-bottom: 80px;"></i>
+            <div class="bar bar-red animate-subtle" style="width: 120px; height: 80px;"></div>
+        </div>
+        <p style="margin-top: 30px;">시장 신뢰도 <span class="text-red">동반 하락</span></p>
+    </div>
+
+    <!-- 씬 51: 화장 효과 Before/After -->
+    <div class="scene" id="scene51">
+        <div style="display: flex; gap: 40px;">
+            <div class="box" style="opacity: 0.5;">민낯 (위험)</div>
+            <i class="fa-solid fa-arrow-right" style="font-size: 40px; align-self: center;"></i>
+            <div class="box-green">화장 후 (안전)</div>
+        </div>
+        <p style="margin-top: 30px;">환율 방어로 얻는 <span class="text-green">착시 효과</span></p>
+    </div>
+
+    <!-- 씬 52: 대외 부채 국기 -->
+    <div class="scene" id="scene52">
+        <div style="font-size: 150px; margin-bottom: 20px;">🇰🇷</div>
+        <h1>3. 대한민국의 대외 부채</h1>
+    </div>
+
+    <!-- 씬 53: GDP vs 외채 비교 -->
+    <div class="scene" id="scene53">
+        <div style="display: flex; gap: 40px; width: 90%;">
+            <div class="box" style="flex: 1;">
+                <p class="text-sm">GDP</p>
+                <p class="text-xs text-gray">연평균 환율 적용</p>
+            </div>
+            <div class="box-pink" style="flex: 1;">
+                <p class="text-sm">국가 외채</p>
+                <p class="text-xs text-red">연말 환율 적용</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 54: 눈덩이 부채 -->
+    <div class="scene" id="scene54">
+        <i class="fa-solid fa-snowflake animate-spin-slow" style="font-size: 120px; color: var(--light-blue);"></i>
+        <h1 style="margin-top: 30px;">눈덩이처럼 불어나는 부채</h1>
+        <p>환율 1원당 수조 원의 변동</p>
+    </div>
+
+    <!-- 씬 55: 채무 비율 그래프 -->
+    <div class="scene" id="scene55">
+        <h2>GDP 대비 채무 비율 추이</h2>
+        <div class="line-chart" style="width: 600px; height: 250px;">
+            <svg width="100%" height="100%">
+                <polyline points="20,50 200,70 400,100 580,180" stroke="var(--green)" stroke-width="6" fill="none"/>
+            </svg>
+        </div>
+        <p style="margin-top: 20px;">인위적 <span class="text-green">하향 안정화</span></p>
+    </div>
+
+    <!-- 씬 56: 숫자 조작 비판 -->
+    <div class="scene" id="scene56">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-pen-nib animate-subtle" style="font-size: 120px; color: var(--orange);"></i>
+            <h1>"숫자를 예쁘게 만들기"</h1>
+        </div>
+    </div>
+
+    <!-- 씬 57: 재무제표 분장 -->
+    <div class="scene" id="scene57">
+        <div class="box-gray" style="width: 80%;">
+            <h2 style="margin-bottom: 20px;">국가 재무제표 현황</h2>
+            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #ccc; padding: 10px;">
+                <span>자산</span><span>안정적 (분장됨)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #ccc; padding: 10px;">
+                <span>부채</span><span>관리 중 (분장됨)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 58: 궁금증 -->
+    <div class="scene" id="scene58">
+        <i class="fa-solid fa-person-circle-question animate-float" style="font-size: 150px; color: var(--blue);"></i>
+        <h1 style="margin-top: 30px;">그럼 1월엔 어떻게 될까?</h1>
+    </div>
+
+    <!-- 씬 59: 1월 폭등 우려 -->
+    <div class="scene" id="scene59">
+        <div class="line-chart" style="width: 600px; height: 250px;">
+            <svg width="100%" height="100%">
+                <polyline points="20,180 300,170 550,30" stroke="var(--red)" stroke-width="6" fill="none"/>
+            </svg>
+            <p style="position: absolute; right: 50px; top: 50px;" class="text-red animate-pulse-red">폭등 우려</p>
+        </div>
+    </div>
+
+    <!-- 씬 60: 정부 계산 -->
+    <div class="scene" id="scene60">
+        <div class="box-blue" style="padding: 50px;">
+            <i class="fa-solid fa-chess" style="font-size: 80px; margin-bottom: 20px;"></i>
+            <h2>정부의 치밀한 계산</h2>
+            <p>1월의 반등까지 예측했을까?</p>
+        </div>
+    </div>
+
+    <!-- 씬 61: 1월 초 하락 효과 -->
+    <div class="scene" id="scene61">
+        <h2>1월 초 일시적 안정기</h2>
+        <div style="position: relative; width: 600px; height: 250px; border-left: 4px solid #222; border-bottom: 4px solid #222; overflow: hidden;">
+            <svg width="100%" height="100%">
+                <polygon points="30,50 200,80 400,120 570,150 570,250 30,250" fill="rgba(59, 130, 246, 0.2)" stroke="var(--blue)" stroke-width="4"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- 씬 62: 정부 눈치 -->
+    <div class="scene" id="scene62">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-eye animate-float" style="font-size: 120px; color: var(--gray);"></i>
+            <h1>시장의 눈치 보기</h1>
+        </div>
+        <p style="margin-top: 30px;">감히 상승에 배팅하지 못하는 분위기</p>
+    </div>
+
+    <!-- 씬 63: 수출 대금 유입 -->
+    <div class="scene" id="scene63">
+        <div style="display: flex; gap: 40px; align-items: center;">
+            <i class="fa-solid fa-ship" style="font-size: 80px;"></i>
+            <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
+            <i class="fa-solid fa-dollar-sign animate-subtle" style="font-size: 80px; color: var(--green);"></i>
+            <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
+            <div class="box">국내 유입</div>
+        </div>
+        <p style="margin-top: 30px;">연말 수출 물량의 <span class="text-green">결제 대금</span> 유입</p>
+    </div>
+
+    <!-- 씬 64: 해외 지사 송금 -->
+    <div class="scene" id="scene64">
+        <div style="display: flex; gap: 30px; align-items: center;">
+            <div class="box-gray">해외 지사</div>
+            <i class="fa-solid fa-money-bill-transfer animate-subtle" style="font-size: 60px;"></i>
+            <div class="box">국내 본사</div>
+        </div>
+        <p style="margin-top: 30px;">월급 및 대금 지불용 <span class="text-blue">원화 환전</span></p>
+    </div>
+
+    <!-- 씬 65: 종가 관리 결정 -->
+    <div class="scene" id="scene65">
+        <div class="box-blue" style="padding: 60px;">
+            <h1>종가 관리의 정당성 확보?</h1>
+            <p style="margin-top: 20px;">정부는 이 모든 흐름을 읽고 움직였습니다</p>
+        </div>
+    </div>
+
+    <!-- 씬 66: 문제는 그 다음 -->
+    <div class="scene" id="scene66">
+        <i class="fa-solid fa-triangle-exclamation animate-pulse-red" style="font-size: 180px; color: var(--orange);"></i>
+        <h1 style="margin-top: 40px;">하지만 문제는 그 다음입니다</h1>
+    </div>
+
+    <!-- 씬 67: 개입 여력 소진 -->
+    <div class="scene" id="scene67">
+        <h2>정부의 환율 개입 여력</h2>
+        <div class="gauge-track" style="width: 70%; margin-top: 30px;">
+            <div class="gauge-fill" style="width: 15%; background: var(--red);"></div>
+        </div>
+        <p style="margin-top: 30px;"><span class="text-red">거의 바닥</span>난 상태</p>
+    </div>
+
+    <!-- 씬 68: 시장의 똑똑함 -->
+    <div class="scene" id="scene68">
+        <i class="fa-solid fa-brain animate-subtle" style="font-size: 150px; color: var(--purple);"></i>
+        <h1 style="margin-top: 30px;">시장은 훨씬 똑똑합니다</h1>
+    </div>
+
+    <!-- 씬 69: 성공 가능성? -->
+    <div class="scene" id="scene69">
+        <h1 style="font-size: 120px;">성공 확률 <span class="text-blue">??%</span></h1>
+        <p style="margin-top: 30px;">과거의 사례에서 답을 찾아야 합니다</p>
+    </div>
+
+    <!-- 씬 70: 1997 외환위기 -->
+    <div class="scene" id="scene70">
+        <div class="box-pink" style="padding: 60px;">
+            <h1 style="font-size: 100px;">1997</h1>
+            <p>외환위기의 악몽</p>
+        </div>
+    </div>
+
+    <!-- 씬 71: 1997 환율 급등 -->
+    <div class="scene" id="scene71">
+        <h2>1997 환율 추이</h2>
+        <div style="display: flex; gap: 50px; align-items: flex-end; height: 250px;">
+            <div style="text-align: center;">
+                <div class="bar" style="width: 100px; height: 80px;"></div>
+                <p>800원</p>
+            </div>
+            <i class="fa-solid fa-arrow-up-right-dots" style="font-size: 60px; margin-bottom: 100px;"></i>
+            <div style="text-align: center;">
+                <div class="bar bar-red animate-pulse-red" style="width: 100px; height: 240px;"></div>
+                <p class="text-red">1,968원</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 72: 국가 부도 위기 -->
+    <div class="scene" id="scene72">
+        <div class="gauge-track" style="width: 80%;">
+            <div class="gauge-fill" style="width: 2%; background: var(--red);"></div>
+        </div>
+        <h1 style="margin-top: 30px;" class="text-red">외환보유고 고갈</h1>
+        <p>국가 부도 직전의 상황</p>
+    </div>
+
+    <!-- 씬 73: 재발 가능성 낮음 -->
+    <div class="scene" id="scene73">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-circle-check" style="font-size: 120px; color: var(--green);"></i>
+            <h1>현재는 다릅니다</h1>
+        </div>
+        <p style="margin-top: 30px;">97년식 위기 재발 가능성은 <span class="hl-pink">극히 희박</span></p>
+    </div>
+
+    <!-- 씬 74: 달러 보유액 증가 -->
+    <div class="scene" id="scene74">
+        <h2>민간/기업 달러 보유력</h2>
+        <div style="display: flex; align-items: flex-end; gap: 40px; height: 250px;">
+            <div class="bar" style="width: 120px; height: 60px;"></div>
+            <div class="bar bar-blue animate-subtle" style="width: 120px; height: 220px;"></div>
+        </div>
+        <div style="display: flex; gap: 80px; margin-top: 20px;">
+            <span>1997</span>
+            <span>현재</span>
+        </div>
+    </div>
+
+    <!-- 씬 75: 2008 금융위기 -->
+    <div class="scene" id="scene75">
+        <div class="box-gray" style="padding: 60px;">
+            <h1 style="font-size: 100px;">2008</h1>
+            <p>글로벌 금융위기</p>
+        </div>
+    </div>
+
+    <!-- 씬 76: 2008 환율 폭등 -->
+    <div class="scene" id="scene76">
+        <p class="text-gray">2008 최고 환율</p>
+        <h1 style="font-size: 180px;" class="text-red">1,570원</h1>
+        <p class="text-red animate-pulse-red">정부 개입 무력화</p>
+    </div>
+
+    <!-- 씬 77: 통화스왑 -->
+    <div class="scene" id="scene77">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-handshake animate-subtle" style="font-size: 150px; color: var(--blue);"></i>
+            <h1>한미 통화스왑</h1>
+        </div>
+        <p style="margin-top: 30px;">외부의 도움으로 겨우 막아낸 파도</p>
+    </div>
+
+    <!-- 씬 78: 지금은 어떨까? -->
+    <div class="scene" id="scene78">
+        <i class="fa-solid fa-hourglass-half animate-spin-slow" style="font-size: 150px; color: var(--gray);"></i>
+        <h1 style="margin-top: 30px;">그렇다면 현재의 본질은?</h1>
+    </div>
+
+    <!-- 씬 79: 급성 vs 만성 비교 -->
+    <div class="scene" id="scene79">
+        <div style="display: flex; gap: 40px; width: 90%;">
+            <div class="box" style="flex: 1; opacity: 0.6;">
+                <p class="text-sm">과거</p>
+                <h1 class="text-red">급성 (Acute)</h1>
+            </div>
+            <div class="box-blue" style="flex: 1;">
+                <p class="text-sm">현재</p>
+                <h1 class="text-blue">만성 (Chronic)</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 80: 과거의 급성 -->
+    <div class="scene" id="scene80">
+        <i class="fa-solid fa-bolt-lightning" style="font-size: 150px; color: var(--red);"></i>
+        <h1 style="margin-top: 30px;">터지면 걷잡을 수 없는 폭발</h1>
+    </div>
+
+    <!-- 씬 81: 현재의 만성 -->
+    <div class="scene" id="scene81">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-arrow-trend-up" style="font-size: 120px; color: var(--orange);"></i>
+            <h1>서서히 스며드는 위기</h1>
+        </div>
+        <p style="margin-top: 30px;">단기 처방은 듣지만 본질은 악화 중</p>
+    </div>
+
+    <!-- 씬 82: 만성 질환 문제 -->
+    <div class="scene" id="scene82">
+        <i class="fa-solid fa-stethoscope animate-subtle" style="font-size: 150px; color: var(--gray);"></i>
+        <h1 style="margin-top: 30px;">만성 질환의 무서움</h1>
+    </div>
+
+    <!-- 씬 83: 약 끊으면 악화 -->
+    <div class="scene" id="scene83">
+        <div class="line-chart" style="width: 600px; height: 250px;">
+            <svg width="100%" height="100%">
+                <polyline points="20,150 200,180 350,50 500,30" stroke="var(--red)" stroke-width="6" fill="none"/>
+            </svg>
+            <p style="position: absolute; left: 180px; bottom: 20px;">개입 중단</p>
+        </div>
+    </div>
+
+    <!-- 씬 84: 반등 그래프 -->
+    <div class="scene" id="scene84">
+        <div style="display: flex; align-items: center; gap: 50px;">
+            <h1 style="font-size: 120px;" class="text-red">반등</h1>
+            <i class="fa-solid fa-arrow-up-right-dots animate-pulse-red" style="font-size: 100px; color: var(--red);"></i>
+        </div>
+        <p>눌러놓은 에너지가 한꺼번에 폭발합니다</p>
+    </div>
+
+    <!-- 씬 85: 국민연금 동원 -->
+    <div class="scene" id="scene85">
+        <div class="box-pink" style="padding: 50px;">
+            <i class="fa-solid fa-piggy-bank" style="font-size: 100px; color: var(--purple);"></i>
+            <h1>국민연금 동원 의혹</h1>
+        </div>
+    </div>
+
+    <!-- 씬 86: 환헤지 방어 -->
+    <div class="scene" id="scene86">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-shield-virus animate-subtle" style="font-size: 130px; color: var(--green);"></i>
+            <h1>"환헤지로 환율 방어"</h1>
+        </div>
+    </div>
+
+    <!-- 씬 87: 공짜 아님 -->
+    <div class="scene" id="scene87">
+        <div style="position: relative;">
+            <i class="fa-solid fa-wallet" style="font-size: 150px; color: var(--gray);"></i>
+            <i class="fa-solid fa-droplet animate-pulse-red" style="position: absolute; right: -20px; bottom: 0; font-size: 60px; color: var(--red);"></i>
+        </div>
+        <h1 style="margin-top: 30px;">이것은 결코 공짜가 아닙니다</h1>
+    </div>
+
+    <!-- 씬 88: 환헤지 설명 북 -->
+    <div class="scene" id="scene88">
+        <div class="box-gray" style="padding: 60px;">
+            <h2>환헤지의 메커니즘</h2>
+            <p style="margin-top: 20px;">최대한 쉽게 풀어드립니다</p>
+        </div>
+    </div>
+
+    <!-- 씬 89: 달러 빌리기 플로우 -->
+    <div class="scene" id="scene89">
+        <div style="display: flex; gap: 40px; align-items: center;">
+            <div class="box">달러 차입</div>
+            <i class="fa-solid fa-arrows-left-right" style="font-size: 40px;"></i>
+            <div class="box-blue">원화 담보 제공</div>
+        </div>
+        <p style="margin-top: 30px;">미래의 환율을 현재에 고정하는 계약</p>
+    </div>
+
+    <!-- 씬 90: 석 달 뒤 타임라인 -->
+    <div class="scene" id="scene90">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <span class="box-pink">T (현재)</span>
+            <div style="width: 200px; height: 4px; background: #333;"></div>
+            <span class="box">T + 3개월 (정산)</span>
+        </div>
+    </div>
+
+    <!-- 씬 91: 이자 발생 -->
+    <div class="scene" id="scene91">
+        <div style="display: flex; gap: 40px;">
+            <div class="box-pink" style="text-align: center;">
+                <p>달러 이자</p>
+                <p class="text-red">지출 (-)</p>
+            </div>
+            <div class="box-green" style="text-align: center;">
+                <p>원화 이자</p>
+                <p class="text-green">수입 (+)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 92: 금리 역전 바 -->
+    <div class="scene" id="scene92">
+        <h2>한-미 기준금리 비교</h2>
+        <div style="display: flex; align-items: flex-end; gap: 60px; height: 250px;">
+            <div style="text-align: center;">
+                <div class="bar bar-blue" style="width: 120px; height: 180px;"></div>
+                <p>미국 4%대</p>
+            </div>
+            <div style="text-align: center;">
+                <div class="bar bar-red" style="width: 120px; height: 100px;"></div>
+                <p>한국 2%대</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 93: 금리 차이 손해 KPI -->
+    <div class="scene" id="scene93">
+        <div class="box" style="border-color: var(--red);">
+            <p class="text-sm">이자율 차이로 인한 손실</p>
+            <h1 style="font-size: 120px;" class="text-red">역전 폭 만큼</h1>
+            <p class="text-red">국민연금의 잠재적 손해</p>
+        </div>
+    </div>
+
+    <!-- 씬 94: 손해 증가 영역 -->
+    <div class="scene" id="scene94">
+        <h2>기간 경과에 따른 누적 손실</h2>
+        <div class="line-chart" style="width: 600px; height: 250px;">
+            <svg width="100%" height="100%">
+                <polygon points="20,230 100,210 300,150 580,30 580,230 20,230" fill="rgba(239, 68, 68, 0.2)" stroke="var(--red)" stroke-width="4"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- 씬 95: 착각 전구 -->
+    <div class="scene" id="scene95">
+        <i class="fa-solid fa-lightbulb animate-subtle" style="font-size: 150px; color: var(--yellow);"></i>
+        <h1 style="margin-top: 30px;">우리가 착각하고 있는 것</h1>
+    </div>
+
+    <!-- 씬 96: 수익률 뉴스 -->
+    <div class="scene" id="scene96">
+        <div class="box-blue" style="text-align: left; padding: 40px;">
+            <p class="text-gray">뉴스 헤드라인</p>
+            <h2 style="margin-top: 15px;">"국민연금, 역대 최고 수익률 달성!"</h2>
+        </div>
+        <p style="margin-top: 30px;">하지만 <span class="text-red">현금</span>은 다릅니다</p>
+    </div>
+
+    <!-- 씬 97: 미실현 수익 -->
+    <div class="scene" id="scene97">
+        <div style="display: flex; gap: 50px; align-items: center;">
+            <i class="fa-solid fa-chart-line" style="font-size: 100px; opacity: 0.3;"></i>
+            <i class="fa-solid fa-ghost animate-float" style="font-size: 100px; color: var(--blue);"></i>
+        </div>
+        <h1>미실현 평가 수익</h1>
+        <p>팔기 전까지는 내 돈이 아닙니다</p>
+    </div>
+
+    <!-- 씬 98: 현금 비용 KPI -->
+    <div class="scene" id="scene98">
+        <div style="display: flex; gap: 40px; width: 90%;">
+            <div class="box" style="flex: 1;">수익 (장부상)</div>
+            <div class="box-pink" style="flex: 1;">비용 (실제 현금 지출)</div>
+        </div>
+        <p style="margin-top: 30px;">환헤지 비용은 <span class="text-red">매번 생돈</span>이 나갑니다</p>
+    </div>
+
+    <!-- 씬 99: 손실 눈덩이 -->
+    <div class="scene" id="scene99">
+        <i class="fa-solid fa-circle-nodes animate-spin-slow" style="font-size: 130px; color: var(--red);"></i>
+        <h1 style="margin-top: 30px;">눈덩이 손실의 가속화</h1>
+    </div>
+
+    <!-- 씬 100: 중요한 질문 -->
+    <div class="scene" id="scene100">
+        <i class="fa-solid fa-circle-question animate-float" style="font-size: 180px; color: var(--blue);"></i>
+        <h1 style="margin-top: 40px;">본질적인 질문을 던질 때</h1>
+    </div>
+
+    <!-- 씬 101: 환율 상승 화살표 -->
+    <div class="scene" id="scene101">
+        <i class="fa-solid fa-arrow-up-long animate-subtle" style="font-size: 200px; color: var(--red);"></i>
+        <h1 style="margin-top: 30px;">왜 계속 오르는 걸까?</h1>
+    </div>
+
+    <!-- 씬 102: 남 탓하는 아이콘 -->
+    <div class="scene" id="scene102">
+        <div style="display: flex; gap: 40px;">
+            <div class="box-gray">청년 해외투자 탓</div>
+            <div class="box-gray">기업 달러보유 탓</div>
+        </div>
+        <p style="margin-top: 30px;">정부는 <span class="text-red">원인이 아닌 곳</span>을 봅니다</p>
+    </div>
+
+    <!-- 씬 103: 증상 vs 원인 뿌리 -->
+    <div class="scene" id="scene103">
+        <div style="text-align: center;">
+            <div class="box" style="margin-bottom: 20px;">잎사귀 (증상: 환율)</div>
+            <i class="fa-solid fa-arrow-up" style="font-size: 40px;"></i>
+            <div class="box-pink" style="padding: 40px 80px;">뿌리 (원인: 구조)</div>
+        </div>
+    </div>
+
+    <!-- 씬 104: 뇌 문제 비유 -->
+    <div class="scene" id="scene104">
+        <div style="display: flex; gap: 50px; align-items: center;">
+            <i class="fa-solid fa-brain" style="font-size: 100px; color: var(--red);"></i>
+            <i class="fa-solid fa-ban" style="font-size: 100px; color: var(--gray);"></i>
+            <i class="fa-solid fa-pills" style="font-size: 100px; color: var(--blue);"></i>
+        </div>
+        <p style="margin-top: 30px;">두통약은 <span class="text-red">임시방편</span>일 뿐입니다</p>
+    </div>
+
+    <!-- 씬 105: 근본 원인 물음표 -->
+    <div class="scene" id="scene105">
+        <h1 style="font-size: 100px;">환율 상승의 <span class="hl-pink">진짜 이유</span></h1>
+    </div>
+
+    <!-- 씬 106: 한국은행 유동성 수도꼭지 -->
+    <div class="scene" id="scene106">
+        <div style="position: relative;">
+            <i class="fa-solid fa-faucet-drip" style="font-size: 150px; color: var(--blue);"></i>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <i class="fa-solid fa-dollar-sign animate-subtle" style="color: var(--green);"></i>
+                <i class="fa-solid fa-dollar-sign animate-subtle" style="color: var(--green); animation-delay: 0.5s;"></i>
+            </div>
+        </div>
+        <p style="margin-top: 30px;">1. 과도하게 풀린 <span class="text-blue">유동성</span></p>
+    </div>
+
+    <!-- 씬 107: 42개월 금리 역전 -->
+    <div class="scene" id="scene107">
+        <div class="box" style="padding: 50px;">
+            <h1 style="font-size: 90px;" class="text-red">42개월</h1>
+            <p>한-미 금리 역전 기간</p>
+            <p class="text-sm text-gray">대한민국 역사상 최장 기간</p>
+        </div>
+    </div>
+
+    <!-- 씬 108: 재정 적자 바 -->
+    <div class="scene" id="scene108">
+        <h2>정부 재정 수지</h2>
+        <div style="display: flex; align-items: flex-start; gap: 50px; height: 250px;">
+            <div class="bar bar-red animate-pulse-red" style="width: 150px; height: 200px;"></div>
+        </div>
+        <p style="margin-top: 30px;">3. 과도한 <span class="text-red">재정 적자</span></p>
+    </div>
+
+    <!-- 씬 109: 시장 행동 아이콘 -->
+    <div class="scene" id="scene109">
+        <i class="fa-solid fa-users-viewfinder animate-subtle" style="font-size: 130px; color: var(--gray);"></i>
+        <h1 style="margin-top: 30px;">시장은 이미 알고 행동합니다</h1>
+    </div>
+
+    <!-- 씬 110: 근본 치료 -->
+    <div class="scene" id="scene110">
+        <div class="box-green" style="padding: 50px;">
+            <i class="fa-solid fa-hand-holding-medical" style="font-size: 80px; margin-bottom: 20px;"></i>
+            <h1>근본 치료가 시급합니다</h1>
+        </div>
+    </div>
+
+    <!-- 씬 111: 방어 여력 소진 경고 -->
+    <div class="scene" id="scene111">
+        <div class="gauge-track" style="width: 70%;">
+            <div class="gauge-fill animate-pulse-red" style="width: 5%; background: var(--red);"></div>
+        </div>
+        <h1 style="margin-top: 30px;" class="text-red">방어 여력 한계</h1>
+        <p>반복된 개입은 힘을 약화시킵니다</p>
+    </div>
+
+    <!-- 씬 112: 핵심 정리 리스트 -->
+    <div class="scene" id="scene112">
+        <div class="box-gray" style="text-align: left; padding: 40px 60px;">
+            <h1 style="border-bottom: 3px solid #222; margin-bottom: 20px;">핵심 요약</h1>
+            <p>• 톱니 모양 = 개입 예고</p>
+            <p>• 연말 종가 = 회계적 분장</p>
+            <p>• 1월 중순 = 다시 위기</p>
+        </div>
+    </div>
+
+    <!-- 씬 113: 톱니 다시 강조 -->
+    <div class="scene" id="scene113">
+        <div class="line-chart" style="width: 500px; height: 150px;">
+            <svg width="100%" height="100%">
+                <polyline points="10,80 40,20 70,80 100,20 130,80 160,20" stroke="var(--red)" stroke-width="4" fill="none"/>
+            </svg>
+        </div>
+        <p style="margin-top: 20px;">이 패턴을 <span class="hl-pink">절대 잊지 마세요</span></p>
+    </div>
+
+    <!-- 씬 114: 종가 관리 이유 KPI -->
+    <div class="scene" id="scene114">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 90%;">
+            <div class="box-blue">기업 부채 축소</div>
+            <div class="box-blue">은행 건전성 유지</div>
+            <div class="box-blue">국가 외채 관리</div>
+            <div class="box-blue">장부 분장 효과</div>
+        </div>
+    </div>
+
+    <!-- 씬 115: 1월 불안 선 -->
+    <div class="scene" id="scene115">
+        <div class="line-chart" style="width: 600px; height: 250px;">
+            <svg width="100%" height="100%">
+                <polyline points="20,150 200,160 300,50 400,200 550,20" stroke="var(--orange)" stroke-width="5" fill="none"/>
+            </svg>
+        </div>
+        <p style="margin-top: 20px;">1월 중순 이후 <span class="text-orange">변동성 확대</span></p>
+    </div>
+
+    <!-- 씬 116: 환헤지 비용 아이콘 -->
+    <div class="scene" id="scene116">
+        <div style="display: flex; gap: 30px; align-items: center;">
+            <i class="fa-solid fa-piggy-bank" style="font-size: 100px;"></i>
+            <i class="fa-solid fa-minus" style="font-size: 60px;"></i>
+            <i class="fa-solid fa-sack-dollar animate-subtle" style="font-size: 100px; color: var(--red);"></i>
+        </div>
+        <p style="margin-top: 30px;">우리 모두의 돈이 <span class="text-red">비용</span>으로 증발 중</p>
+    </div>
+
+    <!-- 씬 117: 근본 원인 3요소 아이콘 -->
+    <div class="scene" id="scene117">
+        <div style="display: flex; gap: 40px;">
+            <div style="text-align: center;"><i class="fa-solid fa-percent" style="font-size: 80px;"></i><p>금리차</p></div>
+            <div style="text-align: center;"><i class="fa-solid fa-money-bill-1" style="font-size: 80px;"></i><p>유동성</p></div>
+            <div style="text-align: center;"><i class="fa-solid fa-receipt" style="font-size: 80px;"></i><p>적자</p></div>
+        </div>
+    </div>
+
+    <!-- 씬 118: 일희일비 금지 -->
+    <div class="scene" id="scene118">
+        <div style="display: flex; gap: 80px; align-items: center;">
+            <div style="text-align: center; opacity: 0.5;">😰</div>
+            <i class="fa-solid fa-slash" style="font-size: 100px; transform: rotate(-45deg);"></i>
+            <div style="text-align: center;">🛡️</div>
+        </div>
+        <h1 style="margin-top: 30px;">일희일비하지 마십시오</h1>
+    </div>
+
+    <!-- 씬 119: 자산 지키기 금고 -->
+    <div class="scene" id="scene119">
+        <div style="display: flex; gap: 30px; align-items: center;">
+            <i class="fa-solid fa-vault animate-subtle" style="font-size: 150px; color: var(--gray);"></i>
+            <div style="text-align: left;">
+                <p>• 달러 자산</p>
+                <p>• 해외 투자</p>
+                <p>• 분산 투자</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 120: 좋아요 구독 -->
+    <div class="scene" id="scene120">
+        <div style="display: flex; gap: 50px;">
+            <i class="fa-solid fa-thumbs-up animate-float" style="font-size: 120px; color: var(--blue);"></i>
+            <i class="fa-solid fa-bell animate-subtle" style="font-size: 120px; color: var(--yellow);"></i>
+        </div>
+        <h1 style="margin-top: 40px;">구독과 좋아요는 큰 힘이 됩니다</h1>
+    </div>
+
+    <!-- 씬 121: 감사 인사 -->
+    <div class="scene" id="scene121">
+        <div class="box-green" style="padding: 60px 100px;">
+            <h1 style="font-size: 120px;">감사합니다</h1>
+        </div>
+    </div>
+
+</div>
+
+<div id="controls">
+    <button onclick="move(-1)">이전 (Left)</button>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    <button onclick="move(1)">다음 (Right)</button>
+    <div style="font-size: 24px; margin-left: 20px;">
+        <span id="current-idx">1</span> / <span id="total-scenes">121</span>
+    </div>
+</div>
+
+<script>
+    let currentIdx = 0;
+    const scenes = document.querySelectorAll('.scene');
+    const progressBar = document.getElementById('progress-bar');
+    const counterText = document.getElementById('current-idx');
+    const totalText = document.getElementById('total-scenes');
+
+    if (totalText) totalText.innerText = scenes.length;
+
+    function update() {
+        scenes.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
+        progressBar.style.width = ((currentIdx + 1) / scenes.length * 100) + '%';
+        counterText.innerText = currentIdx + 1;
+    }
+
+    function move(n) {
+        currentIdx += n;
+        if (currentIdx < 0) currentIdx = 0;
+        if (currentIdx >= scenes.length) currentIdx = scenes.length - 1;
+        update();
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') move(1);
+        if (e.key === 'ArrowLeft') move(-1);
+    });
+
+    update();
+</script>
+
+</body>
+</html>

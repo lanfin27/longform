@@ -63,23 +63,23 @@ def render_style_card(style: Style, manager: StyleManager, segment: str, idx: in
                 st.markdown("**Negative:**")
                 st.code(style.negative_prompt, language=None)
 
-        # 버튼
+        # 버튼 (segment를 포함하여 고유 키 생성)
         col_a, col_b = st.columns(2)
         with col_a:
-            if st.button("✏️ 수정", key=f"edit_{style.id}_{idx}", use_container_width=True):
+            if st.button("✏️ 수정", key=f"edit_{segment}_{style.id}_{idx}", use_container_width=True):
                 st.session_state["editing_style_id"] = style.id
                 st.session_state["editing_segment"] = segment
                 st.rerun()
         with col_b:
             if not style.is_default:
-                if st.button("🗑️ 삭제", key=f"del_{style.id}_{idx}", use_container_width=True):
-                    if st.session_state.get(f"confirm_del_{style.id}"):
+                if st.button("🗑️ 삭제", key=f"del_{segment}_{style.id}_{idx}", use_container_width=True):
+                    if st.session_state.get(f"confirm_del_{segment}_{style.id}"):
                         manager.delete_style(style.id)
                         invalidate_style_cache()  # 다른 페이지에 알림
                         st.success("삭제됨!")
                         st.rerun()
                     else:
-                        st.session_state[f"confirm_del_{style.id}"] = True
+                        st.session_state[f"confirm_del_{segment}_{style.id}"] = True
                         st.warning("다시 클릭하면 삭제됩니다.")
 
 
@@ -168,7 +168,15 @@ def render_add_style(manager: StyleManager, segment: str):
             return
 
         import uuid
-        style_id = new_id.lower().replace(" ", "_") if new_id else f"{segment}_{uuid.uuid4().hex[:8]}"
+        import re
+
+        # ID 정규화: 공백 → 언더스코어, 특수문자 제거
+        if new_id:
+            style_id = new_id.replace(" ", "_")
+            style_id = re.sub(r'[^a-zA-Z0-9_가-힣]', '', style_id)
+            style_id = style_id.lower() if style_id else f"{segment}_{uuid.uuid4().hex[:8]}"
+        else:
+            style_id = f"{segment}_{uuid.uuid4().hex[:8]}"
 
         new_style = Style(
             id=style_id,
@@ -182,12 +190,22 @@ def render_add_style(manager: StyleManager, segment: str):
             is_default=False
         )
 
-        if manager.add_style(new_style):
+        # ✅ 튜플 반환 처리 (성공여부, 메시지)
+        result = manager.add_style(new_style)
+
+        # 하위 호환성: bool 또는 tuple 처리
+        if isinstance(result, tuple):
+            success, message = result
+        else:
+            success = result
+            message = "추가됨" if result else "추가 실패"
+
+        if success:
             invalidate_style_cache()  # 다른 페이지에 알림
-            st.success(f"'{new_name_ko}' 추가됨!")
+            st.success(f"✅ {message}")
             st.rerun()
         else:
-            st.error("추가 실패 (중복 ID?)")
+            st.error(f"❌ {message}")
 
 
 def render_edit_style(manager: StyleManager):
@@ -403,19 +421,91 @@ def render_segment_tab(manager: StyleManager, segment: str):
         render_test_style(manager, segment)
 
 
+def render_infographic_style_tab(manager: StyleManager):
+    """인포그래픽 스타일 탭 - 레이아웃 미리보기 포함"""
+
+    # 수정 모드인지 확인
+    if st.session_state.get("editing_style_id") and st.session_state.get("editing_segment") == "infographic":
+        render_edit_style(manager)
+        return
+
+    # 설명 섹션
+    with st.expander("💡 인포그래픽 스타일이란?", expanded=False):
+        st.markdown("""
+        **인포그래픽용 이미지**는 가운데를 비워두고 모서리/가장자리에 요소를 배치합니다.
+
+        이렇게 생성된 이미지는 인포그래픽(텍스트, 그래프 등)과 합성할 때
+        서로 겹치지 않고 자연스럽게 조화를 이룹니다.
+
+        ```
+        일반 이미지:           인포그래픽용 이미지:
+        ┌─────────────┐       ┌─────────────┐
+        │  [캐릭터]   │       │[A]       [B]│
+        │   가운데    │       │             │
+        │             │       │   (비움)    │
+        └─────────────┘       │             │
+                              │[C]       [D]│
+                              └─────────────┘
+        ```
+        """)
+
+    # 서브 탭
+    sub_tabs = st.tabs(["📋 목록", "➕ 추가", "📐 레이아웃", "🧪 테스트"])
+
+    with sub_tabs[0]:
+        render_style_list(manager, "infographic")
+
+    with sub_tabs[1]:
+        render_add_style(manager, "infographic")
+
+    with sub_tabs[2]:
+        render_layout_preview()
+
+    with sub_tabs[3]:
+        render_test_style(manager, "infographic")
+
+
+def render_layout_preview():
+    """레이아웃 미리보기"""
+
+    st.markdown("### 📐 레이아웃 옵션")
+    st.caption("인포그래픽 이미지 생성 시 선택할 수 있는 레이아웃입니다.")
+
+    try:
+        from utils.infographic_image_generator import get_available_layouts, get_layout_preview_html
+
+        layouts = get_available_layouts()
+
+        cols = st.columns(3)
+
+        for idx, layout in enumerate(layouts):
+            with cols[idx % 3]:
+                with st.container(border=True):
+                    st.markdown(f"**{layout['icon']} {layout['name']}**")
+                    st.caption(layout['description'])
+
+                    # 시각적 미리보기
+                    preview_html = get_layout_preview_html(layout['id'])
+                    st.markdown(preview_html, unsafe_allow_html=True)
+
+    except ImportError:
+        st.warning("인포그래픽 생성기 모듈을 로드할 수 없습니다.")
+
+
 def main():
     st.title("🎨 스타일 관리")
-    st.caption("캐릭터, 배경, 씬 합성 스타일을 세그먼트별로 관리합니다.")
+    st.caption("캐릭터, 배경, 씬 합성, 인포그래픽 스타일을 세그먼트별로 관리합니다.")
 
     # StyleManager 초기화
     project_path = get_project_path()
     manager = get_style_manager(project_path if project_path else None)
 
-    # 메인 탭 (3개 세그먼트)
+    # 메인 탭 (4개 세그먼트)
     segment_tabs = st.tabs([
         "👤 캐릭터 스타일",
         "🏞️ 배경 스타일",
-        "🎬 씬 합성 스타일"
+        "🎬 씬 합성 스타일",
+        "📊 인포그래픽 스타일"
     ])
 
     with segment_tabs[0]:
@@ -427,6 +517,9 @@ def main():
     with segment_tabs[2]:
         render_segment_tab(manager, "scene_composite")
 
+    with segment_tabs[3]:
+        render_infographic_style_tab(manager)
+
     # 사이드바 - Export/Import
     st.sidebar.markdown("---")
     st.sidebar.markdown("### 📦 Export / Import")
@@ -435,7 +528,8 @@ def main():
         export_data = {
             "character": [s.to_dict() for s in manager.get_styles_by_segment("character") if not s.is_default],
             "background": [s.to_dict() for s in manager.get_styles_by_segment("background") if not s.is_default],
-            "scene_composite": [s.to_dict() for s in manager.get_styles_by_segment("scene_composite") if not s.is_default]
+            "scene_composite": [s.to_dict() for s in manager.get_styles_by_segment("scene_composite") if not s.is_default],
+            "infographic": [s.to_dict() for s in manager.get_styles_by_segment("infographic") if not s.is_default]
         }
 
         st.sidebar.download_button(
@@ -453,7 +547,10 @@ def main():
             for segment, styles in import_data.items():
                 for style_data in styles:
                     style = Style.from_dict(style_data)
-                    if manager.add_style(style):
+                    result = manager.add_style(style)
+                    # 하위 호환성: bool 또는 tuple 처리
+                    success = result[0] if isinstance(result, tuple) else result
+                    if success:
                         count += 1
             if count > 0:
                 invalidate_style_cache()  # 다른 페이지에 알림

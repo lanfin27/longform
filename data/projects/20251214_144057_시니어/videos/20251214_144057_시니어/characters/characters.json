@@ -1,0 +1,120 @@
+[
+  {
+    "id": "kim_semu",
+    "name": "김세무",
+    "name_en": "Kim Semu",
+    "description": "40대 중반, 남성, 세무 전문가, 정장 착용, 안경 착용, 신뢰감 있는 외모, 차분하고 전문적인 말투",
+    "role": "주연",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged Korean male tax expert in his 40s, wearing business suit and glasses, professional and trustworthy appearance, confident posture, expert demeanor",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\characters\\images\\kim_semu.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김세무_standing_1766839225312.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김세무_standing_1766839315157.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김세무_standing_1766839428344.png"
+    ],
+    "appearance_scenes": [],
+    "created_at": "2025-12-14T18:15:58.345337",
+    "updated_at": "2026-01-04T21:57:34.155956"
+  },
+  {
+    "id": "small_business_owner",
+    "name": "중소기업사장",
+    "name_en": "Small Business Owner",
+    "description": "50대 초반, 남성, 중소기업 경영자, 캐주얼한 정장, 진지한 표정, 세금 고민하는 모습",
+    "role": "주연",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Korean small business owner in early 50s, casual business attire, concerned expression about tax matters, realistic entrepreneur appearance",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\characters\\images\\small_business_owner.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_중소기업사장_standing_1766839228773.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_중소기업사장_standing_1766839317544.png"
+    ],
+    "appearance_scenes": [],
+    "created_at": "2025-12-14T18:15:58.346422",
+    "updated_at": "2026-01-04T21:57:34.155971"
+  },
+  {
+    "id": "mr._kim",
+    "name": "김사장님",
+    "name_en": "Mr. Kim",
+    "description": "45세, 남성, 제조업체 사장, 작업복 또는 캐주얼 정장, 성실한 외모, 중소기업 경영자의 전형적 모습",
+    "role": "주연",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Korean manufacturing company president, 45 years old, wearing work clothes or casual suit, diligent appearance, typical small business owner look",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\characters\\images\\mr._kim.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김사장님_standing_1766839323887.png"
+    ],
+    "appearance_scenes": [],
+    "created_at": "2025-12-14T18:15:58.347270",
+    "updated_at": "2026-01-04T21:57:34.155978"
+  },
+  {
+    "id": "kim_jung-bin",
+    "name": "김정빈",
+    "name_en": "Kim Jung-bin",
+    "description": "지갑을 잃어버린 남자",
+    "role": "주연",
+    "nationality": "",
+    "era": "",
+    "appearance": "",
+    "character_prompt": "Korean man in his early 20s, short black hair, brown eyes, fair skin tone, wearing a casual t-shirt and jeans, carrying a backpack",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_standing_1766836048813.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_talking_1766837427927.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_surprised_1766837435208.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_happy_1766837441905.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_walking_1766837448618.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_talking_1766838629558.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_surprised_1766838636212.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_happy_1766838643104.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_walking_1766838650271.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_standing_1766839234952.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_standing_1766839327329.png"
+    ],
+    "appearance_scenes": [
+      3,
+      4,
+      5,
+      6,
+      9,
+      12,
+      13,
+      14
+    ],
+    "created_at": "2025-12-27T20:47:05.011258",
+    "updated_at": "2026-01-04T21:57:34.155983"
+  },
+  {
+    "id": "char_4",
+    "name": "이재용",
+    "name_en": "",
+    "description": "스크립트에서 추출된 인물: 이재용 (회장)",
+    "role": "회장",
+    "nationality": "",
+    "era": "",
+    "appearance": "",
+    "character_prompt": "Modern professional, business attire, contemporary appearance",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_이재용_standing_1767348639492.png"
+    ],
+    "appearance_scenes": [
+      34,
+      35
+    ],
+    "created_at": "2026-01-02T19:09:07.142200",
+    "updated_at": "2026-01-04T21:57:34.157750"
+  }
+]

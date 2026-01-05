@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "characters": [
+    {
+      "id": "char_001",
+      "name": "경제학똑돌이2",
+      "description": "30대남성 경제전문가 안경착용",
+      "folder": "char_001_경제학똑돌이2",
+      "thumbnail": "thumbnail.png",
+      "created_at": "2026-01-01T19:15:50.122864",
+      "updated_at": "2026-01-01T22:51:06.598491",
+      "tags": [],
+      "usage_count": 1
+    }
+  ],
+  "last_selected_id": "char_001",
+  "created_at": "2026-01-01T19:15:42.502444",
+  "updated_at": "2026-01-01T22:51:06.599309"
+}

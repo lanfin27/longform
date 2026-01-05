@@ -12,9 +12,13 @@ import requests
 import tempfile
 import io
 from pathlib import Path
+import json
 
 # 경로 설정
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# 프로젝트 매니저 임포트 (씬 분석 결과 로드용)
+from utils.project_manager import get_current_project
 
 # TTS 유틸리티 임포트
 from utils.tts_utils import (
@@ -59,6 +63,29 @@ from utils.audio_normalizer_forced import (
     analyze_normalization_stats
 )
 
+# TTS 다운로드 컴포넌트
+from components.tts_audio_downloader import (
+    render_tts_download_section,
+    get_simple_filename,
+    TTSAudioDownloader
+)
+
+# TTS 텍스트 정규화 (콤마 숫자, 영어 약어 등)
+from utils.text_normalizer import normalize_for_tts
+
+# AI 텍스트 전처리 (영어 → 발음 변환)
+from components.ai_preprocessing_panel import (
+    render_ai_preprocessing_panel,
+    apply_preprocessing_to_scenes
+)
+
+# 씬 구간 선택 컴포넌트
+from components.scene_range_selector import (
+    render_scene_range_selector,
+    parse_range_string,
+    format_selection_summary
+)
+
 # 완벽 정규화 (3-Pass, ±1% 편차 목표)
 from utils.audio_perfect_normalizer import (
     PerfectAudioNormalizer,
@@ -83,7 +110,7 @@ from utils.audio_unified_processor import (
     process_all_unified
 )
 
-# ⭐ 참조 음성 분석기 v2.0 (텍스트 기반 정확 측정 + 파라미터 자동 추천)
+# ⭐ 참조 음성 분석기 v2.2 (텍스트 기반 정확 측정 + 파라미터 자동 추천 + 최적화)
 from utils.voice_analyzer import (
     VoiceAnalyzer,
     analyze_voice_and_get_params,
@@ -91,7 +118,19 @@ from utils.voice_analyzer import (
     get_voice_transcript,
     set_voice_transcript,
     get_profile_manager,
-    optimize_voice_for_cloning  # ⭐ 참조 음성 최적화 (15~30초 추출)
+    optimize_voice_for_cloning,  # 참조 음성 최적화 (15~30초 추출)
+    is_voice_optimization_needed,  # ⭐ 최적화 필요 여부 확인
+    get_optimized_voice_path,  # ⭐ 최적화 버전 경로 반환
+    optimize_and_register_voice,  # ⭐ 최적화 후 프로필 등록
+    scan_optimized_versions,  # ⭐ 모든 최적화 버전 스캔
+    get_version_manager,  # ⭐ 버전 관리자
+    create_manual_optimized_voice  # ⭐ 수동 구간 선택 최적화
+)
+
+# ⭐ 파형 시각화 및 수동 구간 선택
+from utils.waveform_visualizer import (
+    WaveformVisualizer,
+    get_waveform_visualizer
 )
 
 # ⭐ TTS 자연스러움 최적화 (temperature/repetition_penalty 조정)
@@ -142,8 +181,333 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
+# ============================================================
+# 씬 분석 결과 로드 함수
+# ============================================================
+
+def load_scenes_from_json(force_reload: bool = False) -> tuple[list, bool]:
+    """
+    프로젝트의 scenes.json 파일에서 씬 분석 결과를 로드합니다.
+
+    Args:
+        force_reload: True이면 세션 상태를 무시하고 파일에서 강제 로드
+
+    Returns:
+        (scenes_list, is_loaded_from_file)
+        - scenes_list: 씬 목록
+        - is_loaded_from_file: 파일에서 새로 로드됐는지 여부
+    """
+    # 현재 프로젝트 정보 가져오기 (Path 객체 반환)
+    project_path = get_current_project()
+    if not project_path:
+        return [], False
+
+    # get_current_project()는 Path 객체를 반환함
+    if not isinstance(project_path, Path):
+        project_path = Path(project_path)
+
+    scenes_json_path = project_path / "analysis" / "scenes.json"
+
+    if not scenes_json_path.exists():
+        return [], False
+
+    try:
+        # 파일 수정 시간 확인
+        file_mtime = scenes_json_path.stat().st_mtime
+        last_loaded_mtime = st.session_state.get("scenes_json_mtime", 0)
+
+        # 강제 로드이거나 파일이 수정된 경우 로드
+        if force_reload or file_mtime > last_loaded_mtime:
+            with open(scenes_json_path, "r", encoding="utf-8") as f:
+                scenes = json.load(f)
+
+            # 세션 상태에 저장
+            st.session_state["scenes"] = scenes
+            st.session_state["scenes_json_mtime"] = file_mtime
+
+            # 씬 분석 스크립트도 업데이트
+            if scenes:
+                script_texts = []
+                for scene in scenes:
+                    text = scene.get("script_text", "") or scene.get("text", "")
+                    if text:
+                        script_texts.append(text)
+                st.session_state["scene_analysis_script"] = "\n\n".join(script_texts)
+
+            return scenes, True
+        else:
+            # 세션 상태에서 반환
+            return st.session_state.get("scenes", []), False
+
+    except Exception as e:
+        st.error(f"씬 데이터 로드 실패: {e}")
+        return [], False
+
+
+def get_scenes_json_info() -> dict:
+    """
+    scenes.json 파일 정보를 반환합니다.
+
+    Returns:
+        {"exists": bool, "scene_count": int, "last_modified": str, "path": str}
+    """
+    project_path = get_current_project()
+    if not project_path:
+        return {"exists": False, "scene_count": 0, "last_modified": "", "path": ""}
+
+    # get_current_project()는 Path 객체를 반환함
+    if not isinstance(project_path, Path):
+        project_path = Path(project_path)
+
+    scenes_json_path = project_path / "analysis" / "scenes.json"
+
+    if not scenes_json_path.exists():
+        return {"exists": False, "scene_count": 0, "last_modified": "", "path": str(scenes_json_path)}
+
+    try:
+        mtime = scenes_json_path.stat().st_mtime
+        from datetime import datetime
+        last_modified = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
+
+        with open(scenes_json_path, "r", encoding="utf-8") as f:
+            scenes = json.load(f)
+
+        return {
+            "exists": True,
+            "scene_count": len(scenes),
+            "last_modified": last_modified,
+            "path": str(scenes_json_path)
+        }
+    except Exception:
+        return {"exists": False, "scene_count": 0, "last_modified": "", "path": str(scenes_json_path)}
+
+
 # Chatterbox 서버 설정
 CHATTERBOX_URL = "http://localhost:8100"
+
+
+# ============================================================
+# 음성 품질 프리셋 정의 (Chatterbox 전처리/후처리 설정)
+# ============================================================
+
+VOICE_QUALITY_PRESETS = {
+    # ⭐⭐⭐ 새로운 프리셋: 원본 그대로 (Raw) ⭐⭐⭐
+    "raw": {
+        "name": "🎯 원본 그대로 (Raw)",
+        "description": "전처리/후처리 없음. 참조 음성 특성 100% 보존. 가장 자연스러운 한국어 발음.",
+        "badge": "자연스러움 ★★★★★★",
+        "preprocess": {
+            "enabled": False,  # ⭐ 전처리 완전 비활성화
+            "noisereduce_strength": 0.0,
+            "bandpass_low": 0,
+            "bandpass_high": 24000,
+            "noise_gate_db": -100,
+            "normalize_peak": 1.0,
+        },
+        "postprocess": {
+            "enabled": False,  # ⭐ 후처리 완전 비활성화
+            "noisereduce_strength": 0.0,
+            "lowpass_cutoff": 24000,
+            "soft_clip": False,
+        },
+        "tts_params": {
+            "exaggeration": 0.35,          # 낮춤 → 더 안정적
+            "temperature": 0.72,           # 낮춤 → 더 일관적
+            "cfg_weight": 0.65,            # 높임 → 참조 음성에 더 충실
+            "repetition_penalty": 1.10,    # ⭐ 낮춤 → 자연스러운 반복
+        }
+    },
+    # ⭐ 최소 처리 (Minimal) - 리샘플링만
+    "minimal": {
+        "name": "🌱 최소 처리 (Minimal)",
+        "description": "리샘플링만 적용. 노이즈 제거/필터 없음. 거의 원본 수준.",
+        "badge": "자연스러움 ★★★★★☆",
+        "preprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.0,   # 노이즈 제거 없음
+            "bandpass_low": 20,            # 최소 필터
+            "bandpass_high": 22000,        # 거의 전체 대역
+            "noise_gate_db": -80,          # 거의 없음
+            "normalize_peak": 0.98,        # 거의 원본
+        },
+        "postprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.0,   # 없음
+            "lowpass_cutoff": 22000,
+            "soft_clip": False,
+        },
+        "tts_params": {
+            "exaggeration": 0.40,
+            "temperature": 0.55,           # 0.75 → 0.55 (일관성 강화)
+            "cfg_weight": 0.70,            # 0.60 → 0.70 (참조 음성 충실)
+            "repetition_penalty": 1.15,    # 추가 (자연스러운 반복)
+        }
+    },
+    # ⭐⭐⭐ 새로운 프리셋: 발음 일관성 (Consistent) ⭐⭐⭐
+    "consistent": {
+        "name": "🎯 발음 일관성 (Consistent)",
+        "description": "씬 간 발음 일관성 최대화. 같은 단어가 항상 같게 발음됨. 한국어 TTS 권장.",
+        "badge": "일관성 ★★★★★★",
+        "preprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.15,
+            "bandpass_low": 30,
+            "bandpass_high": 20000,
+            "noise_gate_db": -60,
+            "normalize_peak": 0.95,
+        },
+        "postprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.05,
+            "lowpass_cutoff": 20000,
+            "soft_clip": False,
+        },
+        "tts_params": {
+            "exaggeration": 0.38,          # ⭐ 낮춤 → 안정적 발음
+            "temperature": 0.50,           # ⭐ 낮춤 → 결정적 출력
+            "cfg_weight": 0.72,            # ⭐ 높임 → 참조 음성에 충실
+            "repetition_penalty": 1.10,    # ⭐ 낮춤 → 자연스러운 반복
+        }
+    },
+    "ultra_natural": {
+        "name": "🎙️ 완전 자연스러운",
+        "description": "매우 약한 처리. 원본 특성 최대 보존. 발음 일관성 강화됨.",
+        "badge": "자연스러움 ★★★★★",
+        "preprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.15,  # 20% → 15%로 낮춤
+            "bandpass_low": 30,            # 35 → 30으로 낮춤
+            "bandpass_high": 20000,        # 19000 → 20000으로 높임
+            "noise_gate_db": -60,          # -58 → -60으로 낮춤
+            "normalize_peak": 0.95,
+        },
+        "postprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.05,  # 10% → 5%로 낮춤
+            "lowpass_cutoff": 20000,       # 19000 → 20000
+            "soft_clip": False,
+        },
+        "tts_params": {
+            "exaggeration": 0.42,          # 0.45 → 0.42 (더 안정적)
+            "temperature": 0.55,           # 0.78 → 0.55 (일관성 강화)
+            "cfg_weight": 0.68,            # 0.55 → 0.68 (참조 음성 충실)
+            "repetition_penalty": 1.12,    # 추가 (자연스러운 반복)
+        }
+    },
+    "natural": {
+        "name": "🌿 자연스러운",
+        "description": "약한 처리. 자연스러운 발음과 적당한 노이즈 제거. 발음 일관성 강화됨.",
+        "badge": "자연스러움 ★★★★☆",
+        "preprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.25,  # 30% → 25%
+            "bandpass_low": 35,            # 40 → 35
+            "bandpass_high": 19000,        # 18000 → 19000
+            "noise_gate_db": -58,          # -55 → -58
+            "normalize_peak": 0.92,
+        },
+        "postprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.10,  # 15% → 10%
+            "lowpass_cutoff": 19000,       # 18000 → 19000
+            "soft_clip": False,
+        },
+        "tts_params": {
+            "exaggeration": 0.45,          # 0.50 → 0.45
+            "temperature": 0.58,           # 0.80 → 0.58 (일관성 강화)
+            "cfg_weight": 0.65,            # 0.55 → 0.65 (참조 음성 충실)
+            "repetition_penalty": 1.15,    # 추가
+        }
+    },
+    "balanced": {
+        "name": "⚖️ 균형 잡힌",
+        "description": "노이즈 제거와 음질의 균형. 대부분의 경우 권장.",
+        "badge": "균형 ★★★☆☆",
+        "preprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.40,  # 45% → 40%
+            "bandpass_low": 45,            # 50 → 45
+            "bandpass_high": 17000,        # 16000 → 17000
+            "noise_gate_db": -52,          # -50 → -52
+            "normalize_peak": 0.90,
+        },
+        "postprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.20,  # 25% → 20%
+            "lowpass_cutoff": 17000,       # 16000 → 17000
+            "soft_clip": False,            # True → False (자연스러움)
+        },
+        "tts_params": {
+            "exaggeration": 0.48,          # 0.50 → 0.48
+            "temperature": 0.60,           # 0.80 → 0.60 (일관성 강화)
+            "cfg_weight": 0.62,            # 0.50 → 0.62 (참조 음성 충실)
+            "repetition_penalty": 1.18,    # 추가
+        }
+    },
+    "broadcast": {
+        "name": "🎬 방송용",
+        "description": "방송/팟캐스트에 적합. 명확하고 깔끔한 발음. 일관성 강화됨.",
+        "badge": "깨끗함 ★★★★☆",
+        "preprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.45,  # 50% → 45%
+            "bandpass_low": 55,            # 60 → 55
+            "bandpass_high": 16000,        # 15000 → 16000
+            "noise_gate_db": -50,          # -48 → -50
+            "normalize_peak": 0.88,
+        },
+        "postprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.25,  # 30% → 25%
+            "lowpass_cutoff": 16000,       # 15000 → 16000
+            "soft_clip": True,
+        },
+        "tts_params": {
+            "exaggeration": 0.43,          # 0.45 → 0.43
+            "temperature": 0.58,           # 0.78 → 0.58 (일관성 강화)
+            "cfg_weight": 0.65,            # 0.50 → 0.65 (참조 음성 충실)
+            "repetition_penalty": 1.15,    # 추가
+        }
+    },
+    "clean": {
+        "name": "🔇 깨끗한",
+        "description": "노이즈 최소화. 다소 딱딱하거나 기계적일 수 있음.",
+        "badge": "깨끗함 ★★★★★",
+        "preprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.60,  # 70% → 60%
+            "bandpass_low": 70,            # 80 → 70
+            "bandpass_high": 15000,        # 14000 → 15000
+            "noise_gate_db": -48,          # -45 → -48
+            "normalize_peak": 0.85,
+        },
+        "postprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.35,  # 40% → 35%
+            "lowpass_cutoff": 15000,       # 14000 → 15000
+            "soft_clip": True,
+        },
+        "tts_params": {
+            "exaggeration": 0.38,          # 0.40 → 0.38
+            "temperature": 0.55,           # 0.75 → 0.55 (일관성 강화)
+            "cfg_weight": 0.68,            # 0.50 → 0.68 (참조 음성 충실)
+            "repetition_penalty": 1.12,    # 추가
+        }
+    },
+    "custom": {
+        "name": "⚙️ 사용자 정의",
+        "description": "모든 설정을 직접 조절합니다.",
+        "badge": "",
+        "preprocess": {
+            "enabled": True,  # 사용자 정의도 기본 활성화
+        },
+        "postprocess": {
+            "enabled": True,
+        },
+        "tts_params": {},
+    }
+}
 
 
 # ============================================================
@@ -643,7 +1007,8 @@ def generate_single_chunk(
     voice_ref_path: str,
     params: dict,
     repetition_penalty: float = 1.3,
-    timeout: int = 120
+    timeout: int = 120,
+    quality_settings: dict = None
 ) -> dict:
     """
     단일 청크 TTS 생성
@@ -654,6 +1019,7 @@ def generate_single_chunk(
         params: TTS 파라미터
         repetition_penalty: 반복 억제 강도
         timeout: 타임아웃 (초)
+        quality_settings: 음성 품질 설정 (preprocess, postprocess)
 
     Returns:
         {success, audio_data, duration, error}
@@ -664,6 +1030,8 @@ def generate_single_chunk(
     print(f"  - text: {text[:30]}...")
     print(f"  - voice_ref_path: {voice_ref_path}")
     print(f"  - seed: {seed_value} ({'고정' if seed_value is not None else '랜덤'})")
+    if quality_settings:
+        print(f"  - quality_settings: 적용됨")
 
     payload = {
         "text": text,
@@ -672,10 +1040,12 @@ def generate_single_chunk(
             "exaggeration": params.get("exaggeration", 0.5),
             "cfg_weight": params.get("cfg_weight", 0.5),
             "temperature": params.get("temperature", 0.8),
-            "speed": params.get("speed", 1.0),
+            "speed": 1.0,  # ⭐ 원본 속도로 생성 (후처리에서 조정)
             "seed": seed_value,
             "voice_ref_path": voice_ref_path,
-            "repetition_penalty": repetition_penalty
+            "repetition_penalty": repetition_penalty,
+            "quality_settings": quality_settings,
+            "skip_speed_adjustment": True  # ⭐ Chatterbox 속도 조정 스킵
         }
     }
 
@@ -730,7 +1100,8 @@ def generate_chunk_with_retry(
     voice_ref_path: str,
     params: dict,
     initial_rep_penalty: float = 1.3,
-    max_retries: int = 3
+    max_retries: int = 3,
+    quality_settings: dict = None
 ) -> dict:
     """
     청크 생성 (재시도 로직 포함)
@@ -743,6 +1114,7 @@ def generate_chunk_with_retry(
         params: TTS 파라미터
         initial_rep_penalty: 초기 반복 억제 강도
         max_retries: 최대 재시도 횟수
+        quality_settings: 음성 품질 설정
 
     Returns:
         생성 결과 dict
@@ -766,7 +1138,8 @@ def generate_chunk_with_retry(
             text=text,
             voice_ref_path=voice_ref_path,
             params=retry_params,
-            repetition_penalty=current_rep_penalty
+            repetition_penalty=current_rep_penalty,
+            quality_settings=quality_settings  # 품질 설정 전달
         )
 
         if not result.get("success"):
@@ -873,7 +1246,8 @@ def generate_chatterbox_tts_robust(
     repetition_penalty: float = 1.3,
     max_retries: int = 3,
     pause_ms: int = 200,
-    progress_callback=None
+    progress_callback=None,
+    quality_settings: dict = None
 ) -> dict:
     """
     안정적인 Chatterbox TTS 생성 (청크 분할 + 재시도)
@@ -927,7 +1301,8 @@ def generate_chatterbox_tts_robust(
             voice_ref_path=voice_ref_path,
             params=params,
             initial_rep_penalty=repetition_penalty,
-            max_retries=max_retries
+            max_retries=max_retries,
+            quality_settings=quality_settings
         )
 
         if result.get("success") or result.get("status") == "truncated":
@@ -1253,7 +1628,11 @@ def render_edge_tts_tab():
     scenes_data = st.session_state.get("scenes", [])
     has_scene_data = len(scenes_data) > 0
 
-    if st.session_state.get("scene_analysis_script") or has_scene_data:
+    # 파일에서 씬 데이터 존재 여부도 확인
+    scenes_json_info = get_scenes_json_info()
+    has_scene_file = scenes_json_info.get("exists", False)
+
+    if st.session_state.get("scene_analysis_script") or has_scene_data or has_scene_file:
         script_sources.append("씬 분석 스크립트")
         script_data["씬 분석 스크립트"] = st.session_state.get("scene_analysis_script", "")
 
@@ -1277,8 +1656,34 @@ def render_edge_tts_tab():
             key="edge_script_input"
         )
     elif script_source == "씬 분석 스크립트" and has_scene_data:
+        # 🔄 새로고침 버튼 및 파일 정보
+        refresh_col1, refresh_col2 = st.columns([3, 1])
+        with refresh_col1:
+            edge_scenes_json_info = get_scenes_json_info()
+            if edge_scenes_json_info["exists"]:
+                st.caption(f"📁 마지막 수정: {edge_scenes_json_info['last_modified']} ({edge_scenes_json_info['scene_count']}개 씬)")
+        with refresh_col2:
+            if st.button("🔄 새로고침", key="edge_refresh_scenes", help="씬 분석 결과를 다시 로드합니다"):
+                loaded_scenes, was_loaded = load_scenes_from_json(force_reload=True)
+                if was_loaded and loaded_scenes:
+                    st.success(f"✅ {len(loaded_scenes)}개 씬 새로고침 완료!")
+                    st.rerun()
+                else:
+                    st.warning("씬 데이터가 없거나 로드에 실패했습니다.")
+
         # 씬별 생성 모드 UI
         st.info(f"📊 총 **{len(scenes_data)}개** 씬이 분석되어 있습니다.")
+
+    elif script_source == "씬 분석 스크립트" and not has_scene_data and has_scene_file:
+        # 파일은 있지만 세션에 로드되지 않은 경우
+        st.warning(f"📁 씬 분석 파일이 있습니다 ({scenes_json_info['scene_count']}개 씬). 로드 버튼을 눌러주세요.")
+        if st.button("📥 씬 데이터 로드", key="edge_load_scenes", type="primary"):
+            loaded_scenes, was_loaded = load_scenes_from_json(force_reload=True)
+            if was_loaded and loaded_scenes:
+                st.success(f"✅ {len(loaded_scenes)}개 씬 로드 완료!")
+                st.rerun()
+            else:
+                st.error("씬 데이터 로드에 실패했습니다.")
 
         # 생성 모드 선택
         edge_generation_mode = st.radio(
@@ -1292,52 +1697,40 @@ def render_edge_tts_tab():
         st.markdown("---")
 
         if edge_generation_mode == "씬별 개별 생성":
-            st.markdown("**📋 생성할 씬 선택**")
-
-            # 전체 선택/해제
-            col_sel1, col_sel2 = st.columns([1, 3])
-            with col_sel1:
-                select_all = st.checkbox("전체 선택", value=True, key="edge_select_all_scenes")
-
-            # 씬 목록 표시
-            edge_selected_scenes = []
+            # 씬 데이터를 컴포넌트용 형식으로 변환
+            edge_scenes_for_selector = []
             for idx, scene in enumerate(scenes_data):
                 scene_id = scene.get('scene_id', idx + 1)
                 scene_text = scene.get('script_text', '')
-                char_count = len(scene_text)
-                duration_est = scene.get('duration_estimate', char_count // 10)
+                edge_scenes_for_selector.append({
+                    "scene_id": scene_id,
+                    "text": scene_text,
+                    "script_text": scene_text,
+                    "duration_estimate": scene.get('duration_estimate', max(1, len(scene_text) // 10))
+                })
 
-                # 체크박스와 미리보기를 같은 행에
-                col_check, col_info = st.columns([1, 4])
+            # 씬 구간 선택 컴포넌트 사용
+            selected_scene_numbers = render_scene_range_selector(
+                total_scenes=len(scenes_data),
+                scenes_data=edge_scenes_for_selector,
+                key_prefix="edge_scene",
+                show_header=True,
+                default_mode="전체"
+            )
 
-                with col_check:
-                    is_selected = st.checkbox(
-                        f"씬 {scene_id}",
-                        value=select_all,
-                        key=f"edge_scene_select_{scene_id}"
-                    )
-
-                with col_info:
-                    with st.expander(f"{scene_text[:40]}... ({char_count}자, ~{duration_est}초)", expanded=False):
-                        st.text_area(
-                            "내용",
-                            value=scene_text,
-                            height=100,
-                            disabled=True,
-                            key=f"edge_scene_preview_{scene_id}"
-                        )
-
-                if is_selected:
+            # 선택된 씬 필터링
+            edge_selected_scenes = []
+            for scene_num in selected_scene_numbers:
+                if scene_num <= len(scenes_data):
+                    scene = scenes_data[scene_num - 1]
+                    scene_id = scene.get('scene_id', scene_num)
+                    scene_text = scene.get('script_text', '')
                     edge_selected_scenes.append({
                         "scene_id": scene_id,
                         "text": scene_text,
-                        "char_count": char_count,
-                        "duration_estimate": duration_est
+                        "char_count": len(scene_text),
+                        "duration_estimate": scene.get('duration_estimate', max(1, len(scene_text) // 10))
                     })
-
-            # 선택 요약
-            total_chars = sum(s["char_count"] for s in edge_selected_scenes)
-            st.success(f"✅ **{len(edge_selected_scenes)}개** 씬 선택됨 (총 {total_chars:,}자)")
 
             # 전체 텍스트 (미리보기용)
             script_text = "\n\n".join([s["text"] for s in edge_selected_scenes]) if edge_selected_scenes else ""
@@ -1372,6 +1765,25 @@ def render_edge_tts_tab():
                 "duration_estimate": s.get('duration_estimate', 10)
             } for idx, s in enumerate(scenes_data)]
 
+        # ⭐ AI 텍스트 전처리 (영어 → 발음 변환)
+        if edge_selected_scenes:
+            st.markdown("---")
+            preprocess_result = render_ai_preprocessing_panel(
+                scenes=edge_selected_scenes,
+                session_key="edge_tts_preprocess",
+                default_language=selected_lang,
+                show_preview=True,
+                expanded=False
+            )
+            # 전처리 적용
+            if preprocess_result.get("use_preprocessed"):
+                edge_selected_scenes = preprocess_result.get("preprocessed_scenes", edge_selected_scenes)
+                # script_text도 업데이트
+                script_text = "\n\n".join([
+                    s.get("preprocessed_text") or s.get("text", "")
+                    for s in edge_selected_scenes
+                ])
+
     elif script_source in script_data:
         script_text = script_data[script_source]
         st.text_area(f"{script_source}", value=script_text, height=200, disabled=True, key="edge_script_preview")
@@ -1404,6 +1816,56 @@ def render_edge_tts_tab():
                 add_breaks=add_breaks,
                 generate_subs=generate_subs
             )
+
+        # ⭐ 세션에서 이전 생성 결과 복원 (다운로드 옵션 선택 시 화면 유지)
+        elif st.session_state.get("edge_tts_generation_done"):
+            edge_audio_files = st.session_state.get("edge_tts_audio_files", [])
+            edge_timestamp = st.session_state.get("edge_tts_timestamp", 0)
+            generated_files = st.session_state.get("last_tts_scenes", [])
+
+            if edge_audio_files:
+                # 결과 요약
+                success_count = len([f for f in generated_files if f.get("status") == "success"])
+                st.success(f"✅ **{success_count}개** 씬 생성 완료!")
+
+                # 씬별 오디오 플레이어
+                st.markdown("### 🎵 생성된 음성 파일")
+                for file_info in generated_files:
+                    if file_info.get("status") == "success":
+                        scene_id = file_info["scene_id"]
+                        with st.expander(f"📢 씬 {scene_id} - {file_info.get('text_preview', '')} ({file_info.get('char_count', 0)}자)", expanded=False):
+                            col1, col2 = st.columns([3, 1])
+                            with col1:
+                                if file_info.get("path") and os.path.exists(file_info["path"]):
+                                    st.audio(file_info["path"])
+                            with col2:
+                                if file_info.get("path") and os.path.exists(file_info["path"]):
+                                    with open(file_info["path"], "rb") as f:
+                                        st.download_button(
+                                            "⬇️",
+                                            data=f.read(),
+                                            file_name=f"{scene_id}.mp3",
+                                            mime="audio/mpeg",
+                                            key=f"edge_restore_dl_{scene_id}",
+                                            use_container_width=True
+                                        )
+
+                # 다운로드 섹션
+                if len(edge_audio_files) > 1:
+                    st.markdown("---")
+                    render_tts_download_section(
+                        audio_files=edge_audio_files,
+                        project_name=f"edge_tts_{edge_timestamp}",
+                        extension="mp3",
+                        key_prefix="edge_dl"
+                    )
+
+                # 초기화 버튼
+                if st.button("🗑️ 결과 초기화", key="edge_clear_results"):
+                    st.session_state["edge_tts_generation_done"] = False
+                    st.session_state["edge_tts_audio_files"] = []
+                    st.session_state["last_tts_scenes"] = []
+                    st.rerun()
     else:
         # 일반 생성 모드
         if st.button(
@@ -1625,10 +2087,25 @@ def generate_edge_tts_by_scenes(scenes, voice_id, rate, pitch, volume, add_break
         # 씬별 생성 루프
         for idx, scene in enumerate(scenes):
             scene_id = scene.get("scene_id", idx + 1)
-            scene_text = scene.get("text", "")
+
+            # ⭐⭐⭐ 핵심 수정: AI 전처리 텍스트 우선 사용 ⭐⭐⭐
+            if scene.get("preprocessed_text"):
+                # AI가 이미 전처리한 텍스트 사용 (추가 정규화 불필요)
+                scene_text = scene["preprocessed_text"]
+                print(f"[EdgeTTS] 씬 {scene_id}: ✅ AI 전처리 텍스트 사용")
+            else:
+                # AI 전처리 없으면 원본에 규칙 기반 정규화 적용
+                scene_text = scene.get("text", "")
+                original_text = scene_text
+                scene_text = normalize_for_tts(scene_text)
+                if scene_text != original_text:
+                    print(f"[EdgeTTS] 씬 {scene_id} 정규화: {original_text[:40]}... → {scene_text[:40]}...")
 
             if not scene_text.strip():
                 continue
+            # scene 객체도 업데이트
+            scene = dict(scene)
+            scene["text"] = scene_text
 
             # 진행 상황 업데이트
             progress_bar.progress((idx + 1) / total_scenes)
@@ -1686,7 +2163,7 @@ def generate_edge_tts_by_scenes(scenes, voice_id, rate, pitch, volume, add_break
                                     st.download_button(
                                         "⬇️ 다운로드",
                                         data=f.read(),
-                                        file_name=f"scene_{scene_id:02d}.mp3",
+                                        file_name=f"{scene_id}.mp3",
                                         mime="audio/mpeg",
                                         key=f"download_scene_{scene_id}_{timestamp}",
                                         use_container_width=True
@@ -1694,31 +2171,30 @@ def generate_edge_tts_by_scenes(scenes, voice_id, rate, pitch, volume, add_break
                     else:
                         st.error(f"❌ 씬 {scene_id} 생성 실패: {file_info.get('error', '알 수 없는 오류')}")
 
-                # 전체 ZIP 다운로드
+                # 전체 ZIP 다운로드 (새 컴포넌트 사용)
                 if success_count > 1:
                     st.markdown("---")
-                    st.markdown("### 📦 일괄 다운로드")
 
-                    # ZIP 파일 생성
-                    import zipfile
-                    import io
+                    # 다운로드용 데이터 준비
+                    edge_audio_files = []
+                    for file_info in generated_files:
+                        if file_info["status"] == "success" and file_info["path"]:
+                            edge_audio_files.append({
+                                "scene_id": file_info["scene_id"],
+                                "path": file_info["path"]
+                            })
 
-                    zip_buffer = io.BytesIO()
-                    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                        for file_info in generated_files:
-                            if file_info["status"] == "success" and file_info["path"]:
-                                scene_id = file_info["scene_id"]
-                                zip_file.write(file_info["path"], f"scene_{scene_id:02d}.mp3")
+                    # 세션에 다운로드용 데이터 저장 (rerun 시 복원용)
+                    st.session_state["edge_tts_audio_files"] = edge_audio_files
+                    st.session_state["edge_tts_timestamp"] = timestamp
+                    st.session_state["edge_tts_generation_done"] = True
 
-                    zip_buffer.seek(0)
-
-                    st.download_button(
-                        f"📦 전체 다운로드 (ZIP, {success_count}개 파일)",
-                        data=zip_buffer.getvalue(),
-                        file_name=f"tts_scenes_{timestamp}.zip",
-                        mime="application/zip",
-                        key=f"download_all_zip_{timestamp}",
-                        use_container_width=True
+                    # 새 다운로드 UI 렌더링
+                    render_tts_download_section(
+                        audio_files=edge_audio_files,
+                        project_name=f"edge_tts_{timestamp}",
+                        extension="mp3",
+                        key_prefix="edge_dl"  # 고정 키 사용 (timestamp 제거)
                     )
 
                 # 세션에 저장
@@ -2115,32 +2591,658 @@ def render_reference_voice_selector():
                         st.warning("⚠️ 텍스트 없음 - 발화속도 추정 모드 (정확도 ±20%)")
                         st.caption("참조 음성의 텍스트를 입력하면 정확한 발화속도를 측정할 수 있습니다.")
 
-                    new_transcript = st.text_area(
-                        "참조 음성 텍스트",
-                        value=current_transcript,
-                        height=80,
-                        placeholder="예: 안녕하세요, 오늘은 회계사 시험 준비에 대해 이야기해 보려고 합니다.",
-                        key="transcript_input",
+                    # ⭐ 입력 방식 선택
+                    input_mode = st.radio(
+                        "입력 방식",
+                        ["일반 텍스트", "📋 SRT 자막 (타임스탬프 기반 정확 측정)"],
+                        horizontal=True,
+                        key="text_input_mode",
                         label_visibility="collapsed"
                     )
 
-                    col_save, col_clear = st.columns(2)
-                    with col_save:
-                        if st.button("💾 텍스트 저장", key="save_transcript", use_container_width=True):
-                            if new_transcript.strip():
-                                set_voice_transcript(selected_path, new_transcript.strip())
-                                # 재분석 강제
+                    if input_mode == "일반 텍스트":
+                        # 기존 일반 텍스트 입력
+                        new_transcript = st.text_area(
+                            "참조 음성 텍스트",
+                            value=current_transcript,
+                            height=80,
+                            placeholder="예: 안녕하세요, 오늘은 회계사 시험 준비에 대해 이야기해 보려고 합니다.",
+                            key="transcript_input",
+                            label_visibility="collapsed"
+                        )
+
+                        col_save, col_clear = st.columns(2)
+                        with col_save:
+                            if st.button("💾 텍스트 저장", key="save_transcript", use_container_width=True):
+                                if new_transcript.strip():
+                                    set_voice_transcript(selected_path, new_transcript.strip())
+                                    st.session_state["_prev_analyzed_voice_path"] = None
+                                    st.success("✅ 텍스트 저장 완료! 재분석 중...")
+                                    st.rerun()
+                                else:
+                                    st.error("텍스트를 입력해주세요")
+                        with col_clear:
+                            if has_transcript:
+                                if st.button("🗑️ 텍스트 삭제", key="delete_transcript", use_container_width=True):
+                                    set_voice_transcript(selected_path, "")
+                                    st.session_state["_prev_analyzed_voice_path"] = None
+                                    st.rerun()
+
+                    else:  # SRT 모드
+                        st.info("💡 SRT 자막을 붙여넣으면 타임스탬프 기반으로 **밀리초 단위 정확한 발화속도**를 측정합니다.")
+
+                        # SRT 입력 방법 선택
+                        srt_method = st.radio(
+                            "SRT 입력 방법",
+                            ["직접 붙여넣기", "파일 업로드"],
+                            horizontal=True,
+                            key="srt_input_method_radio"
+                        )
+
+                        srt_content = ""
+
+                        if srt_method == "직접 붙여넣기":
+                            # ⭐ 세션 상태에서 기존 값 가져오기
+                            default_srt = st.session_state.get("srt_content_cache", "")
+
+                            srt_content = st.text_area(
+                                "SRT 내용 붙여넣기",
+                                value=default_srt,  # ⭐ 명시적 value 설정
+                                height=250,
+                                placeholder="""1
+00:00:00,100 --> 00:00:01,533
+2018년 언론인 자말
+
+2
+00:00:01,600 --> 00:00:02,766
+카슈크지가 튀르키의
+
+...""",
+                                key="srt_paste_textarea_input",  # ⭐ 고유한 key
+                                disabled=False,  # ⭐ 명시적 활성화
+                                help="SRT 파일 내용을 여기에 붙여넣으세요 (Ctrl+V)"
+                            )
+
+                            # 세션에 저장
+                            if srt_content:
+                                st.session_state["srt_content_cache"] = srt_content
+
+                        else:  # 파일 업로드
+                            uploaded_srt = st.file_uploader(
+                                "SRT 파일 업로드",
+                                type=["srt", "txt"],
+                                key="srt_file_upload_input"
+                            )
+
+                            if uploaded_srt:
+                                try:
+                                    srt_content = uploaded_srt.read().decode("utf-8")
+                                    st.session_state["srt_content_cache"] = srt_content
+                                    st.success(f"✅ 파일 로드됨: {uploaded_srt.name}")
+                                except Exception as e:
+                                    st.error(f"❌ 파일 읽기 오류: {e}")
+
+                        # SRT 파싱 및 분석
+                        if srt_content and len(srt_content.strip()) > 20:
+                            try:
+                                from utils.srt_parser import SRTParser, SpeakingRateAnalyzer
+
+                                scenes = SRTParser.parse_content(srt_content)
+
+                                if scenes:
+                                    analyzer = SpeakingRateAnalyzer(scenes)
+                                    analysis = analyzer.analyze()
+
+                                    # 분석 결과 표시
+                                    st.success(f"✅ {analysis['segment_count']}개 세그먼트 파싱 완료!")
+
+                                    col1, col2, col3, col4 = st.columns(4)
+                                    col1.metric("⭐ 평균 발화속도", f"{analysis['weighted_average_rate']:.2f}", "글자/초")
+                                    col2.metric("중앙값", f"{analysis['median_rate']:.2f}", "글자/초")
+                                    col3.metric("총 발화시간", f"{analysis['total_duration']:.1f}초")
+                                    col4.metric("총 글자수", f"{analysis['total_chars']:,}자")
+
+                                    # 상세 통계 (접기)
+                                    with st.expander("📊 상세 통계"):
+                                        st.write(f"- 최소: {analysis['min_rate']:.2f} 글자/초")
+                                        st.write(f"- 최대: {analysis['max_rate']:.2f} 글자/초")
+                                        st.write(f"- 표준편차: {analysis['std_dev']:.2f}")
+                                        st.write(f"- 이상치 제거: {analysis['outliers_removed']}개")
+
+                                    # 저장 버튼
+                                    col_save1, col_save2 = st.columns(2)
+
+                                    with col_save1:
+                                        if st.button("💾 텍스트만 저장", key="save_srt_text", use_container_width=True):
+                                            plain_text = ' '.join(s['narration'] for s in scenes)
+                                            set_voice_transcript(selected_path, plain_text)
+                                            st.session_state["_prev_analyzed_voice_path"] = None
+                                            st.success("✅ 텍스트 저장 완료!")
+                                            st.rerun()
+
+                                    with col_save2:
+                                        if st.button("⭐ 발화속도 측정값으로 저장", key="save_srt_with_rate", use_container_width=True):
+                                            plain_text = ' '.join(s['narration'] for s in scenes)
+                                            set_voice_transcript(selected_path, plain_text)
+
+                                            # 정확한 발화속도 저장
+                                            st.session_state["accurate_speaking_rate"] = analysis['weighted_average_rate']
+                                            st.session_state["speaking_rate_source"] = "srt_timestamp"
+                                            st.session_state["_prev_analyzed_voice_path"] = None
+
+                                            st.success(
+                                                f"✅ 저장 완료!\n"
+                                                f"- 텍스트: {analysis['total_chars']}자\n"
+                                                f"- 정확한 발화속도: {analysis['weighted_average_rate']:.2f} 글자/초"
+                                            )
+                                            st.rerun()
+                                else:
+                                    st.warning("⚠️ SRT 파싱 실패. 형식을 확인해주세요.")
+
+                            except Exception as e:
+                                st.error(f"❌ SRT 파싱 오류: {e}")
+
+                # ⭐ 음성 최적화 UI v2.0 (여러 버전 선택 + 품질 점수 표시)
+                needs_opt, opt_reason = is_voice_optimization_needed(selected_path)
+                voice_name = os.path.splitext(os.path.basename(selected_path))[0]
+
+                # 모든 최적화 버전 스캔
+                optimized_versions = scan_optimized_versions(voice_name)
+
+                with st.expander("🎯 음성 최적화 (Voice Cloning 품질 향상)", expanded=needs_opt or len(optimized_versions) > 0):
+                    if optimized_versions:
+                        # ✅ 최적화 버전 있음 - 선택 UI 표시
+                        st.success(f"✅ 최적화 버전 {len(optimized_versions)}개 발견")
+
+                        # 버전 선택 라디오 버튼
+                        st.markdown("##### 📂 최적화 버전 선택")
+
+                        # 세션 상태 초기화
+                        if "selected_opt_version_idx" not in st.session_state:
+                            st.session_state.selected_opt_version_idx = 0
+
+                        # 옵션 생성
+                        version_labels = []
+                        for i, v in enumerate(optimized_versions):
+                            label = f"{v['filename']}"
+                            badges = []
+                            if v.get("is_latest"):
+                                badges.append("⭐최신")
+                            if v.get("quality_score", 0) >= 0.8:
+                                badges.append("🏆고품질")
+                            if v.get("is_manual"):
+                                badges.append("✂️수동")
+                            if badges:
+                                label += f" ({', '.join(badges)})"
+
+                            # 상세 정보
+                            detail = f"📍 {v.get('start_time', 0):.1f}~{v.get('end_time', 0):.1f}초"
+                            detail += f" | 길이: {v.get('duration', 0):.1f}초"
+                            if v.get("quality_score", 0) > 0:
+                                detail += f" | 품질: {v['quality_score']:.3f}"
+
+                            version_labels.append(f"{label}\n   {detail}")
+
+                        selected_idx = st.radio(
+                            "버전 선택:",
+                            range(len(version_labels)),
+                            format_func=lambda i: version_labels[i],
+                            key="opt_version_radio",
+                            index=st.session_state.selected_opt_version_idx,
+                            label_visibility="collapsed"
+                        )
+                        st.session_state.selected_opt_version_idx = selected_idx
+
+                        # 선택된 버전 정보
+                        selected_version = optimized_versions[selected_idx]
+
+                        # 상세 정보 표시
+                        with st.container():
+                            st.markdown("##### 📊 선택된 버전 정보")
+                            col1, col2 = st.columns(2)
+
+                            with col1:
+                                st.markdown(f"**파일:** `{selected_version['filename']}`")
+                                st.markdown(f"**구간:** {selected_version.get('start_time', 0):.1f}초 ~ {selected_version.get('end_time', 0):.1f}초")
+                                st.markdown(f"**길이:** {selected_version.get('duration', 0):.1f}초")
+
+                            with col2:
+                                quality = selected_version.get('quality_score', 0)
+                                quality_emoji = "🏆" if quality >= 0.8 else "✅" if quality >= 0.6 else "⚠️"
+                                st.markdown(f"**품질:** {quality_emoji} {quality:.3f}" if quality > 0 else "**품질:** 측정 안됨")
+                                st.markdown(f"**생성일:** {selected_version.get('created_at', 'N/A')}")
+                                # 상태 배지
+                                status_parts = []
+                                if selected_version.get("is_latest"):
+                                    status_parts.append("⭐ 최신")
+                                if selected_version.get("is_manual"):
+                                    status_parts.append("✂️ 수동선택")
+                                else:
+                                    status_parts.append("🤖 자동선택")
+                                st.markdown(f"**상태:** {', '.join(status_parts)}")
+
+                        # 미리듣기
+                        st.markdown("##### 🎧 미리듣기")
+                        col_play1, col_play2 = st.columns(2)
+                        with col_play1:
+                            st.audio(selected_version["filepath"], format="audio/mp3")
+                            st.caption("선택된 버전")
+                        with col_play2:
+                            st.audio(selected_path, format="audio/mp3")
+                            st.caption("원본 음성")
+
+                        # 액션 버튼
+                        st.markdown("---")
+                        col_use, col_new, col_manage = st.columns(3)
+
+                        with col_use:
+                            if st.button("✅ 선택한 버전 사용", key="use_selected_version", type="primary", use_container_width=True):
+                                st.session_state["selected_reference_voice"] = selected_version["filepath"]
                                 st.session_state["_prev_analyzed_voice_path"] = None
-                                st.success("✅ 텍스트 저장 완료! 재분석 중...")
+                                st.success(f"✅ '{selected_version['filename']}' 사용")
                                 st.rerun()
+
+                        with col_new:
+                            if st.button("🔄 새로 최적화", key="create_new_optimization", use_container_width=True):
+                                with st.spinner("새로운 최적화 버전 생성 중..."):
+                                    result = optimize_and_register_voice(selected_path)
+                                    if result.get("success"):
+                                        st.success(f"✅ 새 버전 생성!")
+                                        st.info(f"품질 점수: {result.get('quality_score', 0):.3f}")
+                                        st.rerun()
+                                    else:
+                                        st.error(f"❌ 실패: {result.get('error')}")
+
+                        with col_manage:
+                            if st.button("🗑️ 버전 관리", key="manage_versions", use_container_width=True):
+                                st.session_state.show_version_manager = not st.session_state.get("show_version_manager", False)
+
+                        # 버전 관리 모달
+                        if st.session_state.get("show_version_manager", False):
+                            st.markdown("---")
+                            st.markdown("##### 🗂️ 버전 관리")
+                            for v in optimized_versions:
+                                col_name, col_quality, col_del = st.columns([4, 2, 1])
+                                with col_name:
+                                    st.text(f"{v['filename']} ({v.get('duration', 0):.1f}초)")
+                                with col_quality:
+                                    st.text(f"품질: {v.get('quality_score', 0):.3f}")
+                                with col_del:
+                                    del_key = f"del_{v['filename']}"
+                                    if st.button("🗑️", key=del_key):
+                                        try:
+                                            get_version_manager().delete_version(v["filepath"])
+                                            st.success(f"삭제됨: {v['filename']}")
+                                            st.rerun()
+                                        except Exception as e:
+                                            st.error(f"삭제 실패: {e}")
+
+                            if st.button("닫기", key="close_version_manager"):
+                                st.session_state.show_version_manager = False
+                                st.rerun()
+
+                    elif needs_opt:
+                        # ⚠️ 최적화 필요
+                        st.warning(f"⚠️ {opt_reason}")
+                        st.caption("긴 음성은 Voice Cloning 품질이 저하될 수 있습니다. 최적의 20초 구간을 추출합니다.")
+
+                        if st.button("🎯 최적화 및 저장", key="optimize_voice", use_container_width=True):
+                            with st.spinner("최적 구간 추출 중..."):
+                                result = optimize_and_register_voice(selected_path)
+
+                                if result.get("success"):
+                                    st.success(f"✅ 최적화 완료!")
+                                    st.info(f"📁 새 음성: {os.path.basename(result['optimized_path'])}")
+                                    st.info(f"⏱️ 길이: {result['original_duration']:.0f}초 → {result['optimized_duration']:.0f}초")
+                                    st.info(f"📊 품질 점수: {result.get('quality_score', 0):.3f}")
+
+                                    # 최적화된 버전으로 전환
+                                    st.session_state["selected_reference_voice"] = result["optimized_path"]
+                                    st.session_state["_prev_analyzed_voice_path"] = None
+                                    st.rerun()
+                                else:
+                                    st.error(f"❌ 최적화 실패: {result.get('error')}")
+                    else:
+                        # ✅ 최적화 불필요
+                        st.success(f"✅ {opt_reason}")
+
+                        # 새 최적화 버전 생성 옵션 제공
+                        if st.button("🔄 새 최적화 버전 생성", key="create_opt_anyway", use_container_width=True):
+                            with st.spinner("최적 구간 추출 중..."):
+                                result = optimize_and_register_voice(selected_path)
+                                if result.get("success"):
+                                    st.success(f"✅ 완료! 품질: {result.get('quality_score', 0):.3f}")
+                                    st.rerun()
+                                else:
+                                    st.error(f"❌ 실패: {result.get('error')}")
+
+                    # ⭐⭐⭐ 수동 구간 선택 섹션 (v2.0 - 텍스트 입력 + 발화속도 측정) ⭐⭐⭐
+                    st.markdown("---")
+                    st.markdown("##### ✂️ 수동 구간 선택")
+                    st.caption("자동 최적화가 적합하지 않을 때 직접 구간을 선택할 수 있습니다.")
+
+                    # 수동 선택 모드 토글
+                    show_manual = st.checkbox(
+                        "수동 구간 선택 모드 활성화",
+                        value=st.session_state.get("show_manual_segment", False),
+                        key="manual_segment_toggle"
+                    )
+                    st.session_state["show_manual_segment"] = show_manual
+
+                    if show_manual:
+                        try:
+                            import re
+                            import hashlib
+                            from datetime import datetime
+                            from pydub import AudioSegment
+
+                            # 오디오 길이 확인 (pydub 사용)
+                            visualizer = get_waveform_visualizer()
+                            audio_duration = visualizer.get_audio_duration(selected_path)
+
+                            if audio_duration <= 0:
+                                st.error("원본 음성을 로드할 수 없습니다.")
                             else:
-                                st.error("텍스트를 입력해주세요")
-                    with col_clear:
-                        if has_transcript:
-                            if st.button("🗑️ 텍스트 삭제", key="delete_transcript", use_container_width=True):
-                                set_voice_transcript(selected_path, "")
-                                st.session_state["_prev_analyzed_voice_path"] = None
-                                st.rerun()
+                                voice_name = os.path.splitext(os.path.basename(selected_path))[0]
+                                st.info(f"📁 원본: **{os.path.basename(selected_path)}** ({audio_duration:.1f}초)")
+
+                                # 원본 듣기
+                                with st.expander("🎧 원본 음성 듣기"):
+                                    st.audio(selected_path)
+                                    st.caption("인터뷰 화자나 배경음이 없는 깨끗한 구간을 찾아보세요.")
+
+                                st.markdown("---")
+
+                                # 구간 설정 (숫자 입력)
+                                st.markdown("**🎚️ 구간 설정** (권장: 15~20초)")
+                                col_start, col_end = st.columns(2)
+
+                                with col_start:
+                                    start_sec = st.number_input(
+                                        "시작 시간 (초)",
+                                        min_value=0.0,
+                                        max_value=max(0.0, audio_duration - 10.0),
+                                        value=st.session_state.get("manual_start_sec", 0.0),
+                                        step=5.0,
+                                        key="manual_start_input"
+                                    )
+                                    st.session_state.manual_start_sec = start_sec
+
+                                with col_end:
+                                    default_end = min(start_sec + 20.0, audio_duration)
+                                    end_sec = st.number_input(
+                                        "끝 시간 (초)",
+                                        min_value=start_sec + 10.0,
+                                        max_value=audio_duration,
+                                        value=max(default_end, start_sec + 15.0),
+                                        step=5.0,
+                                        key="manual_end_input"
+                                    )
+                                    st.session_state.manual_end_sec = end_sec
+
+                                # 선택 구간 정보
+                                segment_duration = end_sec - start_sec
+
+                                if 15.0 <= segment_duration <= 20.0:
+                                    st.success(f"✅ 선택: **{start_sec:.0f}~{end_sec:.0f}초** ({segment_duration:.1f}초, 최적 범위)")
+                                elif 10.0 <= segment_duration <= 30.0:
+                                    st.info(f"ℹ️ 선택: **{start_sec:.0f}~{end_sec:.0f}초** ({segment_duration:.1f}초)")
+                                else:
+                                    st.warning(f"⚠️ 선택: {segment_duration:.1f}초 (15~20초 권장)")
+
+                                st.markdown("---")
+
+                                # ⭐ 텍스트 입력 (발화속도 측정용) - 새로 추가!
+                                st.markdown("**📝 구간 텍스트 입력** (발화속도 측정용)")
+                                st.caption("선택한 구간에서 화자가 말하는 내용을 입력하면 발화속도를 계산합니다.")
+
+                                segment_text = st.text_area(
+                                    "구간 텍스트",
+                                    value=st.session_state.get("manual_segment_text", ""),
+                                    height=100,
+                                    placeholder="예: 안녕하세요 여러분 오늘은 삼성전자에 대해 이야기해보겠습니다...",
+                                    key="manual_segment_text_input",
+                                    help="SRT 파일의 해당 구간 자막을 붙여넣기 해도 됩니다."
+                                )
+                                st.session_state.manual_segment_text = segment_text
+
+                                # 발화속도 계산
+                                speaking_rate = None
+                                char_count = 0
+
+                                if segment_text.strip():
+                                    # 글자수 계산 (공백, 특수문자 제외)
+                                    clean_text = re.sub(r'[^\w가-힣a-zA-Z0-9]', '', segment_text)
+                                    char_count = len(clean_text)
+
+                                    if segment_duration > 0:
+                                        speaking_rate = char_count / segment_duration
+
+                                        st.markdown("**📊 발화속도 분석**")
+                                        col_sr1, col_sr2, col_sr3 = st.columns(3)
+
+                                        with col_sr1:
+                                            st.metric("글자수", f"{char_count}자")
+                                        with col_sr2:
+                                            st.metric("구간 길이", f"{segment_duration:.1f}초")
+                                        with col_sr3:
+                                            if 5.5 <= speaking_rate <= 7.5:
+                                                st.metric("발화속도", f"{speaking_rate:.2f} 글자/초", "정상")
+                                            elif speaking_rate < 5.5:
+                                                st.metric("발화속도", f"{speaking_rate:.2f} 글자/초", "느림")
+                                            else:
+                                                st.metric("발화속도", f"{speaking_rate:.2f} 글자/초", "빠름")
+
+                                        # 추천 speed 파라미터
+                                        if speaking_rate < 5.5:
+                                            recommended_speed = 0.7
+                                        elif speaking_rate < 6.5:
+                                            recommended_speed = 0.75
+                                        elif speaking_rate < 7.5:
+                                            recommended_speed = 0.85
+                                        else:
+                                            recommended_speed = 1.0
+                                        st.caption(f"💡 추천 TTS speed 파라미터: **{recommended_speed}**")
+                                else:
+                                    st.caption("💡 텍스트를 입력하면 발화속도를 계산합니다. (선택사항)")
+
+                                st.markdown("---")
+
+                                # 미리듣기
+                                st.markdown("**🎧 미리듣기**")
+                                col_preview1, col_preview2 = st.columns(2)
+
+                                with col_preview1:
+                                    if st.button("▶️ 선택 구간 듣기", key="preview_segment", use_container_width=True):
+                                        with st.spinner("추출 중..."):
+                                            preview_path = visualizer.extract_segment(selected_path, start_sec, end_sec)
+                                            if preview_path:
+                                                st.session_state["manual_preview_path"] = preview_path
+                                                st.rerun()
+
+                                with col_preview2:
+                                    from_time = st.number_input(
+                                        "특정 시점부터",
+                                        min_value=0.0,
+                                        max_value=max(0.0, audio_duration - 10.0),
+                                        value=start_sec,
+                                        step=10.0,
+                                        key="from_time_input"
+                                    )
+                                    if st.button("▶️ 30초 듣기", key="preview_from", use_container_width=True):
+                                        with st.spinner("추출 중..."):
+                                            to_time = min(from_time + 30.0, audio_duration)
+                                            preview_path = visualizer.extract_segment(selected_path, from_time, to_time)
+                                            if preview_path:
+                                                st.session_state["manual_preview_30s"] = preview_path
+                                                st.rerun()
+
+                                # 미리듣기 재생
+                                if st.session_state.get("manual_preview_path"):
+                                    st.audio(st.session_state["manual_preview_path"], format="audio/mp3")
+                                    st.caption(f"🎵 선택 구간: {start_sec:.0f} ~ {end_sec:.0f}초")
+
+                                if st.session_state.get("manual_preview_30s"):
+                                    st.audio(st.session_state["manual_preview_30s"], format="audio/mp3")
+                                    st.caption(f"🎵 30초 미리듣기")
+
+                                st.markdown("---")
+
+                                # ⭐ 최적화 결과 표시 (세션 상태 기반)
+                                if "manual_opt_result" not in st.session_state:
+                                    st.session_state.manual_opt_result = None
+
+                                # 이전 결과가 있으면 표시
+                                if st.session_state.manual_opt_result:
+                                    result = st.session_state.manual_opt_result
+                                    if result.get("success"):
+                                        st.success(f"✅ 최적화 완료!")
+                                        st.info(f"📁 파일: `{result.get('filename', '')}`")
+                                        st.info(f"⏱️ 길이: {result.get('duration', 0):.1f}초")
+                                        if result.get("speaking_rate"):
+                                            st.info(f"⭐ 발화속도: {result['speaking_rate']:.2f} 글자/초")
+
+                                        # 생성된 파일 듣기
+                                        if result.get("filepath") and os.path.exists(result["filepath"]):
+                                            st.audio(result["filepath"])
+
+                                        col_use, col_reset = st.columns(2)
+                                        with col_use:
+                                            if st.button("✅ 이 버전 사용", key="use_new_manual_opt", type="primary", use_container_width=True):
+                                                st.session_state["selected_reference_voice"] = result["filepath"]
+                                                st.session_state["_prev_analyzed_voice_path"] = None
+                                                st.session_state["show_manual_segment"] = False
+                                                st.session_state.manual_opt_result = None
+                                                st.balloons()
+                                                st.rerun()
+                                        with col_reset:
+                                            if st.button("🔄 다시 생성", key="reset_manual_opt", use_container_width=True):
+                                                st.session_state.manual_opt_result = None
+                                                st.rerun()
+                                    else:
+                                        st.error(f"❌ 최적화 실패: {result.get('error', '알 수 없는 오류')}")
+                                        if st.button("🔄 다시 시도", key="retry_manual_opt"):
+                                            st.session_state.manual_opt_result = None
+                                            st.rerun()
+                                else:
+                                    # 생성 버튼
+                                    st.markdown("**🔧 최적화 생성**")
+                                    if st.button("✅ 선택한 구간으로 최적화 생성", key="create_manual_opt", type="primary", use_container_width=True):
+                                        with st.spinner(f"수동 최적화 버전 생성 중... ({start_sec:.0f}~{end_sec:.0f}초)"):
+                                            try:
+                                                # 직접 최적화 생성 (함수 인라인)
+                                                print(f"\n{'='*60}")
+                                                print(f"[ManualOpt] 수동 최적화 시작")
+                                                print(f"  원본: {os.path.basename(selected_path)}")
+                                                print(f"  구간: {start_sec:.1f} ~ {end_sec:.1f}초")
+                                                if segment_text.strip():
+                                                    print(f"  텍스트: {char_count}자")
+                                                if speaking_rate:
+                                                    print(f"  발화속도: {speaking_rate:.2f} 글자/초")
+                                                print(f"{'='*60}")
+
+                                                # 출력 디렉토리 설정
+                                                base_dir = os.path.dirname(selected_path)
+                                                if "default" in base_dir:
+                                                    base_dir = os.path.dirname(base_dir)
+                                                output_dir = os.path.join(base_dir, "optimized")
+                                                os.makedirs(output_dir, exist_ok=True)
+
+                                                # 파일명 생성
+                                                clean_name = voice_name.replace(" ", "_")
+                                                if "_최적화" in clean_name:
+                                                    clean_name = clean_name.split("_최적화")[0]
+                                                if "_opt_" in clean_name:
+                                                    clean_name = clean_name.split("_opt_")[0]
+
+                                                time_str = f"{int(start_sec)}-{int(end_sec)}s"
+                                                hash_str = hashlib.md5(f"{voice_name}{start_sec}{end_sec}{datetime.now().isoformat()}".encode()).hexdigest()[:8]
+                                                filename = f"{clean_name}__manual_{time_str}_{hash_str}.mp3"
+                                                output_path = os.path.join(output_dir, filename)
+
+                                                print(f"[ManualOpt] 출력: {filename}")
+
+                                                # 오디오 로드 및 구간 추출
+                                                audio = AudioSegment.from_file(selected_path)
+                                                start_ms = int(start_sec * 1000)
+                                                end_ms = int(end_sec * 1000)
+                                                segment = audio[start_ms:end_ms]
+
+                                                # 음량 정규화
+                                                original_dBFS = segment.dBFS
+                                                target_dBFS = -3.0
+                                                change = target_dBFS - original_dBFS
+                                                if 0 < change < 15:
+                                                    segment = segment.apply_gain(change)
+                                                    print(f"[ManualOpt] 음량 조정: {original_dBFS:.1f} → {segment.dBFS:.1f} dBFS")
+
+                                                # MP3로 저장
+                                                segment.export(output_path, format="mp3", bitrate="192k")
+                                                print(f"[ManualOpt] ✅ 저장 완료: {os.path.getsize(output_path)} bytes")
+
+                                                # 메타데이터 저장
+                                                metadata = {
+                                                    "source_file": selected_path,
+                                                    "start_time": start_sec,
+                                                    "end_time": end_sec,
+                                                    "duration": segment_duration,
+                                                    "optimization_type": "manual",
+                                                    "created_at": datetime.now().isoformat(),
+                                                    "is_manual": True,
+                                                }
+                                                if speaking_rate:
+                                                    metadata["speaking_rate"] = speaking_rate
+                                                    metadata["char_count"] = char_count
+                                                if segment_text.strip():
+                                                    metadata["segment_text"] = segment_text
+
+                                                # 메타데이터 파일 저장
+                                                meta_path = os.path.join(output_dir, "optimization_metadata.json")
+                                                all_meta = {"versions": {}}
+                                                if os.path.exists(meta_path):
+                                                    try:
+                                                        with open(meta_path, "r", encoding="utf-8") as f:
+                                                            all_meta = json.load(f)
+                                                    except:
+                                                        pass
+                                                all_meta.setdefault("versions", {})[filename] = metadata
+                                                with open(meta_path, "w", encoding="utf-8") as f:
+                                                    json.dump(all_meta, f, ensure_ascii=False, indent=2, default=str)
+
+                                                # 텍스트 파일 저장
+                                                if segment_text.strip():
+                                                    text_path = output_path.replace(".mp3", ".txt")
+                                                    with open(text_path, "w", encoding="utf-8") as f:
+                                                        f.write(segment_text)
+                                                    print(f"[ManualOpt] ✅ 텍스트 저장: {os.path.basename(text_path)}")
+
+                                                print(f"[ManualOpt] ✅✅✅ 최적화 완료! ✅✅✅\n")
+
+                                                # 결과 세션에 저장
+                                                st.session_state.manual_opt_result = {
+                                                    "success": True,
+                                                    "filename": filename,
+                                                    "filepath": output_path,
+                                                    "duration": segment_duration,
+                                                    "speaking_rate": speaking_rate,
+                                                    "char_count": char_count,
+                                                }
+                                                st.rerun()
+
+                                            except Exception as e:
+                                                import traceback
+                                                print(f"[ManualOpt] ❌ 오류: {e}")
+                                                traceback.print_exc()
+                                                st.session_state.manual_opt_result = {
+                                                    "success": False,
+                                                    "error": str(e)
+                                                }
+                                                st.rerun()
+
+                        except Exception as e:
+                            st.error(f"수동 구간 선택 오류: {e}")
+                            import traceback
+                            st.code(traceback.format_exc())
 
                 # ⭐ 음성 분석 및 파라미터 추천
                 prev_analyzed_path = st.session_state.get("_prev_analyzed_voice_path")
@@ -2406,6 +3508,149 @@ def render_chatterbox_tab():
         )
         st.session_state["chatter_temp"] = temperature
 
+    # =========================================================
+    # 🎚️ 음성 품질 설정 (전처리/후처리)
+    # =========================================================
+    st.markdown("---")
+    st.markdown("#### 🎚️ 음성 품질 설정")
+
+    # 프리셋 선택
+    preset_keys = list(VOICE_QUALITY_PRESETS.keys())
+    preset_names = [VOICE_QUALITY_PRESETS[k]["name"] for k in preset_keys]
+
+    quality_col1, quality_col2 = st.columns([2, 1])
+
+    with quality_col1:
+        selected_preset_idx = st.selectbox(
+            "프리셋 선택",
+            range(len(preset_keys)),
+            format_func=lambda i: preset_names[i],
+            index=1,  # 기본: natural (자연스러운)
+            key="chatter_quality_preset",
+            help="미리 정의된 음성 품질 설정"
+        )
+
+    selected_preset = preset_keys[selected_preset_idx]
+    preset = VOICE_QUALITY_PRESETS[selected_preset]
+
+    with quality_col2:
+        if preset.get("badge"):
+            st.markdown(f"**{preset['badge']}**")
+
+    # 설명
+    st.info(f"📝 {preset['description']}")
+
+    # 사용자 정의 모드
+    if selected_preset == "custom":
+        with st.expander("🔧 상세 설정", expanded=True):
+            st.markdown("**📥 참조 음성 전처리**")
+
+            custom_col1, custom_col2 = st.columns(2)
+
+            with custom_col1:
+                pre_noisereduce = st.slider(
+                    "노이즈 제거 (%)",
+                    0, 100, 30, 5,
+                    key="custom_pre_nr",
+                    help="높을수록 노이즈↓, 자연스러움↓"
+                )
+                pre_bandpass_low = st.slider(
+                    "저음역 (Hz)",
+                    20, 150, 40, 5,
+                    key="custom_bp_low",
+                    help="높을수록 저음↓"
+                )
+                pre_noise_gate = st.slider(
+                    "노이즈 게이트 (dB)",
+                    -60, -30, -55, 1,
+                    key="custom_gate",
+                    help="낮을수록 미세음 보존↑"
+                )
+
+            with custom_col2:
+                pre_bandpass_high = st.slider(
+                    "고음역 (Hz)",
+                    10000, 20000, 18000, 500,
+                    key="custom_bp_high",
+                    help="높을수록 치찰음(ㅅ,ㅆ) 선명↑"
+                )
+                pre_normalize_peak = st.slider(
+                    "정규화 피크",
+                    0.50, 1.00, 0.92, 0.02,
+                    key="custom_peak",
+                    help="높을수록 다이내믹↑"
+                )
+
+            st.markdown("**📤 TTS 후처리**")
+
+            custom_col3, custom_col4 = st.columns(2)
+
+            with custom_col3:
+                post_noisereduce = st.slider(
+                    "후처리 노이즈 제거 (%)",
+                    0, 50, 15, 5,
+                    key="custom_post_nr"
+                )
+                post_soft_clip = st.checkbox(
+                    "소프트 클리핑",
+                    value=False,
+                    key="custom_soft_clip",
+                    help="켜면 기계음 감소, 끄면 더 자연스러움"
+                )
+
+            with custom_col4:
+                post_lowpass = st.slider(
+                    "저역 통과 (Hz)",
+                    10000, 20000, 18000, 500,
+                    key="custom_lowpass"
+                )
+
+            # 사용자 정의 설정 저장
+            custom_settings = {
+                "preprocess": {
+                    "noisereduce_strength": pre_noisereduce / 100,
+                    "bandpass_low": pre_bandpass_low,
+                    "bandpass_high": pre_bandpass_high,
+                    "noise_gate_db": pre_noise_gate,
+                    "normalize_peak": pre_normalize_peak,
+                },
+                "postprocess": {
+                    "noisereduce_strength": post_noisereduce / 100,
+                    "lowpass_cutoff": post_lowpass,
+                    "soft_clip": post_soft_clip,
+                }
+            }
+            st.session_state["chatter_quality_settings"] = custom_settings
+    else:
+        # 프리셋 설정 표시 (읽기 전용)
+        with st.expander("📋 현재 설정 보기", expanded=False):
+            pre = preset["preprocess"]
+            post = preset["postprocess"]
+
+            info_col1, info_col2 = st.columns(2)
+
+            with info_col1:
+                st.markdown("**📥 전처리**")
+                st.caption(f"• 노이즈 제거: {int(pre['noisereduce_strength']*100)}%")
+                st.caption(f"• 밴드패스: {pre['bandpass_low']}~{pre['bandpass_high']}Hz")
+                st.caption(f"• 노이즈 게이트: {pre['noise_gate_db']}dB")
+                st.caption(f"• 정규화 피크: {pre['normalize_peak']}")
+
+            with info_col2:
+                st.markdown("**📤 후처리**")
+                st.caption(f"• 노이즈 제거: {int(post['noisereduce_strength']*100)}%")
+                st.caption(f"• 저역 통과: {post['lowpass_cutoff']}Hz")
+                st.caption(f"• 소프트 클리핑: {'✅' if post['soft_clip'] else '❌'}")
+
+        # 프리셋에서 설정 가져오기
+        preset_settings = {
+            "preprocess": preset["preprocess"],
+            "postprocess": preset["postprocess"],
+        }
+        st.session_state["chatter_quality_settings"] = preset_settings
+
+    st.markdown("---")
+
     # 시드 설정
     col1, col2 = st.columns([1, 1])
     with col1:
@@ -2439,7 +3684,11 @@ def render_chatterbox_tab():
     chatter_scenes_data = st.session_state.get("scenes", [])
     chatter_has_scene_data = len(chatter_scenes_data) > 0
 
-    if st.session_state.get("scene_analysis_script") or chatter_has_scene_data:
+    # 파일에서 씬 데이터 존재 여부도 확인
+    chatter_scenes_json_info = get_scenes_json_info()
+    chatter_has_scene_file = chatter_scenes_json_info.get("exists", False)
+
+    if st.session_state.get("scene_analysis_script") or chatter_has_scene_data or chatter_has_scene_file:
         chatter_script_sources.append("씬 분석 스크립트")
         chatter_script_data["씬 분석 스크립트"] = st.session_state.get("scene_analysis_script", "")
 
@@ -2463,6 +3712,21 @@ def render_chatterbox_tab():
             key="chatter_text_input"
         )
     elif chatter_script_source == "씬 분석 스크립트" and chatter_has_scene_data:
+        # 🔄 새로고침 버튼 및 파일 정보
+        chatter_refresh_col1, chatter_refresh_col2 = st.columns([3, 1])
+        with chatter_refresh_col1:
+            chatter_scenes_json_info = get_scenes_json_info()
+            if chatter_scenes_json_info["exists"]:
+                st.caption(f"📁 마지막 수정: {chatter_scenes_json_info['last_modified']} ({chatter_scenes_json_info['scene_count']}개 씬)")
+        with chatter_refresh_col2:
+            if st.button("🔄 새로고침", key="chatter_refresh_scenes", help="씬 분석 결과를 다시 로드합니다"):
+                loaded_scenes, was_loaded = load_scenes_from_json(force_reload=True)
+                if was_loaded and loaded_scenes:
+                    st.success(f"✅ {len(loaded_scenes)}개 씬 새로고침 완료!")
+                    st.rerun()
+                else:
+                    st.warning("씬 데이터가 없거나 로드에 실패했습니다.")
+
         # 씬별 생성 모드 UI
         st.info(f"📊 총 **{len(chatter_scenes_data)}개** 씬이 분석되어 있습니다.")
 
@@ -2478,52 +3742,40 @@ def render_chatterbox_tab():
         st.markdown("---")
 
         if chatter_generation_mode == "씬별 개별 생성":
-            st.markdown("**📋 생성할 씬 선택**")
-
-            # 전체 선택/해제
-            col_sel1, col_sel2 = st.columns([1, 3])
-            with col_sel1:
-                chatter_select_all = st.checkbox("전체 선택", value=True, key="chatter_select_all_scenes")
-
-            # 씬 목록 표시
-            chatter_selected_scenes = []
+            # 씬 데이터를 컴포넌트용 형식으로 변환
+            chatter_scenes_for_selector = []
             for idx, scene in enumerate(chatter_scenes_data):
                 scene_id = scene.get('scene_id', idx + 1)
                 scene_text = scene.get('script_text', '')
-                char_count = len(scene_text)
-                duration_est = scene.get('duration_estimate', char_count // 10)
+                chatter_scenes_for_selector.append({
+                    "scene_id": scene_id,
+                    "text": scene_text,
+                    "script_text": scene_text,
+                    "duration_estimate": scene.get('duration_estimate', max(1, len(scene_text) // 10))
+                })
 
-                # 체크박스와 미리보기를 같은 행에
-                col_check, col_info = st.columns([1, 4])
+            # 씬 구간 선택 컴포넌트 사용
+            chatter_selected_scene_numbers = render_scene_range_selector(
+                total_scenes=len(chatter_scenes_data),
+                scenes_data=chatter_scenes_for_selector,
+                key_prefix="chatter_scene",
+                show_header=True,
+                default_mode="전체"
+            )
 
-                with col_check:
-                    is_selected = st.checkbox(
-                        f"씬 {scene_id}",
-                        value=chatter_select_all,
-                        key=f"chatter_scene_select_{scene_id}"
-                    )
-
-                with col_info:
-                    with st.expander(f"{scene_text[:40]}... ({char_count}자, ~{duration_est}초)", expanded=False):
-                        st.text_area(
-                            "내용",
-                            value=scene_text,
-                            height=100,
-                            disabled=True,
-                            key=f"chatter_scene_preview_{scene_id}"
-                        )
-
-                if is_selected:
+            # 선택된 씬 필터링
+            chatter_selected_scenes = []
+            for scene_num in chatter_selected_scene_numbers:
+                if scene_num <= len(chatter_scenes_data):
+                    scene = chatter_scenes_data[scene_num - 1]
+                    scene_id = scene.get('scene_id', scene_num)
+                    scene_text = scene.get('script_text', '')
                     chatter_selected_scenes.append({
                         "scene_id": scene_id,
                         "text": scene_text,
-                        "char_count": char_count,
-                        "duration_estimate": duration_est
+                        "char_count": len(scene_text),
+                        "duration_estimate": scene.get('duration_estimate', max(1, len(scene_text) // 10))
                     })
-
-            # 선택 요약
-            total_chars = sum(s["char_count"] for s in chatter_selected_scenes)
-            st.success(f"✅ **{len(chatter_selected_scenes)}개** 씬 선택됨 (총 {total_chars:,}자)")
 
             # 전체 텍스트 (미리보기용)
             script_text = "\n\n".join([s["text"] for s in chatter_selected_scenes]) if chatter_selected_scenes else ""
@@ -2557,6 +3809,36 @@ def render_chatterbox_tab():
                 "char_count": len(s.get('script_text', '')),
                 "duration_estimate": s.get('duration_estimate', 10)
             } for idx, s in enumerate(chatter_scenes_data)]
+
+        # ⭐ AI 텍스트 전처리 (영어 → 발음 변환)
+        if chatter_selected_scenes:
+            st.markdown("---")
+            chatter_preprocess_result = render_ai_preprocessing_panel(
+                scenes=chatter_selected_scenes,
+                session_key="chatterbox_preprocess",
+                default_language="ko",  # Chatterbox는 주로 한국어
+                show_preview=True,
+                expanded=False
+            )
+            # 전처리 적용
+            if chatter_preprocess_result.get("use_preprocessed"):
+                chatter_selected_scenes = chatter_preprocess_result.get("preprocessed_scenes", chatter_selected_scenes)
+                # script_text도 업데이트
+                script_text = "\n\n".join([
+                    s.get("preprocessed_text") or s.get("text", "")
+                    for s in chatter_selected_scenes
+                ])
+
+    elif chatter_script_source == "씬 분석 스크립트" and not chatter_has_scene_data and chatter_has_scene_file:
+        # 파일은 있지만 세션에 로드되지 않은 경우
+        st.warning(f"📁 씬 분석 파일이 있습니다 ({chatter_scenes_json_info['scene_count']}개 씬). 로드 버튼을 눌러주세요.")
+        if st.button("📥 씬 데이터 로드", key="chatter_load_scenes", type="primary"):
+            loaded_scenes, was_loaded = load_scenes_from_json(force_reload=True)
+            if was_loaded and loaded_scenes:
+                st.success(f"✅ {len(loaded_scenes)}개 씬 로드 완료!")
+                st.rerun()
+            else:
+                st.error("씬 데이터 로드에 실패했습니다.")
 
     elif chatter_script_source in chatter_script_data:
         script_text = chatter_script_data[chatter_script_source]
@@ -2608,6 +3890,62 @@ def render_chatterbox_tab():
                 gen_options=gen_options,
                 norm_options=norm_options
             )
+
+        # ⭐ 세션에서 이전 생성 결과 복원 (다운로드 옵션 선택 시 화면 유지)
+        elif st.session_state.get("chatter_tts_generation_done"):
+            chatter_audio_files = st.session_state.get("chatter_tts_audio_files", [])
+            chatter_timestamp = st.session_state.get("chatter_tts_timestamp", 0)
+            generated_files = st.session_state.get("last_chatterbox_scenes", [])
+
+            if chatter_audio_files and generated_files:
+                # 결과 요약
+                success_count = len([f for f in generated_files if f and f.get("success") and f.get("audio_data")])
+                st.success(f"✅ **{success_count}개** 씬 생성 완료!")
+
+                # 씬별 오디오 플레이어
+                st.markdown("### 🎵 생성된 음성 파일")
+                for file_info in generated_files:
+                    if not file_info:
+                        continue
+                    is_success = file_info.get("success") and file_info.get("audio_data")
+                    if is_success:
+                        scene_id = file_info.get("scene_id", 0)
+                        text_preview = file_info.get("text_preview", file_info.get("text", "")[:50])
+                        char_count = file_info.get("char_count", len(file_info.get("text", "")))
+                        with st.expander(f"✅ 씬 {scene_id} - {text_preview} ({char_count}자)", expanded=False):
+                            col1, col2 = st.columns([3, 1])
+                            with col1:
+                                if file_info.get("audio_data"):
+                                    st.audio(file_info["audio_data"], format="audio/wav")
+                                st.caption(f"⏱️ {file_info.get('duration', 0):.1f}초")
+                            with col2:
+                                if file_info.get("audio_data"):
+                                    st.download_button(
+                                        "⬇️",
+                                        data=file_info["audio_data"],
+                                        file_name=f"{scene_id}.wav",
+                                        mime="audio/wav",
+                                        key=f"chatter_restore_dl_{scene_id}",
+                                        use_container_width=True
+                                    )
+
+                # 다운로드 섹션
+                if len(chatter_audio_files) > 1:
+                    st.markdown("---")
+                    render_tts_download_section(
+                        audio_files=chatter_audio_files,
+                        project_name=f"chatterbox_{chatter_timestamp}",
+                        extension="wav",
+                        key_prefix="chatter_dl"
+                    )
+
+                # 초기화 버튼
+                if st.button("🗑️ 결과 초기화", key="chatter_clear_results"):
+                    st.session_state["chatter_tts_generation_done"] = False
+                    st.session_state["chatter_tts_audio_files"] = []
+                    st.session_state["last_chatterbox_scenes"] = []
+                    st.rerun()
+
     else:
         # 일반 생성 모드 - 프리뷰/전체 통합
         btn_label = "🎤 TTS 생성"
@@ -2625,6 +3963,9 @@ def render_chatterbox_tab():
             disabled=not script_text or not server_status,
             key="generate_chatterbox_robust"
         ):
+            # 품질 설정 가져오기
+            quality_settings = st.session_state.get("chatter_quality_settings", None)
+
             _handle_chatterbox_single_generation(
                 text=script_text,
                 voice_path=voice_path,
@@ -2636,15 +3977,20 @@ def render_chatterbox_tab():
                     "seed": seed
                 },
                 gen_options=gen_options,
-                norm_options=norm_options
+                norm_options=norm_options,
+                quality_settings=quality_settings  # 품질 설정 전달
             )
 
 
-def _handle_chatterbox_single_generation(text, voice_path, params, gen_options, norm_options=None):
+def _handle_chatterbox_single_generation(text, voice_path, params, gen_options, norm_options=None, quality_settings=None):
     """단일 텍스트 Chatterbox 생성 핸들러 (청크 분할 + 재시도 + 정규화)"""
 
     if norm_options is None:
         norm_options = {"enabled": False}
+
+    # 품질 설정 로깅
+    if quality_settings:
+        print(f"[TTS] 품질 설정 적용: {quality_settings.get('preprocess', {}).get('noisereduce_strength', 'default')}")
 
     result_container = st.container()
 
@@ -2658,21 +4004,26 @@ def _handle_chatterbox_single_generation(text, voice_path, params, gen_options, 
 
         status_text.info(f"🎙️ {mode_label}{norm_label} TTS 생성 준비 중... (참조 음성: {voice_name})")
 
-        # ⭐ 참조 음성 최적화 (긴 음성 → 15~30초 추출)
+        # ⭐ 참조 음성 최적화 (이미 최적화된 버전이 있으면 사용)
         optimized_voice_path = voice_path
         if voice_path:
             try:
-                from pydub import AudioSegment
-                voice_audio = AudioSegment.from_file(voice_path)
-                voice_duration = len(voice_audio) / 1000
+                # 먼저 이미 최적화된 버전이 있는지 확인
+                existing_optimized = get_optimized_voice_path(voice_path)
+                if existing_optimized:
+                    optimized_voice_path = existing_optimized
+                    print(f"[VoiceOptimizer] ✅ 기존 최적화 버전 사용: {os.path.basename(existing_optimized)}")
+                else:
+                    # 최적화 필요 여부 확인
+                    needs_opt, opt_reason = is_voice_optimization_needed(voice_path)
+                    if needs_opt:
+                        status_text.text(f"🔍 참조 음성 최적화 중...")
+                        optimized_voice_path = optimize_voice_for_cloning(voice_path)
 
-                if voice_duration > 60:  # 60초 이상이면 최적화
-                    status_text.text(f"🔍 참조 음성 최적화 중... ({voice_duration:.0f}초 → 20초)")
-                    optimized_voice_path = optimize_voice_for_cloning(voice_path)
-
-                    if optimized_voice_path != voice_path:
-                        opt_audio = AudioSegment.from_file(optimized_voice_path)
-                        print(f"[VoiceOptimizer] 최적화 적용: {voice_duration:.0f}초 → {len(opt_audio)/1000:.0f}초")
+                        if optimized_voice_path != voice_path:
+                            from pydub import AudioSegment
+                            opt_audio = AudioSegment.from_file(optimized_voice_path)
+                            print(f"[VoiceOptimizer] 최적화 적용: {len(opt_audio)/1000:.0f}초")
             except Exception as e:
                 print(f"[VoiceOptimizer] 최적화 실패: {e}")
                 optimized_voice_path = voice_path
@@ -2693,7 +4044,8 @@ def _handle_chatterbox_single_generation(text, voice_path, params, gen_options, 
             repetition_penalty=gen_options["repetition_penalty"],
             max_retries=gen_options["max_retries"],
             pause_ms=gen_options["pause_ms"],
-            progress_callback=progress_callback
+            progress_callback=progress_callback,
+            quality_settings=quality_settings
         )
 
         # 정규화 적용 (활성화된 경우)
@@ -2801,21 +4153,26 @@ def _handle_chatterbox_scenes_generation(scenes, voice_path, params, gen_options
     scene_params = params.copy()
     scene_params["seed"] = scene_seed
 
-    # ⭐ 참조 음성 최적화 (긴 음성 → 15~30초 추출)
+    # ⭐ 참조 음성 최적화 (이미 최적화된 버전이 있으면 사용)
     optimized_voice_path = voice_path
     if voice_path:
         try:
-            from pydub import AudioSegment
-            voice_audio = AudioSegment.from_file(voice_path)
-            voice_duration = len(voice_audio) / 1000
+            # 먼저 이미 최적화된 버전이 있는지 확인
+            existing_optimized = get_optimized_voice_path(voice_path)
+            if existing_optimized:
+                optimized_voice_path = existing_optimized
+                print(f"[VoiceOptimizer] 씬별 생성: ✅ 기존 최적화 버전 사용: {os.path.basename(existing_optimized)}")
+            else:
+                # 최적화 필요 여부 확인
+                needs_opt, opt_reason = is_voice_optimization_needed(voice_path)
+                if needs_opt:
+                    status_text.text(f"🔍 참조 음성 최적화 중...")
+                    optimized_voice_path = optimize_voice_for_cloning(voice_path)
 
-            if voice_duration > 60:  # 60초 이상이면 최적화
-                status_text.text(f"🔍 참조 음성 최적화 중... ({voice_duration:.0f}초 → 20초)")
-                optimized_voice_path = optimize_voice_for_cloning(voice_path)
-
-                if optimized_voice_path != voice_path:
-                    opt_audio = AudioSegment.from_file(optimized_voice_path)
-                    print(f"[VoiceOptimizer] 씬별 생성: 최적화 적용 {voice_duration:.0f}초 → {len(opt_audio)/1000:.0f}초")
+                    if optimized_voice_path != voice_path:
+                        from pydub import AudioSegment
+                        opt_audio = AudioSegment.from_file(optimized_voice_path)
+                        print(f"[VoiceOptimizer] 씬별 생성: 최적화 적용 {len(opt_audio)/1000:.0f}초")
         except Exception as e:
             print(f"[VoiceOptimizer] 씬별 생성: 최적화 실패 - {e}")
             optimized_voice_path = voice_path
@@ -2832,12 +4189,35 @@ def _handle_chatterbox_scenes_generation(scenes, voice_path, params, gen_options
     voice_info = os.path.basename(voice_path) if voice_path else "기본 음성"
     total_start = time.time()
 
-    # 씬 데이터 준비
-    scene_list = [
-        {"scene_id": s.get("scene_id", idx + 1), "text": s.get("text", "")}
-        for idx, s in enumerate(scenes)
-        if s.get("text", "").strip()
-    ]
+    # 씬 데이터 준비 + ⭐⭐⭐ AI 전처리 텍스트 우선 사용! ⭐⭐⭐
+    scene_list = []
+    for idx, s in enumerate(scenes):
+        scene_id = s.get("scene_id", idx + 1)
+
+        # ============================================================
+        # ⭐⭐⭐ 핵심 수정: AI 전처리 텍스트 우선 사용 ⭐⭐⭐
+        # ============================================================
+        if s.get("preprocessed_text"):
+            # AI가 이미 전처리한 텍스트 사용 (추가 정규화 불필요!)
+            final_text = s["preprocessed_text"]
+            print(f"[TTS] 씬 {scene_id}: ✅ AI 전처리 텍스트 사용")
+            print(f"[TTS] 씬 {scene_id}: '{final_text[:60]}...'")
+        else:
+            # AI 전처리 없는 경우에만 규칙 기반 정규화 적용
+            original_text = s.get("text", "")
+            if not original_text.strip():
+                continue
+            final_text = normalize_for_tts(original_text)
+            if final_text != original_text:
+                print(f"[TTS] 씬 {scene_id} 정규화: {original_text[:40]}... → {final_text[:40]}...")
+
+        if not final_text.strip():
+            continue
+
+        scene_list.append({
+            "scene_id": scene_id,
+            "text": final_text
+        })
 
     if use_sequential:
         # ============================================================
@@ -3058,7 +4438,7 @@ def _handle_chatterbox_scenes_generation(scenes, voice_path, params, gen_options
                                 st.download_button(
                                     "⬇️ 다운로드",
                                     data=file_info["audio_data"],
-                                    file_name=f"scene_{scene_id:02d}.wav",
+                                    file_name=f"{scene_id}.wav",
                                     mime="audio/wav",
                                     key=f"chatter_robust_dl_scene_{scene_id}_{timestamp}",
                                     use_container_width=True
@@ -3066,29 +4446,31 @@ def _handle_chatterbox_scenes_generation(scenes, voice_path, params, gen_options
                 else:
                     st.error(f"❌ 씬 {scene_id} 생성 실패: {file_info.get('error', '알 수 없는 오류')}")
 
-            # 전체 ZIP 다운로드
+            # 전체 ZIP 다운로드 (새 컴포넌트 사용)
             if success_count > 1:
                 st.markdown("---")
-                st.markdown("### 📦 일괄 다운로드")
 
-                import zipfile
+                # 다운로드용 데이터 준비
+                chatter_audio_files = []
+                for file_info in generated_files:
+                    if file_info["status"] in ["success", "partial"] and file_info.get("audio_data"):
+                        chatter_audio_files.append({
+                            "scene_id": file_info["scene_id"],
+                            "data": file_info["audio_data"],
+                            "format": "wav"
+                        })
 
-                zip_buffer = io.BytesIO()
-                with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                    for file_info in generated_files:
-                        if file_info["status"] in ["success", "partial"] and file_info.get("audio_data"):
-                            scene_id = file_info["scene_id"]
-                            zip_file.writestr(f"scene_{scene_id:02d}.wav", file_info["audio_data"])
+                # ⭐ 세션에 다운로드용 데이터 저장 (rerun 시 복원용)
+                st.session_state["chatter_tts_audio_files"] = chatter_audio_files
+                st.session_state["chatter_tts_timestamp"] = timestamp
+                st.session_state["chatter_tts_generation_done"] = True
 
-                zip_buffer.seek(0)
-
-                st.download_button(
-                    f"📦 전체 다운로드 (ZIP, {success_count}개 파일)",
-                    data=zip_buffer.getvalue(),
-                    file_name=f"chatterbox_scenes_{timestamp}.zip",
-                    mime="application/zip",
-                    key=f"chatter_robust_dl_all_zip_{timestamp}",
-                    use_container_width=True
+                # 새 다운로드 UI 렌더링
+                render_tts_download_section(
+                    audio_files=chatter_audio_files,
+                    project_name=f"chatterbox_{timestamp}",
+                    extension="wav",
+                    key_prefix="chatter_dl"  # 고정 키 사용 (timestamp 제거)
                 )
 
             # 세션에 저장
@@ -3133,9 +4515,10 @@ def generate_chatterbox_tts(text, cfg_weight, exaggeration, temperature, speed, 
                     "exaggeration": exaggeration,
                     "cfg_weight": cfg_weight,
                     "temperature": temperature,
-                    "speed": speed,
+                    "speed": 1.0,  # ⭐ 원본 속도로 생성 (후처리에서 조정)
                     "seed": seed,
-                    "voice_ref_path": voice_ref_path
+                    "voice_ref_path": voice_ref_path,
+                    "skip_speed_adjustment": True  # ⭐ Chatterbox 속도 조정 스킵
                 }
             }
 
@@ -3240,7 +4623,21 @@ def generate_chatterbox_tts_by_scenes(scenes, cfg_weight, exaggeration, temperat
         # 씬별 생성 루프
         for idx, scene in enumerate(scenes):
             scene_id = scene.get("scene_id", idx + 1)
-            scene_text = scene.get("text", "")
+
+            # ⭐⭐⭐ 핵심 수정: AI 전처리 텍스트 우선 사용 ⭐⭐⭐
+            if scene.get("preprocessed_text"):
+                # AI가 이미 전처리한 텍스트 사용 (추가 정규화 불필요)
+                scene_text = scene["preprocessed_text"]
+                print(f"[TTS] 씬 {scene_id}: ✅ AI 전처리 텍스트 사용")
+            else:
+                # AI 전처리 없으면 원본에 규칙 기반 정규화 적용
+                scene_text = scene.get("text", "")
+                original_text = scene_text
+                scene_text = normalize_for_tts(scene_text)
+                if scene_text != original_text:
+                    print(f"[TTS] 씬 {scene_id} 정규화: {original_text[:40]}... → {scene_text[:40]}...")
+                else:
+                    print(f"[TTS] 씬 {scene_id}: 원본 텍스트 사용")
 
             if not scene_text.strip():
                 continue
@@ -3262,9 +4659,10 @@ def generate_chatterbox_tts_by_scenes(scenes, cfg_weight, exaggeration, temperat
                         "exaggeration": exaggeration,
                         "cfg_weight": cfg_weight,
                         "temperature": temperature,
-                        "speed": speed,
+                        "speed": 1.0,  # ⭐ 원본 속도로 생성 (후처리에서 조정)
                         "seed": seed,
-                        "voice_ref_path": voice_ref_path
+                        "voice_ref_path": voice_ref_path,
+                        "skip_speed_adjustment": True  # ⭐ Chatterbox 속도 조정 스킵
                     }
                 }
 
@@ -3282,17 +4680,69 @@ def generate_chatterbox_tts_by_scenes(scenes, cfg_weight, exaggeration, temperat
                             full_url = f"{CHATTERBOX_URL}{audio_url}"
                             audio_response = requests.get(full_url, timeout=30)
                             if audio_response.status_code == 200:
+                                duration = result.get("duration_seconds", 0)
+                                char_count = len(scene_text)
+
+                                # ⭐⭐⭐ TTS 결과 검증: 비정상적인 speaking rate 감지 ⭐⭐⭐
+                                speaking_rate = char_count / duration if duration > 0 else 0
+                                MAX_SPEAKING_RATE = 12  # 정상: 5~8 char/sec, 비정상: > 12
+
+                                if speaking_rate > MAX_SPEAKING_RATE and duration > 0:
+                                    print(f"[TTS] ⚠️ 씬 {scene_id} 비정상 감지: {speaking_rate:.1f} char/sec (정상: 5-8)")
+
+                                    # 재시도: temperature 낮추고 cfg_weight 높임
+                                    retry_payload = {
+                                        "text": scene_text,
+                                        "settings": {
+                                            "language": "ko",
+                                            "exaggeration": max(0.3, exaggeration - 0.1),
+                                            "cfg_weight": min(1.0, cfg_weight + 0.1),
+                                            "temperature": max(0.3, temperature - 0.1),
+                                            "speed": 1.0,  # ⭐ 원본 속도로 생성 (후처리에서 조정)
+                                            "seed": seed + 1 if seed else None,
+                                            "voice_ref_path": voice_ref_path,
+                                            "skip_speed_adjustment": True  # ⭐ Chatterbox 속도 조정 스킵
+                                        }
+                                    }
+                                    print(f"[TTS] 🔄 씬 {scene_id} 재시도 중...")
+                                    retry_r = requests.post(f"{CHATTERBOX_URL}/generate", json=retry_payload, timeout=120)
+
+                                    if retry_r.status_code == 200:
+                                        retry_result = retry_r.json()
+                                        if retry_result.get("success"):
+                                            retry_url = f"{CHATTERBOX_URL}{retry_result.get('audio_url', '')}"
+                                            retry_audio = requests.get(retry_url, timeout=30)
+                                            if retry_audio.status_code == 200:
+                                                retry_duration = retry_result.get("duration_seconds", 0)
+                                                retry_rate = char_count / retry_duration if retry_duration > 0 else 0
+
+                                                # 재시도 결과가 더 나으면 사용
+                                                if retry_rate < speaking_rate:
+                                                    print(f"[TTS] ✅ 씬 {scene_id} 재시도 성공: {retry_rate:.1f} char/sec")
+                                                    audio_response = retry_audio
+                                                    duration = retry_duration
+                                                    speaking_rate = retry_rate
+                                                else:
+                                                    print(f"[TTS] ❌ 씬 {scene_id} 재시도 실패, 원본 사용")
+
                                 with open(audio_path, "wb") as f:
                                     f.write(audio_response.content)
+
+                                # speaking rate 경고 추가
+                                status_msg = "success"
+                                if speaking_rate > MAX_SPEAKING_RATE:
+                                    status_msg = "warning"  # 여전히 비정상적인 경우 경고
+                                    print(f"[TTS] ⚠️ 씬 {scene_id}: 최종 speaking rate {speaking_rate:.1f} char/sec (비정상)")
 
                                 generated_files.append({
                                     "scene_id": scene_id,
                                     "path": audio_path,
                                     "text_preview": scene_text[:50] + "..." if len(scene_text) > 50 else scene_text,
-                                    "char_count": len(scene_text),
-                                    "duration": result.get("duration_seconds", 0),
+                                    "char_count": char_count,
+                                    "duration": duration,
+                                    "speaking_rate": speaking_rate,
                                     "processing_time": elapsed,
-                                    "status": "success"
+                                    "status": status_msg
                                 })
                             else:
                                 raise Exception(f"오디오 다운로드 실패: {audio_response.status_code}")
@@ -3334,12 +4784,16 @@ def generate_chatterbox_tts_by_scenes(scenes, cfg_weight, exaggeration, temperat
         status_text.empty()
 
         # 결과 표시
-        success_count = len([f for f in generated_files if f["status"] == "success"])
+        success_count = len([f for f in generated_files if f["status"] in ("success", "warning")])
+        warning_count = len([f for f in generated_files if f["status"] == "warning"])
         failed_count = len([f for f in generated_files if f["status"] == "failed"])
 
         with results_container:
             if success_count > 0:
-                st.success(f"✅ **{success_count}/{total_scenes}개** 씬 생성 완료!")
+                if warning_count > 0:
+                    st.warning(f"⚠️ **{success_count}/{total_scenes}개** 씬 생성 완료 ({warning_count}개 비정상 speaking rate)")
+                else:
+                    st.success(f"✅ **{success_count}/{total_scenes}개** 씬 생성 완료!")
 
                 # 씬별 오디오 플레이어 및 다운로드
                 st.markdown("### 🎵 생성된 음성 파일")
@@ -3347,20 +4801,28 @@ def generate_chatterbox_tts_by_scenes(scenes, cfg_weight, exaggeration, temperat
                 for file_info in generated_files:
                     scene_id = file_info["scene_id"]
 
-                    if file_info["status"] == "success":
-                        with st.expander(f"📢 씬 {scene_id} - {file_info['text_preview']} ({file_info['char_count']}자)", expanded=True):
+                    if file_info["status"] in ("success", "warning"):
+                        # 경고 표시 추가
+                        warn_icon = "⚠️" if file_info["status"] == "warning" else "📢"
+                        rate_info = f" | {file_info.get('speaking_rate', 0):.1f} 글자/초" if file_info.get("speaking_rate") else ""
+
+                        with st.expander(f"{warn_icon} 씬 {scene_id} - {file_info['text_preview']} ({file_info['char_count']}자)", expanded=True):
+                            # 비정상 speaking rate 경고
+                            if file_info["status"] == "warning":
+                                st.warning(f"⚠️ 비정상 speaking rate: {file_info.get('speaking_rate', 0):.1f} 글자/초 (정상: 5-8)")
+
                             col1, col2 = st.columns([3, 1])
 
                             with col1:
                                 st.audio(file_info["path"])
-                                st.caption(f"⏱️ {file_info.get('duration', 0):.1f}초 | 처리시간: {file_info.get('processing_time', 0):.1f}s")
+                                st.caption(f"⏱️ {file_info.get('duration', 0):.1f}초 | 처리시간: {file_info.get('processing_time', 0):.1f}s{rate_info}")
 
                             with col2:
                                 with open(file_info["path"], "rb") as f:
                                     st.download_button(
                                         "⬇️ 다운로드",
                                         data=f.read(),
-                                        file_name=f"scene_{scene_id:02d}.wav",
+                                        file_name=f"{scene_id}.wav",
                                         mime="audio/wav",
                                         key=f"chatter_download_scene_{scene_id}_{timestamp}",
                                         use_container_width=True
@@ -3368,31 +4830,25 @@ def generate_chatterbox_tts_by_scenes(scenes, cfg_weight, exaggeration, temperat
                     else:
                         st.error(f"❌ 씬 {scene_id} 생성 실패: {file_info.get('error', '알 수 없는 오류')}")
 
-                # 전체 ZIP 다운로드
+                # 전체 ZIP 다운로드 (새 컴포넌트 사용)
                 if success_count > 1:
                     st.markdown("---")
-                    st.markdown("### 📦 일괄 다운로드")
 
-                    # ZIP 파일 생성
-                    import zipfile
-                    import io
+                    # 다운로드용 데이터 준비
+                    chatter_legacy_files = []
+                    for file_info in generated_files:
+                        if file_info["status"] == "success" and file_info["path"]:
+                            chatter_legacy_files.append({
+                                "scene_id": file_info["scene_id"],
+                                "path": file_info["path"]
+                            })
 
-                    zip_buffer = io.BytesIO()
-                    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                        for file_info in generated_files:
-                            if file_info["status"] == "success" and file_info["path"]:
-                                scene_id = file_info["scene_id"]
-                                zip_file.write(file_info["path"], f"scene_{scene_id:02d}.wav")
-
-                    zip_buffer.seek(0)
-
-                    st.download_button(
-                        f"📦 전체 다운로드 (ZIP, {success_count}개 파일)",
-                        data=zip_buffer.getvalue(),
-                        file_name=f"chatterbox_scenes_{timestamp}.zip",
-                        mime="application/zip",
-                        key=f"chatter_download_all_zip_{timestamp}",
-                        use_container_width=True
+                    # 새 다운로드 UI 렌더링
+                    render_tts_download_section(
+                        audio_files=chatter_legacy_files,
+                        project_name=f"chatterbox_{timestamp}",
+                        extension="wav",
+                        key_prefix=f"chatter_legacy_dl_{timestamp}"
                     )
 
                 # 세션에 저장
@@ -3520,6 +4976,19 @@ def render_preview_tab():
 def main():
     """메인 함수"""
     st.title("🎤 TTS 생성")
+
+    # ============================================================
+    # 🔄 씬 분석 결과 자동 로드
+    # ============================================================
+    # 페이지 진입 시 scenes.json 파일에서 자동으로 씬 데이터 로드
+    scenes_info = get_scenes_json_info()
+    if scenes_info["exists"]:
+        # 파일이 수정됐거나 세션에 데이터가 없으면 자동 로드
+        current_scenes = st.session_state.get("scenes", [])
+        if not current_scenes:
+            loaded_scenes, was_loaded = load_scenes_from_json(force_reload=False)
+            if was_loaded and loaded_scenes:
+                st.toast(f"✅ 씬 분석 결과 자동 로드됨 ({len(loaded_scenes)}개 씬)", icon="📥")
 
     # 프로젝트 선택
     col1, col2 = st.columns([3, 1])

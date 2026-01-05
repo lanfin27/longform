@@ -24,12 +24,111 @@ from utils.project_manager import (
     update_project_step
 )
 from utils.data_loader import load_script
+from utils.script_sync_manager import sync_load_script, get_synced_script_info
+from utils.scene_character_loader import clear_scene_cache
 from utils.api_helper import require_api_key, show_api_status_sidebar
 from utils.progress_ui import render_api_selector, StreamlitProgressUI
 from core.api.api_manager import get_api_manager
 from core.prompt.prompt_template_manager import get_template_manager, reload_template_manager
-from components.prompt_viewer import render_prompts_viewer, render_bulk_download_section, get_prompt
+from components.prompt_viewer import (
+    render_prompts_viewer,
+    render_bulk_download_section,
+    render_enhanced_bulk_download_section,
+    render_quick_prompt_downloads,
+    get_prompt,
+    PROMPT_TYPES
+)
 import os
+import re
+from datetime import datetime
+
+
+# ============================================================
+# 스크립트 다운로드 헬퍼 함수
+# ============================================================
+
+def extract_scripts_from_scenes(scenes: list) -> str:
+    """
+    씬 목록에서 스크립트만 추출하여 TXT 형식으로 변환
+
+    형식:
+        살면서 지갑을 네 번 잃어버렸는데 한 번이 유독 기억에 남아요///
+        그날 저는 이제 막 친구들이랑 시내에 딱 도착했는데///
+        ...
+
+    Args:
+        scenes: 분석된 씬 목록
+
+    Returns:
+        str: "///" 구분자로 구분된 스크립트 텍스트
+    """
+    if not scenes:
+        return ""
+
+    script_lines = []
+
+    for scene in scenes:
+        # 스크립트 텍스트 추출 (여러 가능한 키 이름 처리)
+        script = None
+        possible_keys = ["script_text", "text", "narration", "대사", "content", "dialogue", "나레이션"]
+
+        for key in possible_keys:
+            if scene.get(key):
+                script = scene.get(key)
+                break
+
+        # 스크립트가 있는 경우만 추가
+        if script and str(script).strip():
+            # 문자열로 변환 및 정리
+            cleaned_script = str(script).strip()
+
+            # 내부 줄바꿈을 공백으로 변환 (한 줄로 만들기)
+            cleaned_script = cleaned_script.replace("\n", " ").replace("\r", "")
+
+            # 연속 공백 제거
+            cleaned_script = re.sub(r'\s+', ' ', cleaned_script)
+
+            # "///" 구분자 추가
+            script_lines.append(f"{cleaned_script}///")
+
+    # 줄바꿈으로 연결
+    return "\n".join(script_lines)
+
+
+def get_script_download_filename(project_name: str = "") -> str:
+    """스크립트 다운로드 파일명 생성"""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    if project_name:
+        # 파일명에 사용할 수 없는 문자 제거
+        safe_name = re.sub(r'[<>:"/\\|?*]', '', project_name)
+        safe_name = safe_name.strip()[:50]  # 최대 50자
+        return f"{safe_name}_script_{timestamp}.txt"
+
+    return f"script_{timestamp}.txt"
+
+
+def extract_prompts_from_scenes(scenes: list) -> str:
+    """씬 목록에서 이미지 프롬프트만 추출"""
+    prompt_lines = []
+
+    for scene in scenes:
+        scene_id = scene.get("scene_id", scene.get("index", 0))
+
+        # 이미지 프롬프트 추출 (여러 가능한 키)
+        prompt = (
+            scene.get("image_prompt_en") or
+            scene.get("image_prompt") or
+            scene.get("prompt") or
+            ""
+        )
+
+        if prompt and prompt.strip():
+            prompt_lines.append(f"[씬 {scene_id}]")
+            prompt_lines.append(prompt.strip())
+            prompt_lines.append("")  # 빈 줄
+
+    return "\n".join(prompt_lines)
 
 
 def check_api_availability() -> dict:
@@ -171,22 +270,54 @@ if not require_api_key("ANTHROPIC_API_KEY", "Anthropic API"):
 
 st.divider()
 
+# ═══════════════════════════════════════════════════════════════
+# 동기화된 스크립트 확인 (스크립트 생성 페이지에서 저장한 최신 데이터)
+# ═══════════════════════════════════════════════════════════════
+synced_script, synced_language = sync_load_script(str(project_path))
+synced_info = get_synced_script_info()
+
+# 동기화된 스크립트가 있으면 언어 기본값을 동기화
+if synced_script and synced_info.get("has_content"):
+    default_lang_index = 0 if synced_language == "ko" else 1
+    st.info(f"📝 스크립트 탭에서 저장된 **{synced_info.get('language_name', synced_language)}** 스크립트가 있습니다 ({synced_info.get('char_count', 0):,}자)")
+else:
+    default_lang_index = 0 if project_config.get("language") == "ko" else 1
+
 # 언어 선택
 language = st.selectbox(
     "언어",
     ["ko", "ja"],
     format_func=lambda x: "한국어" if x == "ko" else "일본어",
-    index=0 if project_config.get("language") == "ko" else 1
+    index=default_lang_index
 )
 
-# 스크립트 로드 (자동)
-auto_script = load_script(project_path, language, "final") or load_script(project_path, language, "draft")
+# 스크립트 로드 (동기화 우선, 없으면 기존 파일)
+if synced_script and synced_language == language:
+    auto_script = synced_script
+elif synced_script:
+    # 동기화된 스크립트가 있지만 언어가 다른 경우
+    auto_script = synced_script
+    if language != synced_language:
+        st.warning(f"⚠️ 저장된 스크립트는 **{synced_info.get('language_name')}**입니다. 언어 설정을 확인하세요.")
+else:
+    # 동기화된 스크립트가 없으면 기존 파일에서 로드
+    auto_script = load_script(project_path, language, "final") or load_script(project_path, language, "draft")
 
-# 탭 구성
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📝 스크립트 입력", "🎬 씬 분석", "👤 캐릭터", "📋 결과", "⚙️ 프롬프트 설정"])
+# 탭 구성 (v2.5: TTS+AI 타임스탬프 탭 추가)
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    "📝 스크립트 입력",
+    "🎬 씬 분석",
+    "👤 캐릭터",
+    "📋 결과",
+    "⚙️ 프롬프트 설정",
+    "🎤 TTS+AI 타임스탬프"
+])
 
-# 세션에 스크립트 저장용
-if "scene_analysis_script" not in st.session_state:
+# 세션에 스크립트 저장용 (동기화된 스크립트가 있으면 항상 최신으로 업데이트)
+if synced_script:
+    # 동기화된 스크립트가 있으면 항상 사용 (스크립트 생성에서 새로 저장된 것)
+    st.session_state["scene_analysis_script"] = auto_script
+elif "scene_analysis_script" not in st.session_state:
     st.session_state["scene_analysis_script"] = auto_script
 
 # === 탭 1: 스크립트 입력 ===
@@ -665,6 +796,9 @@ with tab2:
                 st.session_state["extracted_characters"] = result.get("characters", [])
                 st.session_state["analysis_source"] = "manual"  # 수동 입력 표시
 
+                # 다른 페이지 캐시 클리어 (Problem 56)
+                clear_scene_cache(str(project_path))
+
                 st.success(f"✅ 적용 완료! 씬 {len(result.get('scenes', []))}개가 로드되었습니다.")
                 st.balloons()
 
@@ -829,7 +963,7 @@ with tab2:
                             # 캐릭터용 모델 선택 (같은 프로바이더의 빠른 모델 우선)
                             char_model = "claude-3-5-haiku-20241022"  # 기본값
                             if model_info and model_info.provider.value == "google":
-                                char_model = "gemini-1.5-flash"
+                                char_model = "gemini-2.0-flash-exp"
                             elif model_info and model_info.provider.value == "openai":
                                 char_model = "gpt-4o-mini"
 
@@ -905,6 +1039,9 @@ with tab2:
                     st.session_state["scene_characters"] = all_characters
                     st.session_state["extracted_characters"] = all_characters
                     st.session_state["analysis_source"] = "srt"
+
+                    # 다른 페이지 캐시 클리어 (Problem 56)
+                    clear_scene_cache(str(project_path))
 
                     status.empty()
                     st.success(f"✅ SRT 씬 적용 완료! {len(analysis_scenes)}개 씬이 저장되었습니다.")
@@ -1130,6 +1267,9 @@ with tab2:
                 st.session_state["scene_characters"] = characters
                 st.session_state["extracted_characters"] = characters
 
+                # 다른 페이지 캐시 클리어 (Problem 56)
+                clear_scene_cache(str(project_path))
+
                 print(f"[씬 분석 페이지] 세션 저장 완료: 씬 {len(scenes)}개, 캐릭터 {len(characters)}개")
 
                 # 캐릭터 visual_prompt 디버그 출력
@@ -1141,7 +1281,7 @@ with tab2:
                 # 사용량 기록 (provider에 따른 모델 ID 결정)
                 model_id_map = {
                     "anthropic": "claude-sonnet-4-20250514",
-                    "google": "gemini-1.5-flash",
+                    "google": "gemini-2.0-flash-exp",
                     "openai": "gpt-4o"
                 }
                 record_model_id = model_id_map.get(provider, "claude-sonnet-4-20250514")
@@ -1174,7 +1314,7 @@ with tab2:
                 # 에러 기록 (provider에 따른 모델 ID 결정)
                 model_id_map = {
                     "anthropic": "claude-sonnet-4-20250514",
-                    "google": "gemini-1.5-flash",
+                    "google": "gemini-2.0-flash-exp",
                     "openai": "gpt-4o"
                 }
                 record_model_id = model_id_map.get(provider, "claude-sonnet-4-20250514")
@@ -1474,6 +1614,72 @@ with tab4:
         with result_tab1:
             # 씬 목록 간략 표시
             st.markdown("#### 분석된 씬 목록")
+
+            # ============================================================
+            # ✅ 다운로드 버튼 영역
+            # ============================================================
+            if scenes_data:
+                st.markdown("##### 📥 다운로드")
+
+                dl_col1, dl_col2, dl_col3 = st.columns(3)
+
+                with dl_col1:
+                    # 스크립트만 다운로드 (TXT, /// 구분자)
+                    script_text = extract_scripts_from_scenes(scenes_data)
+                    script_count = script_text.count("///") if script_text else 0
+
+                    if script_text:
+                        st.download_button(
+                            label=f"📝 스크립트 TXT ({script_count}개)",
+                            data=script_text,
+                            file_name=get_script_download_filename(project_path.name if project_path else ""),
+                            mime="text/plain",
+                            key="download_script_txt_result",
+                            use_container_width=True,
+                            help="각 씬의 스크립트가 '///'로 구분된 TXT 파일"
+                        )
+                    else:
+                        st.button(
+                            "📝 스크립트 없음",
+                            disabled=True,
+                            use_container_width=True
+                        )
+
+                with dl_col2:
+                    # 전체 JSON 다운로드
+                    json_data = json.dumps(scenes_data, ensure_ascii=False, indent=2)
+
+                    st.download_button(
+                        label=f"📄 씬 JSON ({len(scenes_data)}개)",
+                        data=json_data,
+                        file_name=f"scenes_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+                        mime="application/json",
+                        key="download_scenes_json_result",
+                        use_container_width=True
+                    )
+
+                with dl_col3:
+                    # 프롬프트만 다운로드
+                    prompts_text = extract_prompts_from_scenes(scenes_data)
+
+                    if prompts_text:
+                        st.download_button(
+                            label="🎨 프롬프트 TXT",
+                            data=prompts_text,
+                            file_name=f"prompts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+                            mime="text/plain",
+                            key="download_prompts_txt_result",
+                            use_container_width=True
+                        )
+                    else:
+                        st.button(
+                            "🎨 프롬프트 없음",
+                            disabled=True,
+                            use_container_width=True
+                        )
+
+                st.markdown("---")
+
             if scenes_data:
                 for scene in scenes_data:
                     scene_id = scene.get("scene_id", "?")
@@ -1497,12 +1703,20 @@ with tab4:
             else:
                 st.info("씬 데이터가 없습니다. 씬 분석을 먼저 실행하세요.")
 
+            # 🔄 프로세스 간 동기화 섹션
+            if scenes_data:
+                st.markdown("---")
+                from utils.sync_manager import ProcessType
+                from utils.sync_ui import render_sync_buttons
+                render_sync_buttons(ProcessType.SCENE_ANALYSIS)
+
         with result_tab2:
             # 프롬프트 뷰어 컴포넌트 사용
             if scenes_data:
                 render_prompts_viewer(scenes_data)
                 st.divider()
-                render_bulk_download_section(scenes_data, characters_data)
+                # ✅ 향상된 다운로드 섹션 (유형별/범위별 선택 가능)
+                render_enhanced_bulk_download_section(scenes_data, characters_data)
             else:
                 st.info("프롬프트 데이터가 없습니다. 씬 분석을 먼저 실행하세요.")
 
@@ -1742,6 +1956,524 @@ with tab5:
                         - 배경 설명
                         - 추상적 특성 (professional, trustworthy 등)
                         """)
+
+# === 탭 6: TTS + AI 타임스탬프 (v5.0) ===
+with tab6:
+    st.subheader("🎤 TTS 오디오 → 완벽한 SRT (v5.0 - 3단계 파이프라인)")
+
+    st.success("""
+    **v5.0 - 3단계 파이프라인 (싱크 100% + 텍스트 교정)**
+
+    1. **Whisper 문장 분리**: 오디오에서 문장 단위로 정확한 타임스탬프 추출 (100-150개)
+    2. **AI 스타일별 병합**: 잘게(1-2문장), 기본(2-4문장), 크게(4-8문장)으로 병합
+    3. **원문 텍스트 교정**: Whisper 오타를 원문 기준으로 수정 (ZF→DF, 2015→2025 등)
+    """)
+
+    st.info("💡 **원문 스크립트를 입력하면 Whisper 오타가 교정됩니다!** (입력하지 않아도 변환 가능)")
+
+    st.divider()
+
+    # 입력 섹션 - 오디오 + 원문 스크립트
+    col_audio, col_script = st.columns(2)
+
+    with col_audio:
+        st.markdown("### 📁 TTS 오디오 파일")
+
+        uploaded_audio = st.file_uploader(
+            "TTS 오디오 파일 업로드",
+            type=["mp3", "wav", "flac", "m4a", "ogg"],
+            key="hybrid_audio_upload"
+        )
+
+        hybrid_audio_path = None
+        if uploaded_audio:
+            import tempfile
+            temp_dir = Path(tempfile.gettempdir()) / "longform_hybrid"
+            temp_dir.mkdir(exist_ok=True)
+
+            hybrid_audio_path = str(temp_dir / uploaded_audio.name)
+            with open(hybrid_audio_path, 'wb') as f:
+                f.write(uploaded_audio.getvalue())
+
+            st.success(f"✅ {uploaded_audio.name}")
+            st.audio(uploaded_audio)
+
+    with col_script:
+        st.markdown("### 📝 원본 스크립트 (선택사항)")
+
+        hybrid_original_script = st.text_area(
+            "TTS 변환에 사용한 원본 텍스트",
+            height=200,
+            placeholder="여러분, 삼성전자 하면 뭐가 떠오르세요?\n스마트폰? 반도체? TV?\n...\n\n(원문을 입력하면 Whisper 오타가 교정됩니다)",
+            key="hybrid_original_script"
+        )
+
+        if hybrid_original_script:
+            st.caption(f"✅ 원본 스크립트: {len(hybrid_original_script)}자")
+        else:
+            st.caption("💡 원문 없이도 변환 가능 (오타 교정 없음)")
+
+    st.divider()
+
+    # 설정
+    st.markdown("### 변환 설정")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        hybrid_language = st.selectbox(
+            "언어",
+            ["ko", "en", "ja"],
+            format_func=lambda x: {"ko": "한국어", "en": "영어", "ja": "일본어"}[x],
+            key="hybrid_language"
+        )
+
+    with col2:
+        hybrid_whisper_model = st.selectbox(
+            "Whisper 모델",
+            ["tiny", "base", "small", "medium"],
+            index=1,
+            help="tiny: 빠름, base: 균형, small/medium: 정확",
+            key="hybrid_whisper_model"
+        )
+
+    with col3:
+        hybrid_split_style = st.selectbox(
+            "씬 분할 스타일",
+            ["기본", "잘게", "크게"],
+            help="기본: 1~3문장, 잘게: 1문장, 크게: 3~5문장",
+            key="hybrid_split_style"
+        )
+
+    with col4:
+        # AI 모델 옵션 (Claude Agent 추가)
+        ai_model_options = {
+            "gemini-2.0-flash-exp": "Gemini 2.0 Flash (빠름)",
+            "gemini-1.5-flash": "Gemini 1.5 Flash",
+            "gemini-1.5-pro": "Gemini 1.5 Pro (고품질)",
+            "claude-agent": "Claude Agent (씬분할+교정)"
+        }
+        hybrid_ai_model = st.selectbox(
+            "AI 모델",
+            list(ai_model_options.keys()),
+            format_func=lambda x: ai_model_options[x],
+            key="hybrid_ai_model"
+        )
+
+        # Claude Agent 선택 시 API 키 확인
+        if hybrid_ai_model == "claude-agent":
+            import os
+            if os.getenv("ANTHROPIC_API_KEY"):
+                st.caption("Anthropic API 키 설정됨")
+            else:
+                st.warning("ANTHROPIC_API_KEY 환경변수 필요")
+
+    # Whisper 엔진 선택
+    st.markdown("### Whisper 엔진")
+
+    try:
+        from utils.whisper_timestamp import get_available_engines, is_faster_whisper_available, is_stable_ts_available
+
+        available_engines = get_available_engines()
+        engine_col1, engine_col2 = st.columns([1, 2])
+
+        with engine_col1:
+            engine_options = ["auto"]
+            engine_labels = {"auto": "자동 선택 (빠른 엔진 우선)"}
+
+            for eng in available_engines:
+                engine_options.append(eng["id"])
+                engine_labels[eng["id"]] = eng["name"]
+
+            hybrid_whisper_engine = st.selectbox(
+                "Whisper 엔진",
+                engine_options,
+                format_func=lambda x: engine_labels[x],
+                key="hybrid_whisper_engine",
+                help="faster-whisper: CPU에서 3~4배 빠름\nstable-ts: 정밀한 타임스탬프"
+            )
+
+            # 엔진 미설치 경고
+            if hybrid_whisper_engine == "faster-whisper" and not is_faster_whisper_available():
+                st.warning("faster-whisper 미설치\n`pip install faster-whisper`")
+            elif hybrid_whisper_engine == "stable-ts" and not is_stable_ts_available():
+                st.warning("stable-ts 미설치\n`pip install stable-ts`")
+
+        with engine_col2:
+            # 엔진별 설명
+            if hybrid_whisper_engine == "auto":
+                st.info("설치된 엔진 중 faster-whisper를 우선 사용합니다.")
+            elif hybrid_whisper_engine == "faster-whisper":
+                st.info("CTranslate2 기반 - CPU에서 3~4배 빠름, 메모리 50~70% 적음")
+            elif hybrid_whisper_engine == "stable-ts":
+                st.info("정밀한 타임스탬프, refine/align 기능 지원")
+
+    except ImportError:
+        hybrid_whisper_engine = "auto"
+        st.warning("Whisper 모듈을 불러올 수 없습니다")
+
+    # Whisper 고급 옵션
+    with st.expander("Whisper 고급 옵션"):
+        adv_col1, adv_col2 = st.columns(2)
+
+        with adv_col1:
+            hybrid_vad_filter = st.checkbox(
+                "VAD 필터 (무음 구간 스킵)",
+                value=True,
+                key="hybrid_vad_filter",
+                help="faster-whisper 전용: 무음 구간을 자동으로 건너뜀"
+            )
+
+            hybrid_compute_type = st.selectbox(
+                "계산 타입",
+                ["auto", "int8", "float16", "float32"],
+                index=0,
+                key="hybrid_compute_type",
+                help="faster-whisper 전용: int8이 CPU에서 가장 빠름"
+            )
+
+        with adv_col2:
+            hybrid_refine = st.checkbox(
+                "타임스탬프 미세 조정 (Refine)",
+                value=False,
+                key="hybrid_refine",
+                help="stable-ts 전용: 더 정밀한 타임스탬프 (처리 시간 증가)"
+            )
+
+    # 디바이스 설정
+    st.markdown("### 디바이스 설정")
+
+    try:
+        from utils.device_manager import get_gpu_status, select_device, get_upgrade_instructions
+
+        gpu_status = get_gpu_status()
+
+        col_device, col_status = st.columns([1, 2])
+
+        with col_device:
+            device_mode_options = {
+                "auto": "🔄 자동 감지 (권장)",
+                "gpu": "🎮 GPU 강제",
+                "cpu": "💻 CPU 강제"
+            }
+            hybrid_device_mode = st.selectbox(
+                "디바이스 모드",
+                list(device_mode_options.keys()),
+                format_func=lambda x: device_mode_options[x],
+                key="hybrid_device_mode",
+                help="auto: GPU 사용 가능하면 GPU, 아니면 CPU\nGPU: GPU 강제 (호환 안 되면 CPU 폴백)\nCPU: CPU 강제"
+            )
+
+        with col_status:
+            # GPU 상태 표시
+            if gpu_status["gpu_available"]:
+                if gpu_status["pytorch_compatible"]:
+                    st.success(f"✅ GPU 사용 가능: **{gpu_status['gpu_name']}** ({gpu_status['gpu_memory']}, CUDA {gpu_status.get('cuda_version', 'N/A')})")
+                else:
+                    st.warning(f"⚠️ GPU 호환 불가: {gpu_status['gpu_name']} (compute {gpu_status['compute_capability']})")
+                    if gpu_status.get("warning"):
+                        st.caption(gpu_status["warning"])
+            else:
+                st.info("💻 CPU 모드로 실행됩니다")
+
+            # 선택 모드에 따른 예상 디바이스
+            device_result = select_device(hybrid_device_mode)
+            if device_result.fallback_used:
+                st.caption(f"⚠️ {device_result.message}")
+            else:
+                st.caption(f"ℹ️ {device_result.message}")
+
+        # RTX 50xx 업그레이드 안내
+        if gpu_status.get("needs_upgrade"):
+            with st.expander("🔧 GPU 활성화 방법 (PyTorch 업그레이드 필요)", expanded=False):
+                upgrade_instructions = get_upgrade_instructions()
+                if upgrade_instructions:
+                    st.markdown(upgrade_instructions)
+
+                st.info("""
+                **빠른 실행:**
+                ```bash
+                python scripts/upgrade_pytorch.py
+                ```
+                """)
+
+    except ImportError:
+        hybrid_device_mode = "cpu"
+        st.info("💻 CPU 모드로 실행됩니다 (device_manager 없음)")
+
+    # 프롬프트 설정 섹션
+    st.markdown("### 씬 분할 프롬프트 설정")
+
+    with st.expander("분할 기준 상세 설정", expanded=False):
+        try:
+            from utils.ai_scene_splitter import get_prompt_manager
+
+            prompt_mgr = get_prompt_manager()
+            current_prompt = prompt_mgr.get_prompt(hybrid_split_style)
+
+            st.info(f"현재 스타일: **{current_prompt['name']}** - {current_prompt['description']}")
+
+            # 글자 수 설정
+            col_min, col_max = st.columns(2)
+            with col_min:
+                new_min_chars = st.number_input(
+                    "최소 글자 수",
+                    min_value=10,
+                    max_value=500,
+                    value=current_prompt["min_chars"],
+                    key=f"prompt_min_chars_{hybrid_split_style}"
+                )
+            with col_max:
+                new_max_chars = st.number_input(
+                    "최대 글자 수",
+                    min_value=50,
+                    max_value=1000,
+                    value=current_prompt["max_chars"],
+                    key=f"prompt_max_chars_{hybrid_split_style}"
+                )
+
+            # 분할 기준 표시 및 편집
+            st.markdown("**분할 기준:**")
+            criteria_text = "\n".join([f"- {c}" for c in current_prompt["criteria"]])
+            st.text(criteria_text)
+
+            # 추가 지시사항
+            custom_instructions = st.text_area(
+                "추가 지시사항 (선택)",
+                value=current_prompt.get("custom_instructions", ""),
+                height=80,
+                placeholder="예: 대화 장면은 더 짧게 나눠주세요",
+                key=f"prompt_custom_{hybrid_split_style}"
+            )
+
+            # 저장/리셋 버튼
+            col_save, col_reset = st.columns(2)
+            with col_save:
+                if st.button("설정 저장", key="save_prompt_settings"):
+                    prompt_mgr.update_prompt(
+                        hybrid_split_style,
+                        min_chars=new_min_chars,
+                        max_chars=new_max_chars,
+                        custom_instructions=custom_instructions
+                    )
+                    st.success("설정 저장됨")
+                    st.rerun()
+
+            with col_reset:
+                if st.button("기본값 복원", key="reset_prompt_settings"):
+                    prompt_mgr.reset_prompt(hybrid_split_style)
+                    st.success("기본값 복원됨")
+                    st.rerun()
+
+            # v5 세그먼트 병합 프롬프트 미리보기
+            with st.expander("v5.0 스타일별 병합 프롬프트 미리보기"):
+                try:
+                    from utils.ai_scene_splitter import STYLE_CONFIG, MERGE_PROMPTS
+                    style_config = STYLE_CONFIG.get(hybrid_split_style, STYLE_CONFIG["기본"])
+                    st.info(f"**{style_config['name']}**: {style_config['description']} ({style_config['min_sentences']}-{style_config['max_sentences']}문장/씬)")
+                    merge_config = MERGE_PROMPTS.get(hybrid_split_style, MERGE_PROMPTS["기본"])
+                    st.code(merge_config["prompt_template"][:1000] + "...", language="markdown")
+                except Exception:
+                    st.warning("STYLE_CONFIG를 로드할 수 없습니다")
+
+        except ImportError:
+            st.warning("HybridPromptManager를 로드할 수 없습니다")
+        except Exception as e:
+            st.error(f"프롬프트 설정 로드 실패: {e}")
+
+    st.divider()
+
+    # 변환 실행 (v5.4)
+    if st.button("🚀 6단계 파이프라인 실행 (v5.4)", type="primary", key="hybrid_convert", use_container_width=True):
+        if not hybrid_audio_path:
+            st.error("TTS 오디오 파일을 업로드하세요")
+        else:
+            try:
+                from utils.tts_to_srt_hybrid import TTStoSRTHybridV5
+
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+
+                def update_progress(percent, message):
+                    progress_bar.progress(percent / 100)
+                    status_text.text(f"{percent}% - {message}")
+
+                status_text.text("0% - 초기화 중...")
+
+                converter = TTStoSRTHybridV5(
+                    whisper_model=hybrid_whisper_model,
+                    device_mode=hybrid_device_mode,
+                    ai_model=hybrid_ai_model,
+                    whisper_engine=hybrid_whisper_engine,
+                    whisper_compute_type=hybrid_compute_type,
+                    whisper_vad_filter=hybrid_vad_filter,
+                    whisper_refine=hybrid_refine
+                )
+
+                # 저장 경로
+                srt_path = str(project_path / "analysis" / "hybrid_v5.srt")
+                json_path = str(project_path / "analysis" / "hybrid_v5_scenes.json")
+
+                # v5.4: 원문 스크립트 전달 + 후처리 교정 + SRT 검증 + 최종 검증
+                srt_text, results, metadata = converter.convert(
+                    audio_path=hybrid_audio_path,
+                    original_script=hybrid_original_script or "",
+                    language=hybrid_language,
+                    split_style=hybrid_split_style,
+                    output_srt_path=srt_path,
+                    output_json_path=json_path,
+                    enable_v3_correction=True,
+                    enable_srt_validation=True,  # v5.3: SRT 타임스탬프 검증
+                    enable_final_validation=True,  # v5.4: 최종 SRT 검증
+                    progress_callback=update_progress
+                )
+
+                # v5.4: 메타데이터 추출
+                correction_changes = metadata.get("correction_changes", [])
+                validation_fixes = metadata.get("validation_fixes", [])
+                final_corrections = metadata.get("final_corrections", [])
+
+                progress_bar.progress(100)
+                status_text.text("완료!")
+
+                # 세션에 저장 (기존 씬 분석 결과와 통합)
+                hybrid_scenes = []
+                for r in results:
+                    hybrid_scenes.append({
+                        "scene_id": r.scene_id,
+                        "script_text": r.text,  # v4에서는 text 사용
+                        "start_time": r.start_time,
+                        "end_time": r.end_time,
+                        "duration_estimate": r.duration,
+                        "timecode": r.timecode,
+                        "mood": r.mood,
+                        "segment_ids": r.segment_ids,  # v4 신규
+                        "scene_break_reason": r.scene_break_reason,
+                        "char_count": r.char_count
+                    })
+
+                st.session_state["scenes"] = hybrid_scenes
+                st.session_state["scene_data"] = {"scenes": hybrid_scenes}
+                st.session_state["hybrid_srt"] = srt_text
+
+                # 결과 표시
+                device_used = converter.device_used or "cpu"
+                engine_used = getattr(converter, 'whisper_engine', hybrid_whisper_engine)
+                ai_model_used = metadata.get("ai_model", hybrid_ai_model)
+                correction_count = len(correction_changes) if correction_changes else 0
+                validation_count = len(validation_fixes) if validation_fixes else 0
+                final_correction_count = len(final_corrections) if final_corrections else 0
+                correction_info = f"원문 기반 {correction_count}개 씬 교정됨" if hybrid_original_script and correction_count > 0 else ("원문 없음 (교정 생략)" if not hybrid_original_script else "교정 필요 없음")
+                validation_info = f"{validation_count}개 수정됨" if validation_count > 0 else "문제 없음"
+                final_correction_info = f"{final_correction_count}개 최종 교정됨" if final_correction_count > 0 else "추가 교정 없음"
+                st.success(f"""
+                **v5.4 변환 완료! (6단계 파이프라인 - 싱크 100%)**
+
+                - 씬 수: **{len(results)}개**
+                - 총 길이: **{results[-1].end_time:.1f}초** ({int(results[-1].end_time//60)}분 {int(results[-1].end_time%60)}초)
+                - Whisper 엔진: **{engine_used}**
+                - 사용 디바이스: **{device_used.upper()}**
+                - AI 모델: **{ai_model_used}**
+                - 원문 교정: **{correction_info}**
+                - 타임스탬프: **{validation_info}**
+                - 최종 검증: **{final_correction_info}**
+                - SRT: `{srt_path}`
+                """)
+
+                # 결과 미리보기
+                with st.expander("📄 생성된 씬 미리보기", expanded=True):
+                    for r in results[:5]:
+                        st.markdown(f"""
+                        **씬 {r.scene_id}** ({r.timecode}, {r.duration:.1f}초) [문장 ID: {r.sentence_ids}]
+                        - 텍스트: {r.text[:80]}{"..." if len(r.text) > 80 else ""}
+                        - 분위기: {r.mood}
+                        - 씬 분할 이유: {r.scene_break_reason}
+                        ---
+                        """)
+
+                # ✅ v5.2: 교정 변경 내역 표시
+                if correction_changes:
+                    with st.expander(f"📝 원문 기반 교정 내역 ({len(correction_changes)}개)", expanded=True):
+                        for change in correction_changes[:10]:
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                st.caption(f"**씬 {change['scene_id']} - 교정 전 (Whisper)**")
+                                st.text(change['original'][:100] + "..." if len(change['original']) > 100 else change['original'])
+                            with col2:
+                                st.caption(f"**교정 후 (원문 기반)**")
+                                st.text(change['corrected'][:100] + "..." if len(change['corrected']) > 100 else change['corrected'])
+                            st.divider()
+                        if len(correction_changes) > 10:
+                            st.info(f"... 외 {len(correction_changes) - 10}개 교정됨")
+
+                # ✅ v5.4: 최종 검증 교정 내역 표시
+                if final_corrections:
+                    with st.expander(f"🔍 최종 검증 교정 내역 ({len(final_corrections)}개)", expanded=True):
+                        for corr in final_corrections[:10]:
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                st.caption(f"**씬 {corr.get('scene_id', '?')} - 교정 전**")
+                                orig_text = str(corr.get('original_srt', ''))
+                                st.text(orig_text[:100] + "..." if len(orig_text) > 100 else orig_text)
+                            with col2:
+                                st.caption(f"**최종 교정 후** ({corr.get('reason', '')})")
+                                corr_text = str(corr.get('corrected', ''))
+                                st.text(corr_text[:100] + "..." if len(corr_text) > 100 else corr_text)
+                            st.divider()
+                        if len(final_corrections) > 10:
+                            st.info(f"... 외 {len(final_corrections) - 10}개 최종 교정됨")
+
+                elif hybrid_original_script:
+                    with st.expander("🔍 Whisper vs 교정 비교 (샘플)", expanded=False):
+                        for r in results[:3]:
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                st.caption(f"**씬 {r.scene_id} - Whisper 원본**")
+                                whisper_text = r.whisper_text if hasattr(r, 'whisper_text') else r.text
+                                st.text(whisper_text[:100] + "..." if len(whisper_text) > 100 else whisper_text)
+                            with col2:
+                                st.caption(f"**교정 후**")
+                                st.text(r.text[:100] + "..." if len(r.text) > 100 else r.text)
+                            st.divider()
+
+                        if len(results) > 5:
+                            st.info(f"... 외 {len(results) - 5}개 씬")
+
+                # 다운로드 버튼
+                col_dl1, col_dl2 = st.columns(2)
+                with col_dl1:
+                    st.download_button(
+                        "SRT 다운로드",
+                        srt_text,
+                        "hybrid_generated.srt",
+                        mime="text/plain",
+                        key="download_hybrid_srt"
+                    )
+                with col_dl2:
+                    st.download_button(
+                        "JSON 다운로드",
+                        json.dumps({"scenes": hybrid_scenes}, ensure_ascii=False, indent=2),
+                        "hybrid_scenes.json",
+                        mime="application/json",
+                        key="download_hybrid_json"
+                    )
+
+            except ImportError as e:
+                st.error(f"""
+                **필요한 라이브러리 설치 필요**
+
+                ```
+                pip install stable-ts
+                ```
+
+                오류: {e}
+                """)
+            except Exception as e:
+                st.error(f"오류: {e}")
+                import traceback
+                with st.expander("상세 오류"):
+                    st.code(traceback.format_exc())
+
 
 # 다음 단계 안내
 st.divider()

@@ -150,7 +150,9 @@ class ImageAPIManager:
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
         self.stability_api_key = os.getenv("STABILITY_API_KEY")
         self.replicate_api_token = os.getenv("REPLICATE_API_TOKEN")
-        self.imagefx_cookie = os.getenv("IMAGEFX_COOKIE")
+
+        # ImageFX 쿠키: 환경변수 > 파일 순서 (동적 로드)
+        self.imagefx_cookie = self._load_imagefx_cookie()
 
         # ImageFX Authorization 토큰 (권장 방식)
         self.imagefx_auth_token = self._load_imagefx_auth_token()
@@ -167,6 +169,21 @@ class ImageAPIManager:
             "Stability AI": 1.0,           # 1초 간격
             "Replicate SDXL": 0.5,         # 0.5초 간격
         }
+
+    def _load_imagefx_cookie(self) -> str:
+        """ImageFX 쿠키 로드 (환경변수 > 파일 순서)"""
+        # 1. 환경 변수에서 먼저 확인
+        env_cookie = os.getenv("IMAGEFX_COOKIE", "").strip()
+        if env_cookie:
+            return env_cookie
+
+        # 2. config/settings.py의 load 함수 사용
+        try:
+            from config.settings import load_imagefx_cookie
+            return load_imagefx_cookie()
+        except:
+            pass
+        return ""
 
     def _load_imagefx_auth_token(self) -> str:
         """ImageFX Authorization 토큰 로드 (환경변수 > 파일 순서)"""
@@ -251,7 +268,7 @@ class ImageAPIManager:
     def reload_imagefx_credentials(self):
         """ImageFX 인증 정보 다시 로드"""
         self.imagefx_auth_token = self._load_imagefx_auth_token()
-        self.imagefx_cookie = os.getenv("IMAGEFX_COOKIE")
+        self.imagefx_cookie = self._load_imagefx_cookie()
         self._imagefx_client = None  # 재초기화 필요
 
     def generate_image(

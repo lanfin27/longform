@@ -14,11 +14,92 @@ Chatterbox TTS API 클라이언트
         result = chatterbox_client.generate_preview("안녕하세요")
 """
 
+import os
 import requests
+from pathlib import Path
 from typing import List, Dict, Optional, Any
 import logging
 
 logger = logging.getLogger(__name__)
+
+# 텍스트 정규화기 (지연 로딩)
+_text_normalizer = None
+
+def get_text_normalizer():
+    """텍스트 정규화기 지연 로딩"""
+    global _text_normalizer
+    if _text_normalizer is None:
+        try:
+            from utils.text_normalizer import normalize_for_tts
+            _text_normalizer = normalize_for_tts
+            logger.info("[TextNorm] 정규화기 로드 완료")
+        except ImportError as e:
+            logger.warning(f"[TextNorm] 정규화기 로드 실패: {e}")
+            _text_normalizer = lambda x: x  # 패스스루
+    return _text_normalizer
+
+# longform 프로젝트 루트 경로
+PROJECT_ROOT = Path(__file__).parent.parent.parent.resolve()
+
+
+def resolve_voice_path(voice_path: str) -> str:
+    """
+    음성 파일 경로를 절대 경로로 변환
+
+    Args:
+        voice_path: 상대 또는 절대 경로
+
+    Returns:
+        절대 경로 문자열
+    """
+    if not voice_path:
+        return voice_path
+
+    # 이미 절대 경로인 경우
+    if os.path.isabs(voice_path):
+        if os.path.exists(voice_path):
+            return voice_path
+        logger.warning(f"[VoicePath] 절대 경로 파일 없음: {voice_path}")
+        return voice_path
+
+    # 상대 경로 → 절대 경로 변환
+    absolute_path = PROJECT_ROOT / voice_path
+
+    if absolute_path.exists():
+        resolved = str(absolute_path.resolve())
+        logger.info(f"[VoicePath] ✅ 상대→절대 변환: {voice_path} → {resolved}")
+        return resolved
+
+    # 대체 경로 탐색
+    alternative_dirs = [
+        PROJECT_ROOT / "data" / "voice_samples" / "default",
+        PROJECT_ROOT / "data" / "voice_samples" / "optimized",
+        PROJECT_ROOT / "data" / "voice_samples",
+    ]
+
+    filename = Path(voice_path).name
+    stem = Path(voice_path).stem
+
+    for alt_dir in alternative_dirs:
+        if not alt_dir.exists():
+            continue
+
+        # 정확한 파일명 매칭
+        exact_match = alt_dir / filename
+        if exact_match.exists():
+            resolved = str(exact_match.resolve())
+            logger.info(f"[VoicePath] ✅ 대체 경로 발견: {resolved}")
+            return resolved
+
+        # stem 기반 매칭
+        for file in alt_dir.glob("*.mp3"):
+            if stem in file.stem:
+                resolved = str(file.resolve())
+                logger.info(f"[VoicePath] ✅ 유사 파일 발견: {resolved}")
+                return resolved
+
+    logger.warning(f"[VoicePath] ⚠️ 파일 없음: {voice_path}")
+    return str(absolute_path.resolve())
 
 
 class ChatterboxTTSClient:
@@ -132,6 +213,14 @@ class ChatterboxTTSClient:
     ) -> Dict:
         """프리뷰 TTS 생성"""
         try:
+            # ⭐ 한국어 텍스트 정규화 (콤마 숫자, 영어 약어 등)
+            original_text = text
+            if language == "ko" and text:
+                normalizer = get_text_normalizer()
+                text = normalizer(text)
+                if text != original_text:
+                    print(f"[CLIENT] 텍스트 정규화: {original_text[:50]}... → {text[:50]}...")
+
             # ========== 디버깅 로그 ==========
             print("=" * 60)
             print("[CLIENT DEBUG] generate_preview() called")
@@ -167,7 +256,10 @@ class ChatterboxTTSClient:
             if voice_id is not None:
                 payload["settings"]["voice_id"] = voice_id
             elif voice_ref_path is not None:
-                payload["settings"]["voice_ref_path"] = voice_ref_path
+                # ⭐ 상대 경로 → 절대 경로 변환 (Chatter 서버에서 인식하도록)
+                resolved_path = resolve_voice_path(voice_ref_path)
+                payload["settings"]["voice_ref_path"] = resolved_path
+                print(f"[CLIENT DEBUG] voice_ref_path resolved: {voice_ref_path} → {resolved_path}")
 
             # 전송할 payload 로그
             print(f"[CLIENT DEBUG] Sending payload: {payload}")
@@ -207,9 +299,33 @@ class ChatterboxTTSClient:
     ) -> Dict:
         """롱폼 TTS 생성"""
         try:
+            # ⭐ settings에서 voice_ref_path 절대 경로 변환
+            resolved_settings = dict(settings)
+            if resolved_settings.get("voice_ref_path"):
+                resolved_path = resolve_voice_path(resolved_settings["voice_ref_path"])
+                resolved_settings["voice_ref_path"] = resolved_path
+                logger.info(f"[Longform] voice_ref_path resolved: {resolved_path}")
+
+            # ⭐ 씬별 텍스트 정규화 적용 (콤마 숫자, 영어 약어 등)
+            language = resolved_settings.get("language", "ko")
+            if language == "ko":
+                normalizer = get_text_normalizer()
+                normalized_scenes = []
+                for scene in scenes:
+                    scene_copy = dict(scene)
+                    original_text = scene_copy.get("text", "")
+                    if original_text:
+                        normalized_text = normalizer(original_text)
+                        if normalized_text != original_text:
+                            print(f"[Longform] 씬 {scene_copy.get('scene_id', '?')} 정규화: {original_text[:40]}... → {normalized_text[:40]}...")
+                        scene_copy["text"] = normalized_text
+                    normalized_scenes.append(scene_copy)
+            else:
+                normalized_scenes = scenes
+
             payload = {
-                "scenes": scenes,
-                "settings": settings,
+                "scenes": normalized_scenes,
+                "settings": resolved_settings,
                 "senior_friendly": senior_friendly or {"enabled": False, "silence_duration": 1.5},
                 "project_id": project_id,
                 "project_name": project_name,
@@ -497,11 +613,13 @@ class ChatterboxTTSClient:
             }
         """
         try:
-            logger.info(f"음성 분석 요청: {audio_path}")
+            # ⭐ 절대 경로로 변환
+            resolved_path = resolve_voice_path(audio_path)
+            logger.info(f"음성 분석 요청: {resolved_path}")
 
             r = requests.post(
                 f"{self.base_url}/analyze_voice",
-                json={"audio_path": audio_path},
+                json={"audio_path": resolved_path},
                 timeout=30
             )
             r.raise_for_status()

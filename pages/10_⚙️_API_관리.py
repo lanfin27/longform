@@ -19,6 +19,11 @@ ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
 from core.api.api_manager import get_api_manager, APIProvider, APIFunction
+from utils.imagefx_cookie_manager import (
+    get_cookie_state,
+    CookieStatus,
+    reset_cookie_state
+)
 
 st.set_page_config(page_title="API 관리", page_icon="⚙️", layout="wide")
 
@@ -122,10 +127,10 @@ with tab1:
     status_cols = st.columns(7)
     for i, provider in enumerate(providers):
         with status_cols[i]:
-            # ImageFX 특별 처리: 세션 쿠키 또는 환경변수 확인
+            # ImageFX 특별 처리: 세션 쿠키 또는 파일에서 동적 로드
             if provider.get("is_cookie"):
-                from config.settings import IMAGEFX_COOKIE
-                has_key = bool(st.session_state.get("imagefx_cookie") or IMAGEFX_COOKIE)
+                from config.settings import load_imagefx_cookie
+                has_key = bool(st.session_state.get("imagefx_cookie") or load_imagefx_cookie())
             else:
                 has_key = api_manager.has_api_key(provider["id"])
             if has_key:
@@ -140,7 +145,7 @@ with tab1:
         with st.expander(f"**{provider['name']}** - {provider['description']}", expanded=False):
             # ImageFX 인증 (v6.0 - 쿠키 기반)
             if provider.get("is_cookie"):
-                from config.settings import IMAGEFX_COOKIE, SECRETS_DIR
+                from config.settings import load_imagefx_cookie, SECRETS_DIR
 
                 st.warning("""
                 ⚠️ **v6.0 변경사항: 쿠키 기반 인증**
@@ -186,13 +191,45 @@ with tab1:
                 5. 아래 입력란에 붙여넣기
                 """)
 
-                # 현재 쿠키 상태
-                current_cookie = st.session_state.get("imagefx_cookie") or IMAGEFX_COOKIE
-                if current_cookie:
-                    preview = current_cookie[:50] + "..." if len(current_cookie) > 50 else current_cookie
-                    st.success(f"✅ 쿠키 저장됨: `{preview}`")
-                else:
-                    st.info("ℹ️ 쿠키가 설정되지 않았습니다")
+                # 현재 쿠키 상태 (동적 로드 + 유효성 상태)
+                current_cookie = st.session_state.get("imagefx_cookie") or load_imagefx_cookie()
+                cookie_state = get_cookie_state()
+
+                st.markdown("### 🔐 쿠키 상태")
+
+                if cookie_state.status == CookieStatus.VALID:
+                    if current_cookie:
+                        preview = current_cookie[:50] + "..." if len(current_cookie) > 50 else current_cookie
+                        st.success(f"✅ 쿠키 유효: `{preview}`")
+                    else:
+                        st.success("✅ 쿠키 유효")
+                    if cookie_state.last_success:
+                        st.caption(f"마지막 성공: {cookie_state.last_success.strftime('%Y-%m-%d %H:%M')}")
+
+                elif cookie_state.status == CookieStatus.EXPIRED:
+                    st.error("❌ 쿠키 만료됨")
+                    if cookie_state.error_time:
+                        st.caption(f"만료 시각: {cookie_state.error_time.strftime('%Y-%m-%d %H:%M')}")
+                    if cookie_state.last_error:
+                        with st.expander("에러 상세"):
+                            st.code(cookie_state.last_error[:500])
+
+                    # 상태 초기화 버튼
+                    if st.button("🔄 쿠키 상태 초기화", key="reset_cookie_state_api"):
+                        reset_cookie_state()
+                        st.success("상태가 초기화되었습니다. 새 쿠키를 입력해주세요.")
+                        st.rerun()
+
+                elif cookie_state.status == CookieStatus.NOT_SET:
+                    st.warning("⚠️ 쿠키가 설정되지 않았습니다")
+                    st.info("아래에서 쿠키를 입력해주세요.")
+
+                else:  # UNKNOWN
+                    if current_cookie:
+                        preview = current_cookie[:50] + "..." if len(current_cookie) > 50 else current_cookie
+                        st.info(f"ℹ️ 쿠키 저장됨 (상태 미확인): `{preview}`")
+                    else:
+                        st.info("ℹ️ 쿠키 상태를 확인할 수 없습니다")
 
                 # 쿠키 입력
                 new_cookie = st.text_area(
@@ -216,6 +253,8 @@ with tab1:
                             try:
                                 cookie_file = SECRETS_DIR / "imagefx_cookie.txt"
                                 cookie_file.write_text(cookie_value, encoding="utf-8")
+                                # 새 쿠키 저장 시 상태 초기화
+                                reset_cookie_state()
                                 st.success("✅ 쿠키가 저장되었습니다!")
                                 st.rerun()
                             except Exception as e:

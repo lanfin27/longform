@@ -40,10 +40,11 @@ class VoiceProfileManager:
 
     def __init__(self, base_path: str = None):
         if base_path is None:
-            # 기본 경로 설정
-            self.base_path = Path("data/voice_samples")
+            # ⭐ 절대 경로 사용 (Chatter 서버에서 인식 가능하도록)
+            project_root = Path(__file__).parent.parent.resolve()
+            self.base_path = project_root / "data" / "voice_samples"
         else:
-            self.base_path = Path(base_path)
+            self.base_path = Path(base_path).resolve()
 
         self.profiles_file = self.base_path / "voice_profiles.json"
         self.profiles: Dict[str, Dict] = {}
@@ -235,6 +236,122 @@ class VoiceProfileManager:
         """모든 음성 목록"""
         return list(self.profiles.values())
 
+    def list_voices_grouped(self) -> Dict[str, List[Dict]]:
+        """
+        최적화 상태별로 그룹화된 음성 목록
+
+        Returns:
+            {
+                "optimized": [...],   # 최적화된 음성
+                "original": [...]     # 원본 음성
+            }
+        """
+        optimized = []
+        original = []
+
+        for profile in self.profiles.values():
+            if profile.get("is_optimized", False):
+                optimized.append(profile)
+            else:
+                original.append(profile)
+
+        return {
+            "optimized": optimized,
+            "original": original
+        }
+
+    def add_profile(
+        self,
+        voice_id: str,
+        name: str,
+        audio_path: str,
+        transcript: str = None,
+        is_optimized: bool = False,
+        original_id: str = None,
+        analysis: Dict = None,
+        params: Dict = None
+    ) -> Dict:
+        """
+        새 음성 프로필 추가
+
+        Args:
+            voice_id: 음성 고유 ID
+            name: 표시 이름
+            audio_path: 오디오 파일 경로
+            transcript: 텍스트
+            is_optimized: 최적화된 음성인지
+            original_id: 원본 음성 ID (최적화 음성인 경우)
+            analysis: 분석 결과
+            params: 추천 파라미터
+
+        Returns:
+            생성된 프로필
+        """
+
+        # 기존 프로필 확인
+        voice_id_lower = voice_id.lower().replace(" ", "_")
+
+        profile = {
+            "id": voice_id_lower,
+            "name": name,
+            "audio_file": os.path.basename(audio_path),
+            "audio_path": audio_path,
+            "transcript": transcript,
+            "language": "ko",
+            "analyzed": analysis is not None,
+            "is_optimized": is_optimized,
+        }
+
+        if original_id:
+            profile["original_id"] = original_id
+
+        if analysis:
+            profile["analysis"] = analysis
+
+        if params:
+            profile["recommended_params"] = params
+
+        # 프로필 저장
+        self.profiles[voice_id_lower] = profile
+        self.save_profiles()
+
+        print(f"[VoiceProfileManager] 프로필 추가: {name}")
+        if is_optimized:
+            print(f"  ⭐ 최적화된 음성 (원본: {original_id})")
+
+        return profile
+
+    def get_optimized_version(self, voice_id: str) -> Optional[Dict]:
+        """
+        원본 음성의 최적화 버전 찾기
+
+        Returns:
+            최적화된 프로필 또는 None
+        """
+        voice_id_lower = voice_id.lower().replace(" ", "_")
+
+        # 해당 음성의 최적화 버전 검색
+        for profile in self.profiles.values():
+            if profile.get("original_id") == voice_id_lower and profile.get("is_optimized"):
+                return profile
+
+        return None
+
+    def is_voice_optimized(self, voice_id: str) -> bool:
+        """음성이 이미 최적화되었는지 확인"""
+        voice_id_lower = voice_id.lower().replace(" ", "_")
+
+        # 자체가 최적화된 음성인지
+        profile = self.profiles.get(voice_id_lower)
+        if profile and profile.get("is_optimized"):
+            return True
+
+        # 최적화 버전이 존재하는지
+        if self.get_optimized_version(voice_id):
+            return True
+
+        return False
+
     def update_analysis(self, voice_id: str, analysis: Dict, params: Dict):
         """분석 결과 저장"""
 
@@ -391,10 +508,12 @@ class VoiceAnalyzer:
         """
         분석 결과 기반 TTS 파라미터 추천
 
-        ⭐ 정확한 측정일 때 더 정밀한 추천
+        ⭐ Voice Clone 품질 최적화
+        - cfg_weight: 0.7 (참조 특성 강화)
+        - temperature: 0.5 (안정적인 발음)
         """
 
-        print(f"\n[VoiceAnalyzer] 파라미터 추천")
+        print(f"\n[VoiceAnalyzer] ⭐ Voice Clone 최적화 파라미터 추천")
 
         speech_rate = analysis.get("speech_rate", self.reference_speed)
         energy_var = analysis.get("energy_variation", 0.1)
@@ -424,24 +543,18 @@ class VoiceAnalyzer:
 
         print(f"  발화속도: {speech_rate:.2f} → speed: {recommended_speed:.2f}")
 
-        # 2. CFG Weight
-        if energy_var > 0.15:
-            cfg_weight = 0.4
-        elif energy_var < 0.08:
-            cfg_weight = 0.6
-        else:
-            cfg_weight = 0.5
+        # ⭐⭐⭐ Voice Clone 최적화 파라미터 ⭐⭐⭐
+        # 🔴 기존: cfg_weight 0.4~0.6, temperature 0.7~0.9 (Voice Clone 품질 저하)
+        # ✅ 수정: cfg_weight 0.7, temperature 0.5 (참조 특성 강화 + 안정성)
 
-        # 3. Exaggeration
-        exaggeration = max(0.3, min(0.7, 0.3 + energy_var * 2))
+        # 2. CFG Weight - 참조 음성 특성 강화
+        cfg_weight = 0.7  # 🔴 0.4~0.6 → 0.7 고정
 
-        # 4. Temperature
-        if tempo == "slow":
-            temperature = 0.7
-        elif tempo == "fast":
-            temperature = 0.9
-        else:
-            temperature = 0.8
+        # 3. Exaggeration - 감정 표현
+        exaggeration = 0.55  # 🔴 변동 → 0.55 고정 (적당한 표현)
+
+        # 4. Temperature - 안정적인 발음
+        temperature = 0.5  # 🔴 0.7~0.9 → 0.5 고정
 
         # 5. 목표 발화속도 (정규화용)
         # 정확한 측정이면 해당 속도 사용, 아니면 기준값 사용
@@ -449,14 +562,17 @@ class VoiceAnalyzer:
 
         params = {
             "speed": round(recommended_speed, 2),
-            "cfg_weight": round(cfg_weight, 2),
-            "exaggeration": round(exaggeration, 2),
-            "temperature": round(temperature, 2),
+            "cfg_weight": cfg_weight,
+            "exaggeration": exaggeration,
+            "temperature": temperature,
             "target_speed": round(target_speed, 2),
             "based_on_accurate": accurate,
         }
 
-        print(f"[VoiceAnalyzer] 추천: {params}")
+        print(f"[VoiceAnalyzer] ⭐ Voice Clone 최적화:")
+        print(f"  cfg_weight: {cfg_weight} (참조 특성 강화)")
+        print(f"  temperature: {temperature} (안정성 우선)")
+        print(f"  speed: {recommended_speed:.2f}")
 
         return params
 
@@ -654,25 +770,40 @@ def get_recommended_target_speed(audio_path: str) -> float:
 
 class VoiceOptimizer:
     """
-    참조 음성 최적화기
+    참조 음성 최적화기 v2.3
 
     긴 음성에서 voice cloning에 최적인 구간(15~30초) 추출
     - 음성이 연속적인 구간 선택
     - 음량이 안정적인 구간 선택
     - 시작보다 중간 부분 선호
+    - ⭐ 품질 점수 기반 구간 선택 강화
+    - ⭐ 최적화된 음성을 새 프로필로 등록
     """
 
     # 최적 구간 설정
     OPTIMAL_MIN_SEC = 15   # 최소 15초
     OPTIMAL_MAX_SEC = 30   # 최대 30초
     OPTIMAL_TARGET_SEC = 20  # 목표 20초
+    OPTIMIZATION_THRESHOLD_SEC = 60  # 60초 이상일 때만 최적화
+    MIN_QUALITY_SCORE = 0.6  # ⭐ 최소 품질 점수 (이하면 경고)
 
-    def __init__(self):
-        self.cache_dir = Path("data/voice_samples/optimized")
+    def __init__(self, profile_manager: VoiceProfileManager = None):
+        # ⭐ 절대 경로 사용 (Chatter 서버에서 인식 가능하도록)
+        project_root = Path(__file__).parent.parent.resolve()
+
+        self.default_dir = project_root / "data" / "voice_samples" / "default"
+        self.default_dir.mkdir(parents=True, exist_ok=True)
+
+        # 기존 캐시 디렉토리도 유지 (하위호환)
+        self.cache_dir = project_root / "data" / "voice_samples" / "optimized"
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-        print("[VoiceOptimizer] 초기화")
+        self.profile_manager = profile_manager
+
+        print("[VoiceOptimizer v2.2] 초기화")
         print(f"  최적 구간: {self.OPTIMAL_MIN_SEC}~{self.OPTIMAL_MAX_SEC}초")
+        print(f"  최적화 기준: {self.OPTIMIZATION_THRESHOLD_SEC}초 이상")
+        print(f"  캐시 경로: {self.cache_dir}")
 
     def optimize_for_cloning(
         self,
@@ -740,12 +871,13 @@ class VoiceOptimizer:
 
     def _extract_best_segment(self, audio: AudioSegment) -> AudioSegment:
         """
-        최적 구간 추출
+        최적 구간 추출 (품질 점수 기반)
 
         기준:
         1. 음성이 연속적인 구간 (묵음 적음)
         2. 음량이 안정적인 구간
-        3. 시작 부분보다 중간 부분 선호 (워밍업 후)
+        3. 억양 다양성 (표현력)
+        4. 시작 부분보다 중간 부분 선호 (워밍업 후)
         """
 
         duration_ms = len(audio)
@@ -754,20 +886,44 @@ class VoiceOptimizer:
         # 후보 구간들의 품질 점수 계산
         best_score = -1
         best_start = 0
+        all_scores = []
 
-        # 1초 단위로 스캔
-        step_ms = 1000
+        # 2초 단위로 스캔 (더 정밀)
+        step_ms = 2000
 
         for start_ms in range(0, duration_ms - target_ms, step_ms):
             segment = audio[start_ms:start_ms + target_ms]
             score = self._calculate_segment_quality(segment, start_ms, duration_ms)
+            all_scores.append((start_ms, score))
 
             if score > best_score:
                 best_score = score
                 best_start = start_ms
 
+        # ⭐ 점수 통계 및 품질 경고
+        scores_only = [s[1] for s in all_scores]
+        avg_score = np.mean(scores_only) if scores_only else 0
+        min_score = min(scores_only) if scores_only else 0
+        max_score = max(scores_only) if scores_only else 0
+
+        print(f"[VoiceOptimizer] 구간 탐색 완료:")
+        print(f"  탐색 구간 수: {len(all_scores)}")
+        print(f"  점수 범위: {min_score:.3f} ~ {max_score:.3f}")
+        print(f"  평균 점수: {avg_score:.3f}")
         print(f"  최적 구간: {best_start/1000:.1f}초 ~ {(best_start + target_ms)/1000:.1f}초")
-        print(f"  품질 점수: {best_score:.3f}")
+        print(f"  📊 품질 점수: {best_score:.3f}")
+
+        # ⭐ 품질 경고
+        if best_score < self.MIN_QUALITY_SCORE:
+            print(f"[VoiceOptimizer] ⚠️ 경고: 품질 점수가 낮습니다 ({best_score:.3f} < {self.MIN_QUALITY_SCORE})")
+            print(f"[VoiceOptimizer] ⚠️ 더 깨끗한 참조 음성을 권장합니다.")
+            # 상위 3개 후보 표시
+            top_candidates = sorted(all_scores, key=lambda x: x[1], reverse=True)[:3]
+            print(f"[VoiceOptimizer] 📋 상위 후보 구간:")
+            for i, (start, score) in enumerate(top_candidates):
+                print(f"  {i+1}. {start/1000:.1f}~{(start+target_ms)/1000:.1f}초 (점수: {score:.3f})")
+        elif best_score >= 0.7:
+            print(f"[VoiceOptimizer] ✅ 좋은 품질의 구간 발견!")
 
         return audio[best_start:best_start + target_ms]
 
@@ -778,12 +934,16 @@ class VoiceOptimizer:
         total_ms: int
     ) -> float:
         """
-        구간 품질 점수 계산
+        구간 품질 점수 계산 (개선된 알고리즘)
 
-        점수 = 음성비율(40%) + 음량안정성(30%) + 위치점수(30%)
+        점수 구성:
+        - 음성비율(35%): 묵음이 적을수록 좋음
+        - 에너지 적절성(20%): 너무 작거나 크지 않아야 함
+        - 억양 다양성(25%): 표현력이 풍부할수록 좋음
+        - 위치점수(20%): 시작보다 중간 선호
         """
 
-        # 1. 음성 비율 (묵음이 적을수록 좋음)
+        # 1. 음성 비율 (35%)
         try:
             nonsilent = detect_nonsilent(
                 segment,
@@ -792,15 +952,17 @@ class VoiceOptimizer:
             )
             speech_ms = sum(end - start for start, end in nonsilent) if nonsilent else len(segment)
             speech_ratio = speech_ms / len(segment)
+            speech_score = min(speech_ratio / 0.7, 1.0)  # 70% 이상이면 만점
         except:
-            speech_ratio = 0.7
+            speech_score = 0.7
 
-        # 2. 음량 안정성 (변화가 적을수록 좋음)
+        # 2. 에너지 적절성 (20%)
         try:
             samples = np.array(segment.get_array_of_samples()).astype(np.float32)
+            samples = samples / 32768.0  # 정규화
 
             # 프레임별 RMS
-            frame_size = len(samples) // 20
+            frame_size = len(samples) // 40  # 40개 프레임
             if frame_size > 0:
                 rms_values = []
                 for i in range(0, len(samples) - frame_size, frame_size):
@@ -810,16 +972,31 @@ class VoiceOptimizer:
 
                 if rms_values:
                     mean_rms = np.mean(rms_values)
-                    std_rms = np.std(rms_values)
-                    stability = 1.0 - min(1.0, std_rms / (mean_rms + 1e-10))
+                    # 이상적 범위: 0.02 ~ 0.15
+                    if 0.02 < mean_rms < 0.15:
+                        energy_score = 1.0
+                    elif 0.01 < mean_rms < 0.25:
+                        energy_score = 0.7
+                    else:
+                        energy_score = 0.3
                 else:
-                    stability = 0.5
+                    energy_score = 0.5
             else:
-                stability = 0.5
+                energy_score = 0.5
         except:
-            stability = 0.5
+            energy_score = 0.5
 
-        # 3. 위치 점수 (시작보다 중간 선호)
+        # 3. 억양 다양성 (25%) - 에너지 변화량
+        try:
+            if 'rms_values' in dir() and rms_values and len(rms_values) > 1:
+                energy_std = np.std(rms_values)
+                variance_score = min(energy_std * 25, 1.0)
+            else:
+                variance_score = 0.5
+        except:
+            variance_score = 0.5
+
+        # 4. 위치 점수 (20%) - 시작보다 중간 선호
         position = start_ms / total_ms
         # 10%~50% 구간 선호
         if 0.1 <= position <= 0.5:
@@ -827,13 +1004,14 @@ class VoiceOptimizer:
         elif position < 0.1:
             position_score = position * 10  # 0~0.1 → 0~1
         else:
-            position_score = max(0, 1.0 - (position - 0.5))  # 0.5~1 → 1~0
+            position_score = max(0, 1.0 - (position - 0.5) * 2)  # 0.5~1 → 1~0
 
         # 종합 점수
         score = (
-            speech_ratio * 0.4 +
-            stability * 0.3 +
-            position_score * 0.3
+            speech_score * 0.35 +
+            energy_score * 0.20 +
+            variance_score * 0.25 +
+            position_score * 0.20
         )
 
         return score
@@ -851,6 +1029,299 @@ class VoiceOptimizer:
 
         return self.cache_dir / cache_name
 
+    def is_optimization_needed(self, audio_path: str) -> Tuple[bool, str]:
+        """
+        최적화 필요 여부 확인
+
+        Returns:
+            (needed: bool, reason: str)
+        """
+
+        if not os.path.exists(audio_path):
+            return False, "파일 없음"
+
+        # 이미 최적화된 음성인지 확인
+        if self.profile_manager:
+            profile = self.profile_manager.get_profile(audio_path)
+            if profile and profile.get("is_optimized"):
+                return False, "이미 최적화된 음성"
+
+            # 최적화 버전이 있는지 확인
+            if profile:
+                opt_profile = self.profile_manager.get_optimized_version(profile["id"])
+                if opt_profile:
+                    return False, f"최적화 버전 있음: {opt_profile['name']}"
+
+        # 길이 확인
+        try:
+            audio = AudioSegment.from_file(audio_path)
+            duration_sec = len(audio) / 1000
+
+            if duration_sec < self.OPTIMIZATION_THRESHOLD_SEC:
+                return False, f"충분히 짧음 ({duration_sec:.0f}초)"
+
+            return True, f"최적화 필요 ({duration_sec:.0f}초 → {self.OPTIMAL_TARGET_SEC}초)"
+
+        except Exception as e:
+            return False, f"분석 실패: {e}"
+
+    def get_optimized_path_if_exists(self, audio_path: str) -> Optional[str]:
+        """
+        이미 최적화된 버전이 있으면 그 경로 반환
+
+        Returns:
+            최적화된 음성 경로 또는 None
+        """
+
+        # 프로필 관리자에서 최적화 버전 확인
+        if self.profile_manager:
+            profile = self.profile_manager.get_profile(audio_path)
+            if profile:
+                # 자체가 최적화된 음성이면 그대로 반환
+                if profile.get("is_optimized"):
+                    return profile.get("audio_path")
+
+                # 최적화 버전 찾기
+                opt_profile = self.profile_manager.get_optimized_version(profile["id"])
+                if opt_profile and os.path.exists(opt_profile.get("audio_path", "")):
+                    return opt_profile["audio_path"]
+
+        # 캐시에서 확인 (하위호환)
+        cache_path = self._get_cache_path(audio_path)
+        if cache_path.exists():
+            return str(cache_path)
+
+        return None
+
+    def optimize_and_register(
+        self,
+        audio_path: str,
+        original_transcript: str = None,
+        custom_name: str = None
+    ) -> Dict:
+        """
+        음성 최적화 후 새 프로필로 등록
+
+        1. 최적 구간 추출
+        2. 텍스트 구간도 추출 (있는 경우)
+        3. default 폴더에 저장
+        4. 새 프로필로 등록
+
+        Args:
+            audio_path: 원본 음성 경로
+            original_transcript: 원본 텍스트 (없으면 프로필에서 가져옴)
+            custom_name: 커스텀 이름 (없으면 "원본명_최적화")
+
+        Returns:
+            {
+                "success": bool,
+                "optimized_path": str,
+                "optimized_transcript": str,  # 추출된 구간의 텍스트
+                "profile": Dict,              # 새 프로필
+                "original_duration": float,
+                "optimized_duration": float,
+            }
+        """
+
+        print(f"\n[VoiceOptimizer] 최적화 및 등록 시작")
+
+        if not os.path.exists(audio_path):
+            return {"success": False, "error": "파일 없음"}
+
+        # 프로필 확인
+        original_profile = None
+        if self.profile_manager:
+            original_profile = self.profile_manager.get_profile(audio_path)
+
+        # 텍스트 확인
+        if original_transcript is None and original_profile:
+            original_transcript = original_profile.get("transcript")
+
+        # 오디오 로드
+        try:
+            audio = AudioSegment.from_file(audio_path)
+        except Exception as e:
+            return {"success": False, "error": f"로드 실패: {e}"}
+
+        original_duration = len(audio) / 1000
+        print(f"  원본 길이: {original_duration:.1f}초")
+
+        # 최적화 불필요 확인
+        if self.OPTIMAL_MIN_SEC <= original_duration <= self.OPTIMAL_MAX_SEC:
+            print(f"  ✅ 이미 최적 범위, 프로필만 업데이트")
+
+            if original_profile and self.profile_manager:
+                # is_optimized 플래그만 추가
+                original_profile["is_optimized"] = True
+                self.profile_manager.save_profiles()
+
+            return {
+                "success": True,
+                "optimized_path": audio_path,
+                "optimized_transcript": original_transcript,
+                "profile": original_profile,
+                "original_duration": original_duration,
+                "optimized_duration": original_duration,
+                "already_optimal": True,
+            }
+
+        # 최적 구간 추출 (품질 점수 포함)
+        best_start_ms, best_segment, quality_score = self._extract_best_segment_with_position(audio)
+        optimized_duration = len(best_segment) / 1000
+        best_end_ms = best_start_ms + len(best_segment)
+
+        # 텍스트 구간 추출 (비율 기반)
+        optimized_transcript = None
+        if original_transcript:
+            optimized_transcript = self._extract_transcript_segment(
+                original_transcript,
+                best_start_ms,
+                len(best_segment),
+                len(audio)
+            )
+            print(f"  텍스트 추출: {len(original_transcript)}자 → {len(optimized_transcript)}자")
+
+        # 저장 경로 결정
+        original_name = Path(audio_path).stem
+        if custom_name:
+            new_name = custom_name
+        else:
+            new_name = f"{original_name}_최적화"
+
+        save_path = self.default_dir / f"{new_name}.mp3"
+
+        # 중복 방지
+        counter = 1
+        while save_path.exists():
+            save_path = self.default_dir / f"{new_name}_{counter}.mp3"
+            counter += 1
+
+        # 저장
+        best_segment.export(
+            str(save_path),
+            format="mp3",
+            parameters=["-q:a", "2"]
+        )
+
+        # ⭐ 메타데이터 저장 (OptimizedVersionManager 연동)
+        try:
+            version_manager = get_version_manager()
+            version_manager.save_version_metadata(
+                filename=save_path.name,
+                start_time=best_start_ms / 1000,
+                end_time=best_end_ms / 1000,
+                quality_score=quality_score,
+                source_file=audio_path
+            )
+        except Exception as e:
+            print(f"  ⚠️ 메타데이터 저장 실패: {e}")
+
+        print(f"  ✅ 저장: {save_path.name}")
+        print(f"  길이: {original_duration:.1f}초 → {optimized_duration:.1f}초")
+
+        # 프로필 등록
+        new_profile = None
+        if self.profile_manager:
+            original_id = original_profile["id"] if original_profile else None
+
+            new_profile = self.profile_manager.add_profile(
+                voice_id=new_name.lower().replace(" ", "_"),
+                name=new_name,
+                audio_path=str(save_path),
+                transcript=optimized_transcript,
+                is_optimized=True,
+                original_id=original_id,
+            )
+
+            # 텍스트 파일도 저장
+            if optimized_transcript:
+                txt_path = save_path.with_suffix(".txt")
+                try:
+                    with open(txt_path, "w", encoding="utf-8") as f:
+                        f.write(optimized_transcript)
+                    print(f"  📝 텍스트 저장: {txt_path.name}")
+                except:
+                    pass
+
+        return {
+            "success": True,
+            "optimized_path": str(save_path),
+            "optimized_transcript": optimized_transcript,
+            "profile": new_profile,
+            "original_duration": original_duration,
+            "optimized_duration": optimized_duration,
+            "quality_score": quality_score,
+            "start_time": best_start_ms / 1000,
+            "end_time": best_end_ms / 1000,
+        }
+
+    def _extract_best_segment_with_position(
+        self,
+        audio: AudioSegment
+    ) -> Tuple[int, AudioSegment, float]:
+        """
+        최적 구간 추출 (시작 위치, 세그먼트, 품질 점수 함께 반환)
+
+        Returns:
+            (best_start_ms, segment, quality_score)
+        """
+
+        duration_ms = len(audio)
+        target_ms = self.OPTIMAL_TARGET_SEC * 1000
+
+        best_score = -1
+        best_start = 0
+
+        step_ms = 1000
+
+        for start_ms in range(0, duration_ms - target_ms, step_ms):
+            segment = audio[start_ms:start_ms + target_ms]
+            score = self._calculate_segment_quality(segment, start_ms, duration_ms)
+
+            if score > best_score:
+                best_score = score
+                best_start = start_ms
+
+        print(f"  최적 구간: {best_start/1000:.1f}초 ~ {(best_start + target_ms)/1000:.1f}초")
+        print(f"  품질 점수: {best_score:.3f}")
+
+        return best_start, audio[best_start:best_start + target_ms], best_score
+
+    def _extract_transcript_segment(
+        self,
+        original_text: str,
+        start_ms: int,
+        segment_ms: int,
+        total_ms: int
+    ) -> str:
+        """
+        텍스트에서 해당 구간 추출
+
+        비율 기반으로 추정 (정확하지 않을 수 있음)
+        """
+
+        if not original_text:
+            return ""
+
+        start_ratio = start_ms / total_ms
+        end_ratio = (start_ms + segment_ms) / total_ms
+
+        # 글자 위치 계산
+        total_chars = len(original_text)
+        start_char = int(total_chars * start_ratio)
+        end_char = int(total_chars * end_ratio)
+
+        # 문장 경계 조정 (가능하면)
+        # 시작점: 앞쪽 문장 시작으로
+        while start_char > 0 and original_text[start_char - 1] not in ".!?\n":
+            start_char -= 1
+
+        # 끝점: 뒤쪽 문장 끝으로
+        while end_char < total_chars and original_text[end_char - 1] not in ".!?\n":
+            end_char += 1
+
+        return original_text[start_char:end_char].strip()
+
 
 # VoiceOptimizer 싱글톤
 _voice_optimizer = None
@@ -859,7 +1330,7 @@ def get_voice_optimizer() -> VoiceOptimizer:
     """VoiceOptimizer 싱글톤"""
     global _voice_optimizer
     if _voice_optimizer is None:
-        _voice_optimizer = VoiceOptimizer()
+        _voice_optimizer = VoiceOptimizer(get_profile_manager())
     return _voice_optimizer
 
 
@@ -872,3 +1343,430 @@ def optimize_voice_for_cloning(audio_path: str, force: bool = False) -> str:
         # 15~30초 구간으로 최적화된 경로 반환
     """
     return get_voice_optimizer().optimize_for_cloning(audio_path, force)
+
+
+def optimize_and_register_voice(
+    audio_path: str,
+    transcript: str = None,
+    custom_name: str = None
+) -> Dict:
+    """
+    음성 최적화 후 새 프로필로 등록 (간편 함수)
+
+    사용 예:
+        result = optimize_and_register_voice("path/to/long_voice.mp3")
+        if result["success"]:
+            print(f"새 음성: {result['optimized_path']}")
+            print(f"새 프로필: {result['profile']['name']}")
+    """
+    return get_voice_optimizer().optimize_and_register(audio_path, transcript, custom_name)
+
+
+def is_voice_optimization_needed(audio_path: str) -> Tuple[bool, str]:
+    """
+    최적화 필요 여부 확인 (간편 함수)
+
+    Returns:
+        (needed: bool, reason: str)
+    """
+    return get_voice_optimizer().is_optimization_needed(audio_path)
+
+
+def get_optimized_voice_path(audio_path: str) -> Optional[str]:
+    """
+    이미 최적화된 버전이 있으면 그 경로 반환 (간편 함수)
+
+    Returns:
+        최적화된 음성 경로 또는 None
+    """
+    return get_voice_optimizer().get_optimized_path_if_exists(audio_path)
+
+
+# ============================================================
+# OptimizedVersionManager - 최적화 버전 관리자
+# ============================================================
+
+class OptimizedVersionManager:
+    """
+    최적화된 음성 버전 관리자
+
+    기능:
+    1. 특정 음성의 모든 최적화 버전 스캔
+    2. 버전 메타데이터 관리 (구간, 품질 점수, 생성일 등)
+    3. 추천 버전 반환 (품질 점수 기준)
+    """
+
+    def __init__(self, voice_samples_path: str = None):
+        if voice_samples_path is None:
+            project_root = Path(__file__).parent.parent.resolve()
+            self.voice_samples_path = project_root / "data" / "voice_samples"
+        else:
+            self.voice_samples_path = Path(voice_samples_path)
+
+        self.optimized_path = self.voice_samples_path / "optimized"
+        self.default_path = self.voice_samples_path / "default"
+        self.metadata_file = self.optimized_path / "versions_metadata.json"
+
+        # 디렉토리 생성
+        self.optimized_path.mkdir(parents=True, exist_ok=True)
+
+        # 메타데이터 로드
+        self.metadata = self._load_metadata()
+
+        print(f"[OptimizedVersionManager] 초기화")
+        print(f"  경로: {self.voice_samples_path}")
+
+    def _load_metadata(self) -> dict:
+        """메타데이터 파일 로드"""
+        if self.metadata_file.exists():
+            try:
+                with open(self.metadata_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"[OptimizedVersionManager] 메타데이터 로드 오류: {e}")
+        return {"versions": {}}
+
+    def _save_metadata(self):
+        """메타데이터 저장"""
+        try:
+            self.optimized_path.mkdir(parents=True, exist_ok=True)
+            with open(self.metadata_file, 'w', encoding='utf-8') as f:
+                json.dump(self.metadata, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"[OptimizedVersionManager] 메타데이터 저장 오류: {e}")
+
+    def scan_optimized_versions(self, voice_name: str) -> List[Dict]:
+        """
+        특정 음성의 모든 최적화 버전 스캔
+
+        Args:
+            voice_name: 원본 음성 이름 (확장자 제외)
+
+        Returns:
+            List[Dict]: 버전 정보 리스트 (최신 순 정렬)
+            [
+                {
+                    "filename": "세모지__opt_0a9f615c.mp3",
+                    "filepath": "C:\\...\\optimized\\세모지__opt_0a9f615c.mp3",
+                    "start_time": 54.0,
+                    "end_time": 74.0,
+                    "duration": 20.0,
+                    "quality_score": 1.000,
+                    "created_at": "2026-01-05 12:34:56",
+                    "is_latest": True
+                },
+                ...
+            ]
+        """
+        versions = []
+
+        # 음성 이름 정규화 (확장자 제거, 언더스코어 처리)
+        voice_name_clean = Path(voice_name).stem.replace(" ", "_")
+        # 이미 _최적화가 포함된 경우 원본 이름 추출
+        if "_최적화" in voice_name_clean:
+            voice_name_clean = voice_name_clean.split("_최적화")[0]
+        if "_opt_" in voice_name_clean:
+            voice_name_clean = voice_name_clean.split("_opt_")[0]
+
+        print(f"[OptimizedVersionManager] 버전 스캔: '{voice_name_clean}'")
+
+        # 1. optimized 폴더 스캔
+        if self.optimized_path.exists():
+            for filepath in self.optimized_path.iterdir():
+                if filepath.suffix.lower() in ['.mp3', '.wav', '.m4a']:
+                    filename = filepath.stem
+                    # 매칭 조건: 원본 이름으로 시작하고 _opt_ 포함
+                    if filename.startswith(voice_name_clean) and "_opt_" in filename:
+                        version_info = self._get_version_info(filepath)
+                        if version_info:
+                            versions.append(version_info)
+
+        # 2. default 폴더에서 _최적화 파일 스캔
+        if self.default_path.exists():
+            for filepath in self.default_path.iterdir():
+                if filepath.suffix.lower() in ['.mp3', '.wav', '.m4a']:
+                    filename = filepath.stem
+                    # 매칭 조건: 원본 이름 + _최적화
+                    if filename.startswith(voice_name_clean) and "_최적화" in filename:
+                        version_info = self._get_version_info(filepath)
+                        if version_info:
+                            versions.append(version_info)
+
+        # 3. 생성일 기준 정렬 (최신 순)
+        versions.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+
+        # 4. 최신 버전 표시
+        if versions:
+            versions[0]["is_latest"] = True
+
+        print(f"[OptimizedVersionManager] 발견된 버전: {len(versions)}개")
+        for v in versions[:3]:  # 상위 3개만 로그
+            print(f"  - {v['filename']} (품질: {v.get('quality_score', 0):.3f})")
+
+        return versions
+
+    def _get_version_info(self, filepath: Path) -> Optional[Dict]:
+        """개별 버전 정보 추출"""
+        try:
+            from datetime import datetime
+
+            # 파일 수정 시간
+            stat = filepath.stat()
+            created_at = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+
+            # 오디오 길이 확인
+            try:
+                audio = AudioSegment.from_file(str(filepath))
+                duration = len(audio) / 1000
+            except:
+                duration = 0
+
+            # 메타데이터에서 추가 정보 로드
+            meta_key = filepath.name
+            meta = self.metadata.get("versions", {}).get(meta_key, {})
+
+            return {
+                "filename": filepath.name,
+                "filepath": str(filepath),
+                "start_time": meta.get("start_time", 0),
+                "end_time": meta.get("end_time", duration),
+                "duration": duration,
+                "quality_score": meta.get("quality_score", 0.0),
+                "created_at": created_at,
+                "is_latest": False,
+                "source_file": meta.get("source_file", ""),
+                "is_manual": meta.get("is_manual", False),  # ⭐ 수동/자동 구분
+            }
+        except Exception as e:
+            print(f"[OptimizedVersionManager] 버전 정보 로드 실패: {filepath.name} - {e}")
+            return None
+
+    def save_version_metadata(
+        self,
+        filename: str,
+        start_time: float = 0,
+        end_time: float = 0,
+        quality_score: float = 0,
+        source_file: str = "",
+        **kwargs
+    ):
+        """
+        버전 메타데이터 저장
+
+        Args:
+            filename: 최적화된 파일명
+            start_time: 원본에서의 시작 시간 (초)
+            end_time: 원본에서의 종료 시간 (초)
+            quality_score: 품질 점수 (0~1)
+            source_file: 원본 파일 경로
+        """
+        from datetime import datetime
+
+        metadata = {
+            "start_time": start_time,
+            "end_time": end_time,
+            "quality_score": quality_score,
+            "source_file": source_file,
+            "created_at": datetime.now().isoformat(),
+            **kwargs
+        }
+
+        self.metadata.setdefault("versions", {})[filename] = metadata
+        self._save_metadata()
+
+        print(f"[OptimizedVersionManager] 메타데이터 저장: {filename}")
+        print(f"  구간: {start_time:.1f}~{end_time:.1f}초, 품질: {quality_score:.3f}")
+
+    def get_recommended_version(self, voice_name: str) -> Optional[Dict]:
+        """
+        추천 버전 반환 (품질 점수 기준)
+
+        품질 점수가 같으면 최신 버전 우선
+        """
+        versions = self.scan_optimized_versions(voice_name)
+        if not versions:
+            return None
+
+        # 품질 점수 기준 정렬 (품질 > 최신)
+        sorted_versions = sorted(
+            versions,
+            key=lambda x: (x.get("quality_score", 0), x.get("created_at", "")),
+            reverse=True
+        )
+
+        return sorted_versions[0]
+
+    def delete_version(self, filepath: str) -> bool:
+        """버전 삭제"""
+        try:
+            path = Path(filepath)
+            if path.exists():
+                path.unlink()
+
+                # 메타데이터에서도 삭제
+                filename = path.name
+                if filename in self.metadata.get("versions", {}):
+                    del self.metadata["versions"][filename]
+                    self._save_metadata()
+
+                print(f"[OptimizedVersionManager] 삭제됨: {filename}")
+                return True
+        except Exception as e:
+            print(f"[OptimizedVersionManager] 삭제 실패: {e}")
+        return False
+
+
+# OptimizedVersionManager 싱글톤
+_version_manager = None
+
+def get_version_manager() -> OptimizedVersionManager:
+    """OptimizedVersionManager 싱글톤"""
+    global _version_manager
+    if _version_manager is None:
+        _version_manager = OptimizedVersionManager()
+    return _version_manager
+
+
+def scan_optimized_versions(voice_name: str) -> List[Dict]:
+    """
+    특정 음성의 모든 최적화 버전 스캔 (간편 함수)
+
+    Args:
+        voice_name: 원본 음성 이름 (경로 또는 파일명)
+
+    Returns:
+        List[Dict]: 버전 정보 리스트
+    """
+    return get_version_manager().scan_optimized_versions(voice_name)
+
+
+def get_recommended_optimized_version(voice_name: str) -> Optional[Dict]:
+    """
+    추천 최적화 버전 반환 (간편 함수)
+
+    Returns:
+        추천 버전 정보 또는 None
+    """
+    return get_version_manager().get_recommended_version(voice_name)
+
+
+def create_manual_optimized_voice(
+    audio_path: str,
+    start_sec: float,
+    end_sec: float,
+    quality_score: float = 0,
+    normalize: bool = True,
+    noise_reduce: bool = True
+) -> Dict:
+    """
+    수동으로 선택한 구간으로 최적화 버전 생성
+
+    Args:
+        audio_path: 원본 음성 경로
+        start_sec: 시작 시간 (초)
+        end_sec: 끝 시간 (초)
+        quality_score: 품질 점수 (0-100)
+        normalize: 정규화 여부
+        noise_reduce: 노이즈 제거 여부
+
+    Returns:
+        {
+            "success": bool,
+            "optimized_path": str,
+            "start_sec": float,
+            "end_sec": float,
+            "duration": float,
+            "quality_score": float,
+            "is_manual": True,
+            "error": str (실패 시)
+        }
+    """
+    try:
+        import time
+        import hashlib
+
+        audio_path = Path(audio_path)
+        if not audio_path.exists():
+            return {"success": False, "error": f"파일 없음: {audio_path}"}
+
+        # 구간 유효성 검사
+        duration = end_sec - start_sec
+        if duration < 5:
+            return {"success": False, "error": "최소 5초 이상 필요"}
+        if duration > 30:
+            return {"success": False, "error": "최대 30초까지 가능"}
+
+        print(f"\n[ManualOptimize] 수동 최적화 시작")
+        print(f"  원본: {audio_path.name}")
+        print(f"  구간: {start_sec:.1f}~{end_sec:.1f}초 ({duration:.1f}초)")
+
+        # 원본 오디오 로드
+        audio = AudioSegment.from_file(str(audio_path))
+
+        # 구간 추출 (밀리초)
+        start_ms = int(start_sec * 1000)
+        end_ms = int(end_sec * 1000)
+        segment = audio[start_ms:end_ms]
+
+        # 정규화
+        if normalize:
+            target_dBFS = -20.0
+            change = target_dBFS - segment.dBFS
+            segment = segment.apply_gain(change)
+            print(f"[ManualOptimize] 정규화 적용: {change:.1f}dB")
+
+        # 출력 경로 생성
+        timestamp = int(time.time() * 1000)
+        hash_suffix = hashlib.md5(f"{start_sec}_{end_sec}_{timestamp}".encode()).hexdigest()[:8]
+        voice_name = audio_path.stem.replace(" ", "_")
+        # 원본 이름에서 이전 최적화 접미사 제거
+        if "_최적화" in voice_name:
+            voice_name = voice_name.split("_최적화")[0]
+        if "_opt_" in voice_name:
+            voice_name = voice_name.split("_opt_")[0]
+
+        output_filename = f"{voice_name}_opt_{hash_suffix}.mp3"
+
+        # optimized 폴더 경로
+        voices_dir = Path("voices")
+        optimized_dir = voices_dir / "optimized"
+        optimized_dir.mkdir(parents=True, exist_ok=True)
+
+        output_path = optimized_dir / output_filename
+
+        # 저장
+        segment.export(str(output_path), format="mp3", bitrate="192k")
+        print(f"[ManualOptimize] 저장: {output_path}")
+
+        # 노이즈 제거 (비활성화 - librosa 필요)
+        if noise_reduce:
+            print(f"[ManualOptimize] ⚠️ 노이즈 제거는 비활성화됨 (librosa 필요)")
+
+        # 메타데이터 저장
+        normalized_quality = quality_score / 100.0  # 0-100 → 0-1 변환
+        get_version_manager().save_version_metadata(
+            filename=output_filename,
+            start_time=start_sec,
+            end_time=end_sec,
+            quality_score=normalized_quality,
+            source_file=str(audio_path),
+            is_manual=True  # ⭐ 수동 선택 표시
+        )
+
+        print(f"[ManualOptimize] ✅ 완료!")
+
+        return {
+            "success": True,
+            "optimized_path": str(output_path),
+            "start_sec": start_sec,
+            "end_sec": end_sec,
+            "duration": duration,
+            "quality_score": normalized_quality,
+            "is_manual": True
+        }
+
+    except Exception as e:
+        import traceback
+        print(f"[ManualOptimize] ❌ 실패: {e}")
+        traceback.print_exc()
+        return {"success": False, "error": str(e)}

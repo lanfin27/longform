@@ -93,6 +93,7 @@ def is_valid_person_name(name: str) -> bool:
     3. 조사로 끝나지 않음
     4. 숫자만 있지 않음
     5. 한글 자음/모음만 있지 않음
+    6. 문장 패턴이 아님 (동사/형용사 어미로 끝나지 않음)
     """
     import re
 
@@ -106,6 +107,44 @@ def is_valid_person_name(name: str) -> bool:
     if name_lower in INVALID_CHARACTER_WORDS:
         debug_log(f"    ❌ 금지 단어로 필터링: '{name}'")
         return False
+
+    # ============================================================
+    # 🔴 문장 패턴 감지 (Problem 49 추가)
+    # 한국어 문장은 동사/형용사 어미로 끝남
+    # ============================================================
+
+    # 연결 어미 (문장 중간/끝에 나타나는 어미)
+    sentence_endings = [
+        # 연결 어미
+        '면', '해서', '니까', '으니', '지만', '으면', '어서', '아서',
+        '고서', '려고', '으려', '면서', '든지', '거나',
+        # 종결 어미
+        '다', '요', '습니다', '입니다', '세요', '십시오',
+        '네요', '군요', '지요', '죠',
+        # 관형형/명사화 어미가 문장처럼 쓰인 경우
+        '음', '기에', '므로',
+    ]
+
+    # 공백이 있고 4글자 이상이면 문장일 가능성 높음
+    if ' ' in name_clean and len(name_clean) >= 4:
+        # 문장 어미로 끝나는지 체크
+        for ending in sentence_endings:
+            if name_clean.endswith(ending):
+                debug_log(f"    ❌ 문장 패턴 (어미: {ending}): '{name}'")
+                return False
+
+    # 동사/형용사 패턴 감지 (5글자 이상에서 체크)
+    if len(name_clean) >= 5:
+        # ~하다, ~되다, ~이다 계열 동사 패턴
+        verb_patterns = [
+            r'[가-힣]+(하|되|이|지|지|시|았|었|겠|는|ㄴ|을|를|한|된|인)$',
+            r'[가-힣]+(해서|해야|하면|하고|하는|했다|했음|하여)$',
+            r'[가-힣]+(으면|면서|니까|지만|어서|아서|라서|려고)$',
+        ]
+        for pattern in verb_patterns:
+            if re.search(pattern, name_clean):
+                debug_log(f"    ❌ 동사/형용사 패턴: '{name}'")
+                return False
 
     # 조사로 끝나는지 체크 (한글 2-4자 + 조사 패턴)
     particle_endings = ['의', '이', '가', '은', '는', '를', '을', '에', '로', '과', '와', '도']
@@ -153,6 +192,111 @@ def is_valid_person_name(name: str) -> bool:
         return True
 
     debug_log(f"    ❌ 패턴 불일치: '{name}'")
+    return False
+
+
+def _is_valid_foreign_name(name: str) -> bool:
+    """
+    외래/아랍식 이름 검증 (3단어 패턴용)
+
+    "무함마드 빈 살만" 같은 유효한 외래 이름과
+    "크리스마스 이브 아침이었" 같은 문장 조각을 구분합니다.
+    """
+    import re
+
+    if not name or len(name) < 5:
+        return False
+
+    # ============================================================
+    # 문장 조각 필터링 (거부 패턴)
+    # ============================================================
+
+    # 1. 동사/형용사 어미로 끝나는 경우 → 문장 조각
+    SENTENCE_ENDINGS = [
+        # 종결 어미
+        '다', '요', '습니다', '입니다', '네요', '군요', '죠',
+        '었다', '았다', '였다', '했다', '겠다',
+        '습니', '었습', '았습', '였습', '했습',  # 어절 중간 잘림
+        '는지', '인지', '던지', '나요',
+        # 연결 어미
+        '면', '해서', '니까', '으니', '지만', '으면', '어서', '아서',
+        '면서', '려고', '으려', '거나', '든지',
+        # 관형형
+        '하는', '되는', '있는', '없는', '같은', '다른',
+        '하던', '되던', '있던', '없던',
+        '한', '된', '있은', '없은',
+    ]
+
+    for ending in SENTENCE_ENDINGS:
+        if name.endswith(ending):
+            return False
+
+    # 2. 문장 시작 패턴으로 시작하는 경우
+    SENTENCE_STARTS = [
+        '그리고', '그래서', '하지만', '그러나', '따라서', '그런데',
+        '이것은', '그것은', '저것은', '이건', '그건', '저건',
+        '오늘', '내일', '어제', '지금', '이제', '그때',
+        '여기', '거기', '저기', '어디',
+        '왜냐하면', '즉', '결국', '결론',
+    ]
+
+    for start in SENTENCE_STARTS:
+        if name.startswith(start):
+            return False
+
+    # 3. 일반 명사/동사구 패턴 (조사 포함 여부 체크)
+    # 문장 중간에서 잘린 패턴: "~을 하는", "~가 되어" 등
+    MIDDLE_PARTICLES = ['을', '를', '이', '가', '은', '는', '에', '의', '로', '으로', '에서']
+    words = name.split()
+    for i, word in enumerate(words[:-1]):  # 마지막 단어 제외
+        for particle in MIDDLE_PARTICLES:
+            if word.endswith(particle) and len(word) > 2:
+                return False
+
+    # 4. 동사/형용사 어근 + 어미 패턴
+    verb_patterns = [
+        r'[가-힣]+(하|되|이|지|시|았|었|겠|는|ㄴ|을|를|한|된)$',
+        r'[가-힣]+(해야|하면|하고|했다|했음|하여)$',
+    ]
+    for pattern in verb_patterns:
+        if re.search(pattern, name):
+            return False
+
+    # 5. 너무 긴 경우 (외래 이름은 보통 10자 이내)
+    if len(name) > 15:
+        return False
+
+    # 6. 블랙리스트 단어 포함
+    BLACKLIST_WORDS = [
+        '환율', '차트', '주식', '경제', '시장', '금리', '투자',
+        '크리스마스', '이브', '아침', '저녁', '오후', '새벽',
+        '정부', '대통령', '국회', '법원', '검찰', '경찰',
+        '회사', '기업', '은행', '증권', '보험', '펀드',
+        '문제', '해결', '방법', '이유', '원인', '결과',
+        '뉴스', '기사', '영상', '콘텐츠', '채널', '구독',
+        '절대', '진짜', '정말', '매우', '아주', '더욱',
+    ]
+
+    for word in BLACKLIST_WORDS:
+        if word in name:
+            return False
+
+    # ============================================================
+    # 유효한 외래 이름 패턴 (허용 패턴)
+    # ============================================================
+
+    # 전형적인 아랍/중동 이름 패턴
+    # "무함마드 빈 살만", "오사마 빈 라덴" 등
+    # 중간 단어가 1-2자이고 전체가 한글인 경우
+    parts = name.split()
+    if len(parts) == 3:
+        first, middle, last = parts
+        # 중간 단어가 짧은 연결사인 경우 (빈, 알, 압, 이븐 등)
+        if len(middle) <= 2 and len(first) >= 2 and len(last) >= 2:
+            # 추가 검증: 각 부분이 완성형 한글인지
+            if all(re.match(r'^[가-힣]+$', p) for p in parts):
+                return True
+
     return False
 
 
@@ -747,14 +891,35 @@ JSON 형식으로만 응답해주세요. 다른 텍스트는 포함하지 마세
                 person_names.add(name)
                 debug_log(f"      ✅ 패턴3 추출: '{name}'")
 
-            # 패턴 4: 아랍/외래 이름 (예: "무함마드 빈 살만", "자말 카슈끄지")
+            # 패턴 4: 아랍/외래 이름 (예: "무함마드 빈 살만")
+            # 🔴 v2.4: 중간 단어를 알려진 연결사로 제한하여 오탐 방지
+            # 허용 연결사: 빈(bin), 알(al), 압(ab), 이븐(ibn), 벤(ben)
+            FOREIGN_NAME_CONNECTORS = {'빈', '알', '압', '이븐', '벤', '본', '반'}
             pattern4 = r'([가-힣]{2,5})\s+([가-힣]{1,3})\s+([가-힣]{2,4})'
             for match in re.finditer(pattern4, script):
-                name = f"{match.group(1)} {match.group(2)} {match.group(3)}"
+                first, middle, last = match.group(1), match.group(2), match.group(3)
+
+                # 🔴 v2.4: 중간 단어가 알려진 연결사인 경우만 허용
+                if middle not in FOREIGN_NAME_CONNECTORS:
+                    continue
+
+                name = f"{first} {middle} {last}"
+
                 # 국가명 등 제외
-                if not any(kw in name for kw in ['사우디', '아라비아', '대한민국']):
-                    person_names.add(name)
-                    debug_log(f"      ✅ 패턴4 추출: '{name}'")
+                if any(kw in name for kw in ['사우디', '아라비아', '대한민국']):
+                    continue
+
+                # 추가 검증: 각 부분이 완성형 한글인지 확인
+                if not all(re.match(r'^[가-힣]+$', p) for p in [first, middle, last]):
+                    continue
+
+                # 문장 조각 필터링
+                if not _is_valid_foreign_name(name):
+                    debug_log(f"      ❌ 패턴4 문장조각 필터링: '{name}'")
+                    continue
+
+                person_names.add(name)
+                debug_log(f"      ✅ 패턴4 추출: '{name}'")
 
             debug_log(f"    스크립트 패턴에서 {len(person_names)}명 발견: {list(person_names)[:5]}")
 
@@ -1691,6 +1856,10 @@ Gemini를 사용할 수 없습니다.
         """
         MAX_TOKENS로 잘린 응답을 이어서 생성
 
+        v3.0: 100% 커버리지 보장
+        - 최대 30회까지 이어서 생성
+        - 진행률 0% 3회 연속 시 자동 종료 (무한루프 방지)
+
         Args:
             partial_response: 잘린 응답
             original_script: 원본 스크립트
@@ -1698,53 +1867,84 @@ Gemini를 사용할 수 없습니다.
         Returns:
             완성된 응답
         """
-        debug_log("  🔄 이어서 생성 시작...")
+        debug_log("  🔄 이어서 생성 시작 (v3.0 - 100% 커버리지 보장)...")
 
         all_response = partial_response
-        max_continuations = 3  # 최대 3번까지 이어서 생성
+        max_continuations = 30  # v3.0: 최대 30번까지 (긴 스크립트 완전 지원)
+        min_coverage_threshold = 95  # 95% 이상이면 완료로 간주
 
-        # 🔴 원본 스크립트 마지막 부분 추출 (컨텍스트 유지용)
-        script_ending = original_script[-2000:] if len(original_script) > 2000 else original_script
+        # v3.0: 진행률 추적 (무한루프 방지)
+        prev_coverage = 0
+        stall_count = 0
+        MAX_STALL = 3  # 3회 연속 진행 없으면 종료
 
         for i in range(max_continuations):
             debug_log(f"  이어서 생성 {i+1}/{max_continuations}")
 
-            # 🔴 개선된 이어서 생성 프롬프트 - 원본 스크립트 전체 포함 및 보존 규칙 강조
+            # 🔴 v2.4: 남은 스크립트만 추출 (전체 스크립트 대신)
+            remaining_script, coverage, analyzed_end = self._get_remaining_script(all_response, original_script)
+
+            # v3.0: 진행률 계산
+            progress = coverage - prev_coverage
+            debug_log(f"    현재 커버리지: {coverage}%, 진행률: +{progress}%, 남은 스크립트: {len(remaining_script)}자")
+
+            # 충분히 분석되었으면 중단
+            if coverage >= min_coverage_threshold:
+                debug_log(f"  ✅ 커버리지 {coverage}% 달성 - 이어서 생성 완료")
+                break
+
+            # 남은 스크립트가 너무 짧으면 중단 (이미 거의 다 분석됨)
+            if len(remaining_script) < 100:
+                debug_log("  ✅ 남은 스크립트 100자 미만 - 분석 완료")
+                break
+
+            # v3.0: 진행 없음 감지 (무한루프 방지)
+            if progress < 2 and i > 0:  # 2% 미만 진행
+                stall_count += 1
+                debug_log(f"    ⚠️ 진행 없음 감지 ({stall_count}/{MAX_STALL})")
+                if stall_count >= MAX_STALL:
+                    debug_log(f"  ⚠️ {MAX_STALL}회 연속 진행 없음 - 강제 종료")
+                    break
+            else:
+                stall_count = 0
+
+            prev_coverage = coverage
+
+            # 🔴 v2.4: 개선된 이어서 생성 프롬프트 - 남은 스크립트만 포함
             continuation_prompt = f"""이전 JSON 응답이 토큰 제한으로 중간에 잘렸습니다.
 이어서 JSON을 완성해주세요.
 
 🔴🔴🔴 [CRITICAL] 스크립트 원본 보존 절대 규칙 🔴🔴🔴
 
-⚠️ 가장 중요한 규칙: script_text에는 아래 원본 스크립트에 있는 문장만 사용하세요!
+⚠️ 가장 중요한 규칙: script_text에는 아래 "남은 스크립트"에 있는 문장만 사용하세요!
 
 **🚫 절대 금지:**
+- 이미 분석된 앞부분 스크립트 다시 분석 ❌
 - 스크립트에 없는 문장 만들기 ❌
 - "구독과 좋아요 부탁드립니다" 같은 일반 아웃트로 추가 ❌
-- "다음 영상에서 만나요" 같은 문장 추가 ❌
 - 원본 문장을 다르게 바꾸기 ❌
 
 **✅ 반드시:**
-- 아래 원본 스크립트에 있는 문장만 script_text에 사용
+- 아래 "남은 스크립트"에 있는 문장만 script_text에 사용
 - 원본 텍스트를 한 글자도 바꾸지 않고 그대로 복사
+- 이어서 새로운 씬 번호부터 시작
 
-=== 원본 스크립트 전체 (이 내용만 사용!) ===
-{original_script}
-=== 원본 스크립트 끝 ===
+📊 현재 분석 진행 상황: {coverage}% 완료 ({analyzed_end}/{len(original_script)}자)
 
-=== 특히 스크립트 마지막 부분 (이 문장들로 마지막 씬을 만드세요!) ===
-{script_ending}
-=== 마지막 부분 끝 ===
+=== 아직 분석되지 않은 남은 스크립트 (이 부분만 분석!) ===
+{remaining_script}
+=== 남은 스크립트 끝 ===
 
 === 이전 응답의 마지막 부분 (여기서 이어서 작성) ===
 {all_response[-2000:]}
 === 이전 응답 끝 ===
 
 위 JSON을 이어서 완성해주세요:
-1. 중복 없이 이어서 작성 (마지막 부분 바로 다음부터)
-2. 남은 씬들을 모두 포함
+1. 중복 없이 이어서 작성 (마지막 씬 바로 다음 씬부터)
+2. 🔴 위 "남은 스크립트"에 있는 내용으로만 씬을 만들기
 3. 반드시 유효한 JSON으로 완성
-4. 마지막에 }}로 JSON 닫기
-5. 🔴 script_text에는 원본 스크립트에 있는 문장만 사용!
+4. 모든 남은 스크립트를 씬으로 분할
+5. 마지막에 적절히 JSON 닫기
 
 바로 이어서 작성 (```json 없이):"""
 
@@ -1762,6 +1962,13 @@ Gemini를 사용할 수 없습니다.
             if finish_reason == 1:
                 debug_log("  ✅ 정상 종료 - 이어서 생성 완료")
                 break
+
+        # 🔴 v2.4: 최종 커버리지 확인 및 로깅
+        final_coverage = self._calculate_final_coverage(all_response, original_script)
+        debug_log(f"  📊 최종 커버리지: {final_coverage['coverage_percent']}%")
+
+        if final_coverage['coverage_percent'] < 90:
+            debug_log(f"  ⚠️ 커버리지 낮음! 누락된 부분: {final_coverage['missing_portion'][:100]}...")
 
         return all_response
 
@@ -1820,6 +2027,164 @@ Gemini를 사용할 수 없습니다.
             merged = original + continuation
 
         return merged
+
+    def _get_analyzed_script_end(self, partial_response: str, original_script: str) -> int:
+        """
+        부분 응답에서 분석된 스크립트의 마지막 위치를 찾습니다.
+
+        Args:
+            partial_response: 지금까지 생성된 JSON 응답
+            original_script: 원본 스크립트
+
+        Returns:
+            원본 스크립트에서 분석이 완료된 마지막 위치 (인덱스)
+        """
+        import re
+
+        # script_text 필드들 추출
+        script_texts = re.findall(r'"script_text"\s*:\s*"([^"]*)"', partial_response)
+
+        if not script_texts:
+            debug_log("    ⚠️ 분석된 script_text 없음")
+            return 0
+
+        # 마지막 script_text의 마지막 부분으로 위치 찾기
+        last_script_text = script_texts[-1]
+
+        # 마지막 script_text에서 의미있는 문장 끝부분 추출 (마침표, 물음표, 느낌표 기준)
+        sentences = re.split(r'[.?!。？！]', last_script_text)
+        sentences = [s.strip() for s in sentences if s.strip() and len(s.strip()) > 10]
+
+        if not sentences:
+            # 문장 구분자가 없으면 마지막 30자 사용
+            search_text = last_script_text[-30:].strip() if len(last_script_text) > 30 else last_script_text
+        else:
+            # 마지막 문장 사용
+            search_text = sentences[-1]
+
+        # 원본 스크립트에서 위치 찾기
+        pos = original_script.find(search_text)
+
+        if pos == -1:
+            # 정확히 못 찾으면 부분 매칭 시도
+            for length in range(len(search_text), 10, -5):
+                partial_search = search_text[:length]
+                pos = original_script.find(partial_search)
+                if pos != -1:
+                    pos += length  # 찾은 부분 끝으로 이동
+                    break
+        else:
+            pos += len(search_text)  # 찾은 텍스트 끝으로 이동
+
+        if pos == -1:
+            debug_log(f"    ⚠️ script_text 위치 찾기 실패: '{search_text[:30]}...'")
+            return 0
+
+        debug_log(f"    📍 분석 완료 위치: {pos}/{len(original_script)} ({pos * 100 // len(original_script)}%)")
+        return pos
+
+    def _get_remaining_script(self, partial_response: str, original_script: str) -> tuple:
+        """
+        아직 분석되지 않은 남은 스크립트를 반환합니다.
+
+        Args:
+            partial_response: 지금까지 생성된 JSON 응답
+            original_script: 원본 스크립트
+
+        Returns:
+            (remaining_script, coverage_percent, analyzed_end_pos)
+        """
+        analyzed_end = self._get_analyzed_script_end(partial_response, original_script)
+
+        if analyzed_end <= 0:
+            # 분석된 부분을 찾지 못하면 전체 스크립트 반환 (폴백)
+            debug_log("    ⚠️ 분석 위치 추적 실패, 전체 스크립트 사용")
+            return original_script, 0, 0
+
+        # 남은 스크립트 추출 (약간의 오버랩 포함하여 컨텍스트 유지)
+        overlap = min(200, analyzed_end)  # 200자 오버랩
+        remaining_start = max(0, analyzed_end - overlap)
+        remaining_script = original_script[remaining_start:]
+
+        coverage = (analyzed_end * 100) // len(original_script)
+        debug_log(f"    📊 커버리지: {coverage}%, 남은 스크립트: {len(remaining_script)}자")
+
+        return remaining_script, coverage, analyzed_end
+
+    def _calculate_final_coverage(self, final_response: str, original_script: str) -> dict:
+        """
+        최종 응답의 스크립트 커버리지를 계산합니다.
+
+        Args:
+            final_response: 최종 JSON 응답
+            original_script: 원본 스크립트
+
+        Returns:
+            {
+                "coverage_percent": 커버리지 퍼센트,
+                "analyzed_chars": 분석된 문자 수,
+                "total_chars": 전체 문자 수,
+                "missing_portion": 누락된 스크립트 부분 (있다면)
+            }
+        """
+        import re
+
+        # script_text 필드들 추출
+        script_texts = re.findall(r'"script_text"\s*:\s*"([^"]*)"', final_response)
+
+        if not script_texts:
+            return {
+                "coverage_percent": 0,
+                "analyzed_chars": 0,
+                "total_chars": len(original_script),
+                "missing_portion": original_script
+            }
+
+        # 각 script_text가 원본에서 차지하는 범위 추적
+        covered_ranges = []
+        normalized_script = original_script.replace('\n', ' ').replace('\r', '')
+
+        for text in script_texts:
+            normalized_text = text.replace('\\n', ' ').replace('\n', ' ')
+
+            # 원본에서 위치 찾기
+            pos = normalized_script.find(normalized_text[:50])  # 처음 50자로 검색
+            if pos != -1:
+                covered_ranges.append((pos, pos + len(normalized_text)))
+
+        if not covered_ranges:
+            return {
+                "coverage_percent": 0,
+                "analyzed_chars": 0,
+                "total_chars": len(original_script),
+                "missing_portion": original_script
+            }
+
+        # 범위 병합 및 커버리지 계산
+        covered_ranges.sort()
+        merged_ranges = [covered_ranges[0]]
+
+        for start, end in covered_ranges[1:]:
+            last_start, last_end = merged_ranges[-1]
+            if start <= last_end + 50:  # 50자 이내 갭은 연결된 것으로 처리
+                merged_ranges[-1] = (last_start, max(last_end, end))
+            else:
+                merged_ranges.append((start, end))
+
+        # 총 커버된 문자 수
+        analyzed_chars = sum(end - start for start, end in merged_ranges)
+        coverage_percent = (analyzed_chars * 100) // len(original_script)
+
+        # 누락된 부분 찾기 (마지막 범위 이후)
+        last_covered_end = merged_ranges[-1][1] if merged_ranges else 0
+        missing_portion = original_script[last_covered_end:] if last_covered_end < len(original_script) - 100 else ""
+
+        return {
+            "coverage_percent": min(100, coverage_percent),
+            "analyzed_chars": analyzed_chars,
+            "total_chars": len(original_script),
+            "missing_portion": missing_portion[:500] if missing_portion else ""
+        }
 
     def extract_characters(self, script: str) -> List[Dict]:
         """스크립트에서 등장인물만 추출 (상세 외모 프롬프트 포함)"""

@@ -1,0 +1,39 @@
+{
+  "image_generation": {
+    "api": "Google ImageFX",
+    "model": "imagen-4.0-generate-preview-05-20",
+    "resolution": "1280x720",
+    "style": "animation",
+    "api_interval": 1.0,
+    "celebrity_replacement": true,
+    "celebrity_ai_model": "gemini-2.0-flash-exp",
+    "rembg_enabled": false,
+    "auto_save_storyboard": false,
+    "imagefx_model": "IMAGEN_4"
+  },
+  "video_generation": {
+    "platform": "replicate",
+    "model": "wan_i2v",
+    "duration": 5,
+    "resolution": "720p",
+    "camera_motion": false,
+    "slow_motion": false,
+    "loop": false
+  },
+  "channel_trend": {
+    "max_results": 50,
+    "sort_by": "viewCount",
+    "date_range": "month"
+  },
+  "video_research": {
+    "max_results": 30,
+    "sort_by": "viewCount",
+    "video_type": "all",
+    "region": "KR"
+  },
+  "scene_analysis": {
+    "ai_provider": "google",
+    "ai_model": "gemini-2.0-flash-exp",
+    "language": "ko"
+  }
+}

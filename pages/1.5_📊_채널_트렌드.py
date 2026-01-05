@@ -53,11 +53,21 @@ try:
         get_transcript_downloader,
         TranscriptResult,
         DownloadProgress,
-        DownloadMethod  # ⭐ 다운로드 방식 추가
+        DownloadMethod,  # ⭐ 다운로드 방식 추가
+        check_cookies_status,  # ⭐ 쿠키 상태 확인
+        create_cookies_guide,  # ⭐ 쿠키 가이드
+        TranscriptFormatter  # ⭐ v4.4: 다중 형식 저장
     )
     TRANSCRIPT_DOWNLOADER_AVAILABLE = True
 except ImportError:
     TRANSCRIPT_DOWNLOADER_AVAILABLE = False
+
+# ⭐ v4.2: 쿠키 검증 모듈
+try:
+    from utils.cookie_validator import validate_cookies_file, get_cookie_status_summary
+    COOKIE_VALIDATOR_AVAILABLE = True
+except ImportError:
+    COOKIE_VALIDATOR_AVAILABLE = False
 
 # v2.0: 보관함 및 YouTube 서비스 모듈
 try:
@@ -1060,6 +1070,137 @@ def add_to_transcript_queue(channel: dict):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# 시스템 상태 표시 (쿠키, API, yt-dlp)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def render_system_status():
+    """시스템 상태 표시 (쿠키 파일, API, yt-dlp 상태)"""
+
+    try:
+        status = check_cookies_status()
+    except Exception:
+        status = {
+            "cookies_file_found": False,
+            "cookies_file_path": None,
+            "yt_dlp_available": False,
+            "api_available": True
+        }
+
+    # ⭐ v4.2: 쿠키 검증 모듈 사용
+    cookie_validation = None
+    if COOKIE_VALIDATOR_AVAILABLE:
+        try:
+            cookie_validation = get_cookie_status_summary("data/cookies.txt")
+        except Exception:
+            cookie_validation = None
+
+    # 상태 표시 (접힌 상태로 시작)
+    with st.expander("🔧 시스템 상태", expanded=False):
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            if status.get("api_available"):
+                st.success("✅ youtube-transcript-api")
+            else:
+                st.error("❌ youtube-transcript-api 미설치")
+
+        with col2:
+            if status.get("yt_dlp_available"):
+                st.success("✅ yt-dlp")
+            else:
+                st.warning("⚠️ yt-dlp 미설치")
+
+        with col3:
+            # ⭐ v4.2: 상세 쿠키 검증 결과 표시
+            if cookie_validation:
+                if cookie_validation['status'] == 'ok':
+                    st.success(cookie_validation['message'])
+                elif cookie_validation['status'] == 'warning':
+                    st.warning(cookie_validation['message'])
+                else:
+                    st.error(cookie_validation['message'])
+            elif status.get("cookies_file_found"):
+                st.success("✅ 쿠키 파일")
+            else:
+                st.warning("⚠️ 쿠키 파일 없음")
+
+        # ⭐ v4.2: 상세 쿠키 정보 표시
+        if cookie_validation and cookie_validation.get('details'):
+            details = cookie_validation['details']
+            info = details.get('info', {})
+
+            if info:
+                st.markdown("---")
+                st.markdown("**🍪 쿠키 상세 정보**")
+
+                info_col1, info_col2 = st.columns(2)
+                with info_col1:
+                    st.caption(f"YouTube 쿠키: {info.get('youtube_cookies', 0)}개")
+                    st.caption(f"Google 쿠키: {info.get('google_cookies', 0)}개")
+
+                with info_col2:
+                    found_cookies = info.get('important_cookies_found', [])
+                    if found_cookies:
+                        st.caption(f"인증 쿠키: {', '.join(found_cookies[:3])}...")
+
+                # 경고 표시
+                if details.get('warnings'):
+                    for warn in details['warnings']:
+                        st.warning(f"⚠️ {warn}")
+
+                # 에러 표시
+                if details.get('errors'):
+                    for err in details['errors']:
+                        st.error(f"❌ {err}")
+
+        # 쿠키 파일이 없거나 무효한 경우 가이드 표시
+        show_guide = not status.get("cookies_file_found")
+        if cookie_validation and cookie_validation['status'] == 'error':
+            show_guide = True
+
+        if show_guide:
+            st.markdown("---")
+            st.markdown("""
+            #### 🍪 쿠키 파일 설정 가이드 (Rate Limit 방지)
+
+            쿠키 파일을 설정하면 Rate Limit(429 에러) 발생률을 **대폭 줄일 수 있습니다**.
+
+            **1단계: Chrome 확장 프로그램 설치**
+            - Chrome 웹스토어에서 **"Get cookies.txt LOCALLY"** 검색 후 설치
+
+            **2단계: YouTube 쿠키 내보내기**
+            - YouTube.com에 로그인한 상태에서 확장 프로그램 아이콘 클릭
+            - "Export" 클릭하여 cookies.txt 다운로드
+
+            **3단계: 파일 저장**
+            - 다운로드된 파일을 아래 경로에 저장:
+            """)
+
+            st.code("data/cookies.txt", language="text")
+
+            # 폴더 열기 버튼 (Windows 전용)
+            if st.button("📁 data 폴더 열기", key="open_data_folder"):
+                import subprocess
+                import os
+                data_path = os.path.join(os.getcwd(), "data")
+                try:
+                    subprocess.Popen(f'explorer "{data_path}"', shell=True)
+                    st.info(f"📂 폴더 열기: {data_path}")
+                except Exception as e:
+                    st.warning(f"폴더 열기 실패: {e}")
+
+            st.markdown("""
+            **⚠️ 주의사항**
+            - 쿠키 파일은 2-4주마다 갱신 필요
+            - YouTube에서 로그아웃하면 쿠키 무효화됨
+            - 쿠키 파일을 다른 사람과 공유하지 마세요
+            """)
+        elif status.get("cookies_file_found") and not cookie_validation:
+            # 쿠키 검증 모듈 없이 기본 정보만 표시
+            st.info(f"📄 쿠키 파일: `{status.get('cookies_file_path', 'N/A')}`")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # 트랜스크립트 다운로드 탭
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1077,6 +1218,11 @@ def render_transcript_tab():
     if not api_key:
         st.warning("⚠️ YouTube API 키가 필요합니다. 상단에서 설정하세요.")
         return
+
+    # ═══════════════════════════════════════════════════════
+    # ⭐ 시스템 상태 표시 (쿠키, API, yt-dlp)
+    # ═══════════════════════════════════════════════════════
+    render_system_status()
 
     # 대기열 표시
     render_transcript_queue()
@@ -1116,16 +1262,33 @@ def render_transcript_tab():
             st.caption("💡 수동 자막 우선 → 자동생성 자막 순으로 탐색")
 
     with col2:
-        output_format = st.selectbox(
-            "출력 형식",
-            options=["json", "txt", "srt", "csv"],
-            format_func=lambda x: {
-                "json": "📄 JSON (상세)",
-                "txt": "📝 TXT (텍스트)",
-                "srt": "🎬 SRT (자막 파일)",
-                "csv": "📊 CSV (스프레드시트)"
-            }.get(x, x)
-        )
+        # ⭐ v4.4: 다중 형식 선택 (체크박스)
+        st.write("**📁 저장 형식**")
+        format_col1, format_col2 = st.columns(2)
+        with format_col1:
+            save_json = st.checkbox("JSON", value=True, help="세그먼트 데이터 포함", key="fmt_json")
+            save_srt = st.checkbox("SRT", value=True, help="자막 파일 형식", key="fmt_srt")
+        with format_col2:
+            save_txt = st.checkbox("TXT", value=False, help="순수 텍스트만", key="fmt_txt")
+            save_vtt = st.checkbox("VTT", value=False, help="웹 자막 형식", key="fmt_vtt")
+
+        # 선택된 형식 리스트
+        selected_formats = []
+        if save_json:
+            selected_formats.append('json')
+        if save_srt:
+            selected_formats.append('srt')
+        if save_txt:
+            selected_formats.append('txt')
+        if save_vtt:
+            selected_formats.append('vtt')
+
+        # 최소 하나 선택 필수
+        if not selected_formats:
+            st.warning("⚠️ 최소 하나 선택 필요")
+            selected_formats = ['json']
+
+        st.caption(f"선택: {', '.join(f.upper() for f in selected_formats)}")
 
     with col3:
         include_auto = st.checkbox(
@@ -1135,28 +1298,43 @@ def render_transcript_tab():
         )
 
     # ═══════════════════════════════════════════════════════
-    # 다운로드 방식 선택
+    # 다운로드 방식 선택 (v4.3 적응형)
     # ═══════════════════════════════════════════════════════
-    st.markdown("#### 📡 다운로드 방식")
+    st.markdown("#### 📡 다운로드 방식 (v4.3 적응형)")
 
     download_method = st.radio(
         "방식 선택",
         options=["auto", "api", "yt-dlp"],
         format_func=lambda x: {
-            "auto": "🔄 자동 (API 실패 시 yt-dlp 전환) - 권장",
+            "auto": "🚀 자동 (적응형 최적화) - 권장",
             "api": "⚡ API (빠름, Rate Limit 취약)",
-            "yt-dlp": "🛡️ yt-dlp (안정적, 조금 느림)"
+            "yt-dlp": "🛡️ yt-dlp (안정적)"
         }[x],
         index=0,
         horizontal=True,
-        help="자동: API로 시작, 429 에러 3회 발생 시 yt-dlp로 전환"
+        help="자동: 성공한 방식을 기억하고 우선 사용, Rate Limit 시 즉시 스킵"
     )
 
-    # 방식별 안내
+    # 방식별 안내 + 쿠키 상태 체크
+    try:
+        cookies_status = check_cookies_status()
+        has_cookies = cookies_status.get("cookies_file_found", False)
+    except Exception:
+        has_cookies = False
+
     if download_method == "auto":
-        st.info("💡 **자동 모드**: API로 시작하고, Rate Limit(429) 에러가 3회 연속 발생하면 yt-dlp로 자동 전환합니다.")
+        st.info("""💡 **적응형 자동 모드 (v4.3)**
+- 성공한 방식을 기억하고 다음에 우선 시도
+- Rate Limit 발생 시 즉시 스킵 (긴 대기 없음)
+- 연속 3회 실패한 방식 자동 비활성화
+- 영상 1개 평균 3-5초 (기존 20초 대비 4배 빠름)""")
+        if not has_cookies:
+            st.caption("💡 쿠키 파일 설정 시 Rate Limit 발생률이 줄어듭니다.")
     elif download_method == "api":
-        st.warning("⚠️ **API 모드**: 빠르지만 YouTube Rate Limit에 취약합니다. 429 에러 발생 시 '자동' 또는 'yt-dlp' 모드를 사용하세요.")
+        if not has_cookies:
+            st.error("🚨 **API 모드 + 쿠키 없음**: Rate Limit 발생 위험이 높습니다! '자동' 모드를 권장합니다.")
+        else:
+            st.warning("⚠️ **API 모드**: 빠르지만 YouTube Rate Limit에 취약합니다.")
     else:
         st.success("✅ **yt-dlp 모드**: 안정적입니다. Rate Limit 걱정 없이 다운로드할 수 있습니다.")
 
@@ -1176,14 +1354,14 @@ def render_transcript_tab():
         )
 
     with col2:
-        # ⭐ 요청 간격 - 기본값 2초, 최대 5초
+        # ⭐ v4.3: 요청 간격 최적화 (1-3초)
         request_delay = st.slider(
             "요청 간격 (초)",
             min_value=1.0,  # ⭐ 최소 1초
-            max_value=5.0,  # ⭐ 최대 5초
-            value=2.0,      # ⭐ 기본값 2초
+            max_value=3.0,  # ⭐ 최대 3초 (5→3)
+            value=1.5,      # ⭐ 기본값 1.5초 (2→1.5)
             step=0.5,
-            help="각 영상 자막 요청 사이의 대기 시간. 429 에러가 발생하면 이 값을 높이세요."
+            help="v4.3: 적응형 최적화로 짧은 딜레이도 안정적. Rate Limit 시 즉시 스킵됨."
         )
 
     # ⭐ 배치 설정 추가
@@ -1200,14 +1378,86 @@ def render_transcript_tab():
         )
 
     with col4:
+        # ⭐ v4.3: 배치 대기 시간 최적화
         batch_delay = st.number_input(
             "배치 대기 시간 (초)",
-            min_value=10,
-            max_value=120,
-            value=30,
-            step=10,
-            help="배치 사이에 대기하는 시간 (Rate Limit 방지)"
+            min_value=5,
+            max_value=60,
+            value=10,  # 30 → 10
+            step=5,
+            help="v4.3: Rate Limit 시 즉시 스킵하므로 짧은 대기도 안정적"
         )
+
+    st.markdown("---")
+
+    # ═══════════════════════════════════════════════════════
+    # ✅ 글로벌 필터 옵션 (새로 추가)
+    # ═══════════════════════════════════════════════════════
+    st.markdown("#### 🔍 필터 및 정렬 옵션")
+    st.caption("다운로드 대상 영상을 필터링하고 정렬합니다. (전체 다운로드/수동 선택 모두 적용)")
+
+    filter_col1, filter_col2, filter_col3 = st.columns(3)
+
+    with filter_col1:
+        global_sort_by = st.selectbox(
+            "정렬 기준",
+            options=["latest", "oldest", "popular", "unpopular"],
+            format_func=lambda x: {
+                "latest": "📅 최신순",
+                "oldest": "📅 오래된순",
+                "popular": "🔥 조회수 높은순",
+                "unpopular": "📉 조회수 낮은순"
+            }.get(x, x),
+            index=0,
+            key="global_sort_by"
+        )
+
+    with filter_col2:
+        global_video_count = st.selectbox(
+            "다운로드 개수",
+            options=[10, 20, 50, 100, 200, 500, "전체"],
+            format_func=lambda x: f"{x}개" if isinstance(x, int) else x,
+            index=2,  # 기본값 50개
+            key="global_video_count"
+        )
+
+    with filter_col3:
+        global_period = st.selectbox(
+            "업로드 기간",
+            options=["all", "1week", "1month", "3months", "6months", "1year"],
+            format_func=lambda x: {
+                "all": "전체 기간",
+                "1week": "최근 1주일",
+                "1month": "최근 1개월",
+                "3months": "최근 3개월",
+                "6months": "최근 6개월",
+                "1year": "최근 1년"
+            }.get(x, x),
+            index=0,
+            key="global_period"
+        )
+
+    # 추가 필터
+    with st.expander("🔧 추가 필터 옵션", expanded=False):
+        adv_col1, adv_col2 = st.columns(2)
+
+        with adv_col1:
+            min_views = st.number_input(
+                "최소 조회수",
+                min_value=0,
+                value=0,
+                step=1000,
+                key="global_min_views",
+                help="이 조회수 이상의 영상만 다운로드"
+            )
+
+        with adv_col2:
+            filter_keyword = st.text_input(
+                "제목 키워드 필터",
+                placeholder="포함할 키워드 (선택사항)",
+                key="global_filter_keyword",
+                help="특정 키워드가 제목에 포함된 영상만 다운로드"
+            )
 
     st.markdown("---")
 
@@ -1279,10 +1529,19 @@ def render_transcript_tab():
 
     # 다운로드 시작 버튼
     if st.button("📥 트랜스크립트 다운로드 시작", type="primary", use_container_width=True, disabled=total_estimated == 0):
+        # ✅ 글로벌 필터 옵션 수집
+        global_filter_options = {
+            "sort_by": global_sort_by,
+            "period": global_period,
+            "max_count": global_video_count if global_video_count != "전체" else None,
+            "min_views": min_views,
+            "keyword": filter_keyword
+        }
+
         run_transcript_download_v2(
             queue=queue,
             language=language,
-            output_format=output_format,
+            output_formats=selected_formats,  # ⭐ v4.4: 다중 형식 지원
             include_auto=include_auto,
             max_videos=max_videos_per_channel,
             delay=request_delay,
@@ -1291,7 +1550,8 @@ def render_transcript_tab():
             download_method=download_method,  # ⭐ 방식 추가
             api_key=api_key,
             selection_mode=selection_mode,
-            selected_videos_by_channel=selected_videos_by_channel
+            selected_videos_by_channel=selected_videos_by_channel,
+            global_filter_options=global_filter_options  # ✅ 글로벌 필터 추가
         )
 
 
@@ -1500,6 +1760,93 @@ def apply_video_filters(videos: list, sort_by: str, keyword: str, date_range: st
     return filtered
 
 
+def apply_global_video_filters(
+    videos: list,
+    sort_by: str = "latest",
+    period: str = "all",
+    max_count: int = None,
+    min_views: int = 0,
+    keyword: str = ""
+) -> list:
+    """
+    글로벌 필터 적용 (전체 다운로드 모드에서 사용)
+
+    Args:
+        videos: 영상 목록
+        sort_by: 정렬 기준 (latest, oldest, popular, unpopular)
+        period: 기간 필터 (all, 1week, 1month, 3months, 6months, 1year)
+        max_count: 최대 영상 수 (None이면 제한 없음)
+        min_views: 최소 조회수
+        keyword: 제목 키워드 필터
+
+    Returns:
+        필터링된 영상 목록
+    """
+    from datetime import timedelta
+
+    if not videos:
+        return []
+
+    filtered = videos.copy()
+
+    # 1. 키워드 필터
+    if keyword and keyword.strip():
+        keyword_lower = keyword.lower().strip()
+        filtered = [v for v in filtered if keyword_lower in v.get("title", "").lower()]
+
+    # 2. 기간 필터
+    if period != "all":
+        days_map = {
+            "1week": 7,
+            "1month": 30,
+            "3months": 90,
+            "6months": 180,
+            "1year": 365
+        }
+        days = days_map.get(period, 0)
+
+        if days > 0:
+            cutoff = datetime.now() - timedelta(days=days)
+            cutoff_str = cutoff.isoformat()
+
+            def is_within_period(v):
+                pub_date = v.get("published_at", "")
+                if not pub_date:
+                    return True  # 날짜 없으면 포함
+                return pub_date >= cutoff_str
+
+            filtered = [v for v in filtered if is_within_period(v)]
+
+    # 3. 최소 조회수 필터
+    if min_views > 0:
+        def has_min_views(v):
+            views = v.get("view_count", 0)
+            if isinstance(views, str):
+                try:
+                    views = int(views.replace(",", ""))
+                except:
+                    views = 0
+            return views >= min_views
+
+        filtered = [v for v in filtered if has_min_views(v)]
+
+    # 4. 정렬
+    if sort_by == "latest":
+        filtered.sort(key=lambda x: x.get("published_at", ""), reverse=True)
+    elif sort_by == "oldest":
+        filtered.sort(key=lambda x: x.get("published_at", ""))
+    elif sort_by == "popular":
+        filtered.sort(key=lambda x: x.get("view_count", 0) if isinstance(x.get("view_count", 0), int) else 0, reverse=True)
+    elif sort_by == "unpopular":
+        filtered.sort(key=lambda x: x.get("view_count", 0) if isinstance(x.get("view_count", 0), int) else 0)
+
+    # 5. 개수 제한
+    if max_count is not None and isinstance(max_count, int) and max_count > 0:
+        filtered = filtered[:max_count]
+
+    return filtered
+
+
 def render_transcript_queue():
     """트랜스크립트 다운로드 대기열 표시"""
     st.markdown("#### 📋 다운로드 대기열")
@@ -1651,7 +1998,7 @@ def run_transcript_download(
 def run_transcript_download_v2(
     queue: list,
     language: str,
-    output_format: str,
+    output_formats: list,  # ⭐ v4.4: 다중 형식 리스트
     include_auto: bool,
     max_videos: int,
     delay: float,
@@ -1660,9 +2007,10 @@ def run_transcript_download_v2(
     download_method: str,  # ⭐ 다운로드 방식 추가
     api_key: str,
     selection_mode: str,
-    selected_videos_by_channel: dict
+    selected_videos_by_channel: dict,
+    global_filter_options: dict = None  # ✅ 글로벌 필터 옵션 추가
 ):
-    """트랜스크립트 다운로드 실행 (하이브리드 버전)"""
+    """트랜스크립트 다운로드 실행 (하이브리드 버전 + 다중 형식 지원)"""
     st.markdown("---")
     st.markdown("### 📊 다운로드 진행 중...")
 
@@ -1696,6 +2044,23 @@ def run_transcript_download_v2(
     # 방식 표시
     method_name = {"auto": "자동", "api": "API", "yt-dlp": "yt-dlp"}.get(download_method, download_method)
     logs.append(f"[설정] 다운로드 방식: {method_name}")
+
+    # ✅ 글로벌 필터 옵션 표시
+    if global_filter_options:
+        filter_info = []
+        if global_filter_options.get("sort_by") and global_filter_options["sort_by"] != "latest":
+            filter_info.append(f"정렬: {global_filter_options['sort_by']}")
+        if global_filter_options.get("period") and global_filter_options["period"] != "all":
+            filter_info.append(f"기간: {global_filter_options['period']}")
+        if global_filter_options.get("max_count"):
+            filter_info.append(f"개수: {global_filter_options['max_count']}개")
+        if global_filter_options.get("min_views") and global_filter_options["min_views"] > 0:
+            filter_info.append(f"최소조회수: {global_filter_options['min_views']}")
+        if global_filter_options.get("keyword"):
+            filter_info.append(f"키워드: {global_filter_options['keyword']}")
+
+        if filter_info:
+            logs.append(f"[설정] 필터: {', '.join(filter_info)}")
 
     total_videos_to_download = 0
     videos_downloaded = 0
@@ -1731,6 +2096,20 @@ def run_transcript_download_v2(
             # 수동 선택된 영상
             videos_to_download = selected_videos_by_channel[channel_id]
             logs.append(f"[{channel_name}] 선택된 {len(videos_to_download)}개 영상 다운로드")
+
+            # ✅ 수동 선택 모드에서도 글로벌 필터 적용 (정렬, 개수 제한)
+            if global_filter_options:
+                original_count = len(videos_to_download)
+                videos_to_download = apply_global_video_filters(
+                    videos=videos_to_download,
+                    sort_by=global_filter_options.get("sort_by", "latest"),
+                    period=global_filter_options.get("period", "all"),
+                    max_count=global_filter_options.get("max_count"),
+                    min_views=global_filter_options.get("min_views", 0),
+                    keyword=global_filter_options.get("keyword", "")
+                )
+                if len(videos_to_download) != original_count:
+                    logs.append(f"[{channel_name}] 필터 적용 후: {len(videos_to_download)}개")
         else:
             # 전체 다운로드 (최대 영상 수 제한 적용)
             logs.append(f"[{channel_name}] 영상 목록 조회 중...")
@@ -1746,6 +2125,20 @@ def run_transcript_download_v2(
                     max_results=max_videos
                 )
             logs.append(f"[{channel_name}] {len(videos_to_download)}개 영상 발견")
+
+            # ✅ 글로벌 필터 적용
+            if global_filter_options and videos_to_download:
+                original_count = len(videos_to_download)
+                videos_to_download = apply_global_video_filters(
+                    videos=videos_to_download,
+                    sort_by=global_filter_options.get("sort_by", "latest"),
+                    period=global_filter_options.get("period", "all"),
+                    max_count=global_filter_options.get("max_count"),
+                    min_views=global_filter_options.get("min_views", 0),
+                    keyword=global_filter_options.get("keyword", "")
+                )
+                if len(videos_to_download) != original_count:
+                    logs.append(f"[{channel_name}] 필터 적용 후: {original_count} → {len(videos_to_download)}개")
 
         if not videos_to_download:
             logs.append(f"[{channel_name}] ⚠️ 다운로드할 영상이 없습니다.")
@@ -1782,6 +2175,25 @@ def run_transcript_download_v2(
                 total_failed += 1
                 logs.append(f"⚠️ Rate Limit 감지: {video_title[:30]}...")
                 log_area.code("\n".join(logs[-20:]))
+
+                # ⭐ 글로벌 Rate Limit 초과 시 조기 종료
+                if "글로벌 Rate Limit 초과" in result.error or result.method_used == "blocked":
+                    logs.append("🚨 글로벌 Rate Limit 초과! 다운로드 중단...")
+                    logs.append("💡 쿠키 파일(data/cookies.txt) 설정을 권장합니다.")
+                    log_area.code("\n".join(logs[-20:]))
+                    st.warning("""
+                    ### 🚨 Rate Limit 초과
+
+                    YouTube가 너무 많은 요청을 차단했습니다.
+
+                    **해결 방법:**
+                    1. **쿠키 파일 설정** (권장): 시스템 상태에서 가이드 확인
+                    2. **5분 후 재시도**: 잠시 후 다시 시도하세요
+                    3. **yt-dlp 모드 사용**: 다운로드 방식을 'yt-dlp'로 변경
+
+                    쿠키 파일 경로: `data/cookies.txt`
+                    """)
+                    break  # 현재 채널 다운로드 중단
             else:
                 total_failed += 1
 
@@ -1816,16 +2228,54 @@ def run_transcript_download_v2(
                     current_status.text(f"⏳ Rate Limit 방지 대기 중... ({batch_delay}초)")
                     time.sleep(batch_delay)
 
-        # 채널별 결과 저장
+        # ⭐ v4.4: 채널별 결과 저장 (다중 형식 지원)
         if channel_results:
             try:
-                output_path = downloader.save_results(
-                    results=channel_results,
-                    channel_name=channel_name,
-                    output_format=output_format
-                )
-                output_files.append(output_path)
-                logs.append(f"[{channel_name}] ✅ 저장: {output_path}")
+                # 기본 파일 경로 생성
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                safe_channel = "".join(c for c in channel_name if c.isalnum() or c in (' ', '-', '_')).strip()[:50]
+                base_path = f"data/transcripts/transcripts_{safe_channel}_{timestamp}"
+
+                saved_format_files = []
+
+                # 성공한 결과만 추출
+                successful_results = [r for r in channel_results if r.success and r.transcript]
+
+                if successful_results:
+                    # JSON 형식 저장 (기본)
+                    if 'json' in output_formats:
+                        json_path = downloader.save_results(
+                            results=channel_results,
+                            channel_name=channel_name,
+                            output_format='json'
+                        )
+                        output_files.append(json_path)
+                        saved_format_files.append('JSON')
+
+                    # SRT/VTT/TXT 형식 저장 (TranscriptFormatter 사용)
+                    for fmt in output_formats:
+                        if fmt == 'json':
+                            continue  # 이미 처리됨
+
+                        fmt_path = f"{base_path}.{fmt}"
+
+                        # 모든 결과의 세그먼트 합치기
+                        all_segments = []
+                        for r in successful_results:
+                            if r.transcript:
+                                all_segments.extend(r.transcript)
+
+                        if all_segments:
+                            content = TranscriptFormatter.convert(all_segments, fmt)
+                            with open(fmt_path, 'w', encoding='utf-8') as f:
+                                f.write(content)
+                            output_files.append(fmt_path)
+                            saved_format_files.append(fmt.upper())
+
+                    logs.append(f"[{channel_name}] ✅ 저장: {', '.join(saved_format_files)}")
+                else:
+                    logs.append(f"[{channel_name}] ⚠️ 저장할 성공 결과 없음")
+
             except Exception as e:
                 logs.append(f"[{channel_name}] ❌ 저장 실패: {e}")
 
@@ -1840,6 +2290,7 @@ def run_transcript_download_v2(
 
     # 결과 요약
     method_summary = f"API {method_api_count}개, yt-dlp {method_ytdlp_count}개" if (method_api_count + method_ytdlp_count) > 0 else "N/A"
+    formats_summary = ', '.join(f.upper() for f in output_formats)
 
     st.success(f"""
     ### ✅ 다운로드 완료!
@@ -1850,6 +2301,7 @@ def run_transcript_download_v2(
     - ⚠️ 자막 없음: {total_no_caption}개
     - ❌ 실패: {total_failed}개
     - 📡 방식: {method_summary}
+    - 📁 형식: {formats_summary}
     """)
 
     # 다운로드 파일 목록

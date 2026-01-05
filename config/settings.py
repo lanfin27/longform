@@ -171,8 +171,12 @@ SECRETS_DIR.mkdir(parents=True, exist_ok=True)
 
 # === Google ImageFX (Imagen) 설정 ===
 # 쿠키는 환경변수 또는 보안 저장소 파일에서 로드
-def _load_imagefx_cookie() -> str:
-    """ImageFX 쿠키 로드 (환경변수 > 파일 순서)"""
+def load_imagefx_cookie() -> str:
+    """
+    ImageFX 쿠키 로드 (환경변수 > 파일 순서)
+
+    매번 파일에서 읽어오므로 앱 실행 중 쿠키 변경이 반영됨
+    """
     # 1. 환경변수에서 먼저 확인
     env_cookie = get_api_key("IMAGEFX_COOKIE")
     if env_cookie:
@@ -188,9 +192,14 @@ def _load_imagefx_cookie() -> str:
         except Exception:
             pass
 
-    return None
+    return ""
 
-IMAGEFX_COOKIE = _load_imagefx_cookie()
+
+# 하위 호환성을 위한 별칭
+_load_imagefx_cookie = load_imagefx_cookie
+
+# 초기 로드 (하위 호환성)
+IMAGEFX_COOKIE = load_imagefx_cookie()
 
 # ImageFX 모델 목록
 IMAGEFX_MODELS = [

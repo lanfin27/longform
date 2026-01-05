@@ -1,0 +1,80 @@
+{
+    "version": "3.1",
+    "description": "Whisper v3.1 최적화 설정 - 극단적 VAD 민감도로 음성 누락 방지",
+
+    "model": {
+        "size": "small",
+        "device": "auto",
+        "compute_type": "auto",
+        "comment": "small 모델 권장 (base보다 정확, medium보다 빠름)"
+    },
+
+    "vad": {
+        "enabled": true,
+        "threshold": 0.05,
+        "min_speech_duration_ms": 30,
+        "min_silence_duration_ms": 300,
+        "speech_pad_ms": 300,
+        "comment": "v3.1: VAD 극단적 민감도 - 0.15에서 0.05로, min_speech 50→30, pad 200→300"
+    },
+
+    "recognition": {
+        "beam_size": 5,
+        "best_of": 5,
+        "temperature": 0.0,
+        "word_timestamps": true,
+        "comment": "word_timestamps 활성화로 정밀 타임스탬프"
+    },
+
+    "gap_recovery": {
+        "enabled": true,
+        "threshold_seconds": 3.0,
+        "reanalyze_with_sensitive_vad": true,
+        "sensitive_vad_threshold": 0.03,
+        "reanalyze_without_vad": true,
+        "comment": "v3.1: 3초 이상 갭 감지, VAD 0.03으로 재분석, 실패 시 VAD 비활성화 재시도"
+    },
+
+    "audio_preprocessing": {
+        "normalize": true,
+        "compress_dynamic_range": true,
+        "low_volume_threshold_db": -35,
+        "target_volume_db": -14,
+        "comment": "저볼륨 구간 자동 증폭"
+    },
+
+    "language_specific": {
+        "ko": {
+            "chars_per_second": 5.0,
+            "comment": "한국어 평균 발화 속도: 분당 300자"
+        },
+        "en": {
+            "chars_per_second": 15.0,
+            "comment": "영어 평균 발화 속도: 분당 900자"
+        }
+    },
+
+    "presets": {
+        "fast": {
+            "model_size": "base",
+            "beam_size": 3,
+            "best_of": 3,
+            "reanalyze_gaps": false,
+            "comment": "빠른 처리 (정확도 낮음)"
+        },
+        "balanced": {
+            "model_size": "small",
+            "beam_size": 5,
+            "best_of": 5,
+            "reanalyze_gaps": true,
+            "comment": "균형 잡힌 설정 (기본값)"
+        },
+        "accurate": {
+            "model_size": "medium",
+            "beam_size": 10,
+            "best_of": 10,
+            "reanalyze_gaps": true,
+            "comment": "최고 정확도 (느림)"
+        }
+    }
+}

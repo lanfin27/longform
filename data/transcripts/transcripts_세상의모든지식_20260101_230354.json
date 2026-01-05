@@ -1,0 +1,199 @@
+{
+  "channel_name": "세상의모든지식",
+  "downloaded_at": "2026-01-01T23:03:54.270643",
+  "statistics": {
+    "total": 3,
+    "successful": 1,
+    "failed": 2,
+    "total_words": 417,
+    "methods": {
+      "api": 2,
+      "yt-dlp": 1
+    }
+  },
+  "transcripts": [
+    {
+      "video_id": "7H3IcxHD-9k",
+      "video_title": "캄보디아에서 목숨을 잃은 22살 대학생 #캄보디아",
+      "language": "en",
+      "language_code": "en",
+      "is_auto_generated": false,
+      "word_count": 417,
+      "method": "yt-dlp",
+      "full_text": "The most shocking incident that brought this incident to the surface was the death of Mr. Park, a 22-year-old college student from Yecheon, Gyeongbuk death of Mr. Park, a 22-year-old college student from Yecheon, Gyeongbuk . On July . On July . On July 17, 2025, Mr. Park boarded a plane to 17, 2025, Mr. Park boarded a plane to 17, 2025, Mr. Park boarded a plane to Cambodia, leaving his family with a message that he would visit Park Nam-hoe Cambodia, leaving his family with a message that he would visit Park Nam-hoe Cambodia, leaving his family with a message that he would visit Park Nam-hoe . It is known that he was . It is known that he was . It is known that he was recommended by a senior from the same school, Mr. Hong, but in recommended by a senior from the same school, Mr. Hong, but in recommended by a senior from the same school, Mr. Hong, but in reality, he was a recruiter for a large-scale bank account reality, he was a recruiter for a large-scale bank account reality, he was a recruiter for a large-scale bank account . The place he arrived was . The place he arrived was . The place he arrived was not Chairman Park Nam, but a not Chairman Park Nam, but a not Chairman Park Nam, but a criminal network in Bosan, Kampot Province, Cambodia. criminal network in Bosan, Kampot Province, Cambodia. criminal network in Bosan, Kampot Province, Cambodia. Mr. Park was held there for a week, Mr. Park was held there for a week, subjected to unimaginable beatings, torture, and forced drug use. The family received a threatening phone call from a man who spoke in a Joseon Dynasty accent, saying that he would release them if they sent 50 million won. However, on August received a threatening phone call from a man who spoke in a Joseon Dynasty accent, saying that he would release them if they sent 50 million won. However, on August 8, Park Shin was found dead in a vehicle 8, Park Shin was found dead in a vehicle 8, Park Shin was found dead in a vehicle . Local police said the . Local police said the . Local police said the cause of death was cardiac arrest due to torture and extreme pain cause of death was cardiac arrest due to torture and extreme pain cause of death was cardiac arrest due to torture and extreme pain .",
+      "segments": [
+        {
+          "start": 2.51,
+          "duration": 2.08,
+          "text": "The most shocking incident that brought this incident to the surface was the"
+        },
+        {
+          "start": 6.51,
+          "duration": 0.009999999999999787,
+          "text": "death of Mr. Park, a 22-year-old college student from Yecheon, Gyeongbuk"
+        },
+        {
+          "start": 6.52,
+          "duration": 1.9890000000000008,
+          "text": "death of Mr. Park, a 22-year-old college student from Yecheon, Gyeongbuk .  On July"
+        },
+        {
+          "start": 8.509,
+          "duration": 0.009999999999999787,
+          "text": ".  On July"
+        },
+        {
+          "start": 8.519,
+          "duration": 1.9510000000000005,
+          "text": ".  On July 17, 2025, Mr. Park boarded a plane to"
+        },
+        {
+          "start": 10.47,
+          "duration": 0.009999999999999787,
+          "text": "17, 2025, Mr. Park boarded a plane to"
+        },
+        {
+          "start": 10.48,
+          "duration": 2.148999999999999,
+          "text": "17, 2025, Mr. Park boarded a plane to Cambodia, leaving his family with a message that he would visit Park Nam-hoe"
+        },
+        {
+          "start": 12.629,
+          "duration": 0.009999999999999787,
+          "text": "Cambodia, leaving his family with a message that he would visit Park Nam-hoe"
+        },
+        {
+          "start": 12.639,
+          "duration": 2.0700000000000003,
+          "text": "Cambodia, leaving his family with a message that he would visit Park Nam-hoe .  It is known that he was"
+        },
+        {
+          "start": 14.709,
+          "duration": 0.009999999999999787,
+          "text": ".  It is known that he was"
+        },
+        {
+          "start": 14.719,
+          "duration": 1.7509999999999994,
+          "text": ".  It is known that he was recommended by a senior from the same school, Mr. Hong, but in"
+        },
+        {
+          "start": 16.47,
+          "duration": 0.010000000000001563,
+          "text": "recommended by a senior from the same school, Mr. Hong, but in"
+        },
+        {
+          "start": 16.48,
+          "duration": 1.948999999999998,
+          "text": "recommended by a senior from the same school, Mr. Hong, but in reality, he was a recruiter for a large-scale bank account"
+        },
+        {
+          "start": 18.429,
+          "duration": 0.010000000000001563,
+          "text": "reality, he was a recruiter for a large-scale bank account"
+        },
+        {
+          "start": 18.439,
+          "duration": 2.151,
+          "text": "reality, he was a recruiter for a large-scale bank account .  The place he arrived was"
+        },
+        {
+          "start": 20.59,
+          "duration": 0.010000000000001563,
+          "text": ".  The place he arrived was"
+        },
+        {
+          "start": 20.6,
+          "duration": 1.908999999999999,
+          "text": ".  The place he arrived was not Chairman Park Nam, but a"
+        },
+        {
+          "start": 22.509,
+          "duration": 0.00999999999999801,
+          "text": "not Chairman Park Nam, but a"
+        },
+        {
+          "start": 22.519,
+          "duration": 1.9100000000000001,
+          "text": "not Chairman Park Nam, but a criminal network in Bosan, Kampot Province, Cambodia."
+        },
+        {
+          "start": 24.429,
+          "duration": 0.010000000000001563,
+          "text": "criminal network in Bosan, Kampot Province, Cambodia."
+        },
+        {
+          "start": 24.439,
+          "duration": 1.8709999999999987,
+          "text": "criminal network in Bosan, Kampot Province, Cambodia. Mr. Park was held there for a week,"
+        },
+        {
+          "start": 26.31,
+          "duration": 2.16,
+          "text": "Mr. Park was held there for a week,"
+        },
+        {
+          "start": 30.509,
+          "duration": 2.0009999999999977,
+          "text": "subjected to unimaginable beatings, torture, and forced drug use.  The family"
+        },
+        {
+          "start": 36.549,
+          "duration": 0.00999999999999801,
+          "text": "received a threatening phone call from a man who spoke in a Joseon Dynasty accent, saying that he would release them if they sent 50 million won.  However, on August"
+        },
+        {
+          "start": 36.559,
+          "duration": 2.1500000000000057,
+          "text": "received a threatening phone call from a man who spoke in a Joseon Dynasty accent, saying that he would release them if they sent 50 million won.  However, on August 8, Park Shin was found dead in a vehicle"
+        },
+        {
+          "start": 38.709,
+          "duration": 0.00999999999999801,
+          "text": "8, Park Shin was found dead in a vehicle"
+        },
+        {
+          "start": 38.719,
+          "duration": 2.110999999999997,
+          "text": "8, Park Shin was found dead in a vehicle .  Local police said the"
+        },
+        {
+          "start": 40.83,
+          "duration": 0.010000000000005116,
+          "text": ".  Local police said the"
+        },
+        {
+          "start": 40.84,
+          "duration": 2.269999999999996,
+          "text": ".  Local police said the cause of death was cardiac arrest due to torture and extreme pain"
+        },
+        {
+          "start": 43.11,
+          "duration": 0.00999999999999801,
+          "text": "cause of death was cardiac arrest due to torture and extreme pain"
+        },
+        {
+          "start": 43.12,
+          "duration": 3.0,
+          "text": "cause of death was cardiac arrest due to torture and extreme pain ."
+        }
+      ]
+    }
+  ],
+  "failed_videos": [
+    {
+      "video_id": "mEAWlDcIDeY",
+      "video_title": "세모지 다큐 5편 - 민주주의의 양대축! 사회민주주의는 어떻게 만들어졌을까?  [문명 : 정치 체제의 진화 5부]",
+      "error": "API: YouTube 응답 파싱 오류 (API 변경 가능성) | yt-dlp: Rate Limit (429)",
+      "error_type": "other",
+      "method": "api"
+    },
+    {
+      "video_id": "wa5aBeFd4eI",
+      "video_title": "2025년 12월 31일",
+      "error": "API: YouTube 응답 파싱 오류 (API 변경 가능성) | yt-dlp: Rate Limit (429)",
+      "error_type": "other",
+      "method": "api"
+    }
+  ]
+}

@@ -8,10 +8,87 @@
 4. 캐릭터 라이브러리
 """
 import json
+import re
 from pathlib import Path
 from typing import List, Dict, Optional
 from dataclasses import dataclass, asdict, field
 from datetime import datetime
+
+
+# ============================================================
+# 🔴 캐릭터 이름 유효성 검증 (Problem 49)
+# ============================================================
+
+INVALID_CHARACTER_WORDS = {
+    '의', '이', '가', '은', '는', '를', '을', '에서', '로', '으로',
+    '회사', '기업', '브랜드', '제품', '서비스', '시장', '산업',
+    '대표', '회장', '사장', '이사', '임원', '창업자', '설립자',
+    '한국', '미국', '중국', '일본', '사우디', '유럽', '아시아',
+    '하는', '되는', '있는', '없는', '같은', '다른', '모든',
+}
+
+
+def is_valid_character_name(name: str) -> bool:
+    """유효한 캐릭터 이름인지 검증"""
+    if not name or len(name) < 2 or len(name) > 10:
+        return False
+
+    name_clean = name.strip()
+    name_lower = name_clean.lower()
+
+    if name_lower in INVALID_CHARACTER_WORDS:
+        return False
+
+    # 문장 어미 패턴 감지
+    sentence_endings = [
+        '면', '해서', '니까', '으니', '지만', '으면', '어서', '아서',
+        '다', '요', '습니다', '입니다', '네요', '군요',
+    ]
+
+    if ' ' in name_clean and len(name_clean) >= 4:
+        for ending in sentence_endings:
+            if name_clean.endswith(ending):
+                return False
+
+    # 동사/형용사 패턴 감지 (5글자 이상)
+    if len(name_clean) >= 5:
+        verb_patterns = [
+            r'[가-힣]+(하|되|이|지|시|았|었|겠|는|ㄴ|을|를|한|된|인)$',
+            r'[가-힣]+(해서|해야|하면|하고|하는|했다|했음|하여)$',
+            r'[가-힣]+(으면|면서|니까|지만|어서|아서|라서|려고)$',
+        ]
+        for pattern in verb_patterns:
+            if re.search(pattern, name_clean):
+                return False
+
+    # 조사로 끝나는지 체크
+    particle_endings = ['의', '이', '가', '은', '는', '를', '을', '에', '로', '과', '와', '도']
+    for particle in particle_endings:
+        if name_clean.endswith(particle) and len(name_clean) > 2:
+            if particle == '의' and len(name_clean) == 3 and re.match(r'^[가-힣]{3}$', name_clean):
+                continue
+            return False
+
+    if name_clean.isdigit():
+        return False
+
+    if re.match(r'^[ㄱ-ㅎㅏ-ㅣ]+$', name_clean):
+        return False
+
+    # 유효한 이름 패턴
+    if re.match(r'^[가-힣]{2,4}$', name_clean):
+        return True
+
+    if re.match(r'^[A-Z][a-z]+(\s+[A-Z][a-z]+)+$', name_clean):
+        return True
+
+    if re.match(r'^[가-힣]+(\s+[가-힣]+)+$', name_clean):
+        return True
+
+    if len(name_clean) <= 5 and re.search(r'[가-힣]', name_clean):
+        return True
+
+    return False
 
 
 @dataclass
@@ -125,9 +202,20 @@ class CharacterManager:
         """모든 캐릭터 조회"""
         return self.characters
 
-    def import_from_analysis(self, analysis_characters: List[Dict]) -> int:
-        """씬 분석 결과에서 캐릭터 가져오기"""
+    def import_from_analysis(self, analysis_characters: List[Dict], validate: bool = True) -> int:
+        """
+        씬 분석 결과에서 캐릭터 가져오기
+
+        Args:
+            analysis_characters: 분석된 캐릭터 데이터 리스트
+            validate: True면 유효한 캐릭터 이름만 가져옴 (Problem 49)
+
+        Returns:
+            가져온 캐릭터 수
+        """
         imported = 0
+        filtered = 0
+
         for char_data in analysis_characters:
             # 문자열인 경우 딕셔너리로 변환
             if isinstance(char_data, str):
@@ -136,6 +224,12 @@ class CharacterManager:
             # 이미 존재하는지 확인
             name = char_data.get("name", char_data.get("name_ko", ""))
             if not name:
+                continue
+
+            # 🔴 유효성 검증 (Problem 49)
+            if validate and not is_valid_character_name(name):
+                filtered += 1
+                print(f"[CharacterManager] ❌ 유효하지 않은 캐릭터 이름 필터링: '{name}'")
                 continue
 
             existing = self.get_character_by_name(name)
@@ -174,6 +268,9 @@ class CharacterManager:
             self.add_character(character)
             imported += 1
             print(f"[CharacterManager] 캐릭터 '{name}' 가져옴 (prompt={bool(prompt)}, scenes={appearance_scenes})")
+
+        if filtered > 0:
+            print(f"[CharacterManager] ⚠️ {filtered}개의 유효하지 않은 캐릭터 이름 필터링됨")
 
         return imported
 

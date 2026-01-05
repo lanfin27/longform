@@ -19,6 +19,10 @@ isodate>=0.6.0
 edge-tts>=6.1.0
 pydub>=0.25.0
 
+# Speech Recognition / Timestamps
+openai-whisper>=20250625
+stable-ts>=2.19.0
+
 # Data Processing
 pandas>=2.0.0
 openpyxl>=3.1.0

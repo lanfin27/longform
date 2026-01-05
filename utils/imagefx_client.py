@@ -33,6 +33,13 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
+# 쿠키 상태 관리
+from utils.imagefx_cookie_manager import (
+    is_auth_error,
+    mark_cookie_expired,
+    mark_cookie_valid
+)
+
 
 class ImagenModel(Enum):
     """지원되는 Imagen 모델"""
@@ -79,6 +86,11 @@ class ImageFXAuthError(ImageFXError):
 
 class ImageFXRateLimitError(ImageFXError):
     """Rate limit 관련 오류"""
+    pass
+
+
+class CookieExpiredError(ImageFXAuthError):
+    """쿠키 만료 오류 - UI에서 갱신 팝업 표시용"""
     pass
 
 
@@ -336,19 +348,31 @@ class ImageFXClient:
                                 if output.get("success"):
                                     saved_path = output.get("path", output_path)
                                     if os.path.exists(saved_path):
-                                        print(f"[ImageFX v6.1] ✅ 성공! 이미지 저장됨: {saved_path}")
+                                        print(f"[ImageFX v6.1] Success! Image saved: {saved_path}")
+                                        # 성공 시 쿠키 유효 상태로 표시
+                                        mark_cookie_valid()
                                         return [GeneratedImage(
                                             file_path=saved_path,
                                             prompt=prompt
                                         )]
                                 else:
-                                    last_error = output.get("error", "알 수 없는 오류")
+                                    error_msg = output.get("error", "Unknown error")
+                                    # 인증 에러 감지
+                                    if is_auth_error(error_msg):
+                                        print(f"[ImageFX v6.1] Auth error detected - cookie expired")
+                                        mark_cookie_expired(error_msg)
+                                        raise CookieExpiredError(
+                                            "ImageFX cookie has expired.\n"
+                                            "Please enter a new cookie in the API Management page."
+                                        )
+                                    last_error = error_msg
                             except json.JSONDecodeError as e:
-                                print(f"[ImageFX v6.1] JSON 파싱 오류: {e}")
+                                print(f"[ImageFX v6.1] JSON parse error: {e}")
 
                 # 파일이 생성되었는지 직접 확인
                 if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
-                    print(f"[ImageFX v6.1] ✅ 파일 직접 확인 성공: {output_path}")
+                    print(f"[ImageFX v6.1] File directly verified: {output_path}")
+                    mark_cookie_valid()
                     return [GeneratedImage(
                         file_path=output_path,
                         prompt=prompt
@@ -356,30 +380,52 @@ class ImageFXClient:
 
                 # 실패 원인 분석
                 combined_output = result.stdout + result.stderr
-                if "찾을 수 없습니다" in combined_output or "not found" in combined_output.lower():
-                    last_error = "imagefx-api 패키지를 찾을 수 없습니다. npm install imagefx-api 실행 필요"
-                elif "401" in combined_output or "unauthorized" in combined_output.lower():
-                    last_error = "인증 실패: 쿠키가 만료되었거나 유효하지 않습니다."
+
+                # 인증 에러 감지
+                if is_auth_error(combined_output):
+                    print(f"[ImageFX v6.1] Auth error detected in output - cookie expired")
+                    mark_cookie_expired(combined_output[:500])
+                    raise CookieExpiredError(
+                        "ImageFX cookie has expired.\n"
+                        "Please enter a new cookie in the API Management page."
+                    )
+
+                if "not found" in combined_output.lower():
+                    last_error = "imagefx-api package not found. Run: npm install imagefx-api"
                 elif "429" in combined_output or "rate" in combined_output.lower():
-                    last_error = "요청 제한: 잠시 후 다시 시도하세요."
+                    last_error = "Rate limit exceeded. Please try again later."
                 elif not last_error:
-                    last_error = combined_output[:500] if combined_output else "알 수 없는 오류"
+                    last_error = combined_output[:500] if combined_output else "Unknown error"
+
+            except CookieExpiredError:
+                raise  # 쿠키 만료는 재시도하지 않고 즉시 전파
 
             except subprocess.TimeoutExpired:
-                print(f"[ImageFX v6.1] 타임아웃 ({timeout}초)")
-                last_error = f"타임아웃 ({timeout}초)"
+                print(f"[ImageFX v6.1] Timeout ({timeout}s)")
+                last_error = f"Timeout ({timeout}s)"
 
             except Exception as e:
-                print(f"[ImageFX v6.1] 오류: {e}")
-                last_error = str(e)
+                error_str = str(e)
+                print(f"[ImageFX v6.1] Error: {e}")
+
+                # 예외에서도 인증 에러 감지
+                if is_auth_error(error_str):
+                    print(f"[ImageFX v6.1] Auth error in exception - cookie expired")
+                    mark_cookie_expired(error_str)
+                    raise CookieExpiredError(
+                        "ImageFX cookie has expired.\n"
+                        "Please enter a new cookie in the API Management page."
+                    )
+
+                last_error = error_str
 
             # 재시도 대기
             if attempt < retry_count - 1:
                 wait_time = 3 * (attempt + 1)
-                print(f"[ImageFX v6.1] {wait_time}초 후 재시도...")
+                print(f"[ImageFX v6.1] Retrying in {wait_time}s...")
                 time.sleep(wait_time)
 
-        raise ImageFXError(f"이미지 생성 실패: {last_error}")
+        raise ImageFXError(f"Image generation failed: {last_error}")
 
     def test_connection(self) -> Tuple[bool, str]:
         """연결 테스트"""

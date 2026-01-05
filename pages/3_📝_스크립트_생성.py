@@ -24,6 +24,7 @@ from utils.data_loader import (
     load_script,
     save_script_metadata
 )
+from utils.script_sync_manager import sync_save_script
 from config.settings import ANTHROPIC_API_KEY, SUPPORTED_LANGUAGES
 from config.senior_style_guide import get_style_prompt, get_style_checklist, get_example
 from config.constants import SCRIPT_TONES
@@ -211,8 +212,9 @@ with tab_generate:
 
                 progress.update(3, "저장 중...")
 
-                # 저장
+                # 저장 (기존 + 동기화)
                 save_script(project_path, script, language, "draft")
+                sync_save_script(script, language, "ai", str(project_path))  # 씬 분석과 동기화
                 save_script_metadata(project_path, {
                     "topic": topic,
                     "language": language,
@@ -347,6 +349,7 @@ with tab_manual:
 
         if st.button("💾 스크립트 저장", type="primary", use_container_width=True, key="save_manual_script"):
             save_script(project_path, script_content.strip(), manual_language, save_type)
+            sync_save_script(script_content.strip(), manual_language, "manual", str(project_path))  # 씬 분석과 동기화
             st.session_state["generated_script"] = script_content.strip()
             update_project_step(3)
             st.success(f"✅ {SUPPORTED_LANGUAGES[manual_language]} 스크립트({save_type})가 저장되었습니다!")
@@ -391,6 +394,7 @@ with tab_preview:
         if script_type == "draft":
             if st.button("✅ 최종본으로 저장"):
                 save_script(project_path, script, preview_lang, "final")
+                sync_save_script(script, preview_lang, "manual", str(project_path))  # 씬 분석과 동기화
                 st.success("최종본으로 저장되었습니다!")
     else:
         st.info("저장된 스크립트가 없습니다.")
@@ -423,6 +427,7 @@ with tab_translate:
 
                     ja_script = result["script"]
                     save_script(project_path, ja_script, "ja", "draft")
+                    sync_save_script(ja_script, "ja", "ai", str(project_path))  # 씬 분석과 동기화
 
                     st.session_state["ja_script"] = ja_script
                     st.success("✅ Trans-creation 완료!")

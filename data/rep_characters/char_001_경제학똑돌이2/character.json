@@ -1,0 +1,43 @@
+{
+  "id": "char_001",
+  "name": "경제학똑돌이2",
+  "description": "30대남성 경제전문가 안경착용",
+  "prompt": "A full body illustration of a professional Korean male character in his early 30s,\nintelligent and approachable financial expert persona,\nwearing sleek rectangular black-framed glasses,\ndressed in a modern navy blue blazer over a white crew neck t-shirt,\nslim-fit navy trousers and clean white sneakers,\nclean-cut short black hair with a neat side part,\nwarm confident expression with a slight knowing smile,\nstanding pose with one hand gesturing as if explaining a concept,\nother hand casually in pocket or on hip,\nfull body visible from head to toe,\n\nKorean webtoon manhwa character illustration,\nclean bold black outlines defining all features,\nflat solid color fills with minimal shading,\nsimplified facial features with small defined eyes,\nconsistent 2-3px black lineart throughout,\ncel-shaded coloring with minimal gradients,\nclean vector-like illustration quality,\nwarm ivory Korean skin tone with subtle value shifts,\nclothing folds indicated by lineart not shading,\nsolid white or light gray background",
+  "negative_prompt": "no outlines, missing lineart, gradient only no lines, realistic photograph, 3D render, photorealistic, anime big eyes, chibi, super deformed, western cartoon style, disney style, pixar style, painterly watercolor, sketchy rough lines, soft airbrush shading, complex detailed shading, hyper detailed features, bright saturated colors, blurry lines, thick gradients, cropped, cut off feet",
+  "style_preset": "char_animation",
+  "style_suffix": "",
+  "base_images": [
+    {
+      "type": "image_1",
+      "path": "base_images/image_01.png",
+      "generated_at": "2026-01-01T19:15:50.110470"
+    },
+    {
+      "type": "image_2",
+      "path": "base_images/image_02.png",
+      "generated_at": "2026-01-01T19:15:50.122056"
+    },
+    {
+      "type": "front",
+      "path": "base_images/image_03.png",
+      "generated_at": "2026-01-01T22:51:23.785149"
+    },
+    {
+      "type": "smile",
+      "path": "base_images/image_04.png",
+      "generated_at": "2026-01-01T22:51:30.364891"
+    },
+    {
+      "type": "front",
+      "path": "base_images/image_05.png",
+      "generated_at": "2026-01-04T23:34:09.430352"
+    },
+    {
+      "type": "smile",
+      "path": "base_images/image_06.png",
+      "generated_at": "2026-01-04T23:34:16.262305"
+    }
+  ],
+  "created_at": "2026-01-01T19:15:50.122066",
+  "updated_at": "2026-01-04T23:34:16.262312"
+}

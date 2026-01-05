@@ -432,6 +432,171 @@ def prepare_srt_for_batch_analysis(srt_scenes: List[Dict]) -> Dict:
     }
 
 
+# ============================================================
+# 발화속도 분석기 (SRT 기반 정확 측정)
+# ============================================================
+
+class SpeakingRateAnalyzer:
+    """SRT 기반 정확한 발화속도 분석기"""
+
+    def __init__(self, scenes: List[Dict]):
+        """
+        Args:
+            scenes: SRTParser.parse_content()의 결과
+        """
+        self.scenes = scenes
+
+    def analyze(self) -> Dict:
+        """
+        종합 발화속도 분석
+
+        Returns:
+            분석 결과 딕셔너리
+        """
+        import numpy as np
+
+        if not self.scenes:
+            return self._empty_result()
+
+        # 각 세그먼트의 발화속도 계산
+        rates = []
+        for scene in self.scenes:
+            duration = scene.get('duration', 0)
+            text = scene.get('narration', '')
+            # 공백 제외 글자 수
+            char_count = len(text.replace(" ", "").replace("\n", ""))
+
+            if duration > 0.1 and char_count > 0:
+                rate = char_count / duration
+                rates.append({
+                    'scene_id': scene.get('scene_id'),
+                    'duration': duration,
+                    'char_count': char_count,
+                    'rate': rate,
+                    'text': text[:50] + "..." if len(text) > 50 else text
+                })
+
+        if not rates:
+            return self._empty_result()
+
+        # 통계 계산
+        rate_values = np.array([r['rate'] for r in rates])
+
+        # 이상치 제거 (IQR 방식)
+        q1 = np.percentile(rate_values, 25)
+        q3 = np.percentile(rate_values, 75)
+        iqr = q3 - q1
+        lower_bound = q1 - 1.5 * iqr
+        upper_bound = q3 + 1.5 * iqr
+
+        filtered_rates = rate_values[
+            (rate_values >= lower_bound) & (rate_values <= upper_bound)
+        ]
+
+        if len(filtered_rates) == 0:
+            filtered_rates = rate_values
+
+        # 총 글자수와 총 발화시간
+        total_chars = sum(r['char_count'] for r in rates)
+        total_duration = sum(r['duration'] for r in rates)
+
+        # 가중 평균 (긴 세그먼트에 더 가중치)
+        weighted_average = total_chars / total_duration if total_duration > 0 else 0
+
+        result = {
+            "average_rate": float(np.mean(filtered_rates)),
+            "weighted_average_rate": round(weighted_average, 2),
+            "median_rate": float(np.median(filtered_rates)),
+            "min_rate": float(np.min(filtered_rates)),
+            "max_rate": float(np.max(filtered_rates)),
+            "std_dev": float(np.std(filtered_rates)),
+            "total_duration": round(total_duration, 2),
+            "total_chars": total_chars,
+            "segment_count": len(self.scenes),
+            "valid_segment_count": len(filtered_rates),
+            "outliers_removed": len(rate_values) - len(filtered_rates),
+            "percentiles": {
+                "p10": float(np.percentile(filtered_rates, 10)),
+                "p25": float(np.percentile(filtered_rates, 25)),
+                "p50": float(np.percentile(filtered_rates, 50)),
+                "p75": float(np.percentile(filtered_rates, 75)),
+                "p90": float(np.percentile(filtered_rates, 90)),
+            },
+            "segments": rates
+        }
+
+        print(f"[SpeakingRateAnalyzer] ⭐ 분석 완료:")
+        print(f"  평균: {result['average_rate']:.2f} 글자/초")
+        print(f"  가중 평균: {result['weighted_average_rate']:.2f} 글자/초")
+        print(f"  중앙값: {result['median_rate']:.2f} 글자/초")
+        print(f"  범위: {result['min_rate']:.2f} ~ {result['max_rate']:.2f}")
+        print(f"  총 {result['segment_count']}개 세그먼트, {result['total_chars']}자")
+
+        return result
+
+    def _empty_result(self) -> Dict:
+        return {
+            "average_rate": 0.0,
+            "weighted_average_rate": 0.0,
+            "median_rate": 0.0,
+            "min_rate": 0.0,
+            "max_rate": 0.0,
+            "std_dev": 0.0,
+            "total_duration": 0.0,
+            "total_chars": 0,
+            "segment_count": 0,
+            "valid_segment_count": 0,
+            "outliers_removed": 0,
+            "percentiles": {},
+            "segments": []
+        }
+
+    def get_speed_recommendation(self, base_tts_rate: float = 8.5) -> float:
+        """
+        TTS speed 파라미터 추천값 계산
+
+        Args:
+            base_tts_rate: 기본 TTS 발화속도 (글자/초)
+
+        Returns:
+            추천 speed 값 (0.5 ~ 1.5)
+        """
+        analysis = self.analyze()
+
+        # 가중 평균 사용 (더 정확함)
+        measured_rate = analysis.get("weighted_average_rate", 6.0)
+
+        # speed = 목표속도 / 기본속도
+        speed = measured_rate / base_tts_rate
+
+        # 범위 제한
+        speed = max(0.5, min(1.5, speed))
+
+        print(f"[SpeakingRateAnalyzer] Speed 추천: {speed:.2f}")
+        print(f"  측정된 발화속도: {measured_rate:.2f} 글자/초")
+        print(f"  기본 TTS 속도: {base_tts_rate:.2f} 글자/초")
+
+        return round(speed, 2)
+
+
+def analyze_speaking_rate_from_srt(srt_content: str) -> Dict:
+    """
+    SRT 내용에서 발화속도 분석 (헬퍼 함수)
+
+    Args:
+        srt_content: SRT 파일 내용
+
+    Returns:
+        분석 결과 딕셔너리
+    """
+    scenes = SRTParser.parse_content(srt_content)
+    if not scenes:
+        return {"error": "SRT 파싱 실패"}
+
+    analyzer = SpeakingRateAnalyzer(scenes)
+    return analyzer.analyze()
+
+
 # 헬퍼 함수들
 def parse_srt_file(file_path: str, merge_short: bool = False, min_duration: float = 3.0) -> List[Dict]:
     """

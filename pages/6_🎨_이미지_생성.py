@@ -42,6 +42,81 @@ from utils.progress_ui import render_api_selector, StreamlitProgressUI
 from core.api.api_manager import get_api_manager
 from utils.style_manager import get_style_manager
 from components.style_selector import style_radio_selector, get_selected_style
+from utils.prominent_people_sanitizer import (
+    ProminentPeopleSanitizer,
+    sanitize_prompt_for_imagefx,
+    get_available_sanitizer_models,
+    get_recommended_model,
+    check_prominent_people_error
+)
+from utils.imagefx_ui_components import (
+    show_cookie_status_banner,
+    show_cookie_renewal_modal,
+    show_cookie_expired_error_in_result
+)
+from utils.imagefx_client import CookieExpiredError
+from utils.character_image_selector import (
+    get_character_image_for_scene_from_session,
+    check_characters_have_scene_poses
+)
+from components.image_viewer import (
+    render_lightbox_container,
+    render_lightbox_image,
+    clickable_image,
+    render_image_card_with_prompt
+)
+# 확대 + 프롬프트 뷰어 (st.dialog 기반)
+from utils.image_viewer import (
+    render_clickable_image,
+    render_image_card_with_zoom,
+    ImagePromptManager
+)
+from utils.scene_image_manager import (
+    get_scene_image_manager,
+    update_scene_background,
+    update_scene_composite,
+    sync_scene_images
+)
+from utils.settings_manager import (
+    get_setting,
+    set_setting,
+    persistent_selectbox,
+    persistent_checkbox,
+    persistent_number_input,
+    render_settings_management_ui
+)
+from utils.scene_selector import (
+    parse_scene_range_input,
+    format_selected_scenes,
+    generate_preset_ranges,
+    apply_range_to_selection,
+    get_selection_stats
+)
+
+# 이미지 프롬프트 메타데이터 관리
+from utils.image_prompt_metadata import (
+    save_image_with_prompt,
+    get_image_prompt_info,
+    render_prompt_info_expander
+)
+
+# 씬-캐릭터 통합 로더 (Problem 56 수정)
+from utils.scene_character_loader import load_scenes_data, clear_scene_cache
+
+# ✅ 이미지 API 선택기 (탭별 모델 선택 + 설정 버그 수정)
+from utils.image_api_selector import (
+    render_api_selector,
+    get_current_api_settings,
+    render_api_info_banner,
+    get_model_display_name,
+    IMAGE_API_OPTIONS
+)
+
+# ✅ 대표 캐릭터 시스템 import (캐릭터 합성 옵션 분리용)
+from utils.representative_character import (
+    RepresentativeCharacterManager,
+    get_rep_char_manager
+)
 
 # 페이지 설정
 st.set_page_config(
@@ -124,6 +199,9 @@ show_api_status_sidebar()
 if not ensure_project_selected():
     st.stop()
 
+# Lightbox 컨테이너 초기화 (페이지당 한 번)
+render_lightbox_container()
+
 project_path = get_current_project()
 
 # ===================================================================
@@ -132,8 +210,8 @@ project_path = get_current_project()
 
 def sync_all_data():
     """페이지 로드 시 모든 데이터 동기화"""
-    # 씬 데이터 로드
-    scenes = load_scenes(project_path)
+    # 씬 데이터 로드 (통합 로더 사용 - Problem 56 수정)
+    scenes = load_scenes_data(str(project_path))
     if scenes:
         st.session_state["scenes"] = scenes
 
@@ -182,10 +260,27 @@ def sync_all_data():
         except:
             pass
 
+    # ✅ SceneImageManager 초기화 및 자동 동기화 (캐싱 최적화)
+    # 캐시가 유효하면 파일 시스템 조회 없이 즉시 반환
+    if "scene_images_synced" not in st.session_state:
+        try:
+            manager = get_scene_image_manager(str(project_path))
+            if manager:
+                # ✅ 캐싱된 동기화 사용 (60초간 유효)
+                manager.sync_all_scenes_cached(force=False)
+                st.session_state["scene_images_synced"] = True
+        except Exception as e:
+            print(f"[SceneImageManager] 초기화 중 오류: {e}")
+
 
 def get_scenes() -> List[Dict]:
-    """씬 목록 가져오기"""
-    return st.session_state.get("scenes", [])
+    """
+    씬 목록 가져오기
+
+    통합 로더를 사용하여 프로젝트 파일에서 로드
+    (Problem 56 수정: 프로젝트 간 데이터 혼동 방지)
+    """
+    return load_scenes_data(str(project_path))
 
 
 def get_scene_by_id(scene_id: int) -> Optional[Dict]:
@@ -326,6 +421,185 @@ def get_composited_for_scene(scene_id: int) -> Optional[str]:
 
 
 # ===================================================================
+# 캐릭터 합성 옵션 헬퍼 함수 (씬별 캐릭터 vs 대표 캐릭터)
+# ===================================================================
+
+def get_scene_characters_status() -> Dict:
+    """
+    씬별 캐릭터 상태 확인
+
+    Returns:
+        {"total": 씬 수, "available": 이미지 있는 씬 수}
+    """
+    scenes = get_scenes()
+    if not scenes:
+        return {"total": 0, "available": 0}
+
+    total_with_characters = 0
+    available_images = 0
+    all_characters = st.session_state.get("characters", [])
+
+    for scene in scenes:
+        scene_characters = scene.get("characters", [])
+        if scene_characters:
+            total_with_characters += 1
+
+            # 캐릭터 이미지 존재 확인
+            has_image = False
+            for char_name in scene_characters:
+                char_info = next((c for c in all_characters if c.get("name") == char_name), None)
+                if char_info:
+                    char_image = char_info.get("image_path") or char_info.get("image_url")
+                    if char_image and os.path.exists(char_image):
+                        has_image = True
+                        break
+            if has_image:
+                available_images += 1
+
+    return {
+        "total": total_with_characters,
+        "available": available_images
+    }
+
+
+def get_representative_character_status() -> Dict:
+    """
+    대표 캐릭터 상태 확인
+
+    Returns:
+        {"defined": 정의 여부, "name": 이름, "action_images": 액션 이미지 수}
+    """
+    try:
+        manager = get_rep_char_manager(str(project_path))
+        character = manager.get_character()
+
+        if not character:
+            return {"defined": False, "name": "", "action_images": 0}
+
+        # 액션 이미지 수 확인
+        action_images_dir = project_path / "images" / "character_scenes"
+        if not action_images_dir.exists():
+            action_images_dir = project_path / "images" / "representative_character"
+
+        action_count = 0
+        if action_images_dir.exists():
+            action_count = len(list(action_images_dir.glob("scene_*.png")))
+
+        return {
+            "defined": True,
+            "name": character.name,
+            "action_images": action_count
+        }
+    except Exception as e:
+        print(f"[RepChar Status] 오류: {e}")
+        return {"defined": False, "name": "", "action_images": 0}
+
+
+def get_representative_character_image_for_scene(scene_id: int) -> Optional[str]:
+    """
+    특정 씬의 대표 캐릭터 액션 이미지 경로 가져오기
+
+    Args:
+        scene_id: 씬 ID
+
+    Returns:
+        이미지 경로 또는 None
+    """
+    # 1. RepresentativeCharacterManager에서 먼저 조회 (캐릭터 관리에서 생성한 이미지)
+    try:
+        from utils.representative_character import get_rep_char_manager
+        rep_manager = get_rep_char_manager(str(project_path))
+
+        # scene_actions에서 해당 씬 찾기
+        action = rep_manager.get_scene_action(scene_id)
+        if action and action.generated_image_path:
+            if os.path.exists(action.generated_image_path):
+                print(f"[RepCharImage] ✅ 씬 {scene_id} 이미지 발견 (Manager): {action.generated_image_path}")
+                return action.generated_image_path
+            else:
+                print(f"[RepCharImage] ⚠️ 씬 {scene_id} 이미지 경로 있으나 파일 없음: {action.generated_image_path}")
+        else:
+            print(f"[RepCharImage] ℹ️ 씬 {scene_id} Manager에 액션 이미지 없음")
+
+    except Exception as e:
+        print(f"[RepCharImage] Manager 조회 실패: {e}")
+
+    # 2. 폴백: 하드코딩된 경로 패턴으로 검색
+    possible_paths = [
+        # 캐릭터 관리에서 생성하는 패턴
+        project_path / "images" / "character_scenes" / f"scene_{scene_id:03d}_character.png",
+        project_path / "images" / "character_scenes" / f"scene_{scene_id:03d}.png",
+        project_path / "images" / "character_scenes" / f"scene_{scene_id}.png",
+        # 기존 패턴
+        project_path / "images" / "representative_character" / f"scene_{scene_id:03d}_action.png",
+        project_path / "images" / "representative_character" / f"scene_{scene_id:03d}.png",
+    ]
+
+    for path in possible_paths:
+        if path.exists():
+            print(f"[RepCharImage] ✅ 씬 {scene_id} 이미지 발견 (경로 패턴): {path}")
+            return str(path)
+
+    print(f"[RepCharImage] ❌ 씬 {scene_id} 이미지 없음")
+    return None
+
+
+def render_character_composite_options() -> str:
+    """
+    캐릭터 합성 옵션 UI 렌더링
+
+    Returns:
+        선택된 모드 ("none", "scene_character", "representative_character")
+    """
+    st.markdown("##### 🎭 캐릭터 합성 옵션")
+
+    with st.container(border=True):
+        composite_mode = st.radio(
+            "캐릭터 합성 모드",
+            options=["none", "scene_character", "representative_character"],
+            format_func=lambda x: {
+                "none": "❌ 합성 안 함 (배경만)",
+                "scene_character": "👥 씬별 캐릭터 합성",
+                "representative_character": "⭐ 대표 캐릭터 합성"
+            }[x],
+            key="character_composite_mode",
+            horizontal=False,
+            label_visibility="collapsed"
+        )
+
+        # 모드별 상태 표시
+        if composite_mode == "none":
+            st.caption("배경 이미지만 생성합니다. 캐릭터 합성 없음.")
+
+        elif composite_mode == "scene_character":
+            st.caption("📍 **씬 분석에서 식별된 캐릭터** 이미지를 사용합니다.")
+
+            scene_chars = get_scene_characters_status()
+            if scene_chars["available"] > 0:
+                st.success(f"✅ {scene_chars['available']}/{scene_chars['total']} 씬에 캐릭터 이미지 있음")
+            elif scene_chars["total"] > 0:
+                st.warning(f"⚠️ 캐릭터 있는 씬 {scene_chars['total']}개, 이미지 생성 필요")
+            else:
+                st.warning("⚠️ 씬별 캐릭터가 없습니다.")
+
+        elif composite_mode == "representative_character":
+            st.caption("📍 **대표 캐릭터**의 씬별 포즈/표정 이미지를 사용합니다.")
+
+            rep_status = get_representative_character_status()
+            if rep_status["defined"]:
+                st.success(f"✅ 대표 캐릭터: {rep_status['name']}")
+                if rep_status["action_images"] > 0:
+                    st.success(f"✅ {rep_status['action_images']}개 씬 액션 이미지 있음")
+                else:
+                    st.warning("⚠️ 씬별 액션 이미지가 없습니다. 캐릭터 관리에서 생성하세요.")
+            else:
+                st.error("❌ 대표 캐릭터가 정의되지 않았습니다.")
+                st.caption("캐릭터 관리 → 대표 캐릭터 탭에서 먼저 정의해주세요.")
+
+    return composite_mode
+
+
+# ===================================================================
 # 탭 1: 씬별 생성
 # ===================================================================
 
@@ -341,6 +615,29 @@ def render_scene_editor_tab():
         return
 
     st.success(f"✅ {len(scenes)}개의 씬이 로드되었습니다.")
+
+    # ✅ v2.0: API/모델 선택 UI (탭 상단에 배치)
+    scene_api_provider, scene_model = render_api_selector(
+        key_prefix="scene_gen",
+        show_in_expander=True,
+        expander_default_open=False,
+        show_save_button=True
+    )
+
+    # === 이미지 동기화 버튼 ===
+    col_sync, col_space = st.columns([1, 4])
+    with col_sync:
+        if st.button("🔄 이미지 새로고침", key="sync_scene_images", help="파일 시스템의 최신 이미지를 씬 데이터에 반영합니다"):
+            # ✅ 캐시 무효화 후 강제 동기화
+            from utils.scene_image_manager import invalidate_scene_image_cache, clear_image_path_cache
+            invalidate_scene_image_cache(str(project_path))
+            clear_image_path_cache()
+            updated = sync_scene_images(str(project_path))
+            if updated > 0:
+                st.success(f"✅ {updated}개 이미지 경로 동기화됨")
+                st.rerun()
+            else:
+                st.info("모든 이미지가 최신 상태입니다")
 
     # === 씬 선택 그리드 ===
     st.markdown("### 1️⃣ 씬 선택")
@@ -359,12 +656,12 @@ def render_scene_editor_tab():
             bg_data = get_background_for_scene(scene_id)
 
             if comp_img and os.path.exists(comp_img):
-                st.image(comp_img, use_container_width=True)
+                render_lightbox_image(comp_img, key=f"scene_sel_comp_{scene_id}")
                 st.caption("✅ 합성완료")
             elif bg_data:
                 bg_path = bg_data.get("path") or bg_data.get("url")
                 if bg_path and os.path.exists(bg_path):
-                    st.image(bg_path, use_container_width=True)
+                    render_lightbox_image(bg_path, key=f"scene_sel_bg_{scene_id}")
                     st.caption("🏞️ 배경만")
                 else:
                     st.markdown("""
@@ -603,10 +900,10 @@ def render_prompts_tab(scene_id: int, scene: Dict):
                         else:
                             st.warning("visual_prompt가 없습니다. 캐릭터 관리 페이지에서 설정하세요.")
 
-                        # 캐릭터 이미지 미리보기
+                        # 캐릭터 이미지 미리보기 (클릭 시 확대)
                         char_img = char_info.get("image_path") or char_info.get("image_url")
                         if char_img and os.path.exists(char_img):
-                            st.image(char_img, width=150)
+                            clickable_image(char_img, width=150, key=f"char_preview_{scene_id}_{char_name}")
                 else:
                     st.info(f"'{char_name}' 캐릭터 정보를 찾을 수 없습니다.")
         else:
@@ -680,7 +977,14 @@ def render_background_step(scene_id: int, scene: Dict):
             height = st.selectbox("높이", [720, 576], key=f"bg_height_{scene_id}")
 
         if st.button("🎨 배경 생성", type="primary", key=f"gen_bg_{scene_id}"):
-            generate_background_image(scene_id, prompt, style, width, height)
+            # v2.0: 세션에서 선택된 API/모델 가져오기
+            selected_api = st.session_state.get("_scene_gen_api")
+            selected_model = st.session_state.get("_scene_gen_model")
+            generate_background_image(
+                scene_id, prompt, style, width, height,
+                api_provider=selected_api,
+                model=selected_model
+            )
 
     elif bg_source == "📤 업로드":
         uploaded = st.file_uploader(
@@ -826,10 +1130,10 @@ def render_character_placement_step(scene_id: int, scene: Dict):
                     col1, col2 = st.columns([1, 3])
 
                     with col1:
-                        # 캐릭터 이미지
+                        # 캐릭터 이미지 (클릭 시 확대)
                         char_image = char_info.get("image_url") or char_info.get("image_path")
                         if char_image and os.path.exists(char_image):
-                            st.image(char_image, width=120)
+                            clickable_image(char_image, width=120, key=f"slider_char_{scene_id}_{char_name}")
                         else:
                             st.markdown("👤 이미지 없음")
 
@@ -1010,8 +1314,8 @@ def render_composite_step(scene_id: int, scene: Dict):
         st.error("배경 이미지 파일을 찾을 수 없습니다.")
         return
 
-    st.markdown("**배경 이미지:**")
-    st.image(bg_path, use_container_width=True)
+    st.markdown("**배경 이미지:** (클릭하여 확대)")
+    render_lightbox_image(bg_path, key=f"composite_bg_{scene_id}")
 
     # 현재 캐릭터 위치 정보 표시 (동기화된 데이터 사용)
     char_positions = st.session_state.get(f"char_positions_{scene_id}", {})
@@ -1046,10 +1350,44 @@ def render_composite_step(scene_id: int, scene: Dict):
             key=f"output_format_{scene_id}"
         )
 
+    # 캐릭터 포즈 설정 (씬별 포즈 지원)
+    all_characters = st.session_state.get("characters", [])
+    any_has_scene_poses, _ = check_characters_have_scene_poses(all_characters)
+
+    if any_has_scene_poses:
+        st.markdown("##### 🎭 캐릭터 포즈 설정")
+        pose_mode = st.radio(
+            "포즈 적용 방식",
+            options=[
+                "🎭 씬별 다른 포즈 (AI 분석 결과 적용)",
+                "🎯 단일 포즈 (모든 씬에 동일)"
+            ],
+            key=f"pose_mode_{scene_id}",
+            help="캐릭터 관리에서 씬별 포즈를 설정한 경우 '씬별 다른 포즈'를 선택하세요.",
+            horizontal=True
+        )
+        use_scene_pose = "씬별" in pose_mode
+
+        # 씬별 포즈 미리보기
+        if use_scene_pose:
+            scene_chars = scene.get("characters", [])
+            for char_name in scene_chars:
+                char_info = next((c for c in all_characters if c.get("name") == char_name), None)
+                if char_info:
+                    scene_poses = char_info.get("scene_poses", {})
+                    pose_info = scene_poses.get(str(scene_id), {})
+                    pose_name = pose_info.get("pose")
+                    if pose_name:
+                        st.caption(f"• **{char_name}**: {pose_name} 포즈")
+    else:
+        use_scene_pose = False
+
+    st.session_state[f"use_scene_pose_{scene_id}"] = use_scene_pose
+
     # 합성 실행
     if st.button("🎨 합성 실행", type="primary", use_container_width=True, key=f"composite_{scene_id}"):
         with st.spinner("합성 중..."):
-            result = execute_composite(scene_id, scene, remove_bg)
+            result = execute_composite(scene_id, scene, remove_bg, use_scene_pose)
 
             if result:
                 st.session_state[f"composite_result_{scene_id}"] = result
@@ -1061,7 +1399,13 @@ def render_composite_step(scene_id: int, scene: Dict):
     if result and os.path.exists(result):
         st.markdown("---")
         st.markdown("**합성 결과:**")
-        st.image(result, use_container_width=True)
+        # 확대 + 프롬프트 기능 포함
+        render_clickable_image(
+            image_path=result,
+            scene_id=scene_id,
+            scene=scene,
+            key_prefix=f"composite_result_{scene_id}"
+        )
 
 
 def render_edit_step(scene_id: int, scene: Dict):
@@ -1084,7 +1428,13 @@ def render_edit_step(scene_id: int, scene: Dict):
 
     if edit_view == "📸 합성 결과":
         st.markdown("**현재 합성 결과:**")
-        st.image(result, use_container_width=True)
+        # 확대 + 프롬프트 기능 포함
+        render_clickable_image(
+            image_path=result,
+            scene_id=scene_id,
+            scene=scene,
+            key_prefix=f"edit_result_{scene_id}"
+        )
 
         st.info("💡 캐릭터 위치를 수정하려면 '드래그 편집기' 모드로 전환하세요.")
 
@@ -1133,7 +1483,8 @@ def render_edit_step(scene_id: int, scene: Dict):
                 with col1:
                     if st.button("🔄 재합성 실행", type="primary", use_container_width=True, key=f"recomposite_{scene_id}"):
                         with st.spinner("재합성 중..."):
-                            new_result = execute_composite(scene_id, scene, remove_bg=True)
+                            use_scene_pose = st.session_state.get(f"use_scene_pose_{scene_id}", False)
+                            new_result = execute_composite(scene_id, scene, remove_bg=True, use_scene_pose=use_scene_pose)
                             if new_result:
                                 st.session_state[f"composite_result_{scene_id}"] = new_result
                                 st.success("재합성 완료!")
@@ -1150,7 +1501,12 @@ def render_edit_step(scene_id: int, scene: Dict):
 
         except ImportError:
             st.warning("드래그 편집기 컴포넌트를 사용할 수 없습니다.")
-            st.image(result, use_container_width=True)
+            render_clickable_image(
+                image_path=result,
+                scene_id=scene_id,
+                scene=scene,
+                key_prefix=f"edit_fallback_{scene_id}"
+            )
 
 
 def render_save_step(scene_id: int, scene: Dict):
@@ -1163,7 +1519,13 @@ def render_save_step(scene_id: int, scene: Dict):
         st.info("먼저 이미지를 합성하세요.")
         return
 
-    st.image(result, use_container_width=True)
+    # 확대 + 프롬프트 기능 포함
+    render_clickable_image(
+        image_path=result,
+        scene_id=scene_id,
+        scene=scene,
+        key_prefix=f"save_result_{scene_id}"
+    )
 
     col1, col2, col3 = st.columns(3)
 
@@ -1217,6 +1579,17 @@ def render_batch_generation_tab():
         st.warning("씬이 없습니다. 먼저 씬 분석을 실행하세요.")
         return
 
+    # ✅ v2.0: API/모델 선택 UI (탭 상단에 배치)
+    batch_api_provider, batch_model = render_api_selector(
+        key_prefix="batch_gen",
+        show_in_expander=True,
+        expander_default_open=False,
+        show_save_button=True
+    )
+
+    # 현재 선택된 API 정보 배너 표시
+    render_api_info_banner(batch_api_provider, batch_model)
+
     # 서브탭 구성
     batch_tabs = st.tabs(["🎨 배경+합성 일괄 생성", "🔄 합성만 일괄 실행"])
 
@@ -1229,11 +1602,11 @@ def render_batch_generation_tab():
 
 def _render_imagefx_cookie_settings():
     """Google ImageFX 인증 설정 UI (Authorization 토큰 권장)"""
-    from config.settings import IMAGEFX_COOKIE, SECRETS_DIR, save_imagefx_auth_token, load_imagefx_auth_token
+    from config.settings import load_imagefx_cookie, SECRETS_DIR, save_imagefx_auth_token, load_imagefx_auth_token
 
-    # 현재 인증 상태 확인
+    # 현재 인증 상태 확인 (동적 로드)
     current_token = st.session_state.get("imagefx_auth_token", "") or load_imagefx_auth_token()
-    current_cookie = st.session_state.get("imagefx_cookie") or IMAGEFX_COOKIE
+    current_cookie = st.session_state.get("imagefx_cookie") or load_imagefx_cookie()
     has_auth = bool(current_token) or bool(current_cookie)
 
     with st.expander("🔑 Google ImageFX 인증 설정", expanded=not has_auth):
@@ -1318,146 +1691,682 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
     """배경 생성 + 합성 일괄 실행"""
     st.info("💡 여러 씬의 배경과 합성 이미지를 한 번에 생성합니다.")
 
-    # 씬 선택
-    st.markdown("### 생성할 씬 선택")
+    # ============================================================
+    # 씬 선택 (범위 선택 기능 추가)
+    # ============================================================
+    total_scenes = len(scenes)
+    st.markdown(f"### 🎬 생성할 씬 선택 ({total_scenes}개)")
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if st.button("✅ 전체 선택", key="batch_select_all"):
-            for scene in scenes:
-                st.session_state[f"batch_select_{scene.get('scene_id')}"] = True
-            st.rerun()
-    with col2:
-        if st.button("❌ 전체 해제", key="batch_deselect_all"):
-            for scene in scenes:
-                st.session_state[f"batch_select_{scene.get('scene_id')}"] = False
-            st.rerun()
-    with col3:
-        if st.button("🔄 미완료만 선택", key="batch_select_incomplete"):
-            for scene in scenes:
-                scene_id = scene.get("scene_id")
-                has_image = get_composited_for_scene(scene_id) is not None
-                st.session_state[f"batch_select_{scene_id}"] = not has_image
-            st.rerun()
+    # 완료된 씬 목록 생성
+    completed_scene_ids = set()
+    scene_id_list = []
+    for scene in scenes:
+        scene_id = scene.get("scene_id")
+        scene_id_list.append(scene_id)
+        if get_composited_for_scene(scene_id) is not None:
+            completed_scene_ids.add(scene_id)
 
-    # 씬 체크박스 (텍스트 미리보기 포함)
+    # ============================================================
+    # 빠른 선택 섹션
+    # ============================================================
+    with st.container(border=True):
+        st.markdown("#### ⚡ 빠른 선택")
+
+        # 1행: 기본 버튼들
+        btn_col1, btn_col2, btn_col3, btn_col4 = st.columns(4)
+
+        with btn_col1:
+            if st.button("✅ 전체 선택", key="batch_select_all", use_container_width=True):
+                for scene in scenes:
+                    st.session_state[f"batch_select_{scene.get('scene_id')}"] = True
+                st.rerun()
+
+        with btn_col2:
+            if st.button("❌ 전체 해제", key="batch_deselect_all", use_container_width=True):
+                for scene in scenes:
+                    st.session_state[f"batch_select_{scene.get('scene_id')}"] = False
+                st.rerun()
+
+        with btn_col3:
+            if st.button("⬜ 미완료만", key="batch_select_incomplete", use_container_width=True):
+                for scene in scenes:
+                    scene_id = scene.get("scene_id")
+                    has_image = get_composited_for_scene(scene_id) is not None
+                    st.session_state[f"batch_select_{scene_id}"] = not has_image
+                st.rerun()
+
+        with btn_col4:
+            if st.button("🔄 선택 반전", key="batch_invert_selection", use_container_width=True):
+                for scene in scenes:
+                    scene_id = scene.get("scene_id")
+                    current = st.session_state.get(f"batch_select_{scene_id}", False)
+                    st.session_state[f"batch_select_{scene_id}"] = not current
+                st.rerun()
+
+        st.markdown("---")
+
+        # 2행: 범위 선택
+        st.markdown("**📍 범위 선택**")
+
+        range_col1, range_col2, range_col3, range_col4, range_col5 = st.columns([1.5, 0.5, 1.5, 1.5, 1.5])
+
+        with range_col1:
+            range_start = st.number_input(
+                "시작",
+                min_value=1,
+                max_value=total_scenes,
+                value=1,
+                key="batch_range_start",
+                label_visibility="collapsed"
+            )
+
+        with range_col2:
+            st.markdown("<div style='text-align: center; padding-top: 8px; font-weight: bold;'>~</div>", unsafe_allow_html=True)
+
+        with range_col3:
+            range_end = st.number_input(
+                "끝",
+                min_value=1,
+                max_value=total_scenes,
+                value=min(10, total_scenes),
+                key="batch_range_end",
+                label_visibility="collapsed"
+            )
+
+        with range_col4:
+            range_mode = st.selectbox(
+                "모드",
+                options=["새로 선택", "추가", "제외"],
+                key="batch_range_mode",
+                label_visibility="collapsed"
+            )
+
+        with range_col5:
+            if st.button(
+                f"✅ 범위 적용",
+                key="batch_apply_range",
+                use_container_width=True
+            ):
+                # 범위 유효성 검사
+                if range_start <= range_end:
+                    for scene in scenes:
+                        scene_id = scene.get("scene_id")
+                        in_range = range_start <= scene_id <= range_end
+
+                        if range_mode == "새로 선택":
+                            st.session_state[f"batch_select_{scene_id}"] = in_range
+                        elif range_mode == "추가":
+                            if in_range:
+                                st.session_state[f"batch_select_{scene_id}"] = True
+                        elif range_mode == "제외":
+                            if in_range:
+                                st.session_state[f"batch_select_{scene_id}"] = False
+
+                    st.toast(f"씬 {range_start}~{range_end} {range_mode} 완료!")
+                    st.rerun()
+                else:
+                    st.error("시작 번호가 끝 번호보다 작아야 합니다.")
+
+        st.caption(f"({range_end - range_start + 1}개 씬)")
+
+        st.markdown("---")
+
+        # 3행: 직접 입력
+        st.markdown("**🔢 직접 입력** (예: `1-10, 15, 20-30`)")
+
+        input_col1, input_col2 = st.columns([4, 1])
+
+        with input_col1:
+            custom_input = st.text_input(
+                "씬 번호 입력",
+                placeholder="1-10, 15, 20-30, 50 또는 1~10, 15, 20~30",
+                key="batch_custom_scene_input",
+                label_visibility="collapsed"
+            )
+
+        with input_col2:
+            if st.button("✅ 적용", key="batch_apply_custom", use_container_width=True):
+                if custom_input:
+                    parsed_scenes = parse_scene_range_input(custom_input, total_scenes)
+
+                    if parsed_scenes:
+                        # 모두 해제 후 파싱된 씬만 선택
+                        for scene in scenes:
+                            scene_id = scene.get("scene_id")
+                            st.session_state[f"batch_select_{scene_id}"] = scene_id in parsed_scenes
+                        st.toast(f"{len(parsed_scenes)}개 씬 선택됨!")
+                        st.rerun()
+                    else:
+                        st.error("올바른 형식으로 입력해주세요. 예: 1-10, 15, 20-30")
+
+        st.markdown("---")
+
+        # 4행: 프리셋 버튼
+        st.markdown("**📊 프리셋**")
+
+        presets = generate_preset_ranges(total_scenes, chunk_size=10)
+
+        # 프리셋 버튼 그리드 (한 줄에 6개)
+        cols_per_row = 6
+
+        for row_start in range(0, len(presets), cols_per_row):
+            row_presets = presets[row_start:row_start + cols_per_row]
+            preset_cols = st.columns(cols_per_row)
+
+            for idx, (p_start, p_end) in enumerate(row_presets):
+                with preset_cols[idx]:
+                    label = f"{p_start}~{p_end}"
+
+                    if st.button(label, key=f"batch_preset_{p_start}_{p_end}", use_container_width=True):
+                        for scene in scenes:
+                            scene_id = scene.get("scene_id")
+                            st.session_state[f"batch_select_{scene_id}"] = p_start <= scene_id <= p_end
+                        st.rerun()
+
+        # 특수 프리셋 (전반부/후반부)
+        mid_point = total_scenes // 2
+
+        st.markdown("")
+        half_col1, half_col2, half_col3 = st.columns(3)
+
+        with half_col1:
+            if st.button(f"📍 전반부 (1~{mid_point})", key="batch_preset_first_half", use_container_width=True):
+                for scene in scenes:
+                    scene_id = scene.get("scene_id")
+                    st.session_state[f"batch_select_{scene_id}"] = scene_id <= mid_point
+                st.rerun()
+
+        with half_col2:
+            if st.button(f"📍 후반부 ({mid_point+1}~{total_scenes})", key="batch_preset_second_half", use_container_width=True):
+                for scene in scenes:
+                    scene_id = scene.get("scene_id")
+                    st.session_state[f"batch_select_{scene_id}"] = scene_id > mid_point
+                st.rerun()
+
+        with half_col3:
+            odd_even_col1, odd_even_col2 = st.columns([2, 1])
+
+            with odd_even_col1:
+                odd_even = st.selectbox(
+                    "홀수/짝수",
+                    options=["홀수 씬만", "짝수 씬만"],
+                    key="batch_odd_even_select",
+                    label_visibility="collapsed"
+                )
+
+            with odd_even_col2:
+                if st.button("적용", key="batch_apply_odd_even"):
+                    for scene in scenes:
+                        scene_id = scene.get("scene_id")
+                        if odd_even == "홀수 씬만":
+                            st.session_state[f"batch_select_{scene_id}"] = scene_id % 2 == 1
+                        else:
+                            st.session_state[f"batch_select_{scene_id}"] = scene_id % 2 == 0
+                    st.rerun()
+
+    # ============================================================
+    # 선택 현황 표시
+    # ============================================================
     selected_scenes = []
+    for scene in scenes:
+        scene_id = scene.get("scene_id")
+        if st.session_state.get(f"batch_select_{scene_id}", False):
+            selected_scenes.append(scene_id)
 
-    # 선택 UI 모드
-    view_mode = st.radio(
-        "표시 모드",
-        options=["컴팩트", "텍스트 포함"],
-        horizontal=True,
-        key="batch_view_mode"
-    )
+    selected_count = len(selected_scenes)
+    selected_summary = format_selected_scenes(selected_scenes) if selected_scenes else "없음"
 
-    if view_mode == "컴팩트":
-        # 기존 컴팩트 모드
-        cols = st.columns(min(6, len(scenes)))
-        for i, scene in enumerate(scenes):
-            scene_id = scene.get("scene_id")
-            with cols[i % 6]:
-                # 완료 상태 표시
+    # 완료/미완료 통계
+    selected_completed = len([s for s in selected_scenes if s in completed_scene_ids])
+    selected_incomplete = selected_count - selected_completed
+
+    if selected_count > 0:
+        st.success(f"✅ **{selected_count}개** 씬 선택됨: {selected_summary}")
+        if selected_completed > 0 or selected_incomplete > 0:
+            st.caption(f"(완료: {selected_completed}개, 미완료: {selected_incomplete}개)")
+    else:
+        st.warning("⚠️ 선택된 씬이 없습니다.")
+
+    # ============================================================
+    # 개별 체크박스 (기존 UI - Expander로 축소)
+    # ============================================================
+    with st.expander("📋 개별 씬 선택 (체크박스)", expanded=False):
+        # 선택 UI 모드
+        view_mode = st.radio(
+            "표시 모드",
+            options=["컴팩트", "텍스트 포함"],
+            horizontal=True,
+            key="batch_view_mode"
+        )
+
+        if view_mode == "컴팩트":
+            # 컴팩트 모드
+            cols_count = 6
+            for row_start in range(0, len(scenes), cols_count):
+                row_scenes = scenes[row_start:row_start + cols_count]
+                cols = st.columns(cols_count)
+
+                for col_idx, scene in enumerate(row_scenes):
+                    scene_id = scene.get("scene_id")
+                    with cols[col_idx]:
+                        has_image = get_composited_for_scene(scene_id) is not None
+                        status_icon = "✅" if has_image else "⬜"
+
+                        is_selected = st.checkbox(
+                            f"{status_icon} 씬 {scene_id}",
+                            value=st.session_state.get(f"batch_select_{scene_id}", False),
+                            key=f"batch_cb_{scene_id}",
+                            help=_get_scene_preview_text(scene)
+                        )
+
+                        if is_selected:
+                            st.session_state[f"batch_select_{scene_id}"] = True
+                        else:
+                            st.session_state[f"batch_select_{scene_id}"] = False
+        else:
+            # 텍스트 포함 모드
+            for i, scene in enumerate(scenes):
+                scene_id = scene.get("scene_id")
                 has_image = get_composited_for_scene(scene_id) is not None
                 status_icon = "✅" if has_image else "⬜"
 
-                is_selected = st.checkbox(
-                    f"{status_icon} 씬 {scene_id}",
-                    value=st.session_state.get(f"batch_select_{scene_id}", False),
-                    key=f"batch_cb_{scene_id}",
-                    help=_get_scene_preview_text(scene)
+                scene_text = (
+                    scene.get("script_text", "") or
+                    scene.get("narration", "") or
+                    scene.get("description", "") or
+                    scene.get("text", "")
                 )
-                if is_selected:
-                    selected_scenes.append(scene_id)
-    else:
-        # 텍스트 포함 모드
-        for i, scene in enumerate(scenes):
-            scene_id = scene.get("scene_id")
-            has_image = get_composited_for_scene(scene_id) is not None
-            status_icon = "✅" if has_image else "⬜"
 
-            # 씬 텍스트 가져오기 (script_text 우선)
-            scene_text = (
-                scene.get("script_text", "") or
-                scene.get("narration", "") or
-                scene.get("description", "") or
-                scene.get("text", "")
-            )
-            preview_text = scene_text[:80] + "..." if len(scene_text) > 80 else scene_text
+                col1, col2 = st.columns([1, 10])
 
-            col1, col2 = st.columns([1, 10])
+                with col1:
+                    is_selected = st.checkbox(
+                        f"선택",
+                        value=st.session_state.get(f"batch_select_{scene_id}", False),
+                        key=f"batch_cb_{scene_id}",
+                        label_visibility="collapsed"
+                    )
 
-            with col1:
-                is_selected = st.checkbox(
-                    f"선택",
-                    value=st.session_state.get(f"batch_select_{scene_id}", False),
-                    key=f"batch_cb_{scene_id}",
-                    label_visibility="collapsed"
-                )
-                if is_selected:
-                    selected_scenes.append(scene_id)
+                    if is_selected:
+                        st.session_state[f"batch_select_{scene_id}"] = True
+                    else:
+                        st.session_state[f"batch_select_{scene_id}"] = False
 
-            with col2:
-                # 씬 정보 카드
-                chars = scene.get("characters", [])
-                char_str = f" 👤 {', '.join(chars[:2])}{'...' if len(chars) > 2 else ''}" if chars else ""
+                with col2:
+                    chars = scene.get("characters", [])
+                    char_str = f" 👤 {', '.join(chars[:2])}{'...' if len(chars) > 2 else ''}" if chars else ""
 
-                with st.expander(f"{status_icon} **씬 {scene_id}**{char_str}", expanded=False):
-                    st.markdown(f"**내용:**")
-                    st.text(scene_text if scene_text else "(텍스트 없음)")
+                    with st.expander(f"{status_icon} **씬 {scene_id}**{char_str}", expanded=False):
+                        st.markdown(f"**내용:**")
+                        st.text(scene_text if scene_text else "(텍스트 없음)")
 
-                    if scene.get("background_prompt"):
-                        st.markdown(f"**배경 프롬프트:** {scene.get('background_prompt')[:100]}...")
-
-    st.markdown(f"**선택된 씬:** {len(selected_scenes)}개")
+                        if scene.get("background_prompt"):
+                            st.markdown(f"**배경 프롬프트:** {scene.get('background_prompt')[:100]}...")
 
     st.markdown("---")
 
-    # 생성 옵션
+    # ============================================================
+    # 생성 옵션 (스타일 모드 선택 추가)
+    # ============================================================
     st.markdown("### 생성 옵션")
 
-    col1, col2, col3 = st.columns(3)
+    # 스타일 모드 선택
+    from utils.style_manager import (
+        get_styles_by_segment,
+        get_scene_composite_styles,
+        get_scene_composite_style_by_name,
+        build_scene_composite_prompt
+    )
 
-    with col1:
-        # StyleManager에서 배경 스타일 목록 로드
-        from utils.style_manager import get_styles_by_segment
-        bg_styles = get_styles_by_segment("background")
+    with st.container(border=True):
+        st.markdown("#### 🎨 스타일 모드 선택")
 
-        style_options = [(s.id, s.name_ko) for s in bg_styles]
-        style_ids = [s[0] for s in style_options]
-        style_names = {s[0]: s[1] for s in style_options}
-
-        style = st.selectbox(
-            "배경 스타일",
-            options=style_ids,
-            format_func=lambda x: style_names.get(x, x),
-            key="batch_style",
-            help="스타일 관리 페이지에서 등록된 배경 스타일"
+        style_mode = st.radio(
+            "이미지 생성 모드",
+            options=[
+                "🖼️ 배경만 생성 (배경 스타일 사용)",
+                "🎬 씬 합성 생성 (배경 + 캐릭터 통합 스타일)"
+            ],
+            key="batch_style_mode",
+            horizontal=False
         )
 
-        # 선택된 스타일 프롬프트 미리보기
-        selected_style = next((s for s in bg_styles if s.id == style), None)
-        if selected_style and (selected_style.prompt_prefix or selected_style.prompt_suffix):
-            with st.expander("📝 스타일 프롬프트 미리보기", expanded=False):
-                if selected_style.prompt_prefix:
-                    st.caption("**Prefix:**")
-                    st.code(selected_style.prompt_prefix[:200] + "..." if len(selected_style.prompt_prefix) > 200 else selected_style.prompt_prefix, language=None)
-                if selected_style.prompt_suffix:
-                    st.caption("**Suffix:**")
-                    st.code(selected_style.prompt_suffix[:200] + "..." if len(selected_style.prompt_suffix) > 200 else selected_style.prompt_suffix, language=None)
+        # 모드 설명
+        if "배경만" in style_mode:
+            st.caption("💡 배경 이미지만 생성합니다. 캐릭터는 별도로 합성됩니다.")
+        else:
+            st.caption("💡 배경과 캐릭터가 함께 포함된 완성 이미지를 생성합니다. (합성 불필요)")
 
-    with col2:
-        generate_background = st.checkbox("배경 생성", value=True, key="batch_gen_bg")
-        generate_composite = st.checkbox("합성 실행", value=True, key="batch_gen_comp")
+    st.markdown("")
 
-    with col3:
-        remove_bg = st.checkbox("캐릭터 배경 제거", value=True, key="batch_remove_bg")
+    # ============================================================
+    # 모드별 옵션 표시
+    # ============================================================
+
+    if "배경만" in style_mode:
+        # ======== 배경만 생성 모드 (기존) ========
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            bg_styles = get_styles_by_segment("background")
+
+            style_options = [(s.id, s.name_ko) for s in bg_styles]
+            style_ids = [s[0] for s in style_options]
+            style_names = {s[0]: s[1] for s in style_options}
+
+            style = st.selectbox(
+                "배경 스타일",
+                options=style_ids,
+                format_func=lambda x: style_names.get(x, x),
+                key="batch_style",
+                help="스타일 관리 페이지에서 등록된 배경 스타일"
+            )
+
+            # 선택된 스타일 프롬프트 미리보기
+            selected_style = next((s for s in bg_styles if s.id == style), None)
+            if selected_style and (selected_style.prompt_prefix or selected_style.prompt_suffix):
+                with st.expander("📝 스타일 프롬프트 미리보기", expanded=False):
+                    if selected_style.prompt_prefix:
+                        st.caption("**Prefix:**")
+                        st.code(selected_style.prompt_prefix[:200] + "..." if len(selected_style.prompt_prefix) > 200 else selected_style.prompt_prefix, language=None)
+                    if selected_style.prompt_suffix:
+                        st.caption("**Suffix:**")
+                        st.code(selected_style.prompt_suffix[:200] + "..." if len(selected_style.prompt_suffix) > 200 else selected_style.prompt_suffix, language=None)
+
+        with col2:
+            generate_background = st.checkbox("배경 생성", value=True, key="batch_gen_bg")
+
+        with col3:
+            remove_bg = st.checkbox("캐릭터 배경 제거", value=True, key="batch_remove_bg")
+
+        # ✅ 수정: 캐릭터 합성 옵션 분리 (3가지 모드)
+        st.markdown("---")
+        character_composite_mode = render_character_composite_options()
+
+        # 합성 모드에 따른 변수 설정
+        generate_composite = character_composite_mode != "none"
+
+        # 씬별 포즈 사용 여부 (씬별 캐릭터 모드일 때만 표시)
+        batch_use_scene_pose = False
+        if character_composite_mode == "scene_character":
+            all_characters = st.session_state.get("characters", [])
+            any_has_scene_poses, _ = check_characters_have_scene_poses(all_characters)
+            if any_has_scene_poses:
+                batch_use_scene_pose = st.checkbox("씬별 포즈 적용", value=True, key="batch_use_scene_pose",
+                                                   help="캐릭터 관리에서 설정한 씬별 포즈를 적용합니다.")
+
+        # 씬 합성 모드용 변수 초기화 (사용하지 않음)
+        composite_style = None
+        apply_negative = True
+
+    else:
+        # ======== 씬 합성 생성 모드 (NEW!) ========
+        col1, col2 = st.columns([2, 1])
+
+        with col1:
+            # 씬 합성 스타일 선택
+            scene_styles = get_scene_composite_styles()
+
+            if not scene_styles:
+                st.warning("⚠️ 씬 합성 스타일이 없습니다. 스타일 관리 페이지에서 추가해주세요.")
+                composite_style_id = None
+            else:
+                scene_style_options = [(s.id, s.name_ko) for s in scene_styles]
+                scene_style_ids = [s[0] for s in scene_style_options]
+                scene_style_names = {s[0]: s[1] for s in scene_style_options}
+
+                composite_style_id = st.selectbox(
+                    "🎬 씬 합성 스타일",
+                    options=scene_style_ids,
+                    format_func=lambda x: scene_style_names.get(x, x),
+                    key="batch_composite_style",
+                    help="스타일 관리 페이지에서 등록된 씬 합성 스타일"
+                )
+
+                composite_style = next((s for s in scene_styles if s.id == composite_style_id), None)
+
+        with col2:
+            apply_negative = st.checkbox(
+                "네거티브 프롬프트 적용",
+                value=True,
+                key="batch_apply_negative"
+            )
+
+        # 선택된 씬 합성 스타일 상세 표시
+        if composite_style_id and scene_styles:
+            composite_style = next((s for s in scene_styles if s.id == composite_style_id), None)
+
+            if composite_style:
+                st.markdown("---")
+                st.markdown("**📋 프롬프트 구조:**")
+                st.code("[Prefix] + [씬 이미지 프롬프트] + [Suffix]\nNegative: [스타일 Negative 프롬프트]", language=None)
+
+                # 스타일 프롬프트 미리보기
+                with st.expander("🎨 씬 합성 스타일 프롬프트 미리보기", expanded=False):
+                    st.markdown("**Prefix:**")
+                    st.code(composite_style.prompt_prefix[:300] + "..." if len(composite_style.prompt_prefix) > 300 else composite_style.prompt_prefix or "(없음)", language=None)
+
+                    st.markdown("**Suffix:**")
+                    st.code(composite_style.prompt_suffix[:300] + "..." if len(composite_style.prompt_suffix) > 300 else composite_style.prompt_suffix or "(없음)", language=None)
+
+                    st.markdown("**Negative:**")
+                    st.code(composite_style.negative_prompt[:200] + "..." if len(composite_style.negative_prompt) > 200 else composite_style.negative_prompt or "(없음)", language=None)
+
+                # 예시 프롬프트 (씬 1 기준)
+                with st.expander("👁️ 완성 프롬프트 예시 (씬 1 기준)", expanded=False):
+                    if scenes:
+                        scene_1 = scenes[0]
+                        prompts_data = scene_1.get("prompts", {})
+                        scene_prompt = (
+                            scene_1.get("image_prompt_en", "") or
+                            prompts_data.get("image_prompt_en", "") or
+                            scene_1.get("background_prompt", "")
+                        )
+
+                        if scene_prompt:
+                            example_result = build_scene_composite_prompt(
+                                scene_prompt=scene_prompt,
+                                style=composite_style,
+                                include_negative=apply_negative
+                            )
+
+                            st.markdown("**✅ Positive Prompt:**")
+                            st.code(example_result["positive"][:500] + "..." if len(example_result["positive"]) > 500 else example_result["positive"], language=None)
+
+                            if example_result["negative"]:
+                                st.markdown("**❌ Negative Prompt:**")
+                                st.code(example_result["negative"], language=None)
+                        else:
+                            st.info("씬 1에 이미지 프롬프트가 없습니다.")
+                    else:
+                        st.info("씬 데이터가 없습니다.")
+
+        # 배경만 모드 변수 초기화 (사용하지 않음)
+        style = None
+        generate_background = True  # 씬 합성에서는 항상 생성
+        generate_composite = False  # 씬 합성에서는 합성 불필요
+        remove_bg = False
+        batch_use_scene_pose = False
+
+    st.markdown("---")
+
+    # ============================================================
+    # 프롬프트 미리보기 및 수정 섹션
+    # ============================================================
+    if selected_scenes and scenes:
+        with st.expander("최종 프롬프트 미리보기 및 수정", expanded=False):
+            from utils.prompt_builder import PromptBuilder
+
+            # 첫 번째 선택 씬에 대한 예시
+            first_scene_id = selected_scenes[0]
+            first_scene = get_scene_by_id(first_scene_id)
+
+            if first_scene:
+                prompts_data = first_scene.get("prompts", {})
+                scene_prompt = (
+                    first_scene.get("image_prompt_en", "") or
+                    prompts_data.get("image_prompt_en", "") or
+                    first_scene.get("image_prompt_ko", "") or
+                    first_scene.get("background_prompt", "") or
+                    first_scene.get("description", "")
+                )
+
+                st.caption(f"씬 {first_scene_id} 프롬프트 구조 예시")
+
+                builder = PromptBuilder()
+
+                if "배경만" in style_mode:
+                    # 배경만 생성 모드
+                    selected_bg_style = next((s for s in get_styles_by_segment("background") if s.id == style), None) if style else None
+
+                    if selected_bg_style and selected_bg_style.prompt_prefix:
+                        builder.add(
+                            name="스타일 Prefix",
+                            content=selected_bg_style.prompt_prefix,
+                            source=f"배경 스타일 > {selected_bg_style.name_ko}",
+                            order=0
+                        )
+
+                    builder.add(
+                        name="씬 이미지 프롬프트",
+                        content=scene_prompt,
+                        source=f"씬 분석 > 씬 {first_scene_id}",
+                        order=1
+                    )
+
+                    if selected_bg_style and selected_bg_style.prompt_suffix:
+                        builder.add(
+                            name="스타일 Suffix",
+                            content=selected_bg_style.prompt_suffix,
+                            source=f"배경 스타일 > {selected_bg_style.name_ko}",
+                            order=2
+                        )
+
+                    if selected_bg_style and selected_bg_style.negative_prompt:
+                        builder.add_negative(
+                            name="스타일 네거티브",
+                            content=selected_bg_style.negative_prompt,
+                            source=f"배경 스타일 > {selected_bg_style.name_ko}"
+                        )
+
+                else:
+                    # 씬 합성 생성 모드
+                    if composite_style:
+                        if composite_style.prompt_prefix:
+                            builder.add(
+                                name="씬 합성 Prefix",
+                                content=composite_style.prompt_prefix,
+                                source=f"씬 합성 스타일 > {composite_style.name_ko}",
+                                order=0
+                            )
+
+                        builder.add(
+                            name="씬 이미지 프롬프트",
+                            content=scene_prompt,
+                            source=f"씬 분석 > 씬 {first_scene_id}",
+                            order=1
+                        )
+
+                        if composite_style.prompt_suffix:
+                            builder.add(
+                                name="씬 합성 Suffix",
+                                content=composite_style.prompt_suffix,
+                                source=f"씬 합성 스타일 > {composite_style.name_ko}",
+                                order=2
+                            )
+
+                        if apply_negative and composite_style.negative_prompt:
+                            builder.add_negative(
+                                name="씬 합성 네거티브",
+                                content=composite_style.negative_prompt,
+                                source=f"씬 합성 스타일 > {composite_style.name_ko}"
+                            )
+
+                build_result = builder.build()
+
+                # 구성 요소 표시
+                for i, comp in enumerate(build_result.components, 1):
+                    st.markdown(f"**{i}. {comp.name}** ({comp.source})")
+                    st.code(comp.content, language=None)
+
+                st.info("위 구조가 모든 씬에 동일하게 적용됩니다. 씬마다 '씬 이미지 프롬프트' 부분만 달라집니다.")
+
+                st.markdown("---")
+                st.markdown("#### 프롬프트 수정 (일괄 적용)")
+
+                # 수정 모드 선택
+                prompt_edit_mode = st.radio(
+                    "수정 범위",
+                    ["기본 프롬프트 사용", "스타일 일괄 변경"],
+                    horizontal=True,
+                    key="batch_prompt_edit_mode"
+                )
+
+                if prompt_edit_mode == "스타일 일괄 변경":
+                    col_pe1, col_pe2 = st.columns(2)
+
+                    with col_pe1:
+                        if "배경만" in style_mode:
+                            default_prefix = next((s.prompt_prefix for s in get_styles_by_segment("background") if s.id == style), "") if style else ""
+                        else:
+                            default_prefix = composite_style.prompt_prefix if composite_style else ""
+
+                        edited_prefix = st.text_area(
+                            "스타일 Prefix (모든 씬 적용)",
+                            value=default_prefix,
+                            height=80,
+                            key="batch_edited_prefix"
+                        )
+
+                    with col_pe2:
+                        if "배경만" in style_mode:
+                            default_suffix = next((s.prompt_suffix for s in get_styles_by_segment("background") if s.id == style), "") if style else ""
+                        else:
+                            default_suffix = composite_style.prompt_suffix if composite_style else ""
+
+                        edited_suffix = st.text_area(
+                            "스타일 Suffix (모든 씬 적용)",
+                            value=default_suffix,
+                            height=80,
+                            key="batch_edited_suffix"
+                        )
+
+                    edited_negative = st.text_input(
+                        "네거티브 프롬프트 (모든 씬 적용)",
+                        value=build_result.final_negative,
+                        key="batch_edited_negative"
+                    )
+
+                    # 예시 최종 프롬프트 표시
+                    example_final = ", ".join(filter(None, [edited_prefix.strip(), scene_prompt, edited_suffix.strip()]))
+                    st.markdown(f"**예시 최종 프롬프트 (씬 {first_scene_id}):**")
+                    st.code(example_final[:500] + "..." if len(example_final) > 500 else example_final, language=None)
+
+                    # 프롬프트 통계
+                    col_s1, col_s2, col_s3 = st.columns(3)
+                    with col_s1:
+                        st.metric("문자 수", f"{len(example_final):,}")
+                    with col_s2:
+                        st.metric("단어 수", f"{len(example_final.split()):,}")
+                    with col_s3:
+                        approx_tokens = len(example_final) // 4
+                        token_status = "적정" if approx_tokens < 200 else "주의" if approx_tokens < 300 else "초과"
+                        st.metric("예상 토큰", f"~{approx_tokens} ({token_status})")
+
+                    st.session_state["batch_prompt_edits"] = {
+                        "mode": "style",
+                        "prefix": edited_prefix.strip(),
+                        "suffix": edited_suffix.strip(),
+                        "negative": edited_negative.strip()
+                    }
+                else:
+                    st.session_state["batch_prompt_edits"] = {"mode": "default"}
 
     st.markdown("---")
 
     # 생성 버튼
     if st.button(
-        f"🚀 {len(selected_scenes)}개 씬 일괄 생성",
+        f"씬 일괄 생성 ({len(selected_scenes)}개)",
         type="primary",
         use_container_width=True,
         disabled=len(selected_scenes) == 0
@@ -1478,29 +2387,96 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                 continue
 
             try:
-                # 배경 생성
-                if generate_background:
-                    # 프롬프트 우선순위: image_prompt_en > prompts.image_prompt_en > background_prompt > description
-                    prompts_data = scene.get("prompts", {})
-                    prompt = (
-                        scene.get("image_prompt_en", "") or
-                        prompts_data.get("image_prompt_en", "") or
-                        scene.get("image_prompt_ko", "") or
-                        scene.get("background_prompt", "") or
-                        scene.get("description", "")
-                    )
+                # 프롬프트 가져오기 (공통)
+                prompts_data = scene.get("prompts", {})
+                prompt = (
+                    scene.get("image_prompt_en", "") or
+                    prompts_data.get("image_prompt_en", "") or
+                    scene.get("image_prompt_ko", "") or
+                    scene.get("background_prompt", "") or
+                    scene.get("description", "")
+                )
 
-                    if not prompt:
-                        st.warning(f"⚠️ 씬 {scene_id}: 이미지 프롬프트가 없습니다.")
+                if not prompt:
+                    st.warning(f"⚠️ 씬 {scene_id}: 이미지 프롬프트가 없습니다.")
+                    continue
+
+                # 수정된 프롬프트 적용
+                batch_edits = st.session_state.get("batch_prompt_edits", {"mode": "default"})
+
+                if batch_edits.get("mode") == "style":
+                    # 스타일 일괄 변경 모드
+                    edited_prefix = batch_edits.get("prefix", "")
+                    edited_suffix = batch_edits.get("suffix", "")
+                    edited_negative = batch_edits.get("negative", "")
+
+                    # 최종 프롬프트 조합
+                    final_prompt = ", ".join(filter(None, [edited_prefix, prompt, edited_suffix]))
+                    use_edited_style = True
+                else:
+                    final_prompt = prompt  # 기본 스타일 사용
+                    edited_negative = None
+                    use_edited_style = False
+
+                # ======== 모드별 분기 처리 ========
+                # v2.0: 세션에서 선택된 API/모델 가져오기
+                batch_api = st.session_state.get("_batch_gen_api")
+                batch_model = st.session_state.get("_batch_gen_model")
+
+                if "배경만" in style_mode:
+                    # 배경만 생성 모드 (기존 로직)
+                    if generate_background:
+                        if use_edited_style:
+                            # 수정된 프롬프트로 직접 생성
+                            print(f"[일괄생성-배경(수정)] 씬 {scene_id}: {final_prompt[:100]}...")
+                            generate_background_image_with_prompt(
+                                scene_id, final_prompt, edited_negative, 1280, 720,
+                                api_provider=batch_api, model=batch_model
+                            )
+                        else:
+                            print(f"[일괄생성-배경] 씬 {scene_id}: {prompt[:100]}...")
+                            generate_background_image(
+                                scene_id, prompt, style, 1280, 720,
+                                api_provider=batch_api, model=batch_model
+                            )
+                        time.sleep(1)  # API 속도 제한
+
+                    # 합성 (모드에 따라 분기)
+                    if generate_composite:
+                        if character_composite_mode == "scene_character":
+                            # 씬별 캐릭터 합성 (기존 로직)
+                            execute_composite(scene_id, scene, remove_bg, batch_use_scene_pose)
+                        elif character_composite_mode == "representative_character":
+                            # 대표 캐릭터 합성 (NEW!)
+                            execute_representative_character_composite(scene_id, scene, remove_bg)
+
+                else:
+                    # 씬 합성 생성 모드 (NEW!)
+                    if composite_style:
+                        if use_edited_style:
+                            # 수정된 프롬프트로 직접 생성
+                            print(f"[일괄생성-씬합성(수정)] 씬 {scene_id}: {final_prompt[:100]}...")
+                            generate_scene_composite_image_with_prompt(
+                                scene_id=scene_id,
+                                final_prompt=final_prompt,
+                                negative_prompt=edited_negative,
+                                width=1280,
+                                height=720
+                            )
+                        else:
+                            print(f"[일괄생성-씬합성] 씬 {scene_id}: {prompt[:100]}...")
+                            generate_scene_composite_image(
+                                scene_id=scene_id,
+                                scene_prompt=prompt,
+                                composite_style=composite_style,
+                                apply_negative=apply_negative,
+                                width=1280,
+                                height=720
+                            )
+                        time.sleep(1)  # API 속도 제한
+                    else:
+                        st.warning(f"⚠️ 씬 {scene_id}: 씬 합성 스타일이 선택되지 않았습니다.")
                         continue
-
-                    print(f"[일괄생성] 씬 {scene_id} 프롬프트: {prompt[:100]}...")
-                    generate_background_image(scene_id, prompt, style, 1280, 720)
-                    time.sleep(1)  # API 속도 제한
-
-                # 합성
-                if generate_composite:
-                    execute_composite(scene_id, scene, remove_bg)
 
                 success_count += 1
 
@@ -1583,7 +2559,7 @@ def _render_external_upload_section():
         for i, char in enumerate(ext_chars):
             with cols[i % 4]:
                 if os.path.exists(char.get("image_path", "")):
-                    st.image(char["image_path"], width=80)
+                    clickable_image(char["image_path"], width=80, key=f"ext_char_{char.get('id', i)}")
                 st.caption(char["name"])
                 if st.button("❌", key=f"del_ext_{char['id']}"):
                     st.session_state["external_characters"].remove(char)
@@ -1684,12 +2660,12 @@ def _render_scene_preview_cards(scenes: List[Dict], all_characters: List[Dict]) 
                         status_icon = "✅" if has_composite else "⬜"
                         st.markdown(f"**{status_icon} 씬 {scene_id}**")
 
-                    # 배경 프리뷰
+                    # 배경 프리뷰 (클릭 시 확대)
                     bg_data = get_background_for_scene(scene_id)
                     if bg_data:
                         bg_path = bg_data.get("path") or bg_data.get("url")
                         if bg_path and os.path.exists(bg_path):
-                            st.image(bg_path, use_container_width=True)
+                            render_lightbox_image(bg_path, key=f"batch_bg_{scene_id}")
                         else:
                             st.info("🖼️ 배경 파일 없음")
                     else:
@@ -1716,7 +2692,7 @@ def _render_scene_preview_cards(scenes: List[Dict], all_characters: List[Dict]) 
                                 if char_info:
                                     char_img = char_info.get("image_path") or char_info.get("image_url")
                                     if char_img and os.path.exists(char_img):
-                                        st.image(char_img, width=60)
+                                        clickable_image(char_img, width=60, key=f"batch_char_{scene_id}_{char_name}")
                                     else:
                                         st.markdown("👤")
                                     st.caption(char_name[:8])
@@ -1928,6 +2904,19 @@ def _render_batch_composite_only(scenes: List[Dict]):
             help="위치가 설정되지 않은 씬은 캐릭터를 기본 위치에 배치합니다."
         )
 
+    # 씬별 포즈 옵션
+    all_characters = st.session_state.get("characters", [])
+    any_has_scene_poses, _ = check_characters_have_scene_poses(all_characters)
+    if any_has_scene_poses:
+        comp_use_scene_pose = st.checkbox(
+            "씬별 포즈 적용",
+            value=True,
+            key="comp_only_use_scene_pose",
+            help="캐릭터 관리에서 설정한 씬별 포즈를 적용합니다."
+        )
+    else:
+        comp_use_scene_pose = False
+
     st.markdown("---")
 
     # 일괄 합성 실행
@@ -1965,7 +2954,7 @@ def _render_batch_composite_only(scenes: List[Dict]):
 
             try:
                 # 합성 실행
-                result = execute_composite(scene_id, scene, remove_bg)
+                result = execute_composite(scene_id, scene, remove_bg, comp_use_scene_pose)
 
                 if result:
                     success_count += 1
@@ -2040,6 +3029,28 @@ def render_gallery_tab():
     # 이미지 목록 가져오기
     images = get_all_gallery_images()
 
+    # ============================================================
+    # 🆕 중복 분석 및 최신 이미지 추출
+    # ============================================================
+    from utils.image_gallery_manager import ImageGalleryManager
+
+    gallery_manager = ImageGalleryManager(str(project_path))
+    all_scanned = gallery_manager.scan_all_images()
+    analysis = gallery_manager.analyze_duplicates(all_scanned)
+    latest_images = gallery_manager.get_latest_images_list(all_scanned)
+
+    # 중복 통계 표시
+    if analysis["duplicates_count"] > 0:
+        stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
+        with stat_col1:
+            st.metric("총 이미지", f"{analysis['total_images']}개")
+        with stat_col2:
+            st.metric("씬 수", f"{analysis['total_scenes']}개")
+        with stat_col3:
+            st.metric("중복", f"{analysis['duplicates_count']}개", delta=f"-{analysis['savings_percent']:.0f}%", delta_color="inverse")
+        with stat_col4:
+            st.metric("절약 가능", f"{analysis['duplicates_size_mb']:.1f}MB")
+
     # 필터 적용
     if filter_scene != "전체":
         scene_num = filter_scene.replace("씬 ", "")
@@ -2061,8 +3072,144 @@ def render_gallery_tab():
 
     st.markdown(f"**총 {len(images)}개 이미지**")
 
-    # 다중 선택 모드
-    multi_select = st.checkbox("다중 선택 모드", key="gallery_multi")
+    # 옵션 체크박스
+    opt_col1, opt_col2, opt_col3 = st.columns(3)
+    with opt_col1:
+        multi_select = st.checkbox("다중 선택 모드", key="gallery_multi")
+    with opt_col2:
+        show_latest_only = st.checkbox("🕐 최신만 보기", key="gallery_show_latest", help="각 씬별 가장 최신 이미지만 표시")
+    with opt_col3:
+        st.caption(f"최신 이미지: {len(latest_images)}개")
+
+    # ============================================================
+    # 🆕 최신만 다운로드 및 정리 섹션
+    # ============================================================
+    st.markdown("---")
+    st.markdown("#### ⏰ 최신 이미지 다운로드")
+
+    latest_dl_col1, latest_dl_col2, latest_dl_col3 = st.columns(3)
+
+    with latest_dl_col1:
+        # 최신만 다운로드
+        if latest_images:
+            zip_buffer = gallery_manager.create_zip_buffer(latest_images)
+            st.download_button(
+                label=f"⏰ 최신만 다운로드 ({len(latest_images)}개)",
+                data=zip_buffer,
+                file_name=gallery_manager.get_zip_filename("latest_images"),
+                mime="application/zip",
+                type="primary",
+                key="download_latest_only_zip",
+                use_container_width=True
+            )
+        else:
+            st.button("⏰ 최신만 다운로드 (0개)", disabled=True, use_container_width=True)
+
+    with latest_dl_col2:
+        # 프로젝트 폴더에 최신만 저장
+        if st.button("📁 최신만 폴더 저장", key="save_latest_to_folder", use_container_width=True):
+            if latest_images:
+                success, save_dir, saved_count = gallery_manager.save_latest_to_folder(latest_images)
+                if success:
+                    st.success(f"✅ {saved_count}개 저장: {save_dir}")
+            else:
+                st.warning("저장할 이미지가 없습니다.")
+
+    with latest_dl_col3:
+        # 전체 다운로드 (중복 포함)
+        if all_scanned:
+            zip_buffer_all = gallery_manager.create_zip_with_timestamp(all_scanned)
+            st.download_button(
+                label=f"📦 전체 다운로드 ({len(all_scanned)}개)",
+                data=zip_buffer_all,
+                file_name=gallery_manager.get_zip_filename("all_images"),
+                mime="application/zip",
+                key="download_all_with_timestamp_zip",
+                use_container_width=True
+            )
+
+    # ============================================================
+    # 🆕 이미지 정리 (중복 삭제)
+    # ============================================================
+    if analysis["duplicates_count"] > 0:
+        st.markdown("---")
+        with st.expander(f"🗑️ 이미지 정리 ({analysis['duplicates_count']}개 중복, {analysis['duplicates_size_mb']:.1f}MB 절약 가능)", expanded=False):
+            # 중복 분석 상세
+            st.markdown("##### 📊 씬별 중복 현황")
+
+            for stat in analysis["scene_stats"][:15]:
+                prog_col1, prog_col2, prog_col3 = st.columns([1, 2, 1])
+                with prog_col1:
+                    st.caption(f"씬 {stat['scene_id']}")
+                with prog_col2:
+                    st.progress(stat['keep'] / stat['total'])
+                with prog_col3:
+                    st.caption(f"{stat['total']}개 → {stat['keep']}개 (-{stat['delete']}개)")
+
+            if len(analysis["scene_stats"]) > 15:
+                st.caption(f"... 외 {len(analysis['scene_stats']) - 15}개 씬")
+
+            st.markdown("---")
+
+            # 정리 옵션
+            cleanup_col1, cleanup_col2 = st.columns(2)
+
+            with cleanup_col1:
+                cleanup_action = st.radio(
+                    "정리 방식",
+                    options=["🗑️ 영구 삭제", "📁 아카이브로 이동"],
+                    key="gallery_cleanup_action",
+                    horizontal=True
+                )
+
+            with cleanup_col2:
+                # 시뮬레이션
+                if st.button("🔍 시뮬레이션", key="gallery_cleanup_simulate", use_container_width=True):
+                    result = gallery_manager.delete_old_images(all_scanned, dry_run=True)
+                    st.info(f"📋 {result['deleted_count']}개 파일 삭제 예정 ({result['deleted_size_mb']:.1f}MB)")
+
+            # 확인 체크박스
+            confirm_delete = st.checkbox("⚠️ 정말 실행하시겠습니까? (복구 불가)", key="gallery_cleanup_confirm")
+
+            if "영구 삭제" in cleanup_action:
+                if st.button(
+                    f"🗑️ 최신 제외 모두 삭제 ({analysis['duplicates_count']}개)",
+                    type="primary",
+                    disabled=not confirm_delete,
+                    use_container_width=True,
+                    key="gallery_cleanup_delete"
+                ):
+                    with st.spinner("삭제 중..."):
+                        result = gallery_manager.delete_old_images(all_scanned, dry_run=False)
+
+                    if result["errors"]:
+                        st.error(f"⚠️ {len(result['errors'])}개 파일 삭제 실패")
+                    st.success(f"✅ {result['deleted_count']}개 파일 삭제 완료! ({result['deleted_size_mb']:.1f}MB 절약)")
+                    st.rerun()
+            else:
+                if st.button(
+                    f"📁 아카이브로 이동 ({analysis['duplicates_count']}개)",
+                    type="primary",
+                    disabled=not confirm_delete,
+                    use_container_width=True,
+                    key="gallery_cleanup_archive"
+                ):
+                    with st.spinner("이동 중..."):
+                        result = gallery_manager.move_old_to_archive(all_scanned)
+
+                    if result["errors"]:
+                        st.error(f"⚠️ {len(result['errors'])}개 파일 이동 실패")
+                    st.success(f"✅ {result['moved_count']}개 파일 아카이브로 이동! ({result['moved_size_mb']:.1f}MB)")
+                    st.caption(f"📁 아카이브: {result['archive_folder']}")
+                    st.rerun()
+
+    st.markdown("---")
+
+    # 최신만 보기 필터 적용
+    if show_latest_only:
+        # latest_images를 일반 images 형식으로 변환
+        images = [{"path": img.path, "filename": img.filename, "scene_id": img.scene_id, "type": img.image_type, "created": img.created} for img in latest_images]
+        st.info(f"🕐 각 씬별 최신 이미지만 표시 중 ({len(images)}개)")
 
     if multi_select:
         selected_images = st.session_state.get("selected_gallery_images", [])
@@ -2083,6 +3230,111 @@ def render_gallery_tab():
                 st.session_state["selected_gallery_images"] = []
                 st.success(f"{len(selected_images)}개 이미지 삭제됨")
                 st.rerun()
+
+        # 📥 일괄 다운로드 섹션
+        st.markdown("#### 📥 일괄 다운로드")
+        dl_col1, dl_col2, dl_col3 = st.columns(3)
+
+        with dl_col1:
+            # 선택된 이미지 ZIP 다운로드
+            if selected_images and len(selected_images) > 0:
+                from utils.download_manager import create_images_zip
+                zip_buffer, zip_filename = create_images_zip(selected_images)
+                st.download_button(
+                    label=f"📦 선택 다운로드 ({len(selected_images)}개)",
+                    data=zip_buffer,
+                    file_name=zip_filename,
+                    mime="application/zip",
+                    key="download_selected_zip",
+                    use_container_width=True
+                )
+            else:
+                st.button("📦 선택 다운로드 (0개)", disabled=True, use_container_width=True)
+
+        with dl_col2:
+            # 전체 이미지 ZIP 다운로드
+            all_image_paths = [img["path"] for img in images if os.path.exists(img["path"])]
+            if all_image_paths:
+                from utils.download_manager import create_images_zip
+                zip_buffer_all, zip_filename_all = create_images_zip(all_image_paths, f"all_images_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip")
+                st.download_button(
+                    label=f"📦 전체 다운로드 ({len(all_image_paths)}개)",
+                    data=zip_buffer_all,
+                    file_name=zip_filename_all,
+                    mime="application/zip",
+                    key="download_all_zip",
+                    use_container_width=True
+                )
+            else:
+                st.button("📦 전체 다운로드 (0개)", disabled=True, use_container_width=True)
+
+        with dl_col3:
+            # 프로젝트 폴더에 저장
+            if st.button("📁 프로젝트 폴더 저장", key="save_to_folder", use_container_width=True):
+                try:
+                    from utils.download_manager import SceneDownloadManager
+                    manager = SceneDownloadManager(video_path=str(project_path))
+                    save_paths = selected_images if selected_images else all_image_paths
+                    if save_paths:
+                        save_images = manager.collect_images_from_paths(save_paths)
+                        success, save_dir, saved_files = manager.save_to_project_folder(
+                            images=save_images,
+                            subfolder="downloaded_images"
+                        )
+                        if success and saved_files:
+                            st.success(f"✅ {len(saved_files)}개 저장: {save_dir}")
+                        else:
+                            st.warning("저장할 이미지가 없습니다.")
+                    else:
+                        st.warning("저장할 이미지를 선택하세요.")
+                except Exception as e:
+                    st.error(f"저장 오류: {e}")
+
+    # 📥 일괄 다운로드 (다중 선택 모드가 아닐 때)
+    else:
+        st.markdown("#### 📥 일괄 다운로드")
+        dl_col1, dl_col2 = st.columns(2)
+
+        with dl_col1:
+            all_image_paths = [img["path"] for img in images if os.path.exists(img["path"])]
+            if all_image_paths:
+                from utils.download_manager import create_images_zip
+                zip_buffer_all, zip_filename_all = create_images_zip(all_image_paths, f"all_images_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip")
+                st.download_button(
+                    label=f"📦 전체 ZIP 다운로드 ({len(all_image_paths)}개)",
+                    data=zip_buffer_all,
+                    file_name=zip_filename_all,
+                    mime="application/zip",
+                    key="download_all_zip_simple",
+                    type="primary",
+                    use_container_width=True
+                )
+
+        with dl_col2:
+            if st.button("📁 프로젝트 폴더에 저장", key="save_to_folder_simple", use_container_width=True):
+                try:
+                    from utils.download_manager import SceneDownloadManager
+                    all_image_paths = [img["path"] for img in images if os.path.exists(img["path"])]
+                    manager = SceneDownloadManager(video_path=str(project_path))
+                    if all_image_paths:
+                        save_images = manager.collect_images_from_paths(all_image_paths)
+                        success, save_dir, saved_files = manager.save_to_project_folder(
+                            images=save_images,
+                            subfolder="downloaded_images"
+                        )
+                        if success and saved_files:
+                            st.success(f"✅ {len(saved_files)}개 저장: {save_dir}")
+                        else:
+                            st.warning("저장할 이미지가 없습니다.")
+                except Exception as e:
+                    st.error(f"저장 오류: {e}")
+
+    st.markdown("---")
+
+    # 🔄 프로세스 간 동기화 섹션
+    from utils.sync_manager import ProcessType
+    from utils.sync_ui import render_sync_buttons
+    render_sync_buttons(ProcessType.IMAGE_GENERATION)
 
     st.markdown("---")
 
@@ -2128,14 +3380,14 @@ def render_gallery_tab():
             else:
                 is_selected = False
 
-            # 이미지 (선택 시 테두리 표시)
+            # 이미지 (선택 시 테두리 표시, 클릭 시 확대)
             if os.path.exists(img["path"]):
                 if is_selected:
                     st.markdown(
                         '<div style="border: 3px solid #667eea; border-radius: 8px; padding: 2px; background: rgba(102,126,234,0.1);">',
                         unsafe_allow_html=True
                     )
-                st.image(img["path"], use_container_width=True)
+                render_lightbox_image(img["path"], key=f"gallery_{i}")
                 if is_selected:
                     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -2184,6 +3436,9 @@ def render_settings_tab():
     """⚙️ 설정 탭"""
     st.markdown("## ⚙️ 이미지 생성 설정")
 
+    # 페이지 ID (settings_manager용)
+    PAGE_ID = "image_generation"
+
     # 스타일 설정
     st.markdown("### 🎨 기본 스타일")
 
@@ -2212,10 +3467,11 @@ def render_settings_tab():
             st.caption(f"💡 {selected.description or '설명 없음'}")
 
     with col2:
-        default_resolution = st.selectbox(
+        default_resolution = persistent_selectbox(
             "기본 해상도",
             options=["1280x720", "1920x1080", "1024x576"],
-            key="default_resolution"
+            page=PAGE_ID,
+            setting_key="resolution"
         )
 
     st.markdown("---")
@@ -2226,40 +3482,43 @@ def render_settings_tab():
     col1, col2 = st.columns(2)
 
     with col1:
-        image_api = st.selectbox(
+        image_api = persistent_selectbox(
             "이미지 생성 API",
             options=["Together.ai FLUX", "Google ImageFX", "OpenAI DALL-E", "Stability AI"],
-            key="image_api",
+            page=PAGE_ID,
+            setting_key="api",
             help="🆓 Google ImageFX: 무료 (쿠키 필요)\n💰 Together.ai FLUX: ~20원/장\n💰 OpenAI DALL-E: ~60원/장"
         )
 
     with col2:
         if image_api == "Together.ai FLUX":
-            model = st.selectbox(
+            model = persistent_selectbox(
                 "모델",
                 options=[
                     "black-forest-labs/FLUX.2-dev",
                     "black-forest-labs/FLUX.2-flex",
                     "black-forest-labs/FLUX.2-pro"
                 ],
+                page=PAGE_ID,
+                setting_key="flux_model",
                 format_func=lambda x: {
                     "black-forest-labs/FLUX.2-dev": "FLUX.2 Dev (권장, ~20원)",
                     "black-forest-labs/FLUX.2-flex": "FLUX.2 Flex (~40원)",
                     "black-forest-labs/FLUX.2-pro": "FLUX.2 Pro (고품질, ~40원)"
-                }.get(x, x),
-                key="flux_model"
+                }.get(x, x)
             )
         elif image_api == "Google ImageFX":
-            model = st.selectbox(
+            model = persistent_selectbox(
                 "모델",
                 options=["IMAGEN_4", "IMAGEN_3_5", "IMAGEN_3_1", "IMAGEN_3"],
+                page=PAGE_ID,
+                setting_key="imagefx_model",
                 format_func=lambda x: {
                     "IMAGEN_4": "Imagen 4 (최신, 무료)",
                     "IMAGEN_3_5": "Imagen 3.5 (무료)",
                     "IMAGEN_3_1": "Imagen 3.1 (무료)",
                     "IMAGEN_3": "Imagen 3.0 (무료)"
-                }.get(x, x),
-                key="imagefx_model"
+                }.get(x, x)
             )
 
     # Google ImageFX 쿠키 설정 (ImageFX 선택 시)
@@ -2274,31 +3533,82 @@ def render_settings_tab():
     col1, col2 = st.columns(2)
 
     with col1:
-        st.checkbox(
+        persistent_checkbox(
             "캐릭터 배경 자동 제거 (rembg)",
-            value=True,
-            key="auto_remove_bg"
+            page=PAGE_ID,
+            setting_key="rembg_enabled",
+            default_value=True
         )
-        st.checkbox(
+        persistent_checkbox(
             "생성 후 자동 스토리보드 저장",
-            value=False,
-            key="auto_save_storyboard"
+            page=PAGE_ID,
+            setting_key="auto_save_storyboard",
+            default_value=False
         )
 
     with col2:
-        st.checkbox(
+        persistent_checkbox(
             "생성 로그 저장",
-            value=True,
-            key="save_generation_log"
+            page=PAGE_ID,
+            setting_key="save_generation_log",
+            default_value=True
         )
-        st.number_input(
+        persistent_number_input(
             "API 호출 간격 (초)",
+            page=PAGE_ID,
+            setting_key="api_interval",
             min_value=0.5,
             max_value=10.0,
-            value=1.0,
-            step=0.5,
-            key="api_delay"
+            default_value=1.0,
+            step=0.5
         )
+
+    st.markdown("---")
+
+    # 유명인 자동 치환 설정 (ImageFX 전용)
+    st.markdown("### 🛡️ 유명인 자동 치환 (ImageFX)")
+    st.caption("ImageFX에서 유명인 필터(PROMINENT_PEOPLE_FILTER) 에러 발생 시 AI를 사용하여 자동으로 유명인 이름을 일반적인 설명으로 치환합니다.")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        enable_sanitizer = persistent_checkbox(
+            "🔄 유명인 자동 치환 활성화",
+            page=PAGE_ID,
+            setting_key="celebrity_replacement",
+            default_value=True,
+            help="ImageFX에서 유명인 관련 에러 발생 시 AI가 자동으로 프롬프트를 수정하여 재시도합니다."
+        )
+
+    with col2:
+        # 사용 가능한 AI 모델 목록
+        available_models = get_available_sanitizer_models()
+        if available_models:
+            model_options = list(available_models.keys())
+            model_labels = {k: f"{v.name} ({v.provider.value})" for k, v in available_models.items()}
+
+            # 기본값 설정
+            default_model = get_recommended_model()
+            default_idx = model_options.index(default_model) if default_model in model_options else 0
+
+            sanitizer_model = persistent_selectbox(
+                "치환용 AI 모델",
+                options=model_options,
+                page=PAGE_ID,
+                setting_key="celebrity_ai_model",
+                default_index=default_idx,
+                format_func=lambda x: model_labels.get(x, x),
+                disabled=not enable_sanitizer,
+                help="프롬프트에서 유명인 이름을 감지하고 치환하는 데 사용할 AI 모델"
+            )
+        else:
+            st.warning("⚠️ 사용 가능한 AI 모델이 없습니다. API 키를 확인하세요.")
+            sanitizer_model = None
+
+    if enable_sanitizer and available_models and sanitizer_model:
+        selected_model = available_models.get(sanitizer_model)
+        if selected_model:
+            st.info(f"💡 선택된 모델: **{selected_model.name}** - {selected_model.description}")
 
     st.markdown("---")
 
@@ -2325,23 +3635,86 @@ def render_settings_tab():
         if st.button("🗑️ 미사용 이미지 정리"):
             cleanup_unused_images()
 
+    st.markdown("---")
+
+    # 설정 관리 UI
+    render_settings_management_ui(PAGE_ID, "이미지 생성")
+
 
 # ===================================================================
 # 헬퍼 함수 (이미지 생성/합성)
 # ===================================================================
 
-def generate_background_image(scene_id: int, prompt: str, style: str, width: int, height: int):
-    """배경 이미지 생성 - StyleManager의 스타일 프롬프트 적용"""
+def generate_background_image(
+    scene_id: int,
+    prompt: str,
+    style: str,
+    width: int,
+    height: int,
+    api_provider: str = None,
+    model: str = None
+):
+    """
+    배경 이미지 생성 - StyleManager의 스타일 프롬프트 적용
+
+    Args:
+        scene_id: 씬 번호
+        prompt: 이미지 프롬프트
+        style: 스타일 ID 또는 이름
+        width: 이미지 너비
+        height: 이미지 높이
+        api_provider: API 제공자 (None이면 설정에서 로드)
+        model: 모델 ID (None이면 설정에서 로드)
+    """
     try:
-        from core.image.together_client import TogetherImageClient, get_model_price_info
         from utils.style_manager import get_style_by_id, get_styles_by_segment, build_prompt
-        from config.settings import TOGETHER_DEFAULT_MODEL
 
-        # 사용할 모델 (설정에서 가져옴)
-        model = TOGETHER_DEFAULT_MODEL or "black-forest-labs/FLUX.2-dev"
-        model_info = get_model_price_info(model)
+        # ==============================
+        # API 선택에 따른 클라이언트 초기화 (v2.0 - 설정 버그 수정)
+        # ==============================
+        # 파라미터가 없으면 설정에서 로드
+        if api_provider is None or model is None:
+            saved_api, saved_model = get_current_api_settings()
+            api_provider = api_provider or saved_api
+            model = model or saved_model
 
-        client = TogetherImageClient()
+        selected_api = api_provider
+
+        if selected_api == "Google ImageFX":
+            # ImageFX 클라이언트 사용
+            from utils.imagefx_client import ImageFXClient, AspectRatio
+            from config.settings import load_imagefx_cookie
+
+            # 쿠키 확인 (session_state > 파일 순서, 동적 로드)
+            imagefx_cookie = st.session_state.get("imagefx_cookie", "") or load_imagefx_cookie()
+            if not imagefx_cookie:
+                st.error("❌ ImageFX 쿠키가 설정되지 않았습니다. API 관리 페이지에서 쿠키를 입력해주세요.")
+                return None
+
+            print(f"[배경 생성] ImageFX 쿠키 로드됨 (길이: {len(imagefx_cookie)})")
+
+            client = ImageFXClient(cookie=imagefx_cookie)
+            # v2.0: 모델은 파라미터에서 전달됨 (설정에서 이미 로드됨)
+            api_name = "Google ImageFX"
+            model_info = {"name": f"Imagen {model.replace('IMAGEN_', '').replace('_', '.')}", "price": 0.0}
+            use_imagefx = True
+
+            # 비율 계산
+            if width > height:
+                aspect_ratio = AspectRatio.LANDSCAPE
+            elif height > width:
+                aspect_ratio = AspectRatio.PORTRAIT
+            else:
+                aspect_ratio = AspectRatio.SQUARE
+        else:
+            # Together.ai FLUX 클라이언트 사용 (기본값)
+            from core.image.together_client import TogetherImageClient, get_model_price_info
+
+            client = TogetherImageClient()
+            # v2.0: 모델은 파라미터에서 전달됨 (설정에서 이미 로드됨)
+            model_info = get_model_price_info(model)
+            api_name = "Together.ai FLUX"
+            use_imagefx = False
 
         # ==============================
         # 스타일 매니저에서 스타일 로드
@@ -2391,7 +3764,7 @@ def generate_background_image(scene_id: int, prompt: str, style: str, width: int
         # 디버그 로그 출력
         print("=" * 60)
         print(f"[배경 생성] 씬 {scene_id}")
-        print(f"[배경 생성] 📌 API: Together.ai FLUX")
+        print(f"[배경 생성] 📌 API: {api_name}")
         print(f"[배경 생성] 📌 모델: {model}")
         print(f"[배경 생성] 📌 모델명: {model_info['name']}")
         if model_info['price'] > 0:
@@ -2411,7 +3784,7 @@ def generate_background_image(scene_id: int, prompt: str, style: str, width: int
             # API/모델 정보 표시
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("API", "Together.ai FLUX")
+                st.metric("API", api_name)
             with col2:
                 st.metric("모델", model_info['name'])
             with col3:
@@ -2443,11 +3816,74 @@ def generate_background_image(scene_id: int, prompt: str, style: str, width: int
                 st.markdown("**네거티브 프롬프트:**")
                 st.code(negative_prompt, language=None)
 
-        img_data = client.generate_image(
-            prompt=full_prompt,
-            width=width,
-            height=height
-        )
+        # API에 따른 이미지 생성
+        if use_imagefx:
+            # ImageFX 클라이언트 사용
+            from utils.imagefx_client import ImagenModel, ImageFXError
+            model_enum = ImagenModel[model] if model in ImagenModel.__members__ else ImagenModel.DEFAULT
+
+            current_prompt = full_prompt
+            max_sanitize_retries = 2
+            sanitize_attempt = 0
+
+            while True:
+                try:
+                    images = client.generate_image(
+                        prompt=current_prompt,
+                        model=model_enum,
+                        aspect_ratio=aspect_ratio,
+                        num_images=1
+                    )
+                    if images and len(images) > 0:
+                        img_data = images[0].get_bytes()
+                        break
+                    else:
+                        raise Exception("ImageFX 이미지 생성 실패: 결과 없음")
+
+                except CookieExpiredError as e:
+                    # 쿠키 만료 에러 - 재시도하지 않고 즉시 UI에 알림
+                    show_cookie_expired_error_in_result(str(e))
+                    st.stop()
+
+                except (ImageFXError, Exception) as e:
+                    error_msg = str(e)
+
+                    # 유명인 필터 에러 확인 및 자동 치환
+                    enable_sanitizer = st.session_state.get("enable_prominent_people_sanitizer", True)
+                    if enable_sanitizer and sanitize_attempt < max_sanitize_retries:
+                        if check_prominent_people_error(error_msg):
+                            sanitize_attempt += 1
+                            st.warning(f"유명인 필터 감지됨. AI로 프롬프트 치환 중... (시도 {sanitize_attempt}/{max_sanitize_retries})")
+
+                            # AI 모델로 프롬프트 치환
+                            ai_model = st.session_state.get("sanitizer_ai_model", get_recommended_model())
+                            sanitized_prompt, result = sanitize_prompt_for_imagefx(current_prompt, ai_model)
+
+                            if result.was_modified:
+                                st.info(f"치환됨: {result.detected_names}")
+                                with st.expander("치환 상세 정보"):
+                                    st.write("**감지된 이름:**", result.detected_names)
+                                    st.write("**치환 매핑:**", result.replacements)
+                                    st.write("**원본:**", current_prompt[:200] + "..." if len(current_prompt) > 200 else current_prompt)
+                                    st.write("**치환됨:**", sanitized_prompt[:200] + "..." if len(sanitized_prompt) > 200 else sanitized_prompt)
+
+                                current_prompt = sanitized_prompt
+                                continue  # 치환된 프롬프트로 재시도
+                            else:
+                                st.warning("AI가 유명인을 감지하지 못했습니다. 수동으로 프롬프트를 수정해주세요.")
+                                raise e
+                        else:
+                            raise e
+                    else:
+                        raise e
+        else:
+            # Together.ai FLUX 클라이언트 사용
+            img_data = client.generate_image(
+                prompt=full_prompt,
+                model=model,
+                width=width,
+                height=height
+            )
 
         # 저장
         bg_dir = project_path / "images" / "backgrounds"
@@ -2460,16 +3896,488 @@ def generate_background_image(scene_id: int, prompt: str, style: str, width: int
         with open(filepath, "wb") as f:
             f.write(img_data)
 
+        # 프롬프트 메타데이터 저장
+        save_image_with_prompt(
+            image_path=str(filepath),
+            original_prompt=prompt,
+            final_prompt=full_prompt,
+            negative_prompt=negative_prompt,
+            style_id=style_obj.id if style_obj else "",
+            style_name=style_obj.name_ko if style_obj else style,
+            style_prefix=style_prefix,
+            style_suffix=style_suffix,
+            api_provider=api_name,
+            model=model,
+            model_name=model_info['name'],
+            width=width,
+            height=height,
+            scene_id=scene_id
+        )
+
         # 메타데이터 저장
         set_background_for_scene(scene_id, str(filepath))
 
-        st.success(f"✅ 배경 생성 완료: {filename}")
-        st.image(str(filepath), use_container_width=True)
+        # SceneImageManager로 씬 데이터 업데이트
+        update_scene_background(scene_id, str(filepath), str(project_path))
+
+        st.success(f"배경 생성 완료: {filename}")
+        render_lightbox_image(str(filepath), key=f"bg_result_{scene_id}")
 
         return str(filepath)
 
     except Exception as e:
         st.error(f"배경 생성 실패: {e}")
+        import traceback
+        with st.expander("상세 오류"):
+            st.code(traceback.format_exc())
+        return None
+
+
+def generate_background_image_with_prompt(
+    scene_id: int,
+    full_prompt: str,
+    negative_prompt: str,
+    width: int,
+    height: int,
+    api_provider: str = None,
+    model: str = None
+):
+    """
+    사용자가 직접 수정한 프롬프트로 배경 이미지 생성
+
+    Args:
+        scene_id: 씬 번호
+        full_prompt: 최종 프롬프트 (prefix + scene + suffix 이미 조합됨)
+        negative_prompt: 네거티브 프롬프트
+        width: 이미지 너비
+        height: 이미지 높이
+        api_provider: API 제공자 (None이면 설정에서 로드)
+        model: 모델 ID (None이면 설정에서 로드)
+    """
+    try:
+        # v2.0: 파라미터가 없으면 설정에서 로드
+        if api_provider is None or model is None:
+            saved_api, saved_model = get_current_api_settings()
+            api_provider = api_provider or saved_api
+            model = model or saved_model
+
+        selected_api = api_provider
+
+        if selected_api == "Google ImageFX":
+            from utils.imagefx_client import ImageFXClient, AspectRatio, ImagenModel, ImageFXError
+            from config.settings import load_imagefx_cookie, load_imagefx_auth_token
+
+            auth_token = st.session_state.get("imagefx_auth_token", "") or load_imagefx_auth_token()
+            imagefx_cookie = st.session_state.get("imagefx_cookie", "") or load_imagefx_cookie()
+
+            if auth_token:
+                client = ImageFXClient(authorization_token=auth_token)
+            elif imagefx_cookie:
+                client = ImageFXClient(cookie=imagefx_cookie)
+            else:
+                st.error("❌ ImageFX 인증이 설정되지 않았습니다.")
+                return None
+
+            # v2.0: 모델은 파라미터에서 전달됨 (설정에서 이미 로드됨)
+            model_enum = ImagenModel[model] if model in ImagenModel.__members__ else ImagenModel.DEFAULT
+
+            if width > height:
+                aspect_ratio = AspectRatio.LANDSCAPE
+            elif height > width:
+                aspect_ratio = AspectRatio.PORTRAIT
+            else:
+                aspect_ratio = AspectRatio.SQUARE
+
+            images = client.generate_image(
+                prompt=full_prompt,
+                model=model_enum,
+                aspect_ratio=aspect_ratio,
+                num_images=1
+            )
+
+            if images and len(images) > 0:
+                img_data = images[0].get_bytes()
+            else:
+                raise Exception("ImageFX 이미지 생성 실패")
+
+        else:
+            from core.image.together_client import TogetherImageClient
+
+            client = TogetherImageClient()
+            # v2.0: 모델은 파라미터에서 전달됨 (설정에서 이미 로드됨)
+
+            img_data = client.generate_image(
+                prompt=full_prompt,
+                model=model,
+                width=width,
+                height=height
+            )
+
+        # 저장
+        bg_dir = project_path / "images" / "backgrounds"
+        bg_dir.mkdir(parents=True, exist_ok=True)
+
+        timestamp = int(time.time() * 1000)
+        filename = f"bg_scene_{scene_id:03d}_{timestamp}.png"
+        filepath = bg_dir / filename
+
+        with open(filepath, "wb") as f:
+            f.write(img_data)
+
+        # 프롬프트 메타데이터 저장
+        from core.image.together_client import get_model_price_info
+        model_info = get_model_price_info(model) if selected_api != "Google ImageFX" else {"name": f"Imagen {model.replace('IMAGEN_', '').replace('_', '.')}"}
+        save_image_with_prompt(
+            image_path=str(filepath),
+            original_prompt="[User Modified]",
+            final_prompt=full_prompt,
+            negative_prompt=negative_prompt,
+            api_provider=selected_api,
+            model=model,
+            model_name=model_info.get('name', model),
+            width=width,
+            height=height,
+            scene_id=scene_id,
+            extra_info={"user_modified": True}
+        )
+
+        set_background_for_scene(scene_id, str(filepath))
+        update_scene_background(scene_id, str(filepath), str(project_path))
+
+        print(f"[배경 생성(수정)] 씬 {scene_id} 완료: {filename}")
+        return str(filepath)
+
+    except Exception as e:
+        st.error(f"배경 생성 실패: {e}")
+        return None
+
+
+def generate_scene_composite_image_with_prompt(
+    scene_id: int,
+    final_prompt: str,
+    negative_prompt: str,
+    width: int = 1280,
+    height: int = 720
+):
+    """
+    사용자가 직접 수정한 프롬프트로 씬 합성 이미지 생성
+
+    Args:
+        scene_id: 씬 번호
+        final_prompt: 최종 프롬프트 (이미 조합됨)
+        negative_prompt: 네거티브 프롬프트
+        width: 이미지 너비
+        height: 이미지 높이
+    """
+    try:
+        selected_api = st.session_state.get("image_api", "Together.ai FLUX")
+
+        if selected_api == "Google ImageFX":
+            from utils.imagefx_client import ImageFXClient, AspectRatio, ImagenModel
+            from config.settings import load_imagefx_cookie, load_imagefx_auth_token
+
+            auth_token = st.session_state.get("imagefx_auth_token", "") or load_imagefx_auth_token()
+            imagefx_cookie = st.session_state.get("imagefx_cookie", "") or load_imagefx_cookie()
+
+            if auth_token:
+                client = ImageFXClient(authorization_token=auth_token)
+            elif imagefx_cookie:
+                client = ImageFXClient(cookie=imagefx_cookie)
+            else:
+                st.error("❌ ImageFX 인증이 설정되지 않았습니다.")
+                return None
+
+            model = st.session_state.get("imagefx_model", "IMAGEN_3_5")
+            model_enum = ImagenModel[model] if model in ImagenModel.__members__ else ImagenModel.DEFAULT
+
+            if width > height:
+                aspect_ratio = AspectRatio.LANDSCAPE
+            elif height > width:
+                aspect_ratio = AspectRatio.PORTRAIT
+            else:
+                aspect_ratio = AspectRatio.SQUARE
+
+            images = client.generate_image(
+                prompt=final_prompt,
+                model=model_enum,
+                aspect_ratio=aspect_ratio,
+                num_images=1
+            )
+
+            if images and len(images) > 0:
+                img_data = images[0].get_bytes()
+            else:
+                raise Exception("ImageFX 이미지 생성 실패")
+
+        else:
+            from core.image.together_client import TogetherImageClient
+            from config.settings import TOGETHER_DEFAULT_MODEL
+
+            client = TogetherImageClient()
+            model = st.session_state.get("flux_model") or TOGETHER_DEFAULT_MODEL or "black-forest-labs/FLUX.2-dev"
+
+            img_data = client.generate_image(
+                prompt=final_prompt,
+                model=model,
+                width=width,
+                height=height
+            )
+
+        # 저장 (합성 이미지 폴더에)
+        composite_dir = project_path / "images" / "composited"
+        composite_dir.mkdir(parents=True, exist_ok=True)
+
+        timestamp = int(time.time() * 1000)
+        filename = f"composite_scene_{scene_id:03d}_{timestamp}.png"
+        filepath = composite_dir / filename
+
+        with open(filepath, "wb") as f:
+            f.write(img_data)
+
+        # 프롬프트 메타데이터 저장
+        api_name = selected_api
+        if selected_api == "Google ImageFX":
+            model_name = f"Imagen {model.replace('IMAGEN_', '').replace('_', '.')}"
+        else:
+            from core.image.together_client import get_model_price_info
+            model_info = get_model_price_info(model)
+            model_name = model_info.get('name', model)
+
+        save_image_with_prompt(
+            image_path=str(filepath),
+            original_prompt="[User Modified Composite]",
+            final_prompt=final_prompt,
+            negative_prompt=negative_prompt,
+            api_provider=api_name,
+            model=model,
+            model_name=model_name,
+            width=width,
+            height=height,
+            scene_id=scene_id,
+            extra_info={"type": "composite", "user_modified": True}
+        )
+
+        # 메타데이터 업데이트
+        set_composited_for_scene(scene_id, str(filepath))
+
+        print(f"[씬합성 생성(수정)] 씬 {scene_id} 완료: {filename}")
+        return str(filepath)
+
+    except Exception as e:
+        st.error(f"씬 합성 이미지 생성 실패: {e}")
+        return None
+
+
+def generate_scene_composite_image(
+    scene_id: int,
+    scene_prompt: str,
+    composite_style,
+    apply_negative: bool = True,
+    width: int = 1280,
+    height: int = 720
+):
+    """
+    씬 합성 이미지 생성 (배경 + 캐릭터 통합 스타일)
+
+    Args:
+        scene_id: 씬 번호
+        scene_prompt: 씬 이미지 프롬프트
+        composite_style: 씬 합성 스타일 Style 객체
+        apply_negative: 네거티브 프롬프트 적용 여부
+        width: 이미지 너비
+        height: 이미지 높이
+
+    Returns:
+        생성된 이미지 경로 또는 None
+    """
+    try:
+        from utils.style_manager import build_scene_composite_prompt
+
+        # ==============================
+        # 프롬프트 조합
+        # ==============================
+        prompt_result = build_scene_composite_prompt(
+            scene_prompt=scene_prompt,
+            style=composite_style,
+            include_negative=apply_negative
+        )
+
+        full_prompt = prompt_result["positive"]
+        negative_prompt = prompt_result["negative"]
+
+        # ==============================
+        # API 선택에 따른 클라이언트 초기화
+        # ==============================
+        selected_api = st.session_state.get("image_api", "Together.ai FLUX")
+
+        if selected_api == "Google ImageFX":
+            from utils.imagefx_client import ImageFXClient, AspectRatio, ImagenModel, ImageFXError
+            from config.settings import load_imagefx_cookie
+
+            imagefx_cookie = st.session_state.get("imagefx_cookie", "") or load_imagefx_cookie()
+            if not imagefx_cookie:
+                st.error("❌ ImageFX 쿠키가 설정되지 않았습니다.")
+                return None
+
+            client = ImageFXClient(cookie=imagefx_cookie)
+            model = st.session_state.get("imagefx_model", "IMAGEN_3_5")
+            api_name = "Google ImageFX"
+            model_info = {"name": f"Imagen {model.replace('IMAGEN_', '').replace('_', '.')}", "price": 0.0}
+            use_imagefx = True
+
+            if width > height:
+                aspect_ratio = AspectRatio.LANDSCAPE
+            elif height > width:
+                aspect_ratio = AspectRatio.PORTRAIT
+            else:
+                aspect_ratio = AspectRatio.SQUARE
+        else:
+            from core.image.together_client import TogetherImageClient, get_model_price_info
+            from config.settings import TOGETHER_DEFAULT_MODEL
+
+            client = TogetherImageClient()
+            model = st.session_state.get("flux_model") or TOGETHER_DEFAULT_MODEL or "black-forest-labs/FLUX.2-dev"
+            model_info = get_model_price_info(model)
+            api_name = "Together.ai FLUX"
+            use_imagefx = False
+
+        # ==============================
+        # 디버그 로그 출력
+        # ==============================
+        print("=" * 60)
+        print(f"[씬 합성 생성] 씬 {scene_id}")
+        print(f"[씬 합성 생성] 📌 API: {api_name}")
+        print(f"[씬 합성 생성] 📌 모델: {model}")
+        print(f"[씬 합성 생성] 📌 스타일: {composite_style.name_ko}")
+        print(f"[씬 합성 생성] 📌 크기: {width}x{height}")
+        print(f"[씬 합성 생성] 원본 프롬프트: {scene_prompt[:100]}..." if len(scene_prompt) > 100 else f"[씬 합성 생성] 원본 프롬프트: {scene_prompt}")
+        print(f"[씬 합성 생성] 최종 프롬프트 길이: {len(full_prompt)}자")
+        if negative_prompt:
+            print(f"[씬 합성 생성] 네거티브: {negative_prompt[:80]}..." if len(negative_prompt) > 80 else f"[씬 합성 생성] 네거티브: {negative_prompt}")
+        print("-" * 60)
+
+        # UI에 프롬프트 표시
+        with st.expander(f"🔍 씬 {scene_id} - 생성에 사용된 프롬프트", expanded=False):
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("API", api_name)
+            with col2:
+                st.metric("모델", model_info['name'])
+            with col3:
+                st.metric("스타일", composite_style.name_ko)
+
+            st.markdown("---")
+            st.markdown("**원본 씬 프롬프트:**")
+            st.code(scene_prompt, language=None)
+
+            st.markdown("**최종 프롬프트:**")
+            st.code(full_prompt[:500] + "..." if len(full_prompt) > 500 else full_prompt, language=None)
+
+            if negative_prompt:
+                st.markdown("**네거티브 프롬프트:**")
+                st.code(negative_prompt, language=None)
+
+        # ==============================
+        # 이미지 생성
+        # ==============================
+        if use_imagefx:
+            model_enum = ImagenModel[model] if model in ImagenModel.__members__ else ImagenModel.DEFAULT
+
+            current_prompt = full_prompt
+            max_sanitize_retries = 2
+            sanitize_attempt = 0
+
+            while True:
+                try:
+                    images = client.generate_image(
+                        prompt=current_prompt,
+                        model=model_enum,
+                        aspect_ratio=aspect_ratio,
+                        num_images=1
+                    )
+                    if images and len(images) > 0:
+                        img_data = images[0].get_bytes()
+                        break
+                    else:
+                        raise Exception("ImageFX 이미지 생성 실패: 결과 없음")
+
+                except CookieExpiredError as e:
+                    show_cookie_expired_error_in_result(str(e))
+                    st.stop()
+
+                except (ImageFXError, Exception) as e:
+                    error_msg = str(e)
+                    enable_sanitizer = st.session_state.get("enable_prominent_people_sanitizer", True)
+
+                    if enable_sanitizer and sanitize_attempt < max_sanitize_retries:
+                        if check_prominent_people_error(error_msg):
+                            sanitize_attempt += 1
+                            st.warning(f"유명인 필터 감지됨. AI로 프롬프트 치환 중... (시도 {sanitize_attempt}/{max_sanitize_retries})")
+
+                            ai_model = st.session_state.get("sanitizer_ai_model", get_recommended_model())
+                            sanitized_prompt, result = sanitize_prompt_for_imagefx(current_prompt, ai_model)
+
+                            if result.was_modified:
+                                st.info(f"치환됨: {result.detected_names}")
+                                current_prompt = sanitized_prompt
+                                continue
+                            else:
+                                st.warning("AI가 유명인을 감지하지 못했습니다.")
+                                raise e
+                        else:
+                            raise e
+                    else:
+                        raise e
+        else:
+            img_data = client.generate_image(
+                prompt=full_prompt,
+                model=model,
+                width=width,
+                height=height
+            )
+
+        # ==============================
+        # 저장 (composited 폴더에 저장)
+        # ==============================
+        comp_dir = project_path / "images" / "composited"
+        comp_dir.mkdir(parents=True, exist_ok=True)
+
+        timestamp = int(time.time() * 1000)
+        filename = f"composited_scene_{scene_id:03d}_{timestamp}.png"
+        filepath = comp_dir / filename
+
+        with open(filepath, "wb") as f:
+            f.write(img_data)
+
+        # 프롬프트 메타데이터 저장
+        save_image_with_prompt(
+            image_path=str(filepath),
+            original_prompt=scene_prompt,
+            final_prompt=full_prompt,
+            negative_prompt=negative_prompt,
+            style_id=composite_style.id if composite_style else "",
+            style_name=composite_style.name_ko if composite_style else "",
+            style_prefix=composite_style.prompt_prefix if composite_style else "",
+            style_suffix=composite_style.prompt_suffix if composite_style else "",
+            api_provider=api_name,
+            model=model,
+            model_name=model_info['name'],
+            width=width,
+            height=height,
+            scene_id=scene_id,
+            extra_info={"type": "composite"}
+        )
+
+        # SceneImageManager로 씬 데이터 업데이트
+        update_scene_composite(scene_id, str(filepath), str(project_path))
+
+        st.success(f"씬 합성 이미지 생성 완료: {filename}")
+        render_lightbox_image(str(filepath), key=f"comp_result_{scene_id}")
+
+        return str(filepath)
+
+    except Exception as e:
+        st.error(f"씬 합성 이미지 생성 실패: {e}")
         import traceback
         with st.expander("상세 오류"):
             st.code(traceback.format_exc())
@@ -2489,6 +4397,9 @@ def save_uploaded_background(scene_id: int, uploaded_file):
         f.write(uploaded_file.getbuffer())
 
     set_background_for_scene(scene_id, str(filepath))
+
+    # ✅ SceneImageManager로 씬 데이터 업데이트
+    update_scene_background(scene_id, str(filepath), str(project_path))
 
     st.success("배경이 저장되었습니다!")
     st.rerun()
@@ -2513,18 +4424,25 @@ def set_background_for_scene(scene_id: int, filepath: str):
         json.dump(bg_data, f, ensure_ascii=False, indent=2)
 
 
-def execute_composite(scene_id: int, scene: Dict, remove_bg: bool) -> Optional[str]:
+def execute_composite(scene_id: int, scene: Dict, remove_bg: bool, use_scene_pose: bool = False) -> Optional[str]:
     """
     합성 실행 - 드래그 편집기/슬라이더 형식 모두 지원
 
     좌표 형식:
     - 드래그 편집기: x, y (중심 비율 0~1), width, height (캔버스 대비 비율)
     - 슬라이더: x, y (중심 비율 0~1), scale (배율)
+
+    Args:
+        scene_id: 씬 ID
+        scene: 씬 정보
+        remove_bg: 캐릭터 배경 제거 여부
+        use_scene_pose: 씬별 포즈 이미지 사용 여부 (캐릭터 관리에서 설정한 포즈)
     """
     try:
         from PIL import Image, ImageOps
 
         print(f"[Composite] 씬 {scene_id} 합성 시작")
+        print(f"[Composite] 포즈 모드: {'씬별 다른 포즈' if use_scene_pose else '단일 포즈'}")
 
         # 배경 이미지 로드
         bg_data = get_background_for_scene(scene_id)
@@ -2560,7 +4478,15 @@ def execute_composite(scene_id: int, scene: Dict, remove_bg: bool) -> Optional[s
             char_info = next((c for c in all_chars_combined if c.get("name") == char_name), None)
 
             if char_info:
-                char_image_path = char_info.get("image_path") or char_info.get("image_url")
+                # 씬별 포즈 이미지 선택 (use_scene_pose가 True일 때)
+                if use_scene_pose:
+                    char_image_path = get_character_image_for_scene_from_session(
+                        character_info=char_info,
+                        scene_id=scene_id,
+                        use_scene_pose=True
+                    )
+                else:
+                    char_image_path = char_info.get("image_path") or char_info.get("image_url")
 
                 if char_image_path and os.path.exists(char_image_path):
                     # 기본 위치 (캐릭터가 여러 개일 때 분산 배치)
@@ -2573,6 +4499,14 @@ def execute_composite(scene_id: int, scene: Dict, remove_bg: bool) -> Optional[s
                         "flip_x": False,
                         "z_index": idx + 1
                     })
+
+                    # 포즈 정보 로깅
+                    if use_scene_pose:
+                        scene_poses = char_info.get("scene_poses", {})
+                        pose_info = scene_poses.get(str(scene_id), {})
+                        pose_name = pose_info.get("pose", "default")
+                        print(f"[Composite] ✅ '{char_name}': {pose_name} 포즈 적용")
+                        print(f"[Composite]    이미지: {os.path.basename(char_image_path)}")
 
                     char_layers.append({
                         "name": char_name,
@@ -2689,10 +4623,128 @@ def execute_composite(scene_id: int, scene: Dict, remove_bg: bool) -> Optional[s
 
         background.save(filepath, "PNG")
 
+        # ✅ SceneImageManager로 씬 데이터 업데이트
+        update_scene_composite(scene_id, str(filepath), str(project_path))
+
+        print(f"[Composite] ✅ 씬 {scene_id} 합성 저장: {filename}")
+
         return str(filepath)
 
     except Exception as e:
         st.error(f"합성 실패: {e}")
+        import traceback
+        with st.expander("상세 오류"):
+            st.code(traceback.format_exc())
+        return None
+
+
+def execute_representative_character_composite(
+    scene_id: int,
+    scene: Dict,
+    remove_bg: bool = True
+) -> Optional[str]:
+    """
+    대표 캐릭터 합성 실행
+
+    대표 캐릭터 관리에서 생성한 씬별 액션 이미지를 배경에 합성합니다.
+
+    Args:
+        scene_id: 씬 ID
+        scene: 씬 정보
+        remove_bg: 캐릭터 배경 제거 여부
+    """
+    try:
+        from PIL import Image, ImageOps
+
+        print(f"[RepCharComposite] 씬 {scene_id} 대표 캐릭터 합성 시작")
+
+        # 배경 이미지 로드
+        bg_data = get_background_for_scene(scene_id)
+        if not bg_data:
+            st.error("배경 이미지가 없습니다.")
+            return None
+
+        bg_path = bg_data.get("path") or bg_data.get("url")
+        if not bg_path or not os.path.exists(bg_path):
+            st.error("배경 이미지 파일을 찾을 수 없습니다.")
+            return None
+
+        background = Image.open(bg_path).convert("RGBA")
+        bg_width, bg_height = background.size
+        print(f"[RepCharComposite] 배경 크기: {bg_width}x{bg_height}")
+
+        # 대표 캐릭터 액션 이미지 가져오기
+        char_image_path = get_representative_character_image_for_scene(scene_id)
+
+        if not char_image_path:
+            st.warning(f"씬 {scene_id}의 대표 캐릭터 액션 이미지가 없습니다. 캐릭터 관리에서 생성하세요.")
+            return None
+
+        if not os.path.exists(char_image_path):
+            st.warning(f"대표 캐릭터 이미지 파일을 찾을 수 없습니다: {char_image_path}")
+            return None
+
+        print(f"[RepCharComposite] 캐릭터 이미지: {os.path.basename(char_image_path)}")
+
+        # 캐릭터 이미지 로드 및 배경 제거
+        char_img = Image.open(char_image_path).convert("RGBA")
+
+        if remove_bg:
+            try:
+                from utils.background_remover import get_background_remover
+                bg_remover = get_background_remover()
+                transparent_path = bg_remover.remove_background(
+                    char_image_path,
+                    fix_holes=True,
+                    alpha_matting=True
+                )
+                if transparent_path:
+                    char_img = Image.open(transparent_path).convert("RGBA")
+            except Exception as e:
+                print(f"[RepCharComposite] 배경 제거 실패, rembg 시도: {e}")
+                try:
+                    from rembg import remove
+                    char_img = remove(char_img)
+                except Exception as e2:
+                    st.warning(f"배경 제거 실패: {e2}")
+
+        # 캐릭터 크기 조정 (배경의 50% 높이로)
+        char_width, char_height = char_img.size
+        target_height = int(bg_height * 0.5)
+        scale_ratio = target_height / char_height
+        new_width = int(char_width * scale_ratio)
+        new_height = target_height
+
+        char_img = char_img.resize((new_width, new_height), Image.LANCZOS)
+
+        # 중앙 하단에 배치 (기본 위치)
+        x = (bg_width - new_width) // 2
+        y = bg_height - new_height - int(bg_height * 0.05)  # 하단에서 5% 여백
+
+        # 합성
+        background.paste(char_img, (x, y), char_img)
+        print(f"[RepCharComposite] 합성 위치: ({x}, {y}), 크기: {new_width}x{new_height}")
+
+        # 저장
+        comp_dir = project_path / "images" / "composited"
+        comp_dir.mkdir(parents=True, exist_ok=True)
+
+        timestamp = int(time.time())
+        filename = f"scene_{scene_id:03d}_rep_char_{timestamp}.png"
+        filepath = comp_dir / filename
+
+        background.save(filepath, "PNG")
+
+        # SceneImageManager로 씬 데이터 업데이트
+        update_scene_composite(scene_id, str(filepath), str(project_path))
+
+        print(f"[RepCharComposite] ✅ 씬 {scene_id} 대표 캐릭터 합성 저장: {filename}")
+        st.success(f"✅ 씬 {scene_id} 대표 캐릭터 합성 완료")
+
+        return str(filepath)
+
+    except Exception as e:
+        st.error(f"대표 캐릭터 합성 실패: {e}")
         import traceback
         with st.expander("상세 오류"):
             st.code(traceback.format_exc())
@@ -2725,6 +4777,387 @@ def cleanup_unused_images():
 
 
 # ===================================================================
+# 인포그래픽 탭 렌더링
+# ===================================================================
+
+def render_infographic_tab():
+    """인포그래픽용 이미지 생성 탭"""
+
+    st.markdown("### 📊 인포그래픽용 이미지 생성")
+    st.caption("가운데를 비워두고 모서리/가장자리에 요소를 배치한 이미지를 생성합니다.")
+
+    # ✅ v2.0: API/모델 선택 UI (탭 상단에 배치)
+    infographic_api, infographic_model = render_api_selector(
+        key_prefix="infographic",
+        show_in_expander=True,
+        expander_default_open=False,
+        show_save_button=True
+    )
+
+    # 설명
+    with st.expander("💡 인포그래픽용 이미지란?", expanded=False):
+        st.markdown("""
+        **인포그래픽용 이미지**는 텍스트나 그래프와 합성할 때 사용합니다.
+
+        - 가운데가 비어 있어 텍스트/정보를 배치하기 좋습니다
+        - 모서리/가장자리에 장식 요소가 있어 시각적으로 풍부합니다
+        - 프레젠테이션, 유튜브 썸네일, 인포그래픽 등에 활용
+
+        ```
+        일반 이미지:           인포그래픽용:
+        ┌─────────────┐       ┌─────────────┐
+        │  [메인 요소] │       │[A]       [B]│
+        │   중앙 배치  │       │             │
+        │             │       │   (비움)    │
+        └─────────────┘       │[C]       [D]│
+                              └─────────────┘
+        ```
+        """)
+
+    # 씬 데이터 확인
+    scenes = st.session_state.get("scenes", [])
+    if not scenes:
+        st.warning("씬이 없습니다. 먼저 씬 분석을 실행하세요.")
+        return
+
+    # 서브탭
+    sub_tabs = st.tabs(["🎨 개별 생성", "🚀 일괄 생성", "🖼️ 갤러리"])
+
+    with sub_tabs[0]:
+        _render_infographic_single_generation(scenes)
+
+    with sub_tabs[1]:
+        _render_infographic_batch_generation(scenes)
+
+    with sub_tabs[2]:
+        _render_infographic_gallery()
+
+
+def _render_infographic_single_generation(scenes: List[Dict]):
+    """인포그래픽 개별 생성"""
+
+    from utils.infographic_image_generator import (
+        InfographicImageGenerator,
+        get_available_layouts,
+        get_layout_by_id,
+        get_layout_preview_html
+    )
+
+    col_left, col_right = st.columns([1, 1])
+
+    with col_left:
+        st.markdown("#### 씬 선택")
+
+        # 씬 선택
+        scene_options = {
+            f"씬 {s.get('scene_id', i+1)}: {s.get('title', '')[:30]}": s.get('scene_id', i+1)
+            for i, s in enumerate(scenes)
+        }
+        selected_scene_name = st.selectbox(
+            "씬",
+            list(scene_options.keys()),
+            key="infographic_scene_select"
+        )
+        selected_scene_id = scene_options[selected_scene_name]
+        selected_scene = next((s for s in scenes if s.get('scene_id') == selected_scene_id), scenes[0])
+
+        # 프롬프트
+        base_prompt = (
+            selected_scene.get("image_prompt_en", "") or
+            selected_scene.get("image_prompt", "") or
+            selected_scene.get("prompts", {}).get("image_prompt_en", "") or
+            selected_scene.get("description", "")
+        )
+
+        st.markdown("#### 기본 프롬프트")
+        edit_prompt = st.text_area(
+            "프롬프트 (편집 가능)",
+            value=base_prompt,
+            height=100,
+            key="infographic_prompt"
+        )
+
+    with col_right:
+        st.markdown("#### 레이아웃 선택")
+
+        # 레이아웃 선택
+        layouts = get_available_layouts()
+        layout_options = {f"{l['icon']} {l['name']}": l['id'] for l in layouts}
+
+        selected_layout_name = st.selectbox(
+            "레이아웃",
+            list(layout_options.keys()),
+            key="infographic_layout_select"
+        )
+        selected_layout_id = layout_options[selected_layout_name]
+        selected_layout = get_layout_by_id(selected_layout_id)
+
+        # 레이아웃 미리보기
+        st.markdown("**미리보기:**")
+        preview_html = get_layout_preview_html(selected_layout_id)
+        st.markdown(preview_html, unsafe_allow_html=True)
+
+        # 레이아웃 설명
+        layout_info = next((l for l in layouts if l['id'] == selected_layout_id), None)
+        if layout_info:
+            st.caption(layout_info['description'])
+
+    st.markdown("---")
+
+    # 스타일 선택
+    st.markdown("#### 스타일")
+    style_manager = get_style_manager(str(project_path))
+    infographic_styles = style_manager.get_styles_by_segment("infographic")
+
+    if infographic_styles:
+        style_options = {f"{s.name_ko} ({s.name})": s for s in infographic_styles}
+        selected_style_name = st.selectbox(
+            "인포그래픽 스타일",
+            list(style_options.keys()),
+            key="infographic_style_select"
+        )
+        selected_style = style_options[selected_style_name]
+        style_dict = {
+            "prompt_prefix": selected_style.prompt_prefix,
+            "prompt_suffix": selected_style.prompt_suffix,
+            "negative_prompt": selected_style.negative_prompt
+        }
+
+        with st.expander("스타일 상세"):
+            st.markdown(f"**Prefix:** {selected_style.prompt_prefix}")
+            st.markdown(f"**Suffix:** {selected_style.prompt_suffix}")
+            if selected_style.negative_prompt:
+                st.markdown(f"**Negative:** {selected_style.negative_prompt}")
+    else:
+        st.info("인포그래픽 스타일이 없습니다. '스타일 관리' 페이지에서 추가하세요.")
+        style_dict = None
+
+    # 생성 옵션
+    col_a, col_b = st.columns(2)
+    with col_a:
+        width = st.selectbox("너비", [1024, 1280, 1536, 1920], index=1, key="infographic_width")
+    with col_b:
+        height = st.selectbox("높이", [576, 720, 864, 1080], index=1, key="infographic_height")
+
+    # v2.0: 세션에서 선택된 API 가져와서 infographic API 형식으로 변환
+    selected_api = st.session_state.get("_infographic_api", "Together.ai FLUX")
+    if selected_api == "Google ImageFX":
+        api_type = "imagefx"
+    else:
+        api_type = "together"
+
+    st.markdown("---")
+
+    # 생성 버튼
+    if st.button("🎨 인포그래픽 이미지 생성", type="primary", key="generate_infographic"):
+        with st.spinner("인포그래픽용 이미지 생성 중..."):
+            try:
+                generator = InfographicImageGenerator(str(project_path))
+
+                result_path = generator.generate_image(
+                    scene_id=selected_scene_id,
+                    prompt=edit_prompt,
+                    layout=selected_layout,
+                    style=style_dict,
+                    api_type=api_type,
+                    width=width,
+                    height=height
+                )
+
+                if result_path and os.path.exists(result_path):
+                    st.success(f"✅ 생성 완료!")
+
+                    # 이미지 표시
+                    clickable_image(result_path, caption=f"씬 {selected_scene_id} - {selected_layout_name}")
+
+                    # 세션에 저장
+                    if "infographic_images" not in st.session_state:
+                        st.session_state["infographic_images"] = {}
+                    st.session_state["infographic_images"][str(selected_scene_id)] = result_path
+
+                else:
+                    st.error("이미지 생성에 실패했습니다.")
+
+            except Exception as e:
+                st.error(f"오류: {e}")
+                import traceback
+                with st.expander("상세 오류"):
+                    st.code(traceback.format_exc())
+
+
+def _render_infographic_batch_generation(scenes: List[Dict]):
+    """인포그래픽 일괄 생성"""
+
+    from utils.infographic_image_generator import (
+        InfographicImageGenerator,
+        get_available_layouts,
+        get_layout_by_id,
+        get_layout_preview_html
+    )
+
+    st.markdown("#### 일괄 생성 설정")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # 레이아웃 선택
+        layouts = get_available_layouts()
+        layout_options = {f"{l['icon']} {l['name']}": l['id'] for l in layouts}
+
+        selected_layout_name = st.selectbox(
+            "레이아웃 (전체 씬에 적용)",
+            list(layout_options.keys()),
+            key="batch_infographic_layout"
+        )
+        selected_layout_id = layout_options[selected_layout_name]
+        selected_layout = get_layout_by_id(selected_layout_id)
+
+        # 미리보기
+        preview_html = get_layout_preview_html(selected_layout_id)
+        st.markdown(preview_html, unsafe_allow_html=True)
+
+    with col2:
+        # 스타일 선택
+        style_manager = get_style_manager(str(project_path))
+        infographic_styles = style_manager.get_styles_by_segment("infographic")
+
+        if infographic_styles:
+            style_options = {f"{s.name_ko}": s for s in infographic_styles}
+            selected_style_name = st.selectbox(
+                "스타일",
+                list(style_options.keys()),
+                key="batch_infographic_style"
+            )
+            selected_style = style_options[selected_style_name]
+            style_dict = {
+                "prompt_prefix": selected_style.prompt_prefix,
+                "prompt_suffix": selected_style.prompt_suffix,
+                "negative_prompt": selected_style.negative_prompt
+            }
+        else:
+            style_dict = None
+            st.info("스타일 없음")
+
+        # v2.0: 세션에서 선택된 API 가져와서 infographic API 형식으로 변환
+        selected_api = st.session_state.get("_infographic_api", "Together.ai FLUX")
+        if selected_api == "Google ImageFX":
+            api_type = "imagefx"
+        else:
+            api_type = "together"
+
+        st.caption(f"💡 API: {selected_api} → {api_type}")
+
+    # 씬 목록
+    st.markdown("---")
+    st.markdown(f"#### 대상 씬 ({len(scenes)}개)")
+
+    for scene in scenes[:5]:  # 미리보기는 5개만
+        scene_id = scene.get("scene_id", 0)
+        title = scene.get("title", "")[:40]
+        st.caption(f"• 씬 {scene_id}: {title}")
+
+    if len(scenes) > 5:
+        st.caption(f"... 외 {len(scenes) - 5}개")
+
+    st.markdown("---")
+
+    # 일괄 생성 버튼
+    if st.button("🚀 전체 씬 인포그래픽 생성", type="primary", key="batch_generate_infographic"):
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+
+        def on_progress(current, total, message):
+            progress_bar.progress(current / total)
+            status_text.text(message)
+
+        with st.spinner("일괄 생성 중..."):
+            try:
+                generator = InfographicImageGenerator(str(project_path))
+
+                results = generator.batch_generate(
+                    scenes=scenes,
+                    layout=selected_layout,
+                    style=style_dict,
+                    api_type=api_type,
+                    on_progress=on_progress
+                )
+
+                progress_bar.progress(1.0)
+                status_text.empty()
+
+                if results:
+                    st.success(f"✅ {len(results)}/{len(scenes)}개 씬 생성 완료!")
+
+                    # 세션에 저장
+                    if "infographic_images" not in st.session_state:
+                        st.session_state["infographic_images"] = {}
+
+                    for scene_id, image_path in results.items():
+                        st.session_state["infographic_images"][str(scene_id)] = image_path
+
+                    # 결과 미리보기
+                    st.markdown("#### 생성 결과")
+                    cols = st.columns(3)
+                    for idx, (scene_id, image_path) in enumerate(list(results.items())[:6]):
+                        with cols[idx % 3]:
+                            if os.path.exists(image_path):
+                                clickable_image(image_path, caption=f"씬 {scene_id}")
+
+                else:
+                    st.warning("생성된 이미지가 없습니다.")
+
+            except Exception as e:
+                st.error(f"일괄 생성 오류: {e}")
+                import traceback
+                with st.expander("상세 오류"):
+                    st.code(traceback.format_exc())
+
+
+def _render_infographic_gallery():
+    """인포그래픽 이미지 갤러리"""
+
+    st.markdown("#### 생성된 인포그래픽 이미지")
+
+    # 저장된 이미지 조회
+    infographic_dir = project_path / "images" / "infographic"
+
+    if not infographic_dir.exists():
+        st.info("아직 생성된 인포그래픽 이미지가 없습니다.")
+        return
+
+    image_files = list(infographic_dir.glob("*.png"))
+
+    if not image_files:
+        st.info("아직 생성된 인포그래픽 이미지가 없습니다.")
+        return
+
+    # 최신순 정렬
+    image_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+
+    st.caption(f"총 {len(image_files)}개 이미지")
+
+    # 그리드 표시
+    cols = st.columns(3)
+
+    for idx, img_path in enumerate(image_files):
+        with cols[idx % 3]:
+            with st.container(border=True):
+                clickable_image(str(img_path), caption="")
+
+                # 파일 정보
+                filename = img_path.name
+                st.caption(filename[:30] + "..." if len(filename) > 30 else filename)
+
+                # 삭제 버튼
+                if st.button("🗑️", key=f"del_infographic_{idx}", help="삭제"):
+                    try:
+                        os.remove(img_path)
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"삭제 실패: {e}")
+
+
+# ===================================================================
 # 메인
 # ===================================================================
 
@@ -2734,6 +5167,12 @@ sync_all_data()
 # 헤더
 st.title("🎨 6단계: 이미지 생성")
 st.caption(f"프로젝트: {project_path.name}")
+
+# ImageFX 쿠키 갱신 모달 (활성화된 경우 표시)
+show_cookie_renewal_modal()
+
+# ImageFX 쿠키 상태 배너 (만료/미설정 시 표시)
+show_cookie_status_banner()
 
 # API 키 확인
 if not require_api_key("TOGETHER_API_KEY", "Together.ai API"):
@@ -2745,6 +5184,7 @@ st.divider()
 tabs = st.tabs([
     "🎬 씬별 생성",
     "🚀 일괄 생성",
+    "📊 인포그래픽",
     "🖼️ 갤러리",
     "⚙️ 설정"
 ])
@@ -2756,9 +5196,12 @@ with tabs[1]:
     render_batch_generation_tab()
 
 with tabs[2]:
-    render_gallery_tab()
+    render_infographic_tab()
 
 with tabs[3]:
+    render_gallery_tab()
+
+with tabs[4]:
     render_settings_tab()
 
 # 푸터

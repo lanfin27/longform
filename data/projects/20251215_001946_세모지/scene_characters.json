@@ -4,16 +4,20 @@
       "자말 카슈끄지": {
         "poses": {
           "standing": {
-            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766767425977.png",
-            "updated_at": "2025-12-27T01:43:48.348013"
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_standing_1766771420278.png",
+            "updated_at": "2025-12-27T02:50:23.815972"
+          },
+          "portrait": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766800257504.png",
+            "updated_at": "2025-12-27T10:50:57.565728"
           }
         }
       },
       "무함마드 빈 살만": {
         "poses": {
           "standing": {
-            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766767428317.png",
-            "updated_at": "2025-12-27T01:43:48.378323"
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766771423788.png",
+            "updated_at": "2025-12-27T02:50:23.847431"
           }
         }
       }
@@ -24,8 +28,72 @@
       "무함마드 빈 살만": {
         "poses": {
           "standing": {
-            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766767428317.png",
-            "updated_at": "2025-12-27T01:43:48.378334"
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_standing_1766771423788.png",
+            "updated_at": "2025-12-27T02:50:23.847441"
+          },
+          "portrait": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766800257535.png",
+            "updated_at": "2025-12-27T10:50:57.590622"
+          }
+        }
+      },
+      "자말 카슈끄지": {
+        "poses": {
+          "portrait": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_자말_카슈끄지_portrait_1766800257504.png",
+            "updated_at": "2025-12-27T10:50:57.565734"
+          }
+        }
+      }
+    }
+  },
+  "9": {
+    "characters": {
+      "예언자": {
+        "poses": {
+          "standing_right": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_예언자_standing_right_1766800075902.png",
+            "updated_at": "2025-12-27T10:47:55.949784"
+          }
+        }
+      }
+    }
+  },
+  "13": {
+    "characters": {
+      "족장": {
+        "poses": {
+          "standing_right": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_족장_standing_right_1766800074366.png",
+            "updated_at": "2025-12-27T10:47:55.978189"
+          },
+          "portrait": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_족장_portrait_1766800109980.png",
+            "updated_at": "2025-12-27T10:48:48.399635"
+          }
+        }
+      }
+    }
+  },
+  "3": {
+    "characters": {
+      "무함마드 빈 살만": {
+        "poses": {
+          "portrait": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766800257535.png",
+            "updated_at": "2025-12-27T10:50:57.590628"
+          }
+        }
+      }
+    }
+  },
+  "4": {
+    "characters": {
+      "무함마드 빈 살만": {
+        "poses": {
+          "portrait": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251215_001946_세모지\\images\\characters\\char_무함마드_빈_살만_portrait_1766800257535.png",
+            "updated_at": "2025-12-27T10:50:57.590629"
           }
         }
       }

@@ -1,0 +1,197 @@
+{
+  "scenes": [
+    {
+      "scene_id": 1,
+      "script_text": "2018년 언론인 자말 카슈크지가 튜르키의 이스탄불의 사우디아라비아 총영사관에서 살해되었습니다. 그는 사우디 왕세자 무한마드 빈살만을 비판하던 기자였는데요.",
+      "char_count": 87,
+      "duration_estimate": 10,
+      "characters": [
+        "자말 카슈끄지",
+        "무함마드 빈 살만"
+      ],
+      "visual_elements": [
+        "사우디아라비아 총영사관",
+        "자말 카슈끄지 사진"
+      ],
+      "mood": "비극적",
+      "direction_guide": "총영사관 건물 외부, 자말 카슈끄지 사진 클로즈업",
+      "camera_suggestion": "풀샷에서 클로즈업",
+      "image_prompt_ko": "밤, 사우디아라비아 총영사관 외부, 어두운 분위기, 차들이 지나다니는 모습 없음",
+      "image_prompt_en": "Night, exterior of the Saudi Arabian consulate, dark atmosphere, no cars passing by, no characters, no people",
+      "character_prompt_ko": "근엄한 표정의 자말 카슈끄지",
+      "character_prompt_en": "Jamal Khashoggi with a serious expression, white background",
+      "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+      "video_prompt_full": "Camera slowly zooms in on the consulate, subtle lighting changes, atmospheric background movement"
+    },
+    {
+      "scene_id": 2,
+      "script_text": "튜르키의 정부와 국제 사회에서는이 사건의 배우로 사우디의 왕세자 무한마드 빈살만을 지목했지만 정작 사우디 안에서는 그 누구도 왕세자를 향해 질문조차 던질 수 없었습니다.",
+      "char_count": 94,
+      "duration_estimate": 11,
+      "characters": [
+        "무함마드 빈 살만"
+      ],
+      "visual_elements": [
+        "무함마드 빈 살만 사진",
+        "사우디아라비아 내부"
+      ],
+      "mood": "억압적",
+      "direction_guide": "무함마드 빈 살만 사진, 사우디아라비아 내부 모습",
+      "camera_suggestion": "클로즈업에서 와이드 샷",
+      "image_prompt_ko": "사우디아라비아 궁전 내부, 화려한 장식, 왕좌 없음, 사람들 없음",
+      "image_prompt_en": "Interior of a Saudi Arabian palace, opulent decorations, no throne, no people, no characters",
+      "character_prompt_ko": "냉정한 표정의 무함마드 빈 살만",
+      "character_prompt_en": "Mohammed bin Salman with a cold expression, white background",
+      "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+      "video_prompt_full": "Camera pans across the palace interior, subtle lighting changes, atmospheric background movement"
+    },
+    {
+      "scene_id": 3,
+      "script_text": "법과 인권 언론의 자유보다 왕의 권력이 절대적으로 강하다는 것을 전 세계에 보여준 사건이죠.뿐만 뿐만 아니라 사우디아라비아를 대표하는 석유 회사 아람코는 사실상 왕가의 재산으로 취급됩니다.",
+      "char_count": 105,
+      "duration_estimate": 12,
+      "characters": [],
+      "visual_elements": [
+        "사우디아라비아 국기",
+        "아람코 로고"
+      ],
+      "mood": "권위적",
+      "direction_guide": "사우디아라비아 국기, 아람코 로고",
+      "camera_suggestion": "고정 샷",
+      "image_prompt_ko": "사우디아라비아 국기, 바람에 펄럭이는 모습, 푸른 하늘",
+      "image_prompt_en": "Saudi Arabian flag waving in the wind, blue sky, no characters, no people",
+      "character_prompt_ko": "없음",
+      "character_prompt_en": "No character, transparent background",
+      "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+      "video_prompt_full": "Camera slowly zooms in on the flag, subtle lighting changes, atmospheric background movement"
+    },
+    {
+      "scene_id": 4,
+      "script_text": "구강과 왕세자가이 회사의 이익을 직접 통제하며 정치뿐 아니라 경제마저 왕가 중심으로 운영되고 있죠. 그렇다면 오랜 세월이 흐르는 동안 어떻게 사우디의 절대 군주 체제는 더 강력해졌을까요?",
+      "char_count": 104,
+      "duration_estimate": 11,
+      "characters": [],
+      "visual_elements": [
+        "사우디 왕가",
+        "아람코 본사"
+      ],
+      "mood": "지배적",
+      "direction_guide": "사우디 왕가 사진, 아람코 본사 건물",
+      "camera_suggestion": "패닝 샷",
+      "image_prompt_ko": "아람코 본사 건물, 현대적인 건축 양식, 넓은 부지, 맑은 날씨",
+      "image_prompt_en": "Aramco headquarters building, modern architecture, vast grounds, clear weather, no characters, no people",
+      "character_prompt_ko": "없음",
+      "character_prompt_en": "No character, transparent background",
+      "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+      "video_prompt_full": "Camera pans across the Aramco headquarters, subtle lighting changes, atmospheric background movement"
+    },
+    {
+      "scene_id": 5,
+      "script_text": "놀랍게도이 나라를 이끄는 왕가의 절대적 권위는 1400년 전 예언자의 가르침에 기반합니다. >> 사우디아라비아를 비롯한 중동의 국가들은 여전히 종교가 굉장히 중요한 사회적 가치를 가지고 있습니다.",
+      "char_count": 109,
+      "duration_estimate": 12,
+      "characters": [],
+      "visual_elements": [
+        "이슬람 사원",
+        "코란"
+      ],
+      "mood": "종교적",
+      "direction_guide": "이슬람 사원 내부, 코란",
+      "camera_suggestion": "틸트 업",
+      "image_prompt_ko": "웅장한 이슬람 사원 내부, 아름다운 아라베스크 문양, 스테인드글라스, 신자들이 기도하는 모습 없음",
+      "image_prompt_en": "Grand interior of a mosque, beautiful arabesque patterns, stained glass, no worshippers praying, no characters, no people",
+      "character_prompt_ko": "없음",
+      "character_prompt_en": "No character, transparent background",
+      "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+      "video_prompt_full": "Camera tilts up inside the mosque, subtle lighting changes, atmospheric background movement"
+    },
+    {
+      "scene_id": 6,
+      "script_text": "이들의 권력 기반이 여전히 이슬람 성지의 수호자라고 하는 종교적 권위에 있다는 것도 과언이 아닙니다. >> 오랜 세월이 흐르는 동안 어떻게이 국가들은 절대군주 체제를 유지할 수 있었을까요?",
+      "char_count": 105,
+      "duration_estimate": 10,
+      "characters": [],
+      "visual_elements": [
+        "메카",
+        "카바"
+      ],
+      "mood": "신성함",
+      "direction_guide": "메카, 카바",
+      "camera_suggestion": "항공 샷",
+      "image_prompt_ko": "메카, 카바 신전, 수많은 순례자들이 운집한 모습, 낮",
+      "image_prompt_en": "Mecca, the Kaaba shrine, numerous pilgrims gathered, daytime, no characters, no people",
+      "character_prompt_ko": "없음",
+      "character_prompt_en": "No character, transparent background",
+      "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+      "video_prompt_full": "Camera slowly zooms out from the Kaaba, subtle lighting changes, atmospheric background movement"
+    },
+    {
+      "scene_id": 7,
+      "script_text": "일부에서 우리는 인류 최초의 리더가 신체적 능력과 지혜로 권력을 획득했던 족장이었음을 보았습니다. 하지만 시간이 흐르면서 권력의 원천은 힘을 넘어선 곳에서 찾기 시작했습니다.",
+      "char_count": 97,
+      "duration_estimate": 10,
+      "characters": [],
+      "visual_elements": [
+        "고대 부족",
+        "족장"
+      ],
+      "mood": "역사적",
+      "direction_guide": "고대 부족, 족장",
+      "camera_suggestion": "로우 앵글",
+      "image_prompt_ko": "고대 부족 마을, 족장이 연설하는 모습, 불 피워놓은 모습, 석기 시대",
+      "image_prompt_en": "Ancient tribal village, chieftain giving a speech, fire burning, Stone Age, no characters, no people",
+      "character_prompt_ko": "없음",
+      "character_prompt_en": "No character, transparent background",
+      "video_prompt_character": "Subtle facial expressions, gentle eye blinks, slight head movement, mouth moving as if speaking naturally",
+      "video_prompt_full": "Camera slowly zooms in on the chieftain, subtle lighting changes, atmospheric background movement"
+    }
+  ],
+  "characters": [
+    {
+      "name": "자말 카슈끄지",
+      "name_ko": "자말 카슈끄지",
+      "name_en": "Jamal Khashoggi",
+      "type": "person",
+      "category": "",
+      "owner_company": "",
+      "role": "주연",
+      "description": "사우디아라비아 출신 언론인, 사우디 왕세자를 비판",
+      "appearance": "",
+      "nationality": "",
+      "era": "",
+      "character_prompt": "Middle Eastern man in his late 50s, salt-and-pepper beard neatly trimmed, receding hairline with gray hair, round glasses with thin black frames, warm brown eyes, olive skin tone, wearing dark navy business suit with white dress shirt",
+      "visual_prompt": "Middle Eastern man in his late 50s, salt-and-pepper beard neatly trimmed, receding hairline with gray hair, round glasses with thin black frames, warm brown eyes, olive skin tone, wearing dark navy business suit with white dress shirt",
+      "appearance_scenes": [
+        1
+      ]
+    },
+    {
+      "name": "무함마드 빈 살만",
+      "name_ko": "무함마드 빈 살만",
+      "name_en": "Mohammed bin Salman",
+      "type": "person",
+      "category": "",
+      "owner_company": "",
+      "role": "조연",
+      "description": "사우디아라비아 왕세자",
+      "appearance": "",
+      "nationality": "",
+      "era": "",
+      "character_prompt": "Middle Eastern man in his mid-30s, short black hair, clean-shaven, sharp features, dark brown eyes, olive skin tone, wearing a traditional Saudi Arabian thobe and headdress",
+      "visual_prompt": "Middle Eastern man in his mid-30s, short black hair, clean-shaven, sharp features, dark brown eyes, olive skin tone, wearing a traditional Saudi Arabian thobe and headdress",
+      "appearance_scenes": [
+        1,
+        2
+      ]
+    }
+  ],
+  "total_scenes": 7,
+  "total_characters": 2,
+  "estimated_duration": 76,
+  "_script_validation": {
+    "total_scenes": 7,
+    "modified_count": 0,
+    "warning_count": 0,
+    "all_verified": true
+  }
+}

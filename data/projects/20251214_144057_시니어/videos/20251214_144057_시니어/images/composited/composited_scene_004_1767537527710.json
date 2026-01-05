@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-04T23:38:47.711375",
+  "image_file": "composited_scene_004_1767537527710.png",
+  "scene_id": 4,
+  "prompts": {
+    "original": "Image of a car headlight transforming into a camera lens, high-tech feel, no characters, no people, no text, no letters, no words, no numbers, no signs, no logos, no written language of any kind",
+    "final": "Korean webtoon manhwa illustration style, semi-realistic character design with clean bold black outlines, flat color fills with minimal cel-shading, adult Korean characters with realistic body proportions, detailed faces with visible eyebrows thick black eyebrows, small simplified nose, thin lips, subtle facial wrinkles and expression lines, small pupils with visible white sclera, warm beige skin tone, everyday casual Korean urban setting, muted desaturated color palette, simple geometric background elements, Korean city aesthetic with glass buildings bus stops convenience stores, flat perspective minimal depth, digital illustration clean linework, Image of a car headlight transforming into a camera lens, high-tech feel, no characters, no people, no text, no letters, no words, no numbers, no signs, no logos, no written language of any kind, MANDATORY CHARACTER FEATURES: realistic adult proportions with head 1/7 to 1/8 of body height, visible thick black eyebrows, small simplified triangular or line nose, thin neutral lips, subtle wrinkle lines on forehead and around mouth for older characters, small dot pupils centered in almond-shaped eyes with white sclera visible, warm skin tones #D4A574 to #C9956C, MANDATORY LINEART: clean bold black outlines 2-3px weight defining all shapes and forms, MANDATORY COLORING: flat solid color fills with minimal soft shadows, muted dusty color palette - grays #4A4A4A to #6B6B6B, browns #8B7355 to #6B5344, navy #3D4A5C, burgundy #8B4557, olive #5C6B4A, MANDATORY BACKGROUND: simplified Korean urban environment, glass storefronts, bus interiors with orange handrails and blue seats, concrete sidewalks, muted teal and gray tones, Korean signage style shapes without readable text, COMPOSITION: character focused medium shot or close-up, clean minimal background, subtle ground shadows allowed,",
+    "negative": "text, letters, words, writing, typography, readable signs, readable billboards, labels, captions, subtitles, watermark, logo, numbers, alphabet, characters, English text, Arabic text, Korean text, Chinese text, Japanese text, any language text, no outlines, missing lineart, gradient only no lines, oversized head, chibi style, Kurzgesagt style, geometric simple shapes, dot eyes only, no nose, no eyebrows, mitten hands, stubby body, cartoon proportions, childish style, anime style, manga style, realistic photograph, 3D render, painterly, watercolor, sketch, rough lines, thick chunky outlines, glossy shiny skin, complex detailed background, cluttered composition, multiple characters overlapping, western cartoon style, pixar style, disney style,"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "Korean webtoon manhwa illustration style, semi-realistic character design with clean bold black outlines, flat color fills with minimal cel-shading, adult Korean characters with realistic body proportions, detailed faces with visible eyebrows thick black eyebrows, small simplified nose, thin lips, subtle facial wrinkles and expression lines, small pupils with visible white sclera, warm beige skin tone, everyday casual Korean urban setting, muted desaturated color palette, simple geometric background elements, Korean city aesthetic with glass buildings bus stops convenience stores, flat perspective minimal depth, digital illustration clean linework,",
+    "suffix": "MANDATORY CHARACTER FEATURES: realistic adult proportions with head 1/7 to 1/8 of body height, visible thick black eyebrows, small simplified triangular or line nose, thin neutral lips, subtle wrinkle lines on forehead and around mouth for older characters, small dot pupils centered in almond-shaped eyes with white sclera visible, warm skin tones #D4A574 to #C9956C, MANDATORY LINEART: clean bold black outlines 2-3px weight defining all shapes and forms, MANDATORY COLORING: flat solid color fills with minimal soft shadows, muted dusty color palette - grays #4A4A4A to #6B6B6B, browns #8B7355 to #6B5344, navy #3D4A5C, burgundy #8B4557, olive #5C6B4A, MANDATORY BACKGROUND: simplified Korean urban environment, glass storefronts, bus interiors with orange handrails and blue seats, concrete sidewalks, muted teal and gray tones, Korean signage style shapes without readable text, COMPOSITION: character focused medium shot or close-up, clean minimal background, subtle ground shadows allowed,"
+  },
+  "generation": {
+    "api_provider": "Together.ai FLUX",
+    "model": "black-forest-labs/FLUX.2-dev",
+    "model_name": "FLUX.2 Dev",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "type": "composite"
+  }
+}

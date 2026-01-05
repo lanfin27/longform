@@ -1,0 +1,1626 @@
+{
+  "scenes": [
+    {
+      "scene_id": 1,
+      "script_text": "여러분, 삼성전자 하면 뭐가 떠오르세요?",
+      "start_time": 0.0,
+      "end_time": 2.52,
+      "duration": 2.52,
+      "timecode": "00:00",
+      "mood": "질문",
+      "visual_elements": [
+        "삼성전자 로고",
+        "다양한 삼성 제품 이미지"
+      ],
+      "direction_guide": "밝고 활기찬 분위기",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "호기심 유발",
+      "char_count": 22,
+      "word_count": 5
+    },
+    {
+      "scene_id": 2,
+      "script_text": "스마트폰? 반도체? TV?",
+      "start_time": 2.52,
+      "end_time": 4.145,
+      "duration": 1.625,
+      "timecode": "00:02",
+      "mood": "질문",
+      "visual_elements": [
+        "스마트폰 이미지",
+        "반도체 이미지",
+        "TV 이미지"
+      ],
+      "direction_guide": "빠르게 전환되는 이미지",
+      "camera_work": "빠른 컷 전환",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "빠른 템포",
+      "char_count": 14,
+      "word_count": 3
+    },
+    {
+      "scene_id": 3,
+      "script_text": "근데요, 지금 삼성이 2조원을 들여서 사려는 게 뭔지 아세요?",
+      "start_time": 4.145,
+      "end_time": 8.091,
+      "duration": 3.946,
+      "timecode": "00:04",
+      "mood": "호기심",
+      "visual_elements": [
+        "돈 이미지",
+        "물음표"
+      ],
+      "direction_guide": "궁금증 유발",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "강조",
+      "char_count": 34,
+      "word_count": 9
+    },
+    {
+      "scene_id": 4,
+      "script_text": "자동차 눈이에요. 자동차가 세상을 보는 눈.",
+      "start_time": 8.091,
+      "end_time": 10.76,
+      "duration": 2.669,
+      "timecode": "00:08",
+      "mood": "설명",
+      "visual_elements": [
+        "자동차 이미지",
+        "자율주행 센서 이미지"
+      ],
+      "direction_guide": "비유적인 표현 강조",
+      "camera_work": "정지",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "강조",
+      "char_count": 24,
+      "word_count": 6
+    },
+    {
+      "scene_id": 5,
+      "script_text": "2025년 12월, 삼성전자 자회사 하만이 독일의 명문 부품사 ZF의 자율주행 사업부를 15억 유로, 우리 돈으로 약 2조원에 인수한다고 발표했거든요.",
+      "start_time": 10.76,
+      "end_time": 20.44,
+      "duration": 9.68,
+      "timecode": "00:10",
+      "mood": "사실 전달",
+      "visual_elements": [
+        "삼성전자 로고",
+        "하만 로고",
+        "ZF 로고"
+      ],
+      "direction_guide": "뉴스 보도 형식",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 84,
+      "word_count": 19
+    },
+    {
+      "scene_id": 6,
+      "script_text": "근데 이게 왜 중요하냐.",
+      "start_time": 20.44,
+      "end_time": 21.949,
+      "duration": 1.509,
+      "timecode": "00:20",
+      "mood": "질문",
+      "visual_elements": [
+        "물음표"
+      ],
+      "direction_guide": "긴장감 조성",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "호기심 유발",
+      "char_count": 13,
+      "word_count": 4
+    },
+    {
+      "scene_id": 7,
+      "script_text": "지금부터 제가 하는 얘기 끝까지 들으시면요, 삼성이 왜 갑자기 자동차에 미쳤는지, 그리고 이게 테슬라, BMW, 현대차한테 어떤 의미인지 완전히 이해하시게 될 거예요.",
+      "start_time": 21.949,
+      "end_time": 32.742,
+      "duration": 10.793,
+      "timecode": "00:21",
+      "mood": "설명",
+      "visual_elements": [
+        "삼성전자 로고",
+        "테슬라 로고",
+        "BMW 로고",
+        "현대차 로고"
+      ],
+      "direction_guide": "핵심 내용 예고",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 93,
+      "word_count": 22
+    },
+    {
+      "scene_id": 8,
+      "script_text": "아, 그리고 솔직히 말씀드리면요, 저도 이거 조사하면서 좀 소름 돋았어요.",
+      "start_time": 32.742,
+      "end_time": 37.46,
+      "duration": 4.718,
+      "timecode": "00:32",
+      "mood": "긴장",
+      "visual_elements": [
+        "소름 돋는 표정"
+      ],
+      "direction_guide": "진솔한 감정 표현",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "공감대 형성",
+      "char_count": 41,
+      "word_count": 10
+    },
+    {
+      "scene_id": 9,
+      "script_text": "삼성이 진짜 무서운 회사구나, 이런 생각이 들더라고요.",
+      "start_time": 37.46,
+      "end_time": 40.942,
+      "duration": 3.482,
+      "timecode": "00:37",
+      "mood": "긴장",
+      "visual_elements": [
+        "삼성전자 로고",
+        "강렬한 이미지"
+      ],
+      "direction_guide": "삼성의 위엄 강조",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "강조",
+      "char_count": 30,
+      "word_count": 7
+    },
+    {
+      "scene_id": 10,
+      "script_text": "자, 시작해볼게요.",
+      "start_time": 40.942,
+      "end_time": 42.102,
+      "duration": 1.16,
+      "timecode": "00:40",
+      "mood": "시작",
+      "visual_elements": [
+        "시작 버튼"
+      ],
+      "direction_guide": "본격적인 시작 알림",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "전환",
+      "char_count": 10,
+      "word_count": 2
+    },
+    {
+      "scene_id": 11,
+      "script_text": "자, 일단 기본부터 깔고 가야 해요.",
+      "start_time": 42.102,
+      "end_time": 44.423,
+      "duration": 2.321,
+      "timecode": "00:42",
+      "mood": "설명",
+      "visual_elements": [
+        "기본 설명 이미지"
+      ],
+      "direction_guide": "기초 설명 시작",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "전환",
+      "char_count": 20,
+      "word_count": 6
+    },
+    {
+      "scene_id": 12,
+      "script_text": "하만이 뭐하는 회사인지 아시는 분 계세요?",
+      "start_time": 44.423,
+      "end_time": 47.092,
+      "duration": 2.669,
+      "timecode": "00:44",
+      "mood": "질문",
+      "visual_elements": [
+        "하만 로고",
+        "물음표"
+      ],
+      "direction_guide": "청중에게 질문",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "호기심 유발",
+      "char_count": 23,
+      "word_count": 6
+    },
+    {
+      "scene_id": 13,
+      "script_text": "JBL 스피커 아시죠? 하만카돈 사운드바? AKG 헤드폰?",
+      "start_time": 47.092,
+      "end_time": 50.74,
+      "duration": 3.648,
+      "timecode": "00:47",
+      "mood": "질문",
+      "visual_elements": [
+        "JBL 스피커 이미지",
+        "하만카돈 사운드바 이미지",
+        "AKG 헤드폰 이미지"
+      ],
+      "direction_guide": "친숙한 제품 예시",
+      "camera_work": "빠른 컷 전환",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "빠른 템포",
+      "char_count": 32,
+      "word_count": 7
+    },
+    {
+      "scene_id": 14,
+      "script_text": "다 하만 거예요.",
+      "start_time": 50.74,
+      "end_time": 51.784,
+      "duration": 1.044,
+      "timecode": "00:50",
+      "mood": "설명",
+      "visual_elements": [
+        "하만 로고"
+      ],
+      "direction_guide": "하만 소유 강조",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 9,
+      "word_count": 3
+    },
+    {
+      "scene_id": 15,
+      "script_text": "음향기기 덕후들 사이에서는 전설적인 브랜드들이거든요.",
+      "start_time": 51.784,
+      "end_time": 55.15,
+      "duration": 3.366,
+      "timecode": "00:51",
+      "mood": "설명",
+      "visual_elements": [
+        "음향기기 덕후 이미지",
+        "전설적인 브랜드 이미지"
+      ],
+      "direction_guide": "하만의 위상 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 29,
+      "word_count": 5
+    },
+    {
+      "scene_id": 16,
+      "script_text": "근데요, 하만의 진짜 정체는 따로 있어요.",
+      "start_time": 55.15,
+      "end_time": 57.819,
+      "duration": 2.669,
+      "timecode": "00:55",
+      "mood": "호기심",
+      "visual_elements": [
+        "하만 로고",
+        "물음표"
+      ],
+      "direction_guide": "숨겨진 정보 암시",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "강조",
+      "char_count": 23,
+      "word_count": 6
+    },
+    {
+      "scene_id": 17,
+      "script_text": "자동차 안에 들어가는 모든 전자장치, 이걸 전문 용어로 전장이라고 하는데요, 하만은 이 전장 분야의 절대 강자예요.",
+      "start_time": 57.819,
+      "end_time": 65.247,
+      "duration": 7.428,
+      "timecode": "00:57",
+      "mood": "설명",
+      "visual_elements": [
+        "자동차 내부 이미지",
+        "전장 부품 이미지"
+      ],
+      "direction_guide": "전장 분야 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 64,
+      "word_count": 16
+    },
+    {
+      "scene_id": 18,
+      "script_text": "여러분이 요즘 차 타시면 계기판 대신 커다란 화면이 있잖아요?",
+      "start_time": 65.247,
+      "end_time": 69.192,
+      "duration": 3.945,
+      "timecode": "01:05",
+      "mood": "질문",
+      "visual_elements": [
+        "디지털 콕핏 이미지"
+      ],
+      "direction_guide": "일상적인 경험 상기",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "공감대 형성",
+      "char_count": 34,
+      "word_count": 9
+    },
+    {
+      "scene_id": 19,
+      "script_text": "내비게이션도 나오고, 음악도 나오고, 에어컨 조절도 하고.",
+      "start_time": 69.192,
+      "end_time": 72.906,
+      "duration": 3.714,
+      "timecode": "01:09",
+      "mood": "설명",
+      "visual_elements": [
+        "내비게이션 화면",
+        "음악 재생 화면",
+        "에어컨 조절 화면"
+      ],
+      "direction_guide": "디지털 콕핏 기능 설명",
+      "camera_work": "빠른 컷 전환",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "빠른 템포",
+      "char_count": 32,
+      "word_count": 7
+    },
+    {
+      "scene_id": 20,
+      "script_text": "이걸 디지털 콕핏이라고 하는데요, 하만이 이 분야 세계 1등이에요.",
+      "start_time": 72.906,
+      "end_time": 77.2,
+      "duration": 4.294,
+      "timecode": "01:12",
+      "mood": "설명",
+      "visual_elements": [
+        "디지털 콕핏 이미지",
+        "1등 이미지"
+      ],
+      "direction_guide": "하만의 위상 강조",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 37,
+      "word_count": 9
+    },
+    {
+      "scene_id": 21,
+      "script_text": "BMW 타시면 하만 시스템이 들어가 있고요, 메르세데스 벤츠도, 아우디도, 현대차도 다 하만 시스템 써요.",
+      "start_time": 77.2,
+      "end_time": 84.047,
+      "duration": 6.847,
+      "timecode": "01:17",
+      "mood": "설명",
+      "visual_elements": [
+        "BMW 로고",
+        "메르세데스 벤츠 로고",
+        "아우디 로고",
+        "현대차 로고"
+      ],
+      "direction_guide": "하만 시스템 사용 브랜드 나열",
+      "camera_work": "빠른 컷 전환",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 59,
+      "word_count": 14
+    },
+    {
+      "scene_id": 22,
+      "script_text": "그럼 삼성이 이 회사를 언제 샀느냐.",
+      "start_time": 84.047,
+      "end_time": 86.368,
+      "duration": 2.321,
+      "timecode": "01:24",
+      "mood": "질문",
+      "visual_elements": [
+        "삼성전자 로고",
+        "하만 로고",
+        "시계 이미지"
+      ],
+      "direction_guide": "인수 시점 질문",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "호기심 유발",
+      "char_count": 20,
+      "word_count": 6
+    },
+    {
+      "scene_id": 23,
+      "script_text": "2017년이에요.",
+      "start_time": 86.368,
+      "end_time": 87.413,
+      "duration": 1.045,
+      "timecode": "01:26",
+      "mood": "설명",
+      "visual_elements": [
+        "2017년 이미지"
+      ],
+      "direction_guide": "인수 시점 답변",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 9,
+      "word_count": 1
+    },
+    {
+      "scene_id": 24,
+      "script_text": "80억 달러, 우리 돈으로 거의 10조원 가까이 주고 샀어요.",
+      "start_time": 87.413,
+      "end_time": 91.359,
+      "duration": 3.946,
+      "timecode": "01:27",
+      "mood": "설명",
+      "visual_elements": [
+        "돈 이미지",
+        "80억 달러",
+        "10조원"
+      ],
+      "direction_guide": "인수 금액 강조",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 34,
+      "word_count": 9
+    },
+    {
+      "scene_id": 25,
+      "script_text": "근데 진짜 웃긴 게요, 당시에 사람들이 뭐라고 했냐면요.",
+      "start_time": 91.359,
+      "end_time": 95.02,
+      "duration": 3.661,
+      "timecode": "01:31",
+      "mood": "유머",
+      "visual_elements": [
+        "웃는 표정",
+        "말풍선"
+      ],
+      "direction_guide": "당시 반응 소개",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "흥미 유발",
+      "char_count": 31,
+      "word_count": 8
+    },
+    {
+      "scene_id": 26,
+      "script_text": "삼성이 왜 스피커 회사를 사? 무슨 생각이야?",
+      "start_time": 95.02,
+      "end_time": 97.921,
+      "duration": 2.901,
+      "timecode": "01:35",
+      "mood": "비판",
+      "visual_elements": [
+        "물음표",
+        "비판적인 표정"
+      ],
+      "direction_guide": "당시 부정적 반응 재현",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "당시 반응 전달",
+      "char_count": 25,
+      "word_count": 7
+    },
+    {
+      "scene_id": 27,
+      "script_text": "이런 반응이었거든요.",
+      "start_time": 97.921,
+      "end_time": 99.16,
+      "duration": 1.239,
+      "timecode": "01:37",
+      "mood": "설명",
+      "visual_elements": [
+        "다양한 반응 이미지"
+      ],
+      "direction_guide": "당시 반응 요약",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 11,
+      "word_count": 2
+    },
+    {
+      "scene_id": 28,
+      "script_text": "근데요, 이재용 회장 생각은 달랐어요.",
+      "start_time": 99.16,
+      "end_time": 101.597,
+      "duration": 2.437,
+      "timecode": "01:39",
+      "mood": "반전",
+      "visual_elements": [
+        "이재용 회장 이미지"
+      ],
+      "direction_guide": "이재용 회장의 다른 시각 제시",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "전환",
+      "char_count": 21,
+      "word_count": 5
+    },
+    {
+      "scene_id": 29,
+      "script_text": "당시 이재용 부회장이었는데, 이 사람이 본 건 스피커가 아니었어요.",
+      "start_time": 101.597,
+      "end_time": 105.891,
+      "duration": 4.294,
+      "timecode": "01:41",
+      "mood": "설명",
+      "visual_elements": [
+        "이재용 회장 이미지",
+        "스피커 X 표시"
+      ],
+      "direction_guide": "본질을 꿰뚫어보는 시각 강조",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 37,
+      "word_count": 9
+    },
+    {
+      "scene_id": 30,
+      "script_text": "자동차의 미래를 본 거예요.",
+      "start_time": 105.891,
+      "end_time": 107.6,
+      "duration": 1.709,
+      "timecode": "01:45",
+      "mood": "설명",
+      "visual_elements": [
+        "미래 자동차 이미지"
+      ],
+      "direction_guide": "미래 예측 강조",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 15,
+      "word_count": 4
+    },
+    {
+      "scene_id": 31,
+      "script_text": "그때 이미 자동차 산업이 어떻게 바뀔지 읽은 거죠.",
+      "start_time": 107.6,
+      "end_time": 110.849,
+      "duration": 3.249,
+      "timecode": "01:47",
+      "mood": "설명",
+      "visual_elements": [
+        "자동차 산업 변화 이미지"
+      ],
+      "direction_guide": "미래 예측 능력 강조",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 28,
+      "word_count": 8
+    },
+    {
+      "scene_id": 32,
+      "script_text": "앞으로 자동차는 그냥 굴러가는 기계가 아니라, 바퀴 달린 컴퓨터가 된다.",
+      "start_time": 110.849,
+      "end_time": 115.28,
+      "duration": 4.431,
+      "timecode": "01:50",
+      "mood": "설명",
+      "visual_elements": [
+        "자동차 이미지",
+        "컴퓨터 이미지"
+      ],
+      "direction_guide": "미래 자동차 정의",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 40,
+      "word_count": 10
+    },
+    {
+      "scene_id": 33,
+      "script_text": "그리고 그 컴퓨터의 두뇌와 신경망을 만드는 회사가 미래의 강자가 된다.",
+      "start_time": 115.28,
+      "end_time": 119.806,
+      "duration": 4.526,
+      "timecode": "01:55",
+      "mood": "설명",
+      "visual_elements": [
+        "컴퓨터 두뇌 이미지",
+        "신경망 이미지"
+      ],
+      "direction_guide": "미래 강자 조건 제시",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 39,
+      "word_count": 10
+    },
+    {
+      "scene_id": 34,
+      "script_text": "이걸 2017년에 이미 본 거예요.",
+      "start_time": 119.806,
+      "end_time": 122.011,
+      "duration": 2.205,
+      "timecode": "01:59",
+      "mood": "강조",
+      "visual_elements": [
+        "2017년 이미지",
+        "눈 이미지"
+      ],
+      "direction_guide": "선견지명 강조",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "강조",
+      "char_count": 19,
+      "word_count": 5
+    },
+    {
+      "scene_id": 35,
+      "script_text": "실제로 하만 인수 이후에 어떻게 됐냐면요.",
+      "start_time": 122.011,
+      "end_time": 124.68,
+      "duration": 2.669,
+      "timecode": "02:02",
+      "mood": "설명",
+      "visual_elements": [
+        "하만 인수 후 변화 이미지"
+      ],
+      "direction_guide": "결과 제시",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 23,
+      "word_count": 6
+    },
+    {
+      "scene_id": 36,
+      "script_text": "2025년 1분기 하만 매출이 3조 4천억원이에요.",
+      "start_time": 124.68,
+      "end_time": 127.93,
+      "duration": 3.25,
+      "timecode": "02:04",
+      "mood": "설명",
+      "visual_elements": [
+        "2025년 1분기",
+        "3조 4천억원"
+      ],
+      "direction_guide": "매출액 정보",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 28,
+      "word_count": 6
+    },
+    {
+      "scene_id": 37,
+      "script_text": "영업이익이 3천억원이고요.",
+      "start_time": 127.93,
+      "end_time": 129.555,
+      "duration": 1.625,
+      "timecode": "02:07",
+      "mood": "설명",
+      "visual_elements": [
+        "3천억원"
+      ],
+      "direction_guide": "영업이익 정보",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 14,
+      "word_count": 2
+    },
+    {
+      "scene_id": 38,
+      "script_text": "이게 어느 정도냐면요, 삼성전자에서 TV 만드는 사업부랑 비슷한 수준이에요.",
+      "start_time": 129.555,
+      "end_time": 134.429,
+      "duration": 4.874,
+      "timecode": "02:09",
+      "mood": "비교",
+      "visual_elements": [
+        "삼성전자 TV 사업부 이미지"
+      ],
+      "direction_guide": "수준 비교",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 42,
+      "word_count": 9
+    },
+    {
+      "scene_id": 39,
+      "script_text": "스피커 회사가 TV 사업부만큼 돈을 버는 거예요.",
+      "start_time": 134.429,
+      "end_time": 137.562,
+      "duration": 3.133,
+      "timecode": "02:14",
+      "mood": "강조",
+      "visual_elements": [
+        "스피커 이미지",
+        "TV 이미지"
+      ],
+      "direction_guide": "놀라움 강조",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "강조",
+      "char_count": 27,
+      "word_count": 7
+    },
+    {
+      "scene_id": 40,
+      "script_text": "근데요, 삼성은 여기서 멈추지 않았어요.",
+      "start_time": 137.562,
+      "end_time": 140.115,
+      "duration": 2.553,
+      "timecode": "02:17",
+      "mood": "전환",
+      "visual_elements": [
+        "삼성전자 로고"
+      ],
+      "direction_guide": "새로운 정보 예고",
+      "camera_work": "줌아웃",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "전환",
+      "char_count": 22,
+      "word_count": 5
+    },
+    {
+      "scene_id": 41,
+      "script_text": "하만이 잘하는 게 뭐였죠?",
+      "start_time": 140.115,
+      "end_time": 141.74,
+      "duration": 1.625,
+      "timecode": "02:20",
+      "mood": "질문",
+      "visual_elements": [
+        "하만 로고",
+        "물음표"
+      ],
+      "direction_guide": "상기시키는 질문",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "상기",
+      "char_count": 14,
+      "word_count": 4
+    },
+    {
+      "scene_id": 42,
+      "script_text": "디지털 콕핏, 그러니까 차 안에서 운전자한테 정보 보여주는 거잖아요.",
+      "start_time": 141.74,
+      "end_time": 146.15,
+      "duration": 4.41,
+      "timecode": "02:21",
+      "mood": "설명",
+      "visual_elements": [
+        "디지털 콕핏 이미지"
+      ],
+      "direction_guide": "디지털 콕핏 기능 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 38,
+      "word_count": 9
+    },
+    {
+      "scene_id": 43,
+      "script_text": "근데 자율주행 시대가 오면 이것만으론 부족해요.",
+      "start_time": 146.15,
+      "end_time": 149.168,
+      "duration": 3.018,
+      "timecode": "02:26",
+      "mood": "한계",
+      "visual_elements": [
+        "자율주행 자동차 이미지"
+      ],
+      "direction_guide": "새로운 필요성 제시",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "전환",
+      "char_count": 26,
+      "word_count": 6
+    },
+    {
+      "scene_id": 44,
+      "script_text": "차가 스스로 운전하려면 뭐가 필요하겠어요?",
+      "start_time": 149.168,
+      "end_time": 151.837,
+      "duration": 2.669,
+      "timecode": "02:29",
+      "mood": "질문",
+      "visual_elements": [
+        "자율주행 자동차 이미지",
+        "물음표"
+      ],
+      "direction_guide": "필요 요소 질문",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "호기심 유발",
+      "char_count": 23,
+      "word_count": 5
+    },
+    {
+      "scene_id": 45,
+      "script_text": "눈이 필요해요. 차가 세상을 봐야 한다고요.",
+      "start_time": 151.837,
+      "end_time": 154.622,
+      "duration": 2.785,
+      "timecode": "02:31",
+      "mood": "강조",
+      "visual_elements": [
+        "자동차 눈 이미지",
+        "세상 이미지"
+      ],
+      "direction_guide": "필요 요소 강조",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "강조",
+      "char_count": 24,
+      "word_count": 6
+    },
+    {
+      "scene_id": 46,
+      "script_text": "카메라, 레이더, 센서. 이런 것들이 필요한 거죠.",
+      "start_time": 154.622,
+      "end_time": 157.872,
+      "duration": 3.25,
+      "timecode": "02:34",
+      "mood": "설명",
+      "visual_elements": [
+        "카메라 이미지",
+        "레이더 이미지",
+        "센서 이미지"
+      ],
+      "direction_guide": "구체적인 필요 요소 나열",
+      "camera_work": "빠른 컷 전환",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 28,
+      "word_count": 7
+    },
+    {
+      "scene_id": 47,
+      "script_text": "근데 하만은 이게 없었어요.",
+      "start_time": 157.872,
+      "end_time": 159.612,
+      "duration": 1.74,
+      "timecode": "02:37",
+      "mood": "부족",
+      "visual_elements": [
+        "하만 로고",
+        "X 표시"
+      ],
+      "direction_guide": "하만의 부족한 점 지적",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 15,
+      "word_count": 4
+    },
+    {
+      "scene_id": 48,
+      "script_text": "차 안쪽은 잘 보는데, 차 바깥쪽을 못 보는 거예요.",
+      "start_time": 159.612,
+      "end_time": 162.978,
+      "duration": 3.366,
+      "timecode": "02:39",
+      "mood": "비유",
+      "visual_elements": [
+        "자동차 내부 이미지",
+        "자동차 외부 이미지"
+      ],
+      "direction_guide": "비유적인 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 29,
+      "word_count": 9
+    },
+    {
+      "scene_id": 49,
+      "script_text": "그래서 삼성이 뭘 했냐.",
+      "start_time": 162.978,
+      "end_time": 164.487,
+      "duration": 1.509,
+      "timecode": "02:42",
+      "mood": "질문",
+      "visual_elements": [
+        "삼성전자 로고",
+        "물음표"
+      ],
+      "direction_guide": "다음 행동 질문",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "호기심 유발",
+      "char_count": 13,
+      "word_count": 4
+    },
+    {
+      "scene_id": 50,
+      "script_text": "ZF를 노린 거예요.",
+      "start_time": 164.487,
+      "end_time": 165.763,
+      "duration": 1.276,
+      "timecode": "02:44",
+      "mood": "결론",
+      "visual_elements": [
+        "ZF 로고"
+      ],
+      "direction_guide": "ZF 인수 이유 제시",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "결론",
+      "char_count": 11,
+      "word_count": 3
+    },
+    {
+      "scene_id": 51,
+      "script_text": "자, ZF가 뭔지 설명해드릴게요.",
+      "start_time": 165.763,
+      "end_time": 167.84,
+      "duration": 2.077,
+      "timecode": "02:45",
+      "mood": "설명",
+      "visual_elements": [
+        "ZF 로고"
+      ],
+      "direction_guide": "ZF 설명 시작",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "전환",
+      "char_count": 18,
+      "word_count": 4
+    },
+    {
+      "scene_id": 52,
+      "script_text": "ZF 프리드리히스하펜. 독일 회사예요.",
+      "start_time": 167.84,
+      "end_time": 170.277,
+      "duration": 2.437,
+      "timecode": "02:47",
+      "mood": "설명",
+      "visual_elements": [
+        "ZF 로고",
+        "독일 국기"
+      ],
+      "direction_guide": "ZF 정보",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 21,
+      "word_count": 4
+    },
+    {
+      "scene_id": 53,
+      "script_text": "자동차 부품 분야에서는 진짜 명가 중의 명가거든요.",
+      "start_time": 170.277,
+      "end_time": 173.527,
+      "duration": 3.25,
+      "timecode": "02:50",
+      "mood": "설명",
+      "visual_elements": [
+        "자동차 부품 이미지",
+        "명가 이미지"
+      ],
+      "direction_guide": "ZF 위상 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 28,
+      "word_count": 7
+    },
+    {
+      "scene_id": 54,
+      "script_text": "설립이 1915년이에요. 100년이 넘은 회사예요.",
+      "start_time": 173.527,
+      "end_time": 177.02,
+      "duration": 3.493,
+      "timecode": "02:53",
+      "mood": "설명",
+      "visual_elements": [
+        "1915년 이미지",
+        "ZF 역사 이미지"
+      ],
+      "direction_guide": "ZF 역사 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 28,
+      "word_count": 5
+    },
+    {
+      "scene_id": 55,
+      "script_text": "변속기, 조향장치, 샤시. 자동차의 핵심 부품은 다 만들어요.",
+      "start_time": 177.02,
+      "end_time": 180.966,
+      "duration": 3.946,
+      "timecode": "02:57",
+      "mood": "설명",
+      "visual_elements": [
+        "변속기 이미지",
+        "조향장치 이미지",
+        "샤시 이미지"
+      ],
+      "direction_guide": "ZF 생산 부품 설명",
+      "camera_work": "빠른 컷 전환",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 34,
+      "word_count": 8
+    },
+    {
+      "scene_id": 56,
+      "script_text": "근데 최근에 ZF가 좀 힘들었어요.",
+      "start_time": 180.966,
+      "end_time": 183.171,
+      "duration": 2.205,
+      "timecode": "03:00",
+      "mood": "어려움",
+      "visual_elements": [
+        "ZF 로고",
+        "어려운 표정"
+      ],
+      "direction_guide": "ZF의 어려움 암시",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "전환",
+      "char_count": 19,
+      "word_count": 5
+    },
+    {
+      "scene_id": 57,
+      "script_text": "왜냐면 전기차 시대가 오면서 변속기 수요가 확 줄었거든요.",
+      "start_time": 183.171,
+      "end_time": 186.885,
+      "duration": 3.714,
+      "timecode": "03:03",
+      "mood": "설명",
+      "visual_elements": [
+        "전기차 이미지",
+        "변속기 X 표시"
+      ],
+      "direction_guide": "어려움의 이유 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 32,
+      "word_count": 8
+    },
+    {
+      "scene_id": 58,
+      "script_text": "전기차는 변속기가 필요 없잖아요.",
+      "start_time": 186.885,
+      "end_time": 188.973,
+      "duration": 2.088,
+      "timecode": "03:06",
+      "mood": "설명",
+      "visual_elements": [
+        "전기차 이미지"
+      ],
+      "direction_guide": "전기차 특징 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 18,
+      "word_count": 4
+    },
+    {
+      "scene_id": 59,
+      "script_text": "그래서 ZF가 구조조정을 하기 시작한 거예요.",
+      "start_time": 188.973,
+      "end_time": 191.875,
+      "duration": 2.902,
+      "timecode": "03:08",
+      "mood": "설명",
+      "visual_elements": [
+        "ZF 로고",
+        "구조조정 이미지"
+      ],
+      "direction_guide": "구조조정 배경 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 25,
+      "word_count": 6
+    },
+    {
+      "scene_id": 60,
+      "script_text": "그 와중에 ADAS 사업부를 매각하기로 한 거죠.",
+      "start_time": 191.875,
+      "end_time": 195.008,
+      "duration": 3.133,
+      "timecode": "03:11",
+      "mood": "설명",
+      "visual_elements": [
+        "ADAS 사업부 이미지",
+        "매각 이미지"
+      ],
+      "direction_guide": "매각 결정 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 27,
+      "word_count": 7
+    },
+    {
+      "scene_id": 61,
+      "script_text": "ADAS가 뭐냐면요, Advanced Driver Assistance System의 약자예요.",
+      "start_time": 195.008,
+      "end_time": 201.043,
+      "duration": 6.035,
+      "timecode": "03:15",
+      "mood": "설명",
+      "visual_elements": [
+        "ADAS 로고",
+        "ADAS 약자"
+      ],
+      "direction_guide": "ADAS 약자 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 52,
+      "word_count": 7
+    },
+    {
+      "scene_id": 62,
+      "script_text": "우리말로 하면 첨단 운전자 보조 시스템이에요.",
+      "start_time": 201.043,
+      "end_time": 203.944,
+      "duration": 2.901,
+      "timecode": "03:21",
+      "mood": "설명",
+      "visual_elements": [
+        "첨단 운전자 보조 시스템"
+      ],
+      "direction_guide": "ADAS 한국어 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 25,
+      "word_count": 6
+    },
+    {
+      "scene_id": 63,
+      "script_text": "쉽게 말해서 자율주행의 기초 기술이에요.",
+      "start_time": 203.944,
+      "end_time": 206.26,
+      "duration": 2.316,
+      "timecode": "03:23",
+      "mood": "설명",
+      "visual_elements": [
+        "자율주행 자동차 이미지",
+        "기초 기술 이미지"
+      ],
+      "direction_guide": "ADAS 쉬운 설명",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 22,
+      "word_count": 5
+    },
+    {
+      "scene_id": 64,
+      "script_text": "차선 이탈 경고 아시죠? 이게 ADAS예요.",
+      "start_time": 206.26,
+      "end_time": 209.045,
+      "duration": 2.785,
+      "timecode": "03:26",
+      "mood": "예시",
+      "visual_elements": [
+        "차선 이탈 경고 이미지"
+      ],
+      "direction_guide": "ADAS 예시",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 24,
+      "word_count": 6
+    },
+    {
+      "scene_id": 65,
+      "script_text": "앞차랑 거리 유지해주는 스마트 크루즈? 이것도 ADAS예요.",
+      "start_time": 209.045,
+      "end_time": 212.875,
+      "duration": 3.83,
+      "timecode": "03:29",
+      "mood": "예시",
+      "visual_elements": [
+        "스마트 크루즈 이미지"
+      ],
+      "direction_guide": "ADAS 예시",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 33,
+      "word_count": 7
+    },
+    {
+      "scene_id": 66,
+      "script_text": "급브레이크 자동으로 밟아주는 거? 이것도 ADAS고요.",
+      "start_time": 212.875,
+      "end_time": 216.357,
+      "duration": 3.482,
+      "timecode": "03:32",
+      "mood": "예시",
+      "visual_elements": [
+        "자동 급브레이크 이미지"
+      ],
+      "direction_guide": "ADAS 예시",
+      "camera_work": "고정",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 30,
+      "word_count": 6
+    },
+    {
+      "scene_id": 67,
+      "script_text": "ZF는 이 분야에서 레이더, 카메라, 고성능 컴퓨팅 솔루션을 다 갖고 있었어요.",
+      "start_time": 216.357,
+      "end_time": 221.463,
+      "duration": 5.106,
+      "timecode": "03:36",
+      "mood": "설명",
+      "visual_elements": [
+        "레이더 이미지",
+        "카메라 이미지",
+        "고성능 컴퓨팅 이미지"
+      ],
+      "direction_guide": "ZF 기술력 설명",
+      "camera_work": "빠른 컷 전환",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "정보 전달",
+      "char_count": 44,
+      "word_count": 11
+    },
+    {
+      "scene_id": 68,
+      "script_text": "자 그러면요, 이게 하만이랑 합쳐지면 어떻게 되냐.",
+      "start_time": 221.463,
+      "end_time": 224.712,
+      "duration": 3.249,
+      "timecode": "03:41",
+      "mood": "질문",
+      "visual_elements": [
+        "하만 로고",
+        "ZF 로고",
+        "물음표"
+      ],
+      "direction_guide": "결합 효과 질문",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "호기심 유발",
+      "char_count": 28,
+      "word_count": 7
+    },
+    {
+      "scene_id": 69,
+      "script_text": "이게 진짜 핵심이에요. 집중하셔야 해요.",
+      "start_time": 224.712,
+      "end_time": 227.266,
+      "duration": 2.554,
+      "timecode": "03:44",
+      "mood": "강조",
+      "visual_elements": [
+        "집중 이미지"
+      ],
+      "direction_guide": "집중 강조",
+      "camera_work": "줌인",
+      "characters": [
+        "나레이터"
+      ],
+      "scene_break_reason": "강조",
+      "char_count": 22,
+      "word_count": 5
+    },
+    {
+      "scene_id": 70,
+      "script_text": "하만은 차 안쪽을 봐요. 운전자를 본다고요.\n\n운전자가 졸린지, 집중하는지, 스트레스 받는지 감지해요.\n\n이걸 Ready Care라는 시스템으로 하거든요.\n\nZF는 차 바깥쪽을 봐요. 도로를 본다고요.\n\n앞에 차가 있는지, 보행자가 있는지, 신호등이 뭔지 감지해요.\n\n이 두 개가 합쳐지면요?\n\n차가 안과 밖을 동시에 보는 거예요.\n\n예를 들어볼게요.\n\nZF 레이더가 앞에 복잡한 교통상황을 감지해요.\n\n동시에 하만 카메라가 운전자가 좀 피곤한 상태인 걸 감지해요.\n\n그러면 시스템이 자동으로 뭘 하냐면요.\n\n음악 볼륨을 낮추고, 실내 조명을 밝게 하고, 자율주행 보조 기능을 더 강하게 개입시켜요.\n\n사고를 미리 막는 거예요.\n\n이게 왜 대단하냐면요.\n\n지금까지 자동차 회사들은 이걸 따로따로 사왔어요.\n\n콕핏 시스템은 A회사한테, ADAS는 B회사한테.\n\n그리고 이걸 통합하는 게 엄청 어려웠거든요.\n\n근데 하만-ZF가 합쳐지면요?\n\n한 번에 다 해결이 돼요.\n\n자동차 회사 입장에서는 엄청 편해지는 거죠.\n\n개발 기간도 줄고, 비용도 줄고.\n\n그래서 이번 인수가 완료되면요.\n\n하만 매출이 70억 달러에서 110억 달러 이상으로 뛰어요.\n\n우리 돈으로 9조원에서 14조원으로 늘어나는 거예요.\n\n근데요, 여기서 끝이 아니에요.\n\n이게 다가 아닙니다. 진짜 이야기는 지금부터예요.\n\n삼성이 자동차 분야에서 뭘 더 하고 있는지 아시면요.\n\n진짜 소름 돋으실 거예요.",
+      "start_time": 227.266,
+      "end_time": 309.547,
+      "duration": 82.281,
+      "timecode": "03:47",
+      "mood": "설명적, 흥미 유발",
+      "visual_elements": [
+        "운전자 모니터링 시스템 (Ready Care) 시각 자료",
+        "ADAS 시스템 (ZF) 시각 자료",
+        "하만-ZF 통합 시스템 작동 예시 (교통 상황, 운전자 피로도 감지, 자동 조치) 시각 자료",
+        "매출 증가 그래프"
+      ],
+      "direction_guide": "프레젠터는 열정적으로 설명하며, 시각 자료를 활용하여 내용을 효과적으로 전달한다. 목소리 톤은 흥미를 유발하도록 약간 높고, 속도는 적절하게 조절한다.",
+      "camera_work": "다양한 앵글을 사용하여 시각 자료와 프레젠터를 번갈아 보여준다. 중요한 부분에서는 클로즈업을 사용하여 강조한다.",
+      "characters": [
+        "프레젠터"
+      ],
+      "scene_break_reason": "다음 씬에서 삼성의 자동차 사업 전략에 대한 더 깊은 분석으로 전환되기 때문",
+      "char_count": 709,
+      "word_count": 159
+    },
+    {
+      "scene_id": 71,
+      "script_text": "자, 지금까지 얘기 들으시면 삼성이 완전 승승장구하는 것 같죠?\n\n근데요, 현실은 그렇게 녹록하지 않아요.\n\n사실 삼성 내부에서도 엄청난 갈등과 도전이 있었거든요.\n\n2025년 말에 무슨 일이 있었냐면요.\n\n삼성전자 시스템 LSI 사업부에서 엑시노스 오토 개발팀이 축소됐다는 소문이 퍼졌어요.\n\n엑시노스 오토가 뭐냐면요, 삼성이 만드는 자동차용 반도체예요.\n\n근데 이 팀이 AI 조직으로 흡수됐다는 거예요.\n\n업계에서는 삼성이 자동차 반도체 접는 거 아니냐 이런 말이 돌았어요.\n\n솔직히 저도 이 부분 조사하면서 좀 당황했어요.\n\n아니, 하만 인수해서 전장 사업 키운다면서, 자동차 칩은 왜 축소해?\n\n이게 말이 돼요?\n\n근데요, 자세히 들여다보니까 다른 그림이 보이더라고요.",
+      "start_time": 309.547,
+      "end_time": 353.416,
+      "duration": 43.869,
+      "timecode": "05:09",
+      "mood": "반전, 의문 제기",
+      "visual_elements": [
+        "삼성전자 로고",
+        "엑시노스 오토 칩 이미지",
+        "2025년 뉴스 기사 캡쳐 (엑시노스 오토 개발팀 축소 관련)",
+        "혼란스러워하는 프레젠터의 모습"
+      ],
+      "direction_guide": "프레젠터는 지금까지의 긍정적인 분위기를 전환하여, 삼성 내부의 어려움과 의문을 제기한다. 목소리 톤은 약간 낮추고, 진지한 표정을 짓는다.",
+      "camera_work": "프레젠터의 표정을 클로즈업하여 감정을 강조한다. 뉴스 기사 캡쳐 등 시각 자료를 활용하여 내용의 신뢰성을 높인다.",
+      "characters": [
+        "프레젠터"
+      ],
+      "scene_break_reason": "다음 씬에서 삼성의 전략적 선택과 집중, 그리고 BMW와의 계약 내용이 공개되기 때문",
+      "char_count": 378,
+      "word_count": 86
+    },
+    {
+      "scene_id": 72,
+      "script_text": "바로 그때, 삼성이 BMW랑 대형 계약을 발표했거든요.\n\nBMW의 차세대 전기차 플랫폼 노이에 클라세. 이거 아세요?\n\n2025년부터 나오는 BMW의 새로운 전기차 시리즈예요.\n\n여기에 들어가는 핵심 칩을 삼성이 공급하기로 한 거예요.\n\n엑시노스 오토 V720이라는 칩인데요.\n\n5나노 공정으로 만든 고성능 칩이에요.\n\nBMW iX3, 이게 노이에 클라세의 첫 번째 양산 모델인데요.\n\n여기에 삼성 칩이 들어가요.\n\n그리고요, 7시리즈 같은 최상위 모델에는 더 강력한 V920이 들어갈 거라는 얘기도 있어요.\n\n자, 그러면 아까 그 철수설은 뭐냐.\n\n제가 분석해보니까요, 이건 철수가 아니라 전략적 선택과 집중이에요.\n\n삼성이 뭘 한 거냐면요.\n\n그냥 아무나 쓸 수 있는 범용 칩 만드는 건 그만둔 거예요.\n\n대신 BMW, 테슬라, 현대차 같은 대형 고객한테 맞춤형으로 만들어주는 칩에 집중하기로 한 거죠.\n\n그리고 자율주행의 핵심이 뭐예요? AI잖아요.\n\n그래서 자동차 칩 조직을 AI 조직이랑 합친 거예요.\n\n사업 포기가 아니라 기술 융합을 위한 재배치였던 거죠.",
+      "start_time": 353.416,
+      "end_time": 416.3,
+      "duration": 62.884,
+      "timecode": "05:53",
+      "mood": "전환, 해명, 분석",
+      "visual_elements": [
+        "BMW 로고",
+        "BMW 노이에 클라세 플랫폼 이미지",
+        "엑시노스 오토 V720 칩 이미지",
+        "BMW iX3 이미지",
+        "삼성의 전략적 선택과 집중 설명 시각 자료 (범용 칩 vs 맞춤형 칩)"
+      ],
+      "direction_guide": "프레젠터는 BMW와의 계약 내용을 설명하며, 엑시노스 오토 개발팀 축소 소문에 대한 해명을 제시한다. 목소리 톤은 다시 밝아지고, 분석적인 태도를 유지한다.",
+      "camera_work": "BMW 차량 이미지와 칩 이미지를 번갈아 보여주며, 삼성의 전략적 선택과 집중을 설명하는 시각 자료를 활용한다.",
+      "characters": [
+        "프레젠터"
+      ],
+      "scene_break_reason": "다음 씬에서 테슬라와의 협력 관계가 공개되기 때문",
+      "char_count": 541,
+      "word_count": 126
+    },
+    {
+      "scene_id": 73,
+      "script_text": "근데요, 진짜 대박은 테슬라예요.\n\n테슬라 자율주행 칩 아시죠?\n\nHW4, HW5 이런 거요.\n\n이거 누가 만드는지 아세요?\n\n삼성이에요.\n\n테슬라가 설계하고, 삼성 파운드리에서 찍어내는 거예요.\n\n그리고 지금 테슬라가 준비하는 차세대 칩 AI5.\n\n이게 기존보다 40배 성능이 올라간다고 하는데요.\n\n이것도 삼성이 만들 가능성이 높아요.",
+      "start_time": 416.3,
+      "end_time": 438.32,
+      "duration": 22.02,
+      "timecode": "06:56",
+      "mood": "놀라움, 흥분",
+      "visual_elements": [
+        "테슬라 로고",
+        "테슬라 자율주행 칩 (HW4, HW5) 이미지",
+        "삼성 파운드리 공장 이미지",
+        "테슬라 차세대 칩 (AI5) 예상 이미지"
+      ],
+      "direction_guide": "프레젠터는 테슬라와의 협력 관계를 공개하며 놀라움과 흥분을 표현한다. 목소리 톤은 높이고, 제스처를 사용하여 강조한다.",
+      "camera_work": "테슬라 차량 이미지, 칩 이미지, 삼성 파운드리 공장 이미지를 빠르게 전환하여 보여준다.",
+      "characters": [
+        "프레젠터"
+      ],
+      "scene_break_reason": "다음 씬에서 삼성의 자동차 사업 전체 그림을 정리하고, 리스크 요소를 언급하기 때문",
+      "char_count": 189,
+      "word_count": 41
+    },
+    {
+      "scene_id": 74,
+      "script_text": "자, 정리해볼게요.\n\nBMW 전기차 두뇌? 삼성이 만들어요.\n\n테슬라 자율주행 칩? 삼성이 찍어요.\n\n자동차 안의 디지털 콕핏? 하만이 깔아요.\n\n자동차의 눈? 이제 ZF한테서 가져와요.\n\n이게 지금 삼성이 그리고 있는 그림이에요.\n\n근데요, 이렇게 좋은 얘기만 있는 건 아니에요.\n\n리스크도 분명히 있거든요.\n\n첫 번째, 문화 충돌이에요.\n\nZF는 독일 회사예요. 100년 넘은 엔지니어링 강자고요.\n\n하만은 미국 회사고, 삼성은 한국 회사잖아요.\n\n이 세 가지 문화가 충돌하면 어떻게 될까요?\n\n2017년에 하만 인수했을 때도 통합하는 데 꽤 진통을 겪었거든요.\n\n핵심 인력들이 나갈 수도 있고, 제품 개발이 지연될 수도 있어요.\n\n두 번째, 경쟁이에요.\n\nADAS 시장에서 진짜 강자가 누구냐면요.\n\n모빌아이예요. 인텔 자회사고요.\n\n그리고 보쉬. 독일의 또 다른 명가죠.\n\n이 회사들이랑 어떻게 싸울 거냐 이거예요.\n\n세 번째, 지정학적 리스크예요.\n\n삼성이 중국 시안에 낸드플래시 공장이 있거든요.\n\n근데 미중 반도체 전쟁 때문에 미국이 여기 장비 반입을 제한하고 있어요.\n\n2026년까지는 허가가 났는데, 그 다음엔 어떻게 될지 몰라요.\n\n중국 전기차 시장이 세계 최대잖아요.\n\n근데 여기 공급을 못 하게 되면? 큰 타격이에요.\n\n그리고요, 이번 ZF 인수도 2026년 하반기에나 완료돼요.\n\n규제 당국 승인 받아야 하거든요.\n\n그 사이에 시장이 또 어떻게 바뀔지 모르는 거예요.",
+      "start_time": 438.32,
+      "end_time": 522.111,
+      "duration": 83.791,
+      "timecode": "07:18",
+      "mood": "정리, 우려, 경고",
+      "visual_elements": [
+        "삼성의 자동차 사업 전체 그림 시각 자료 (BMW, 테슬라, 하만, ZF)",
+        "문화 충돌 사례 이미지",
+        "모빌아이 로고",
+        "보쉬 로고",
+        "미중 반도체 전쟁 관련 이미지",
+        "삼성 시안 공장 이미지"
+      ],
+      "direction_guide": "프레젠터는 삼성의 자동차 사업 전체 그림을 정리하고, 리스크 요소를 조목조목 지적한다. 목소리 톤은 차분하게 유지하며, 우려와 경고의 메시지를 전달한다.",
+      "camera_work": "각 리스크 요소에 해당하는 시각 자료를 보여주며, 프레젠터의 표정을 클로즈업하여 진지함을 강조한다.",
+      "characters": [
+        "프레젠터"
+      ],
+      "scene_break_reason": "다음 씬에서 삼성의 자동차 사업 분야를 다시 한번 요약하고, 미래 시나리오를 제시하기 때문",
+      "char_count": 722,
+      "word_count": 167
+    },
+    {
+      "scene_id": 75,
+      "script_text": "자, 지금까지 얘기 종합해볼게요.\n\n삼성이 자동차 분야에서 뭘 갖고 있는지 한번 쭉 나열해볼게요.\n\n첫째, 하만. 디지털 콕핏의 절대 강자.\n\n둘째, ZF ADAS. 이제 자동차의 눈까지 갖게 됨.\n\n셋째, 삼성 반도체. BMW랑 테슬라 칩 만들어줌.\n\n넷째, 삼성 디스플레이. 차량용 OLED 시장 점유율 64%.\n\n다섯째, 삼성 SDI. 배터리 만듦. 전고체 배터리 2027년 양산 목표.\n\n여섯째, 6G 통신. SK텔레콤이랑 같이 개발 중.\n\n일곱째, 스마트싱스. 집이랑 차를 연결하는 플랫폼.\n\n이게 다 삼성 거예요.\n\n여러분, 이게 뭘 의미하냐면요.\n\n유럽에서 프리미엄 전기차 한 대가 굴러간다고 생각해보세요.\n\n이 차가 삼성 SDI 배터리로 달려요.\n\n삼성 파운드리에서 만든 칩으로 생각해요.\n\n하만-ZF 센서랑 소프트웨어로 도로를 봐요.\n\n삼성 디스플레이 OLED 화면으로 운전자한테 정보를 보여줘요.\n\n삼성 6G랑 스마트싱스로 집이랑 연결돼요.\n\n이게 삼성이 그리는 그림이에요.\n\n자동차 한 대에 삼성이 다 들어가는 거예요.\n\n전문 용어로 이걸 수직 계열화라고 하는데요.\n\n쉽게 말하면요, 자동차 만드는 데 필요한 핵심 부품을 다 자기가 만드는 거예요.\n\n이러면 뭐가 좋으냐.\n\n협상력이 세져요. 가격도 조절할 수 있고요.\n\n한 곳에서 문제가 생겨도 다른 데서 커버가 돼요.\n\n그리고 부품들끼리 찰떡같이 연동이 되거든요.\n\n근데요, 이런 전략을 쓸 수 있는 회사가 전 세계에 몇 개나 될까요?\n\n테슬라요? 테슬라도 칩이랑 배터리는 자체 개발하지만, 다른 건 외주 줘요.\n\n애플? 애플카는 아직 안 나왔잖아요.\n\n구글? 웨이모가 자율주행 하지만, 하드웨어는 다 외주예요.\n\n삼성만큼 처음부터 끝까지 다 갖고 있는 회사가 없어요.\n\n이게 삼성의 진짜 경쟁력이에요.",
+      "start_time": 522.111,
+      "end_time": 624.354,
+      "duration": 102.243,
+      "timecode": "08:42",
+      "mood": "요약, 강조, 자부심",
+      "visual_elements": [
+        "삼성의 자동차 사업 분야 요약 시각 자료 (하만, ZF, 삼성 반도체, 삼성 디스플레이, 삼성 SDI, 6G 통신, 스마트싱스)",
+        "프리미엄 전기차 이미지",
+        "수직 계열화 설명 시각 자료",
+        "테슬라, 애플, 구글 비교 시각 자료"
+      ],
+      "direction_guide": "프레젠터는 삼성의 자동차 사업 분야를 다시 한번 요약하고, 수직 계열화 전략의 장점을 강조한다. 목소리 톤은 자신감 넘치고, 자부심을 드러낸다.",
+      "camera_work": "삼성의 자동차 사업 분야 요약 시각 자료를 보여주며, 프리미엄 전기차 이미지를 활용하여 설명한다. 테슬라, 애플, 구글과의 비교를 통해 삼성의 경쟁력을 부각시킨다.",
+      "characters": [
+        "프레젠터"
+      ],
+      "scene_break_reason": "다음 씬에서 미래 시나리오를 제시하고, 결론을 내리기 때문",
+      "char_count": 881,
+      "word_count": 205
+    },
+    {
+      "scene_id": 76,
+      "script_text": "자, 그러면 앞으로 어떻게 될까요?\n\n시나리오를 세 가지로 나눠볼게요.\n\n낙관적 시나리오요.\n\nZF 인수가 순조롭게 끝나고, 하만이 ADAS 시장에서 빠르게 점유율을 늘려요.\n\n2027년에 전고체 배터리 상용화되면서 삼성 SDI가 프리미엄 전기차 시장 석권해요.\n\n삼성이 진짜 모빌리티 아키텍트가 되는 거죠.\n\n중립적 시나리오요.\n\n통합 과정에서 진통이 있지만, 어떻게든 해내요.\n\n시장 점유율은 천천히 늘어나고, 기존 강자들이랑 경쟁하면서 2등 그룹으로 자리잡아요.\n\n비관적 시나리오요.\n\n문화 충돌이 심해서 핵심 인력들이 다 빠져나가요.\n\n퀄컴이나 모빌아이가 시장을 다 가져가고, 삼성은 부품 공급사로 남아요.\n\n저요? 개인적으로는 중간쯤 될 것 같아요.\n\n삼성이 실행력 하나는 끝내주잖아요.\n\n근데 자동차 산업이 워낙 보수적이라서요.\n\n시간이 좀 걸릴 거예요.\n\n하지만요, 방향성은 확실해요.\n\n삼성은 이제 가전회사가 아니에요.\n\n바퀴 달린 컴퓨터를 만드는 회사로 바뀌고 있는 거예요.",
+      "start_time": 624.354,
+      "end_time": 682.148,
+      "duration": 57.794,
+      "timecode": "10:24",
+      "mood": "예측, 전망, 결론",
+      "visual_elements": [
+        "낙관적 시나리오 시각 자료 (ADAS 시장 점유율 증가, 전고체 배터리 상용화, 모빌리티 아키텍트)",
+        "중립적 시나리오 시각 자료 (점진적인 시장 점유율 증가, 2등 그룹)",
+        "비관적 시나리오 시각 자료 (문화 충돌, 핵심 인력 이탈, 부품 공급사)",
+        "자동차 산업의 보수적인 특성 강조 이미지",
+        "바퀴 달린 컴퓨터 이미지"
+      ],
+      "direction_guide": "프레젠터는 미래 시나리오를 제시하고, 개인적인 전망을 밝힌다. 목소리 톤은 차분하게 유지하며, 삼성의 미래 방향성을 강조한다.",
+      "camera_work": "각 시나리오에 해당하는 시각 자료를 보여주며, 자동차 산업의 보수적인 특성을 강조하는 이미지를 활용한다. 마지막으로 바퀴 달린 컴퓨터 이미지를 보여주며 삼성의 미래를 상징적으로 표현한다.",
+      "characters": [
+        "프레젠터"
+      ],
+      "scene_break_reason": "다음 씬에서 최종 결론을 내리고, 시청자에게 질문을 던지며 마무리하기 때문",
+      "char_count": 498,
+      "word_count": 107
+    },
+    {
+      "scene_id": 77,
+      "script_text": "자, 오늘 얘기 정리해볼게요.\n\n삼성이 2조원 들여서 ZF ADAS 사업부를 사는 건요.\n\n단순히 회사 하나 인수하는 게 아니에요.\n\n삼성이 자동차의 미래를 통째로 삼키겠다는 선언이에요.\n\n배터리, 반도체, 센서, 디스플레이, 통신.\n\n자동차를 구성하는 모든 핵심 기술을 다 갖춘 회사.\n\n그게 삼성이 되고 싶은 모습이에요.\n\n결국 이 이야기는요.\n\n기술 회사가 어디까지 확장할 수 있는가에 대한 이야기이기도 해요.\n\n스마트폰 만들던 회사가 자동차 두뇌를 만들고.\n\nTV 만들던 회사가 자동차 눈을 장악하는 세상.\n\n여러분은 어떻게 생각하세요?\n\n삼성이 이 거대한 도박에서 성공할 수 있을까요?\n\n댓글로 의견 남겨주시고요.\n\n이런 기업 분석 콘텐츠 더 보고 싶으시면 구독이랑 좋아요 눌러주세요.\n\n다음에 또 재밌는 얘기로 찾아올게요.\n\n감사합니다.",
+      "start_time": 682.148,
+      "end_time": 731.02,
+      "duration": 48.872,
+      "timecode": "11:22",
+      "mood": "",
+      "visual_elements": [],
+      "direction_guide": "",
+      "camera_work": "",
+      "characters": [],
+      "scene_break_reason": "끝부분 누락 보완",
+      "char_count": 418,
+      "word_count": 96
+    }
+  ],
+  "total_scenes": 77,
+  "total_duration": 731.02,
+  "device_used": "cpu"
+}

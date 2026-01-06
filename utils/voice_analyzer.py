@@ -543,36 +543,43 @@ class VoiceAnalyzer:
 
         print(f"  발화속도: {speech_rate:.2f} → speed: {recommended_speed:.2f}")
 
-        # ⭐⭐⭐ Voice Clone 최적화 파라미터 ⭐⭐⭐
-        # 🔴 기존: cfg_weight 0.4~0.6, temperature 0.7~0.9 (Voice Clone 품질 저하)
-        # ✅ 수정: cfg_weight 0.7, temperature 0.5 (참조 특성 강화 + 안정성)
+        # ⭐⭐⭐ Voice Clone 최적화 파라미터 (자연스러움 강화) ⭐⭐⭐
+        # 🔴 기존: 너무 보수적 → 딱딱한 음성
+        # ✅ 수정: 표현력+자연스러움 증가, 참조 특성 강화
 
         # 2. CFG Weight - 참조 음성 특성 강화
-        cfg_weight = 0.7  # 🔴 0.4~0.6 → 0.7 고정
+        cfg_weight = 0.85  # ⭐⭐⭐ 0.75 → 0.85 (참조 특성 최대 강화!)
 
-        # 3. Exaggeration - 감정 표현
-        exaggeration = 0.55  # 🔴 변동 → 0.55 고정 (적당한 표현)
+        # 3. Exaggeration - 감정 표현 (⭐ 핵심 수정!)
+        exaggeration = 0.70  # ⭐ 0.55 → 0.70 (표현력 +27%!)
 
-        # 4. Temperature - 안정적인 발음
-        temperature = 0.5  # 🔴 0.7~0.9 → 0.5 고정
+        # 4. Temperature - 자연스러운 변화 허용
+        temperature = 0.65  # ⭐ 0.5 → 0.65 (자연스러움 +30%!)
 
         # 5. 목표 발화속도 (정규화용)
         # 정확한 측정이면 해당 속도 사용, 아니면 기준값 사용
         target_speed = speech_rate if accurate else self.reference_speed
 
+        # ⭐⭐⭐ speed 1.0 고정 - 후처리 가속 방지! ⭐⭐⭐
+        # 🔴 기존: recommended_speed 사용 → 0.75~0.85 → 후처리에서 46%+ 가속
+        # ✅ 수정: 1.0 고정 → 후처리 가속 최소화 → 자연스러운 음성
+        fixed_speed = 1.0
+
         params = {
-            "speed": round(recommended_speed, 2),
+            "speed": fixed_speed,  # ⭐ 1.0 고정! (recommended_speed 대신)
             "cfg_weight": cfg_weight,
             "exaggeration": exaggeration,
             "temperature": temperature,
             "target_speed": round(target_speed, 2),
             "based_on_accurate": accurate,
+            "_original_recommended_speed": round(recommended_speed, 2),  # 참고용
         }
 
-        print(f"[VoiceAnalyzer] ⭐ Voice Clone 최적화:")
-        print(f"  cfg_weight: {cfg_weight} (참조 특성 강화)")
-        print(f"  temperature: {temperature} (안정성 우선)")
-        print(f"  speed: {recommended_speed:.2f}")
+        print(f"[VoiceAnalyzer] ⭐⭐⭐ Voice Clone 최적화 (후처리 가속 방지):")
+        print(f"  speed: {fixed_speed} (⭐ 1.0 고정! 원래 추천: {recommended_speed:.2f})")
+        print(f"  cfg_weight: {cfg_weight} (참조 특성 ↑↑)")
+        print(f"  exaggeration: {exaggeration} (표현력 ↑)")
+        print(f"  temperature: {temperature} (자연스러움 ↑)")
 
         return params
 
@@ -1467,16 +1474,28 @@ class OptimizedVersionManager:
             voice_name_clean = voice_name_clean.split("_최적화")[0]
         if "_opt_" in voice_name_clean:
             voice_name_clean = voice_name_clean.split("_opt_")[0]
+        if "__manual_" in voice_name_clean:
+            voice_name_clean = voice_name_clean.split("__manual_")[0]
+        # ⭐ 끝의 연속 언더스코어 제거
+        voice_name_clean = voice_name_clean.rstrip('_')
 
-        print(f"[OptimizedVersionManager] 버전 스캔: '{voice_name_clean}'")
+        print(f"[OptimizedVersionManager] 버전 스캔: '{voice_name}' → '{voice_name_clean}'")
 
-        # 1. optimized 폴더 스캔
+        # 1. optimized 폴더 스캔 (⭐ _opt_, __manual_ 패턴 모두 인식)
         if self.optimized_path.exists():
             for filepath in self.optimized_path.iterdir():
                 if filepath.suffix.lower() in ['.mp3', '.wav', '.m4a']:
                     filename = filepath.stem
-                    # 매칭 조건: 원본 이름으로 시작하고 _opt_ 포함
-                    if filename.startswith(voice_name_clean) and "_opt_" in filename:
+                    # ⭐ 파일명도 정규화하여 비교
+                    filename_base = filename
+                    if "_opt_" in filename_base:
+                        filename_base = filename_base.split("_opt_")[0]
+                    elif "__manual_" in filename_base:
+                        filename_base = filename_base.split("__manual_")[0]
+                    filename_base = filename_base.rstrip('_')
+
+                    # 매칭 조건: 정규화된 이름이 일치하고 _opt_ 또는 __manual_ 포함
+                    if filename_base == voice_name_clean and ("_opt_" in filename or "__manual_" in filename):
                         version_info = self._get_version_info(filepath)
                         if version_info:
                             versions.append(version_info)
@@ -1486,8 +1505,14 @@ class OptimizedVersionManager:
             for filepath in self.default_path.iterdir():
                 if filepath.suffix.lower() in ['.mp3', '.wav', '.m4a']:
                     filename = filepath.stem
-                    # 매칭 조건: 원본 이름 + _최적화
-                    if filename.startswith(voice_name_clean) and "_최적화" in filename:
+                    # ⭐ 파일명도 정규화하여 비교
+                    filename_base = filename
+                    if "_최적화" in filename_base:
+                        filename_base = filename_base.split("_최적화")[0]
+                    filename_base = filename_base.rstrip('_')
+
+                    # 매칭 조건: 정규화된 이름이 일치하고 _최적화 포함
+                    if filename_base == voice_name_clean and "_최적화" in filename:
                         version_info = self._get_version_info(filepath)
                         if version_info:
                             versions.append(version_info)
@@ -1500,8 +1525,9 @@ class OptimizedVersionManager:
             versions[0]["is_latest"] = True
 
         print(f"[OptimizedVersionManager] 발견된 버전: {len(versions)}개")
-        for v in versions[:3]:  # 상위 3개만 로그
-            print(f"  - {v['filename']} (품질: {v.get('quality_score', 0):.3f})")
+        for v in versions[:5]:  # 상위 5개만 로그
+            opt_type = "📌수동" if v.get("is_manual") else "🤖자동"
+            print(f"  - {v['filename']} ({opt_type}, 품질: {v.get('quality_score', 0):.3f})")
 
         return versions
 
@@ -1509,6 +1535,9 @@ class OptimizedVersionManager:
         """개별 버전 정보 추출"""
         try:
             from datetime import datetime
+            import re
+
+            filename = filepath.name
 
             # 파일 수정 시간
             stat = filepath.stat()
@@ -1525,17 +1554,33 @@ class OptimizedVersionManager:
             meta_key = filepath.name
             meta = self.metadata.get("versions", {}).get(meta_key, {})
 
+            # ⭐ 파일명에서도 is_manual 판단 (메타데이터 없을 경우 대비)
+            is_manual_from_filename = "__manual_" in filename
+            is_manual = meta.get("is_manual", is_manual_from_filename)
+
+            # ⭐ 파일명에서 구간 정보 추출 (예: _120-140s_)
+            start_time = meta.get("start_time", 0)
+            end_time = meta.get("end_time", duration)
+            time_match = re.search(r'_(\d+)-(\d+)s_', filename)
+            if time_match and start_time == 0:
+                start_time = float(time_match.group(1))
+                end_time = float(time_match.group(2))
+
+            # ⭐ 발화속도 정보
+            speaking_rate = meta.get("speaking_rate")
+
             return {
-                "filename": filepath.name,
+                "filename": filename,
                 "filepath": str(filepath),
-                "start_time": meta.get("start_time", 0),
-                "end_time": meta.get("end_time", duration),
+                "start_time": start_time,
+                "end_time": end_time,
                 "duration": duration,
                 "quality_score": meta.get("quality_score", 0.0),
                 "created_at": created_at,
                 "is_latest": False,
                 "source_file": meta.get("source_file", ""),
-                "is_manual": meta.get("is_manual", False),  # ⭐ 수동/자동 구분
+                "is_manual": is_manual,  # ⭐ 수동/자동 구분
+                "speaking_rate": speaking_rate,  # ⭐ 발화속도
             }
         except Exception as e:
             print(f"[OptimizedVersionManager] 버전 정보 로드 실패: {filepath.name} - {e}")

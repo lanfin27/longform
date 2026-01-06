@@ -16,6 +16,9 @@ from datetime import datetime
 import time
 import os
 import sys
+import zipfile
+import io
+import json
 
 # 경로 설정
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -1220,6 +1223,35 @@ def render_transcript_tab():
         return
 
     # ═══════════════════════════════════════════════════════
+    # ⭐ v4.5: 기존 다운로드 결과 표시 (페이지 리셋 방지)
+    # ═══════════════════════════════════════════════════════
+    existing_results = st.session_state.get("transcript_download_results")
+    if existing_results and existing_results.get("files"):
+        st.success("### ✅ 이전 다운로드 완료!")
+
+        stats = existing_results.get("stats", {})
+        st.markdown(f"""
+        - 📺 처리된 채널: {stats.get('channels', 0)}개
+        - 📺 처리된 영상: {stats.get('videos_downloaded', 0)}개
+        - ✅ 성공: {stats.get('success', 0)}개
+        - ⚠️ 자막 없음: {stats.get('no_caption', 0)}개
+        - ❌ 실패: {stats.get('failed', 0)}개
+        - 📁 형식: {stats.get('formats_summary', 'N/A')}
+        """)
+
+        # 다운로드 버튼 표시
+        _render_download_results(existing_results)
+
+        st.markdown("---")
+
+        # 새 다운로드 시작 버튼
+        if st.button("🔄 새 다운로드 시작", type="secondary", use_container_width=True):
+            st.session_state["transcript_download_results"] = None
+            st.rerun()
+
+        return  # 기존 결과가 있으면 여기서 종료
+
+    # ═══════════════════════════════════════════════════════
     # ⭐ 시스템 상태 표시 (쿠키, API, yt-dlp)
     # ═══════════════════════════════════════════════════════
     render_system_status()
@@ -2228,51 +2260,62 @@ def run_transcript_download_v2(
                     current_status.text(f"⏳ Rate Limit 방지 대기 중... ({batch_delay}초)")
                     time.sleep(batch_delay)
 
-        # ⭐ v4.4: 채널별 결과 저장 (다중 형식 지원)
+        # ⭐ v4.5: 채널별 결과 저장 (개별 파일 + ZIP 지원)
         if channel_results:
             try:
                 # 기본 파일 경로 생성
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 safe_channel = "".join(c for c in channel_name if c.isalnum() or c in (' ', '-', '_')).strip()[:50]
-                base_path = f"data/transcripts/transcripts_{safe_channel}_{timestamp}"
-
-                saved_format_files = []
 
                 # 성공한 결과만 추출
                 successful_results = [r for r in channel_results if r.success and r.transcript]
 
                 if successful_results:
-                    # JSON 형식 저장 (기본)
-                    if 'json' in output_formats:
-                        json_path = downloader.save_results(
-                            results=channel_results,
-                            channel_name=channel_name,
-                            output_format='json'
-                        )
-                        output_files.append(json_path)
-                        saved_format_files.append('JSON')
+                    # ⭐ 개별 파일들을 담을 딕셔너리 (형식별로 구분)
+                    individual_files = {fmt: [] for fmt in output_formats}
 
-                    # SRT/VTT/TXT 형식 저장 (TranscriptFormatter 사용)
+                    # 각 영상별로 개별 파일 생성
+                    for result in successful_results:
+                        video_id = result.video_id
+                        video_title = result.video_title or video_id
+
+                        # 안전한 파일명 생성
+                        safe_title = "".join(c for c in video_title if c.isalnum() or c in (' ', '-', '_', '(', ')')).strip()[:50]
+                        base_filename = f"{safe_channel}_{safe_title}_{video_id}"
+
+                        # 각 형식별로 개별 파일 내용 생성
+                        for fmt in output_formats:
+                            if fmt == 'json':
+                                # JSON 형식
+                                content = json.dumps({
+                                    "video_id": video_id,
+                                    "video_title": video_title,
+                                    "channel_name": channel_name,
+                                    "transcript": result.transcript,
+                                    "language": result.language,
+                                    "downloaded_at": datetime.now().isoformat()
+                                }, ensure_ascii=False, indent=2)
+                            else:
+                                # SRT/VTT/TXT 형식
+                                content = TranscriptFormatter.convert(result.transcript, fmt)
+
+                            individual_files[fmt].append({
+                                "filename": f"{base_filename}.{fmt}",
+                                "content": content
+                            })
+
+                    # ⭐ ZIP 파일 생성 (형식별로)
                     for fmt in output_formats:
-                        if fmt == 'json':
-                            continue  # 이미 처리됨
+                        if individual_files[fmt]:
+                            zip_path = f"data/transcripts/{safe_channel}_{timestamp}_{fmt.upper()}.zip"
 
-                        fmt_path = f"{base_path}.{fmt}"
+                            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+                                for file_info in individual_files[fmt]:
+                                    zf.writestr(file_info["filename"], file_info["content"])
 
-                        # 모든 결과의 세그먼트 합치기
-                        all_segments = []
-                        for r in successful_results:
-                            if r.transcript:
-                                all_segments.extend(r.transcript)
+                            output_files.append(zip_path)
 
-                        if all_segments:
-                            content = TranscriptFormatter.convert(all_segments, fmt)
-                            with open(fmt_path, 'w', encoding='utf-8') as f:
-                                f.write(content)
-                            output_files.append(fmt_path)
-                            saved_format_files.append(fmt.upper())
-
-                    logs.append(f"[{channel_name}] ✅ 저장: {', '.join(saved_format_files)}")
+                    logs.append(f"[{channel_name}] ✅ {len(successful_results)}개 영상 저장 (개별 파일 ZIP)")
                 else:
                     logs.append(f"[{channel_name}] ⚠️ 저장할 성공 결과 없음")
 
@@ -2304,29 +2347,77 @@ def run_transcript_download_v2(
     - 📁 형식: {formats_summary}
     """)
 
-    # 다운로드 파일 목록
-    if output_files:
-        st.markdown("### 📁 저장된 파일")
+    # ⭐ v4.5: 다운로드 결과를 session state에 저장 (페이지 리셋 방지)
+    download_result = {
+        "timestamp": datetime.now().isoformat(),
+        "stats": {
+            "channels": len(queue),
+            "videos_downloaded": videos_downloaded,
+            "success": total_success,
+            "no_caption": total_no_caption,
+            "failed": total_failed,
+            "method_summary": method_summary,
+            "formats_summary": formats_summary
+        },
+        "files": []
+    }
 
+    # 파일 데이터를 미리 로드하여 session state에 저장
+    if output_files:
         for filepath in output_files:
             filename = os.path.basename(filepath)
-
             try:
                 with open(filepath, "rb") as f:
                     file_data = f.read()
-
-                st.download_button(
-                    label=f"📥 {filename}",
-                    data=file_data,
-                    file_name=filename,
-                    mime="application/octet-stream",
-                    key=f"dl_{filename}"
-                )
+                download_result["files"].append({
+                    "filename": filename,
+                    "filepath": filepath,
+                    "data": file_data
+                })
             except Exception as e:
-                st.caption(f"📄 {filename} (파일 로드 실패)")
+                download_result["files"].append({
+                    "filename": filename,
+                    "filepath": filepath,
+                    "data": None,
+                    "error": str(e)
+                })
 
-    # 대기열 비우기
+    st.session_state["transcript_download_results"] = download_result
+
+    # 다운로드 파일 목록 표시
+    _render_download_results(download_result)
+
+    # 대기열 비우기 (결과는 session state에 유지)
     st.session_state["transcript_queue"] = []
+
+
+def _render_download_results(result: dict):
+    """다운로드 결과 표시 (session state에서 호출)"""
+    if not result:
+        return
+
+    st.markdown("### 📁 저장된 파일")
+
+    files = result.get("files", [])
+    if not files:
+        st.info("저장된 파일이 없습니다.")
+        return
+
+    for file_info in files:
+        filename = file_info["filename"]
+        file_data = file_info.get("data")
+
+        if file_data:
+            st.download_button(
+                label=f"📥 {filename}",
+                data=file_data,
+                file_name=filename,
+                mime="application/zip" if filename.endswith('.zip') else "application/octet-stream",
+                key=f"dl_{filename}_{result.get('timestamp', '')}"
+            )
+        else:
+            error = file_info.get("error", "알 수 없는 오류")
+            st.caption(f"📄 {filename} (로드 실패: {error})")
 
 
 def main():

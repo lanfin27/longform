@@ -1,20 +1,31 @@
 # -*- coding: utf-8 -*-
 """
-인포그래픽용 이미지 생성기
+인포그래픽용 이미지 생성기 (v2.0)
 
 기능:
 - 모서리/가장자리에 요소 배치
 - 가운데 공간 확보 (인포그래픽용)
 - 다양한 레이아웃 지원
 - 인포그래픽 + 이미지 합성
+
+v2.0: 한글/아시아 텍스트 생성 방지 강화
+- prompt_sanitizer 사용하여 텍스트 키워드 제거
+- 강력한 텍스트 차단 프롬프트 추가
 """
 
+import gc
 import os
 import json
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 from enum import Enum
+
+from utils.prompt_sanitizer import (
+    sanitize_scene_prompt,
+    get_text_blocking_suffix,
+    get_text_blocking_negative
+)
 
 
 class InfographicLayout(Enum):
@@ -121,6 +132,9 @@ class InfographicImageGenerator:
         # Positive 프롬프트 구성
         prompt_parts = []
 
+        # v2.0: 텍스트 차단 지시 (맨 앞에 배치)
+        prompt_parts.append("IMPORTANT: All surfaces must be completely blank with no text, signs, or writing of any kind")
+
         # 1. 스타일 prefix
         if style_prefix:
             prompt_parts.append(style_prefix.strip())
@@ -129,13 +143,16 @@ class InfographicImageGenerator:
         prompt_parts.append(layout_info["position"])
         prompt_parts.append(layout_info["composition"])
 
-        # 3. 기본 프롬프트
+        # 3. 기본 프롬프트 - v2.0: 텍스트 키워드 제거
         if base_prompt:
-            prompt_parts.append(base_prompt.strip())
+            sanitized_base = sanitize_scene_prompt(base_prompt.strip())
+            prompt_parts.append(sanitized_base)
 
-        # 4. 추가 요소
+        # 4. 추가 요소 - v2.0: 텍스트 키워드 제거
         if additional_elements:
-            prompt_parts.extend(additional_elements)
+            sanitized_elements = [sanitize_scene_prompt(elem) for elem in additional_elements]
+            filtered_elements = [e for e in sanitized_elements if e.strip()]
+            prompt_parts.extend(filtered_elements)
 
         # 5. 스타일 suffix
         if style_suffix:
@@ -149,13 +166,15 @@ class InfographicImageGenerator:
             "high quality"
         ])
 
+        # v2.0: 텍스트 차단 suffix 추가
+        prompt_parts.append(get_text_blocking_suffix())
+
         positive_prompt = ", ".join(filter(None, prompt_parts))
 
-        # Negative 프롬프트
+        # Negative 프롬프트 - v2.0: 강화된 텍스트 차단
         negative_parts = [
             layout_info["negative"],
-            "text in image",
-            "watermark",
+            get_text_blocking_negative(),
             "cluttered center",
             "busy composition",
             "low quality",
@@ -376,6 +395,9 @@ class InfographicImageGenerator:
             # API 속도 제한
             import time
             time.sleep(1)
+
+            # 메모리 정리 (Out of Memory 방지)
+            gc.collect()
 
         print(f"\n{'='*60}")
         print(f"[InfographicGenerator] 완료: {len(results)}/{total}개 생성됨")

@@ -5,13 +5,26 @@
 1. 싱글톤 제거 - 매번 파일에서 로드
 2. 함수 기반 API - 간단하고 명확
 3. 항상 최신 데이터 보장
+4. 세션 스테이트 기반 캐시 무효화 (v2.1)
 """
 import json
 import os
+import time
 from pathlib import Path
 from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict
 from datetime import datetime
+
+# Streamlit 세션 스테이트 (Streamlit 외부에서 실행 시 None)
+try:
+    import streamlit as st
+    _HAS_STREAMLIT = True
+except ImportError:
+    _HAS_STREAMLIT = False
+    st = None
+
+# 캐시 무효화 키
+_STYLE_CACHE_VERSION_KEY = "_style_cache_version"
 
 
 @dataclass
@@ -330,18 +343,37 @@ def _save_all_data(data: Dict[str, List[dict]]) -> bool:
     """전체 데이터를 파일에 저장"""
     storage_path = _get_storage_path()
 
+    print(f"[StyleManager] _save_all_data 시작")
+    print(f"[StyleManager] 저장 경로: {storage_path}")
+
     try:
         os.makedirs(os.path.dirname(storage_path), exist_ok=True)
+
+        # 저장 전 파일 크기
+        before_size = os.path.getsize(storage_path) if os.path.exists(storage_path) else 0
 
         with open(storage_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
+        # 저장 후 파일 크기
+        after_size = os.path.getsize(storage_path)
+
         total = sum(len(styles) for styles in data.values())
-        print(f"[StyleManager] ✅ 저장 완료: {storage_path} ({total}개 스타일)")
+        print(f"[StyleManager] ✅ 저장 완료: {storage_path}")
+        print(f"[StyleManager]   - 스타일 수: {total}개")
+        print(f"[StyleManager]   - 파일 크기: {before_size} → {after_size} bytes")
         return True
+
+    except PermissionError as e:
+        print(f"[StyleManager] ❌ 권한 오류 - 파일 쓰기 불가: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
     except Exception as e:
         print(f"[StyleManager] ❌ 저장 실패: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 
@@ -469,44 +501,106 @@ def add_style(style: Style) -> tuple:
     return False, msg
 
 
-def update_style(style_id: str, updates: dict) -> bool:
+def update_style(style_id: str, updates: dict, target_segment: str = None) -> bool:
     """
     스타일 수정
 
     Args:
         style_id: 수정할 스타일 ID
         updates: 수정할 필드들
+        target_segment: 수정할 세그먼트 (None이면 첫 번째 발견된 것 수정)
+                       ⭐ 같은 ID가 여러 세그먼트에 있을 때 필수!
 
     Returns:
         성공 여부
     """
+    print(f"\n{'='*60}")
+    print(f"[StyleManager] update_style 시작")
+    print(f"[StyleManager] style_id: {style_id}")
+    print(f"[StyleManager] target_segment: {target_segment}")  # ⭐ 세그먼트 로그 추가
+    print(f"[StyleManager] updates keys: {list(updates.keys())}")
+    for key, value in updates.items():
+        preview = str(value)[:50] + "..." if len(str(value)) > 50 else str(value)
+        print(f"[StyleManager]   {key}: {preview}")
+    print(f"{'='*60}")
+
     data = _load_all_data()
+    print(f"[StyleManager] 로드된 세그먼트: {list(data.keys())}")
+
+    # 같은 ID가 여러 세그먼트에 있는지 확인
+    found_in_segments = []
+    for seg, styles_list in data.items():
+        if isinstance(styles_list, list):
+            for s in styles_list:
+                if s.get('id') == style_id:
+                    found_in_segments.append(seg)
+
+    if len(found_in_segments) > 1:
+        print(f"[StyleManager] ⚠️ 같은 ID가 여러 세그먼트에 존재: {found_in_segments}")
+        if target_segment:
+            print(f"[StyleManager] → target_segment={target_segment} 사용")
+        else:
+            print(f"[StyleManager] → target_segment 미지정, 첫 번째({found_in_segments[0]}) 수정")
 
     found = False
-    for segment, styles in data.items():
+    found_segment = None
+
+    # target_segment가 지정된 경우 해당 세그먼트만 검색
+    segments_to_search = [target_segment] if target_segment else data.keys()
+
+    for segment in segments_to_search:
+        if segment not in data:
+            continue
+
+        styles = data[segment]
         if not isinstance(styles, list):
             continue
 
         for style in styles:
             if style.get('id') == style_id:
+                print(f"[StyleManager] ✅ 스타일 발견: {segment}/{style_id}")
+                print(f"[StyleManager] 수정 전 prompt_prefix: {style.get('prompt_prefix', '')[:30]}...")
+
                 for key, value in updates.items():
                     if key not in ['id', 'segment']:
                         style[key] = value
                 style['updated_at'] = datetime.now().isoformat()
                 found = True
+                found_segment = segment
+
+                print(f"[StyleManager] 수정 후 prompt_prefix: {style.get('prompt_prefix', '')[:30]}...")
                 break
 
         if found:
             break
 
     if not found:
-        print(f"[StyleManager] 스타일 찾지 못함: {style_id}")
+        print(f"[StyleManager] ❌ 스타일 찾지 못함: {style_id}")
+        # 모든 스타일 ID 출력
+        all_ids = []
+        for seg, styles_list in data.items():
+            if isinstance(styles_list, list):
+                for s in styles_list:
+                    all_ids.append(f"{seg}/{s.get('id', '?')}")
+        print(f"[StyleManager] 사용 가능한 스타일: {all_ids}")
         return False
 
-    if _save_all_data(data):
-        print(f"[StyleManager] ✅ 스타일 수정됨: {style_id}")
+    # 저장
+    save_result = _save_all_data(data)
+    if save_result:
+        print(f"[StyleManager] ✅ 스타일 수정 완료: {style_id}")
+
+        # 검증: 다시 읽어서 확인
+        verify_data = _load_all_data()
+        for style in verify_data.get(found_segment, []):
+            if style.get('id') == style_id:
+                saved_prefix = style.get('prompt_prefix', '')[:30]
+                print(f"[StyleManager] 검증 - 저장된 prompt_prefix: {saved_prefix}...")
+                break
+
         return True
 
+    print(f"[StyleManager] ❌ 저장 실패")
     return False
 
 
@@ -663,8 +757,9 @@ class StyleManager:
         """스타일 추가 - (성공여부, 메시지) 반환"""
         return add_style(style)
 
-    def update_style(self, style_id: str, updates: dict) -> bool:
-        return update_style(style_id, updates)
+    def update_style(self, style_id: str, updates: dict, target_segment: str = None) -> bool:
+        """스타일 수정 - target_segment로 특정 세그먼트 지정 가능"""
+        return update_style(style_id, updates, target_segment)
 
     def delete_style(self, style_id: str) -> bool:
         return delete_style(style_id)
@@ -693,12 +788,87 @@ def get_style_manager(project_path: str = None) -> StyleManager:
 
 def invalidate_style_cache():
     """
-    스타일 캐시 무효화
+    스타일 캐시 무효화 (v2.1)
 
-    더 이상 캐시가 없으므로 아무것도 하지 않음.
-    호환성을 위해 유지.
+    세션 스테이트의 스타일 관련 캐시를 무효화합니다.
+    다른 페이지에서 스타일 변경을 감지할 수 있도록 버전을 갱신합니다.
     """
-    print("[StyleManager] 캐시 무효화 호출됨 (캐시 없음, 무시)")
+    if not _HAS_STREAMLIT:
+        print("[StyleManager] Streamlit 없음 - 캐시 무효화 스킵")
+        return
+
+    try:
+        # 버전 업데이트 (타임스탬프 기반)
+        new_version = time.time()
+        st.session_state[_STYLE_CACHE_VERSION_KEY] = new_version
+
+        # 스타일 관련 세션 키 클리어
+        keys_to_clear = []
+        for key in list(st.session_state.keys()):
+            # 스타일 선택 관련 키 찾기
+            if any(pattern in key for pattern in [
+                'selected_style_',
+                'style_select',
+                'bg_style',
+                '_style_radio',
+                '_style_selectbox'
+            ]):
+                keys_to_clear.append(key)
+
+        for key in keys_to_clear:
+            del st.session_state[key]
+
+        print(f"[StyleManager] ✅ 캐시 무효화 완료 (버전: {new_version:.2f}, 클리어된 키: {len(keys_to_clear)}개)")
+
+    except Exception as e:
+        print(f"[StyleManager] 캐시 무효화 오류: {e}")
+
+
+def get_style_cache_version() -> float:
+    """
+    현재 스타일 캐시 버전 조회
+
+    Returns:
+        캐시 버전 (타임스탬프). 없으면 0.0
+    """
+    if not _HAS_STREAMLIT:
+        return 0.0
+
+    try:
+        return st.session_state.get(_STYLE_CACHE_VERSION_KEY, 0.0)
+    except Exception:
+        return 0.0
+
+
+def check_and_clear_stale_style_cache(page_key: str = "default") -> bool:
+    """
+    스타일 캐시가 변경되었는지 확인하고 필요시 로컬 캐시 클리어
+
+    각 페이지에서 호출하여 스타일 변경 감지
+
+    Args:
+        page_key: 페이지 고유 키
+
+    Returns:
+        True if cache was invalidated (스타일이 변경됨)
+    """
+    if not _HAS_STREAMLIT:
+        return False
+
+    try:
+        current_version = get_style_cache_version()
+        last_seen_key = f"_style_version_seen_{page_key}"
+        last_seen = st.session_state.get(last_seen_key, 0.0)
+
+        if current_version > last_seen:
+            # 버전이 업데이트됨 - 이 페이지의 스타일 관련 캐시 클리어
+            st.session_state[last_seen_key] = current_version
+            print(f"[StyleManager] 📢 스타일 변경 감지 (페이지: {page_key})")
+            return True
+
+        return False
+    except Exception:
+        return False
 
 
 # ========================================

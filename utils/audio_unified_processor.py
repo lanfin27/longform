@@ -146,8 +146,15 @@ class UnifiedAudioProcessor:
 
         # ===== 2단계: 정규화 계수 계산 =====
         # 전체 속도 조정 계수
+        # ⭐⭐⭐ 속도 조정 범위 제한 (자연스러움 보존) ⭐⭐⭐
+        # 🔴 이전: ±25% (0.80~1.25) → 과도한 가속으로 자연스러움 손실
+        # ✅ 수정: ±15% (0.85~1.15) → 자연스러움 보존
         base_speed_factor = self.target_speed / current_speed if current_speed > 0 else 1.0
-        base_speed_factor = max(0.80, min(1.25, base_speed_factor))
+        original_speed_factor = base_speed_factor
+        base_speed_factor = max(0.85, min(1.15, base_speed_factor))
+
+        if abs(original_speed_factor - base_speed_factor) > 0.01:
+            print(f"  ⚠️ 과도한 속도 조정 방지: {original_speed_factor:.3f}x → {base_speed_factor:.3f}x (자연스러움 보존)")
 
         # 음량 조정 (dB)
         # ⭐⭐⭐ 과도한 음량 조정 방지 ⭐⭐⭐
@@ -173,11 +180,12 @@ class UnifiedAudioProcessor:
             accel_factors = self._get_fixed_pattern(profile)
 
         # ===== 4단계: 최종 atempo 계산 (정규화 + 가속보정) =====
+        # ⭐ 최종 범위도 축소: 0.70~1.35 → 0.85~1.20 (자연스러움 보존)
         final_atempos = []
         for i, accel_factor in enumerate(accel_factors):
             # 최종 = 정규화 속도 × 가속 보정
             final = base_speed_factor * accel_factor
-            final = max(0.70, min(1.35, final))  # 안전 범위
+            final = max(0.85, min(1.20, final))  # ⭐ 안전 범위 축소 (자연스러움 보존)
             final_atempos.append(final)
 
         # 구간별 atempo 출력
@@ -574,7 +582,10 @@ def _final_speed_adjustment(
     - 수정: 각 씬별로 개별 조정 계수 계산 → 각각 적용
     """
 
-    print(f"\n[FinalAdjust v1.1] 씬별 개별 속도 조정")
+    # ⭐⭐⭐ FinalAdjust v1.2 - 범위 대폭 축소 (자연스러움 보존) ⭐⭐⭐
+    # 🔴 기존: ±15~20% 조정 → 과도한 가속으로 딱딱한 음성
+    # ✅ 수정: ±5% 제한 → 미세 조정만 허용
+    print(f"\n[FinalAdjust v1.2] 씬별 미세 조정 (±5% 제한)")
     print(f"  목표: {target_speed:.2f} 글자/초")
 
     adjusted_results = []
@@ -608,15 +619,22 @@ def _final_speed_adjustment(
             current_speed = char_count / duration
             speed_diff_pct = abs(current_speed - target_speed) / target_speed * 100
 
-            # ⭐ 2% 이상 차이나면 개별 조정
-            if speed_diff_pct < 2.0:
-                print(f"  씬 {scene_id}: {current_speed:.2f} 글자/초 ✅")
+            # ⭐⭐⭐ 5% 이상 차이나면 개별 조정 (기존 2% → 5% 완화)
+            # 작은 차이는 무시해서 불필요한 가속 방지
+            if speed_diff_pct < 5.0:
+                print(f"  씬 {scene_id}: {current_speed:.2f} 글자/초 ✅ (차이 {speed_diff_pct:.1f}% - 허용)")
                 adjusted_results.append(scene)
                 continue
 
-            # ⭐ 씬별 개별 조정 계수 계산
+            # ⭐⭐⭐ 씬별 개별 조정 계수 계산 - 범위 대폭 축소!
+            # 🔴 기존: 0.85~1.20 (±15~20%) → 과도한 가속
+            # ✅ 수정: 0.95~1.05 (±5%) → 미세 조정만 허용
             adjustment = target_speed / current_speed
-            adjustment = max(0.85, min(1.20, adjustment))
+            original_adjustment = adjustment
+            adjustment = max(0.95, min(1.05, adjustment))
+
+            if abs(original_adjustment - adjustment) > 0.01:
+                print(f"  ⚠️ 과도한 조정 방지: x{original_adjustment:.3f} → x{adjustment:.3f}")
 
             print(f"  씬 {scene_id}: {current_speed:.2f} → {target_speed:.2f} (x{adjustment:.3f})")
 
@@ -671,7 +689,7 @@ def _final_speed_adjustment(
             adjusted_results.append(scene)
 
     # 최종 결과 요약
-    print(f"\n[FinalAdjust v1.1] 완료 ({adjustments_made}개 씬 조정됨)")
+    print(f"\n[FinalAdjust v1.2] 완료 ({adjustments_made}개 씬 미세 조정됨)")
 
     # 최종 속도 확인
     final_speeds = []

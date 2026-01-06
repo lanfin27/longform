@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-06T10:33:48.318682",
+  "image_file": "bg_scene_010_1767663228317.png",
+  "scene_id": 10,
+  "prompts": {
+    "original": "Logos of Samsung, Tesla, and BMW together, competitive landscape, no characters, no people, no text, no letters, no words, no numbers, no signs, no logos, no written language of any kind",
+    "final": "Korean webtoon manhwa background illustration,\nclean bold black outlines on all elements,\nflat solid color fills with minimal shading,\nsimplified shapes with clear silhouettes,\n2D digital illustration style,\nconsistent 2-3px black lineart throughout, Logos of Samsung, Tesla, and BMW together, competitive landscape, no characters, no people, no text, no letters, no words, no numbers, no signs, no logos, no written language of any kind, background scene, no characters, wide shot, Muted desaturated color palette,\nsoft atmospheric perspective with distant elements lighter,\nsubtle depth through value shifts only,\nclean cel-shaded look with minimal gradients,\nteal-gray and warm beige neutral tones,\nmuted accent colors for focal points,\nsimplified architectural details,\nclear foreground midground background separation",
+    "negative": "no outlines, missing lineart, gradient only no lines,\nhyper detailed architecture, realistic photograph, 3D render,\nfantasy setting, western city style, anime background style,\npainterly watercolor, sketchy rough lines,\ncomplex cluttered details, bright saturated colors,\ntext, readable letters, readable signs, readable Korean text, readable numbers,\nphotorealistic, soft shading, blurry lines"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "Korean webtoon manhwa background illustration,\nclean bold black outlines on all elements,\nflat solid color fills with minimal shading,\nsimplified shapes with clear silhouettes,\n2D digital illustration style,\nconsistent 2-3px black lineart throughout",
+    "suffix": "Muted desaturated color palette,\nsoft atmospheric perspective with distant elements lighter,\nsubtle depth through value shifts only,\nclean cel-shaded look with minimal gradients,\nteal-gray and warm beige neutral tones,\nmuted accent colors for focal points,\nsimplified architectural details,\nclear foreground midground background separation"
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

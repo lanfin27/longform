@@ -1,9 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-Google ImageFX (Imagen) API 클라이언트 v6.1
+Google ImageFX (Imagen) API 클라이언트 v6.3
 
 rohitaryal/imageFX-api Node.js 라이브러리 직접 사용
 Python에서 Node.js 스크립트를 subprocess로 호출
+
+v6.3 변경사항:
+- IMAGEN_4 모델 매핑 버그 수정 (IMAGEN_3 → IMAGEN_4)
+- IMAGEN_3_1 모델 매핑 버그 수정
+- 기본 모델을 IMAGEN_4로 변경
+
+v6.2 변경사항:
+- 네거티브 프롬프트 지원 추가 (_apply_negative_prompt 메서드)
+- 프롬프트 끝에 "AVOID: [네거티브 요소]" 형식으로 추가
 
 v6.1 변경사항:
 - Node.js 메서드명 수정: generate() → generateImage()
@@ -45,9 +54,9 @@ class ImagenModel(Enum):
     """지원되는 Imagen 모델"""
     IMAGEN_3_5 = "IMAGEN_3_5"
     IMAGEN_3 = "IMAGEN_3"
-    IMAGEN_4 = "IMAGEN_3"  # 호환성
-    IMAGEN_3_1 = "IMAGEN_3"
-    DEFAULT = "IMAGEN_3"
+    IMAGEN_4 = "IMAGEN_4"  # v6.3: 정확한 모델 값 사용
+    IMAGEN_3_1 = "IMAGEN_3_1"
+    DEFAULT = "IMAGEN_4"  # v6.3: 기본값을 IMAGEN_4로 변경
 
 
 class AspectRatio(Enum):
@@ -62,8 +71,10 @@ class AspectRatio(Enum):
 
 # UI 표시용 모델 정보
 IMAGEFX_MODELS = [
-    {"value": "IMAGEN_3_5", "label": "Imagen 3.5 (최신)", "description": "최신 모델"},
-    {"value": "IMAGEN_3", "label": "Imagen 3", "description": "안정적"},
+    {"value": "IMAGEN_4", "label": "Imagen 4 (최신)", "description": "최신 모델, 한글 텍스트 없음"},
+    {"value": "IMAGEN_3_5", "label": "Imagen 3.5", "description": "고품질"},
+    {"value": "IMAGEN_3_1", "label": "Imagen 3.1", "description": "안정적"},
+    {"value": "IMAGEN_3", "label": "Imagen 3", "description": "기본"},
 ]
 
 # UI 표시용 비율 정보
@@ -168,9 +179,10 @@ class ImageFXClient:
         # Node.js 설치 확인
         self._check_node_installation()
 
-        print(f"[ImageFX v6.1] 초기화 완료 (Node.js 래퍼 사용)")
-        print(f"[ImageFX v6.1] 쿠키 길이: {len(self.cookie)}")
-        print(f"[ImageFX v6.1] Node 스크립트: {self.node_script}")
+        print(f"[ImageFX v6.3] 초기화 완료 (Node.js 래퍼 사용)")
+        print(f"[ImageFX v6.3] 쿠키 길이: {len(self.cookie)}")
+        print(f"[ImageFX v6.3] Node 스크립트: {self.node_script}")
+        print(f"[ImageFX v6.3] ✅ 네거티브 프롬프트 지원 활성화")
 
     def _check_node_installation(self):
         """Node.js 설치 확인"""
@@ -182,7 +194,7 @@ class ImageFXClient:
                 timeout=10
             )
             if result.returncode == 0:
-                print(f"[ImageFX v6.1] Node.js 버전: {result.stdout.strip()}")
+                print(f"[ImageFX v6.3] Node.js 버전: {result.stdout.strip()}")
             else:
                 raise Exception("Node.js 실행 실패")
         except FileNotFoundError:
@@ -244,6 +256,33 @@ class ImageFXClient:
             "npm_package_installed": self._check_npm_package()
         }
 
+    def _apply_negative_prompt(self, prompt: str, negative_prompt: str) -> str:
+        """
+        네거티브 프롬프트를 메인 프롬프트에 추가 (v6.2)
+
+        ImageFX API는 네거티브 프롬프트를 네이티브로 지원하지 않으므로,
+        프롬프트 끝에 AVOID/NO 문구로 추가합니다.
+
+        Args:
+            prompt: 원본 프롬프트
+            negative_prompt: 네거티브 프롬프트 (피할 요소들)
+
+        Returns:
+            네거티브가 추가된 최종 프롬프트
+        """
+        if not negative_prompt or not negative_prompt.strip():
+            return prompt
+
+        negative = negative_prompt.strip()
+
+        # 프롬프트 끝에 네거티브 추가
+        # 형식: [원본 프롬프트]. AVOID: [네거티브 요소들]
+        final_prompt = f"{prompt.rstrip('.')}. AVOID: {negative}"
+
+        print(f"[ImageFX v6.3] 네거티브 프롬프트 적용됨 ({len(negative)}자)")
+
+        return final_prompt
+
     def generate_image(
         self,
         prompt: str,
@@ -252,7 +291,8 @@ class ImageFXClient:
         num_images: int = 1,
         seed: Optional[int] = None,
         retry_count: int = 3,
-        timeout: int = 180
+        timeout: int = 180,
+        negative_prompt: str = ""
     ) -> List[GeneratedImage]:
         """
         이미지 생성 (Node.js 래퍼 호출)
@@ -265,12 +305,16 @@ class ImageFXClient:
             seed: 시드값 (None이면 랜덤)
             retry_count: 재시도 횟수
             timeout: 타임아웃 (초)
+            negative_prompt: 네거티브 프롬프트 (이미지에 포함하지 않을 요소)
 
         Returns:
             List[GeneratedImage]: 생성된 이미지 리스트
         """
         if not prompt or not prompt.strip():
             raise ImageFXError("프롬프트가 비어있습니다.")
+
+        # ⭐ v6.2: 네거티브 프롬프트를 메인 프롬프트에 추가
+        final_prompt = self._apply_negative_prompt(prompt.strip(), negative_prompt)
 
         # npm 패키지 확인
         if not self._check_npm_package():
@@ -292,18 +336,21 @@ class ImageFXClient:
         # 모델 값 추출
         model_value = model.value if isinstance(model, ImagenModel) else model
 
-        print(f"\n[ImageFX v6.1] ========== 이미지 생성 ==========")
-        print(f"[ImageFX v6.1] 프롬프트: {prompt[:60]}...")
-        print(f"[ImageFX v6.1] 모델: {model_value}")
-        print(f"[ImageFX v6.1] 비율: {aspect_value}")
-        print(f"[ImageFX v6.1] 출력 경로: {output_path}")
-        print(f"[ImageFX v6.1] ===================================")
+        print(f"\n[ImageFX v6.3] ========== 이미지 생성 ==========")
+        print(f"[ImageFX v6.3] 원본 프롬프트: {prompt[:60]}...")
+        if negative_prompt:
+            print(f"[ImageFX v6.3] ✅ 네거티브 프롬프트: {negative_prompt[:80]}...")
+        print(f"[ImageFX v6.3] 최종 프롬프트: {final_prompt[:80]}...")
+        print(f"[ImageFX v6.3] 모델: {model_value}")
+        print(f"[ImageFX v6.3] 비율: {aspect_value}")
+        print(f"[ImageFX v6.3] 출력 경로: {output_path}")
+        print(f"[ImageFX v6.3] ===================================")
 
         # Node.js 스크립트 호출 명령
         cmd = [
             "node", self.node_script,
             "--cookie", self.cookie,
-            "--prompt", prompt.strip(),
+            "--prompt", final_prompt,  # ⭐ 네거티브 포함된 최종 프롬프트 사용
             "--outputPath", output_path,
             "--model", model_value,
             "--aspectRatio", aspect_value,
@@ -317,7 +364,7 @@ class ImageFXClient:
 
         for attempt in range(retry_count):
             try:
-                print(f"[ImageFX v6.1] Node.js 스크립트 실행 중... (시도 {attempt + 1}/{retry_count})")
+                print(f"[ImageFX v6.3] Node.js 스크립트 실행 중... (시도 {attempt + 1}/{retry_count})")
 
                 result = subprocess.run(
                     cmd,
@@ -329,10 +376,10 @@ class ImageFXClient:
                     errors='replace'
                 )
 
-                print(f"[ImageFX v6.1] 종료 코드: {result.returncode}")
-                print(f"[ImageFX v6.1] stdout:\n{result.stdout}")
+                print(f"[ImageFX v6.3] 종료 코드: {result.returncode}")
+                print(f"[ImageFX v6.3] stdout:\n{result.stdout}")
                 if result.stderr:
-                    print(f"[ImageFX v6.1] stderr:\n{result.stderr}")
+                    print(f"[ImageFX v6.3] stderr:\n{result.stderr}")
 
                 # 결과 파싱
                 if "===RESULT===" in result.stdout:
@@ -348,7 +395,7 @@ class ImageFXClient:
                                 if output.get("success"):
                                     saved_path = output.get("path", output_path)
                                     if os.path.exists(saved_path):
-                                        print(f"[ImageFX v6.1] Success! Image saved: {saved_path}")
+                                        print(f"[ImageFX v6.3] Success! Image saved: {saved_path}")
                                         # 성공 시 쿠키 유효 상태로 표시
                                         mark_cookie_valid()
                                         return [GeneratedImage(
@@ -359,7 +406,7 @@ class ImageFXClient:
                                     error_msg = output.get("error", "Unknown error")
                                     # 인증 에러 감지
                                     if is_auth_error(error_msg):
-                                        print(f"[ImageFX v6.1] Auth error detected - cookie expired")
+                                        print(f"[ImageFX v6.3] Auth error detected - cookie expired")
                                         mark_cookie_expired(error_msg)
                                         raise CookieExpiredError(
                                             "ImageFX cookie has expired.\n"
@@ -367,11 +414,11 @@ class ImageFXClient:
                                         )
                                     last_error = error_msg
                             except json.JSONDecodeError as e:
-                                print(f"[ImageFX v6.1] JSON parse error: {e}")
+                                print(f"[ImageFX v6.3] JSON parse error: {e}")
 
                 # 파일이 생성되었는지 직접 확인
                 if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
-                    print(f"[ImageFX v6.1] File directly verified: {output_path}")
+                    print(f"[ImageFX v6.3] File directly verified: {output_path}")
                     mark_cookie_valid()
                     return [GeneratedImage(
                         file_path=output_path,
@@ -383,7 +430,7 @@ class ImageFXClient:
 
                 # 인증 에러 감지
                 if is_auth_error(combined_output):
-                    print(f"[ImageFX v6.1] Auth error detected in output - cookie expired")
+                    print(f"[ImageFX v6.3] Auth error detected in output - cookie expired")
                     mark_cookie_expired(combined_output[:500])
                     raise CookieExpiredError(
                         "ImageFX cookie has expired.\n"
@@ -401,16 +448,16 @@ class ImageFXClient:
                 raise  # 쿠키 만료는 재시도하지 않고 즉시 전파
 
             except subprocess.TimeoutExpired:
-                print(f"[ImageFX v6.1] Timeout ({timeout}s)")
+                print(f"[ImageFX v6.3] Timeout ({timeout}s)")
                 last_error = f"Timeout ({timeout}s)"
 
             except Exception as e:
                 error_str = str(e)
-                print(f"[ImageFX v6.1] Error: {e}")
+                print(f"[ImageFX v6.3] Error: {e}")
 
                 # 예외에서도 인증 에러 감지
                 if is_auth_error(error_str):
-                    print(f"[ImageFX v6.1] Auth error in exception - cookie expired")
+                    print(f"[ImageFX v6.3] Auth error in exception - cookie expired")
                     mark_cookie_expired(error_str)
                     raise CookieExpiredError(
                         "ImageFX cookie has expired.\n"
@@ -422,7 +469,7 @@ class ImageFXClient:
             # 재시도 대기
             if attempt < retry_count - 1:
                 wait_time = 3 * (attempt + 1)
-                print(f"[ImageFX v6.1] Retrying in {wait_time}s...")
+                print(f"[ImageFX v6.3] Retrying in {wait_time}s...")
                 time.sleep(wait_time)
 
         raise ImageFXError(f"Image generation failed: {last_error}")
@@ -464,7 +511,7 @@ def create_imagefx_client(
 
     # 호환성: access_token이 주어지면 무시하고 경고
     if (access_token or authorization_token) and not cookie:
-        print("[ImageFX v6.1] 경고: access_token은 더 이상 지원되지 않습니다. cookie를 사용하세요.")
+        print("[ImageFX v6.3] 경고: access_token은 더 이상 지원되지 않습니다. cookie를 사용하세요.")
         raise ValueError(
             "v6.0부터 쿠키 기반 인증을 사용합니다.\n"
             "Cookie Editor → Export → Header String으로 쿠키를 추출해주세요."

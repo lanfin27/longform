@@ -579,15 +579,188 @@ import json
 
 class TextCorrectorV3:
     """
-    텍스트 교정기 v3.0 - 원문 기반 전체 SRT 교정 (v5.3 Provider별 분기 + Claude Code Agent)
+    텍스트 교정기 v3.0 - 원문 기반 전체 SRT 교정 (v7.0 - TYPO + REGEX 패턴 대폭 확장)
 
     특징:
     1. 전체 SRT를 한 번에 교정 (1-2회 API 호출)
     2. 원문 스크립트에서 단어 사전 추출
     3. 오타 후보 자동 감지 (원문에 없는 단어)
     4. AI 실패 시 로컬 교정 폴백
-    5. ✅ Provider별 분기 처리 (Google/Anthropic/Claude Code Agent)
+    5. Provider별 분기 처리 (Google/Anthropic/Claude Code Agent)
+    6. ⭐ v7.0: 확장된 TYPO_PATTERNS (80개+) + REGEX_PATTERNS (정규식)
     """
+
+    # ⭐ v7.0: 확장된 Whisper 오타 패턴 (80개+)
+    TYPO_PATTERNS = {
+        # ═══════════════════════════════════════════════════════════════
+        # 1. 동사 어미 오류 (가장 흔함!)
+        # ═══════════════════════════════════════════════════════════════
+        '만들어갈요': '만들어요',
+        '만들어갈': '만들어',
+        '들어갈가': '들어가',
+        '들어갈가는': '들어가는',
+        '만들어갈가': '만들어가',
+        '만들어갈가는': '만들어가는',
+        '올라갈가': '올라가',
+        '올라갈가는': '올라가는',
+        '내려갈가': '내려가',
+        '내려갈가는': '내려가는',
+        '해갈요': '해요',
+        '하갈요': '해요',
+
+        # ═══════════════════════════════════════════════════════════════
+        # 2. ~해게요 패턴 (해볼게요로 교정)
+        # ═══════════════════════════════════════════════════════════════
+        '해게요': '해볼게요',
+        '나열해게요': '나열해볼게요',
+        '정리해게요': '정리해볼게요',
+        '시작해게요': '시작해볼게요',
+        '종합해게요': '종합해볼게요',
+        '설명해게요': '설명해볼게요',
+        '말씀해게요': '말씀해볼게요',
+        '살펴보게요': '살펴볼게요',
+        '알아보게요': '알아볼게요',
+        '보여드리게요': '보여드릴게요',
+        '말씀드리게요': '말씀드릴게요',
+
+        # ═══════════════════════════════════════════════════════════════
+        # 3. 숫자/금액 오류 (매우 중요!)
+        # ═══════════════════════════════════════════════════════════════
+        # 조원 관련 (중복 오류)
+        '조조원': '조원',
+        '조 조원': '조원',
+        '조조 원': '조원',
+        '1조 조원': '1조원',
+        '2조 조원': '2조원',
+        '3조 조원': '3조원',
+        '4조 조원': '4조원',
+        '5조 조원': '5조원',
+        '6조 조원': '6조원',
+        '7조 조원': '7조원',
+        '8조 조원': '8조원',
+        '9조 조원': '9조원',
+        '9조 조조원': '9조원',
+        '10조 조원': '10조원',
+        '14조 조원': '14조원',
+        '15조 조원': '15조원',
+        '20조 조원': '20조원',
+
+        # 억원 관련
+        '억억원': '억원',
+        '억 억원': '억원',
+        '4억 천억': '4천억',
+        '4억천억': '4천억',
+        '3조 4억 천억원': '3조 4천억원',
+        '3조 4억천억원': '3조 4천억원',
+        '억 천억': '천억',
+
+        # 원 관련 (핵심!)
+        '원안에서': '원에서',
+        '원안에': '원에',
+        '원안으로': '원으로',
+        '조원안에서': '조원에서',
+        '억원안에서': '억원에서',
+
+        # ═══════════════════════════════════════════════════════════════
+        # 4. 조사/어미 오류
+        # ═══════════════════════════════════════════════════════════════
+        '하면은': '하면',
+        '그러면은': '그러면',
+        '이러면은': '이러면',
+        '보면은': '보면',
+        '있으면은': '있으면',
+        '없으면은': '없으면',
+        '되면은': '되면',
+        '하면은요': '하면요',
+
+        # 안에서 → 에서
+        '분야안에서': '분야에서',
+        '분야안에서서': '분야에서',
+        '입장안에서': '입장에서',
+        '입장안에서는': '입장에서는',
+        '시장안에서': '시장에서',
+        '업계안에서': '업계에서',
+        '안에서서': '에서',
+        '안에서서는': '에서는',
+
+        # ═══════════════════════════════════════════════════════════════
+        # 5. 반복/중복 오류
+        # ═══════════════════════════════════════════════════════════════
+        '와와중에': '와중에',
+        '뭐라고고': '뭐라고',
+        '설명해설명해': '설명해',
+        '드릴게요 설명해드릴게요': '드릴게요',
+        '설명해 설명해드릴게요': '설명해드릴게요',
+        '해드릴게요 해드릴게요': '해드릴게요',
+        '밟아보여주는': '밟아주는',
+        '유지해주는 보여주는': '유지해주는',
+
+        # ═══════════════════════════════════════════════════════════════
+        # 6. 외래어/영어 오류
+        # ═══════════════════════════════════════════════════════════════
+        '류로': '유로',
+
+        # 영어 발음 → 영어
+        '어드벤스드 드라이버, 어시스턴스 시스템': 'Advanced Driver Assistance System',
+        '어드벤스드 드라이버 어시스턴스 시스템': 'Advanced Driver Assistance System',
+        '에이디에이에스': 'ADAS',
+        '에이다스': 'ADAS',
+        '아다스': 'ADAS',
+
+        # ═══════════════════════════════════════════════════════════════
+        # 7. 고유명사/전문용어 오류
+        # ═══════════════════════════════════════════════════════════════
+        '전 회사': '가전회사',
+        '자외사': '자회사',
+        '노이의': '노이에',
+        '노이의 클라세': '노이에 클라세',
+        '콕피시': '콕핏',
+        '콕핏시': '콕핏',
+
+        # ═══════════════════════════════════════════════════════════════
+        # 8. 기타 Whisper 오인식
+        # ═══════════════════════════════════════════════════════════════
+        '본 년': '기본',
+        '지금년': '지금',
+        '첫 번재': '첫 번째',
+        '두 번재': '두 번째',
+        '세 번재': '세 번째',
+        '됬습니다': '됐습니다',
+        '됬어요': '됐어요',
+        '왜냐면요': '왜냐하면요',
+        '왜냐면': '왜냐하면',
+    }
+
+    # ⭐ v7.0: 정규식 기반 패턴 (복잡한 패턴 처리)
+    REGEX_PATTERNS = [
+        # 숫자 + 조 + 조원 → 숫자 + 조원
+        (r'(\d+)조\s*조원', r'\1조원'),
+
+        # 숫자 + 조 + 조 + 원 → 숫자 + 조원
+        (r'(\d+)조\s*조\s*원', r'\1조원'),
+
+        # 숫자 + 억 + 억원 → 숫자 + 억원
+        (r'(\d+)억\s*억원', r'\1억원'),
+
+        # 원안에서 → 원에서 (숫자 뒤)
+        (r'(\d+)원안에서', r'\1원에서'),
+        (r'(\d+)원안에', r'\1원에'),
+        (r'(\d+)원안으로', r'\1원으로'),
+
+        # 조원안에서 → 조원에서
+        (r'조원안에서', r'조원에서'),
+        (r'억원안에서', r'억원에서'),
+
+        # 만들어갈요/갈 패턴
+        (r'만들어갈([요가])', r'만들어\1'),
+        (r'들어갈가([는요])', r'들어가\1'),
+
+        # 분야/시장/업계 + 안에서 → 에서
+        (r'(분야|시장|업계|입장)안에서', r'\1에서'),
+
+        # 숫자 + 억 + 천억 → 숫자 + 천억
+        (r'(\d+)억\s*천억', r'\1천억'),
+    ]
 
     def __init__(
         self,
@@ -612,10 +785,22 @@ class TextCorrectorV3:
         else:
             self.api_key = api_key or GOOGLE_API_KEY or GEMINI_API_KEY
 
-        print(f"[TextCorrectorV3] 초기화 (provider: {provider})")
+        # ⭐ v7.0: 정규식 패턴 컴파일
+        self._compile_regex_patterns()
+
+        print(f"[TextCorrectorV3] v7.0 초기화 (provider: {provider})")
+        print(f"[TextCorrectorV3]   일반 패턴: {len(self.TYPO_PATTERNS)}개")
+        print(f"[TextCorrectorV3]   정규식 패턴: {len(self.REGEX_PATTERNS)}개")
 
         # ✅ 즉시 클라이언트 초기화
         self._initialize_client()
+
+    def _compile_regex_patterns(self):
+        """⭐ v7.0: 정규식 패턴 컴파일"""
+        self._compiled_patterns = [
+            (re.compile(pattern), replacement)
+            for pattern, replacement in self.REGEX_PATTERNS
+        ]
 
     def _initialize_client(self):
         """✅ Provider별 클라이언트 초기화"""
@@ -807,12 +992,24 @@ class TextCorrectorV3:
     ) -> Tuple[List, List[Dict]]:
         """
         AI로 전체 SRT 교정 (1회 API 호출)
+
+        v6.0: TYPO_PATTERNS 먼저 적용
         """
         self._initialize_client()
 
-        # SRT 텍스트 추출
+        # v6.0: TYPO_PATTERNS 먼저 적용
+        pre_corrected_scenes = []
+        for scene in srt_scenes:
+            text = scene.text
+            corrected_text = self._apply_typo_patterns(text)
+            if corrected_text != text:
+                # 복제 후 텍스트 교체
+                scene = self._clone_scene_with_new_text(scene, corrected_text)
+            pre_corrected_scenes.append(scene)
+
+        # SRT 텍스트 추출 (TYPO_PATTERNS 적용 후)
         srt_items = []
-        for i, scene in enumerate(srt_scenes):
+        for i, scene in enumerate(pre_corrected_scenes):
             srt_items.append(f"[{i}] {scene.text}")
 
         # 프롬프트 생성
@@ -837,19 +1034,21 @@ class TextCorrectorV3:
                 if i in corrections and corrections[i] != scene.text:
                     corrected_text = corrections[i]
 
-                    # ⭐ v5.5: 빈 텍스트 방지 + 유사도 검증
+                    # v6.0: 빈 텍스트 방지 + 유사도 검증 (25%로 낮춤)
                     if not corrected_text or not corrected_text.strip():
                         print(f"[TextCorrectorV3] ⚠️ 씬 {i}: 교정 결과 빈 텍스트, 원본 유지")
                         corrected_scenes.append(scene)
                         continue
 
-                    # 유사도 검증 (70% 이상)
+                    # v6.0: 유사도 검증 (25%로 낮춤 - 음차 변환 고려)
                     from difflib import SequenceMatcher
                     similarity = SequenceMatcher(None, scene.text, corrected_text).ratio()
-                    if similarity < 0.7:
+                    if similarity < 0.25:
                         print(f"[TextCorrectorV3] ⚠️ 씬 {i}: 유사도 {similarity:.0%} 낮음, 원본 유지")
                         corrected_scenes.append(scene)
                         continue
+                    elif similarity < 0.50:
+                        print(f"[TextCorrectorV3] ⚠️ 씬 {i}: 유사도 {similarity:.0%} (경고, 적용)")
 
                     # 교정 적용
                     changes.append({
@@ -950,6 +1149,27 @@ class TextCorrectorV3:
             print(f"[TextCorrectorV3] JSON 파싱 오류: {e}")
             return {}
 
+    def _apply_typo_patterns(self, text: str) -> str:
+        """⭐ v7.0: TYPO_PATTERNS + REGEX_PATTERNS 모두 적용"""
+        result = text
+
+        # Step 1: 일반 패턴 적용
+        for typo, fix in self.TYPO_PATTERNS.items():
+            if typo in result:
+                result = result.replace(typo, fix)
+
+        # Step 2: 정규식 패턴 적용
+        result = self._apply_regex_patterns(result)
+
+        return result
+
+    def _apply_regex_patterns(self, text: str) -> str:
+        """⭐ v7.0: 정규식 패턴 적용"""
+        result = text
+        for pattern, replacement in self._compiled_patterns:
+            result = pattern.sub(replacement, result)
+        return result
+
     def _apply_local_corrections(
         self,
         srt_scenes: List,
@@ -958,9 +1178,9 @@ class TextCorrectorV3:
         """
         로컬 교정 (AI 실패 시 폴백)
 
-        감지된 오타만 단순 치환
+        v6.0: TYPO_PATTERNS + 감지된 오타 모두 적용
         """
-        print(f"[TextCorrectorV3] 로컬 교정 폴백 사용")
+        print(f"[TextCorrectorV3] 로컬 교정 폴백 사용 (TYPO_PATTERNS 포함)")
 
         changes = []
         corrected_scenes = []
@@ -968,6 +1188,10 @@ class TextCorrectorV3:
         for scene in srt_scenes:
             corrected_text = scene.text
 
+            # v6.0: TYPO_PATTERNS 먼저 적용
+            corrected_text = self._apply_typo_patterns(corrected_text)
+
+            # 감지된 오타 후보 적용
             for typo, correct in typo_candidates.items():
                 if typo in corrected_text:
                     corrected_text = corrected_text.replace(typo, correct)

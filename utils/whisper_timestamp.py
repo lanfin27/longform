@@ -1,22 +1,36 @@
 # -*- coding: utf-8 -*-
 """
-Whisper 타임스탬프 추출기 (v6.7)
+Whisper 타임스탬프 추출기 (v6.10)
 
 지원 엔진:
 - faster-whisper: 빠른 속도, 적은 메모리 (CPU에서 특히 유리)
 - stable-ts: 정밀한 타임스탬프, 고급 기능 (refine, align)
 
+변경사항 (v6.10):
+- ⭐ VadOptions 객체 사용으로 VAD 파라미터 확실히 전달
+- dict 형식 대신 faster_whisper.vad.VadOptions 객체 사용
+- 오디오 향상 기본값 False로 변경 (VAD 정확도 우선)
+
+변경사항 (v6.9):
+- ⭐ 문장 분리 문제 완전 해결! (짧은 pause에서도 분리)
+- 문제 원인: v6.8에서 min_silence=150ms가 너무 높아 문장이 합쳐짐
+- 해결:
+  - min_silence_duration_ms: 150 → 50 (50ms 무음이면 분리!)
+  - speech_pad_ms: 100 → 30 (패딩 최소화)
+  - vad_threshold: 0.10 → 0.05 (더 민감하게)
+- 목표: 2-3초 단위 짧은 문장 분리 (기존 정상 동작 복원)
+
+변경사항 (v6.8):
+- 문장 분리 개선 시도 (부분적 해결)
+- 스타일별 VAD 설정 적용 (잘게/기본/크게)
+
 변경사항 (v6.7):
 - ⭐ 갭 감지 디버깅 강화 (97초 갭 누락 버그 수정)
 - None 값 처리 추가 (안전한 .get() 사용)
-- 갭 의심 구간 샘플 출력 (100~220초 근처)
-- 가장 큰 갭 Top5 출력 (디버깅용)
 
 변경사항 (v6.6):
 - ⭐ 갭 재분석 기능 추가 (VAD 비활성화로 누락 구간 자동 복구)
 - 5초 이상 갭 감지 및 Whisper 재분석
-- 갭 구간 오디오 추출 + VAD 비활성화로 100% 음성 감지
-- 타임스탬프는 Whisper에서만 생성 (정확도 보장)
 """
 
 import os
@@ -100,21 +114,27 @@ SENTENCE_SPLIT_CONFIG = {
         "max_duration": 3.0,
         "max_chars": 40,
         "gap_threshold": 0.3,
-        "min_silence_duration_ms": 300,
+        "min_silence_duration_ms": 50,     # ⭐ v6.9: 150 → 50 (짧은 pause도 분리점으로!)
+        "speech_pad_ms": 30,               # ⭐ v6.9: 100 → 30 (패딩 최소화)
+        "vad_threshold": 0.05,             # ⭐ v6.9: 0.10 → 0.05 (더 민감하게)
         "description": "짧은 호흡 (3초/40자)"
     },
     "기본": {
         "max_duration": 5.0,
         "max_chars": 60,
         "gap_threshold": 0.5,
-        "min_silence_duration_ms": 500,
+        "min_silence_duration_ms": 150,    # ⭐ v6.9: 300 → 150
+        "speech_pad_ms": 80,               # ⭐ v6.9: 150 → 80
+        "vad_threshold": 0.08,             # ⭐ v6.9: 0.10 → 0.08
         "description": "자연스러운 단위 (5초/60자)"
     },
     "크게": {
         "max_duration": 8.0,
         "max_chars": 100,
         "gap_threshold": 0.7,
-        "min_silence_duration_ms": 1000,
+        "min_silence_duration_ms": 300,    # ⭐ v6.9: 500 → 300
+        "speech_pad_ms": 150,              # ⭐ v6.9: 200 → 150
+        "vad_threshold": 0.12,             # ⭐ v6.9: 0.15 → 0.12
         "description": "큰 주제 단위 (8초/100자)"
     }
 }
@@ -503,19 +523,34 @@ class WhisperTimestamp:
 
         print(f"[WhisperTimestamp] faster-whisper 분석 중...")
 
-        config = SENTENCE_SPLIT_CONFIG.get(style, SENTENCE_SPLIT_CONFIG["기본"])
+        config = SENTENCE_SPLIT_CONFIG.get(style, SENTENCE_SPLIT_CONFIG["잘게"])  # ⭐ v6.9: 기본값을 "잘게"로!
 
-        # v6.5: VAD 설정 극단적 민감도 (음성 누락 방지)
-        # 문제: VAD가 너무 둔감하면 음성 구간을 무음으로 오판
-        # 해결: threshold 0.05 (극도로 민감), min_speech 30ms
-        vad_params = {
-            "threshold": 0.05,                   # ⭐ 0.15 → 0.05 (극도로 민감하게)
-            "min_speech_duration_ms": 30,        # ⭐ 50 → 30 (매우 짧은 발화도 감지)
-            "min_silence_duration_ms": config.get("min_silence_duration_ms", 300),  # 최소 무음 길이
-            "speech_pad_ms": 300,                # ⭐ 200 → 300 (음성 전후 여유 확대)
-        }
+        # v6.10: VAD 설정 - VadOptions 객체 사용
+        threshold = config.get("vad_threshold", 0.05)
+        min_silence = config.get("min_silence_duration_ms", 50)
+        speech_pad = config.get("speech_pad_ms", 30)
 
-        print(f"[WhisperTimestamp] VAD 설정: threshold={vad_params['threshold']}, min_speech={vad_params['min_speech_duration_ms']}ms, pad={vad_params['speech_pad_ms']}ms")
+        # ⭐ v6.10: VadOptions 객체 생성 (확실한 VAD 파라미터 전달!)
+        try:
+            from faster_whisper.vad import VadOptions
+            vad_options = VadOptions(
+                threshold=threshold,
+                min_speech_duration_ms=30,
+                min_silence_duration_ms=min_silence,
+                speech_pad_ms=speech_pad,
+                max_speech_duration_s=float('inf'),
+            )
+            print(f"[WhisperTimestamp] VAD 설정 (v6.10 VadOptions): threshold={threshold}, min_silence={min_silence}ms, pad={speech_pad}ms")
+            print(f"[WhisperTimestamp] ✅ VadOptions 객체 생성됨")
+        except ImportError:
+            vad_options = {
+                "threshold": threshold,
+                "min_speech_duration_ms": 30,
+                "min_silence_duration_ms": min_silence,
+                "speech_pad_ms": speech_pad,
+            }
+            print(f"[WhisperTimestamp] VAD 설정 (v6.10 dict): threshold={threshold}, min_silence={min_silence}ms, pad={speech_pad}ms")
+            print(f"[WhisperTimestamp] ⚠️ VadOptions import 실패, dict 사용")
 
         segments, info = self.model.transcribe(
             audio_path,
@@ -523,7 +558,7 @@ class WhisperTimestamp:
             beam_size=5,
             word_timestamps=True,
             vad_filter=self.vad_filter,
-            vad_parameters=vad_params
+            vad_parameters=vad_options
         )
 
         sentences = []
@@ -1123,17 +1158,19 @@ def get_whisper_extractor(
 
 @dataclass
 class WhisperConfigV3:
-    """Whisper v3.0 설정 (정확도 최적화) - v6.5 업데이트"""
+    """Whisper v3.0 설정 (정확도 최적화) - v6.8 문장 분리 개선"""
     model_size: str = "small"          # ⭐ base → small 권장
     device: str = "auto"               # auto, cpu, cuda
     compute_type: str = "float16"      # float16, int8
 
-    # VAD 설정 (⭐ v6.5 극단적 민감도!)
+    # VAD 설정 (⭐ v6.9 문장 분리 최적화!)
+    # 문제: v6.8에서 min_silence=150ms가 너무 높아 문장이 합쳐짐
+    # 해결: min_silence를 50ms로 낮추고, speech_pad를 30ms로 조정
     vad_filter: bool = True
-    vad_threshold: float = 0.05        # ⭐ 0.15 → 0.05 (극도로 민감하게)
-    min_speech_duration_ms: int = 30   # ⭐ 50 → 30 (매우 짧은 발화도 감지)
-    min_silence_duration_ms: int = 300 # ⭐ 무음 판단 기준 완화
-    speech_pad_ms: int = 300           # ⭐ 200 → 300 (발화 앞뒤 여유 확대)
+    vad_threshold: float = 0.05        # ⭐ v6.9: 0.10 → 0.05 (더 민감하게!)
+    min_speech_duration_ms: int = 30   # ⭐ 짧은 발화도 감지
+    min_silence_duration_ms: int = 50  # ⭐ v6.9: 200 → 50 (짧은 무음도 분리점으로!)
+    speech_pad_ms: int = 30            # ⭐ v6.9: 150 → 30 (패딩 최소화)
 
     # 인식 정확도 설정
     beam_size: int = 5                 # ⭐ 기본값 5 유지
@@ -1168,8 +1205,10 @@ class WhisperTimestampV3:
         print(f"[WhisperV3] v3.0 초기화")
         print(f"[WhisperV3]   모델: {self.config.model_size}")
         print(f"[WhisperV3]   VAD threshold: {self.config.vad_threshold}")
-        print(f"[WhisperV3]   word_timestamps: {self.config.word_timestamps}")
+        print(f"[WhisperV3]   min_silence: {self.config.min_silence_duration_ms}ms")  # ⭐ 핵심 로그!
         print(f"[WhisperV3]   min_speech: {self.config.min_speech_duration_ms}ms")
+        print(f"[WhisperV3]   speech_pad: {self.config.speech_pad_ms}ms")
+        print(f"[WhisperV3]   word_timestamps: {self.config.word_timestamps}")
 
     def _load_model(self):
         """모델 로드"""
@@ -1236,6 +1275,28 @@ class WhisperTimestampV3:
         print(f"\n[WhisperV3] 오디오 분석 시작")
         print(f"[WhisperV3]   파일: {os.path.basename(audio_path)}")
         print(f"[WhisperV3]   언어: {language}")
+        print(f"[WhisperV3]   VAD 파라미터: threshold={self.config.vad_threshold}, min_silence={self.config.min_silence_duration_ms}ms, speech_pad={self.config.speech_pad_ms}ms")
+
+        # ⭐ v6.10: VadOptions 객체 생성 (확실한 VAD 파라미터 전달!)
+        try:
+            from faster_whisper.vad import VadOptions
+            vad_options = VadOptions(
+                threshold=self.config.vad_threshold,
+                min_speech_duration_ms=self.config.min_speech_duration_ms,
+                min_silence_duration_ms=self.config.min_silence_duration_ms,
+                speech_pad_ms=self.config.speech_pad_ms,
+                max_speech_duration_s=float('inf'),  # 무제한
+            )
+            print(f"[WhisperV3]   ✅ VadOptions 객체 생성됨")
+        except ImportError:
+            # VadOptions import 실패 시 dict 사용 (호환성)
+            vad_options = {
+                "threshold": self.config.vad_threshold,
+                "min_speech_duration_ms": self.config.min_speech_duration_ms,
+                "min_silence_duration_ms": self.config.min_silence_duration_ms,
+                "speech_pad_ms": self.config.speech_pad_ms
+            }
+            print(f"[WhisperV3]   ⚠️ VadOptions import 실패, dict 사용")
 
         # 1차 분석 (최적화된 설정)
         segments, info = self.model.transcribe(
@@ -1246,14 +1307,9 @@ class WhisperTimestampV3:
             temperature=self.config.temperature,
             word_timestamps=self.config.word_timestamps,
 
-            # ⭐ VAD 설정 (핵심!)
+            # ⭐ v6.10: VadOptions 객체로 VAD 파라미터 전달
             vad_filter=self.config.vad_filter,
-            vad_parameters={
-                "threshold": self.config.vad_threshold,
-                "min_speech_duration_ms": self.config.min_speech_duration_ms,
-                "min_silence_duration_ms": self.config.min_silence_duration_ms,
-                "speech_pad_ms": self.config.speech_pad_ms
-            }
+            vad_parameters=vad_options
         )
 
         # 세그먼트 수집

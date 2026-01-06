@@ -222,10 +222,24 @@ class SRTValidator:
             })
 
         # ============================================================
-        # Step 8: scene_id 재할당
+        # Step 8: scene_id 재할당 및 타임스탬프 정규화
         # ============================================================
         for i, scene in enumerate(working_scenes):
             scene['scene_id'] = i + 1
+
+            # ⭐ v5.5: start_time/end_time 필드 보장 (hybrid_srt_generator가 사용)
+            # _start_seconds/_end_seconds 값을 start_time/end_time에 복사
+            if '_start_seconds' in scene:
+                scene['start_time'] = scene['_start_seconds']
+            if '_end_seconds' in scene:
+                scene['end_time'] = scene['_end_seconds']
+
+            # start/end 키만 있는 경우도 처리
+            if 'start_time' not in scene and 'start' in scene:
+                scene['start_time'] = self._ensure_float_time(scene['start'])
+            if 'end_time' not in scene and 'end' in scene:
+                scene['end_time'] = self._ensure_float_time(scene['end'])
+
             # 임시 필드 제거
             scene.pop('_start_seconds', None)
             scene.pop('_end_seconds', None)

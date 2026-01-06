@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-06T15:16:55.474348",
+  "image_file": "bg_scene_004_1767680215473.png",
+  "scene_id": 4,
+  "prompts": {
+    "original": "Image of a car headlight transforming into a camera lens, high-tech feel, no characters, no people, no text, no letters, no words, no numbers, no signs, no logos, no written language of any kind",
+    "final": "IMPORTANT: English text and logos are allowed, but absolutely NO Korean text (Hangul), NO Chinese characters, NO Japanese text. Any Asian language text will appear corrupted - avoid completely. Korean webtoon manhwa background illustration, clean bold black outlines on all elements,flat solid color fills with minimal shading, simplified shapes with clear silhouettes, 2D digital illustration style,consistent 2-3px black lineart throughout, Image of a car headlight transforming into a camera lens, high-tech feel, no characters, no people, no text, no letters, no words, no numbers, no signs, no logos, no written language of any kind, background scene, no characters, wide shot, Muted desaturated color palette, soft atmospheric perspective with distant elements lighter, subtle depth through value shifts only, clean cel-shaded look with minimal gradients, teal-gray and warm beige neutral tones, muted accent colors for focal points,\nsimplified architectural details, clear foreground midground background separation,\nSTRICT: If any text appears in the image, it must be in English only. Absolutely no Korean (한글), Chinese (汉字), or Japanese (ひらがな/カタカナ) characters anywhere in the image. These will render as corrupted gibberish.",
+    "negative": "no outlines, missing lineart, gradient only no lines,\nhyper detailed architecture, realistic photograph, 3D render,\nfantasy setting, western city style, anime background style,\npainterly watercolor, sketchy rough lines,\ncomplex cluttered details, bright saturated colors,\n\nKorean text, Hangul, Korean characters, Korean letters, Korean writing, Korean signs, Korean labels,\nChinese text, Chinese characters, Hanzi, simplified Chinese, traditional Chinese,\nJapanese text, Hiragana, Katakana, Kanji, Japanese characters,\nAsian text, Asian characters, Asian writing, non-English text,\ncorrupted text, garbled text, distorted text, unreadable Asian text,\nKorean store signs, Korean shop names, Korean street signs,\n\nphotorealistic, soft shading, blurry lines"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "IMPORTANT: English text and logos are allowed, but absolutely NO Korean text (Hangul), NO Chinese characters, NO Japanese text. Any Asian language text will appear corrupted - avoid completely. Korean webtoon manhwa background illustration, clean bold black outlines on all elements,flat solid color fills with minimal shading, simplified shapes with clear silhouettes, 2D digital illustration style,consistent 2-3px black lineart throughout",
+    "suffix": "Muted desaturated color palette, soft atmospheric perspective with distant elements lighter, subtle depth through value shifts only, clean cel-shaded look with minimal gradients, teal-gray and warm beige neutral tones, muted accent colors for focal points,\nsimplified architectural details, clear foreground midground background separation,\nSTRICT: If any text appears in the image, it must be in English only. Absolutely no Korean (한글), Chinese (汉字), or Japanese (ひらがな/カタカナ) characters anywhere in the image. These will render as corrupted gibberish."
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

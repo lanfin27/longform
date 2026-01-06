@@ -1,19 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-최종 SRT 검증 모듈 (v7.0)
+최종 SRT 검증 모듈 (v9.0 - 숫자 매칭 강화 + 오타 패턴 면제)
 
-변경사항:
-- [NEW] 유사도 50% 미만 교정 거부 (싱크 보호)
-- [NEW] 오타/숫자/영문약자 교정은 유지
-- [NEW] 배치 크기 축소 (20 -> 10)
-- [NEW] 프롬프트 개선 (내용 변경 금지 강조)
-- [NEW] Gemini 사용 (Claude CLI 비활성화 상태)
-- [NEW] 씬 ID 검증 추가
+변경사항 (v9.0):
+- [NEW] 유사도 임계값 25% → 20%로 더 낮춤
+- [NEW] _calculate_similarity() 숫자 매칭 가중치 50%로 높임
+- [NEW] _should_bypass_similarity_check() 개선:
+  - 숫자 동일하면 면제
+  - 길이 차이 5자 이하면 면제
+- [NEW] PHONETIC_BYPASS_PATTERNS 확장 (오타 패턴 추가)
+
+변경사항 (v8.0):
+- 유사도 임계값 50% → 25%로 낮춤 (음차 변환 고려)
+- 음차 변환(영어↔한글) 면제 처리 추가
+- PHONETIC_BYPASS_PATTERNS 추가
+
+변경사항 (v7.0):
+- 유사도 50% 미만 교정 거부 (싱크 보호)
+- 오타/숫자/영문약자 교정은 유지
+- 배치 크기 축소 (20 -> 10)
+- 프롬프트 개선 (내용 변경 금지 강조)
 
 기능:
 1. 전체 SRT를 원문과 비교
 2. Gemini로 불일치 부분 일괄 교정
-3. 유사도 검증으로 잘못된 교정 거부
+3. 유사도 검증으로 잘못된 교정 거부 (숫자/오타/음차 면제)
 4. 교정 결과를 SRT에 반영
 """
 
@@ -50,14 +61,70 @@ class CorrectionResult:
 
 
 class FinalSRTValidator:
-    """최종 SRT 검증기 (v7.0 - 유사도 검증)"""
+    """최종 SRT 검증기 (v9.0 - 숫자 매칭 강화 + 오타 패턴 면제)"""
 
-    # v7.0: 유사도 임계값
-    SIMILARITY_REJECT = 0.50   # 50% 미만: 거부
-    SIMILARITY_WARN = 0.70     # 50~70%: 경고 후 적용
+    # v9.0: 유사도 임계값 (20%로 더 낮춤 - 숫자/오타 교정 우선)
+    SIMILARITY_REJECT = 0.20   # 20% 미만: 거부
+    SIMILARITY_WARN = 0.50     # 20~50%: 경고 후 적용
 
-    # v7.0: 배치 크기 (작을수록 정확)
+    # 배치 크기 (작을수록 정확)
     BATCH_SIZE = 10
+
+    # v9.0: 음차 변환 + 오타 교정 면제 패턴
+    PHONETIC_BYPASS_PATTERNS = [
+        # ═══════════════════════════════════════════════════════════════
+        # 영어 발음 → 영어
+        # ═══════════════════════════════════════════════════════════════
+        ('어드벤스드', 'Advanced'),
+        ('드라이버', 'Driver'),
+        ('어시스턴스', 'Assistance'),
+        ('시스템', 'System'),
+        ('에이디에이에스', 'ADAS'),
+        ('에이다스', 'ADAS'),
+        ('아다스', 'ADAS'),
+        ('레디케어', 'Ready Care'),
+        ('레디 케어', 'Ready Care'),
+        ('에이치비엠', 'HBM'),
+
+        # ═══════════════════════════════════════════════════════════════
+        # 회사명/브랜드명
+        # ═══════════════════════════════════════════════════════════════
+        ('비엠더블유', 'BMW'),
+        ('비엠떠블유', 'BMW'),
+        ('제트에프', 'ZF'),
+        ('지에프', 'ZF'),
+        ('엘지', 'LG'),
+        ('에스케이', 'SK'),
+
+        # ═══════════════════════════════════════════════════════════════
+        # 기술 용어
+        # ═══════════════════════════════════════════════════════════════
+        ('오엘이디', 'OLED'),
+        ('엘이디', 'LED'),
+        ('콕피시', '콕핏'),
+        ('콕핏시', '콕핏'),
+        ('인포테인먼트', 'Infotainment'),
+        ('노이의', '노이에'),
+
+        # ═══════════════════════════════════════════════════════════════
+        # 숫자/금액 표현 (v9.0 추가)
+        # ═══════════════════════════════════════════════════════════════
+        ('조 조원', '조원'),
+        ('조조원', '조원'),
+        ('억 천억', '천억'),
+        ('억억원', '억원'),
+        ('원안에서', '원에서'),
+        ('원안에', '원에'),
+        ('조원안에서', '조원에서'),
+
+        # ═══════════════════════════════════════════════════════════════
+        # 동사 어미 오류 (v9.0 추가)
+        # ═══════════════════════════════════════════════════════════════
+        ('만들어갈요', '만들어요'),
+        ('만들어갈', '만들어'),
+        ('들어갈가는', '들어가는'),
+        ('해게요', '해볼게요'),
+    ]
 
     def __init__(self, api_key: str = None):
         """
@@ -69,8 +136,9 @@ class FinalSRTValidator:
         self.gemini_client = None
         self._init_gemini()
 
-        print(f"[FinalValidator] v7.0 초기화")
+        print(f"[FinalValidator] v9.0 초기화 (숫자 매칭 강화 + 오타 패턴 면제)")
         print(f"[FinalValidator]   유사도 거부 임계값: {self.SIMILARITY_REJECT:.0%}")
+        print(f"[FinalValidator]   면제 패턴: {len(self.PHONETIC_BYPASS_PATTERNS)}개")
         print(f"[FinalValidator]   배치 크기: {self.BATCH_SIZE}")
 
     def _init_gemini(self):
@@ -193,12 +261,15 @@ class FinalSRTValidator:
 
                     corrected_text = ai_corrections[scene_id]
 
-                    # v7.0: 유사도 계산
+                    # v8.0: 유사도 계산
                     similarity = self._calculate_similarity(current_text, corrected_text)
 
-                    # v7.0: 유사도 기반 판정
-                    if similarity < self.SIMILARITY_REJECT:
-                        # 50% 미만: 거부!
+                    # v8.0: 음차 변환 면제 체크
+                    is_phonetic_bypass = self._should_bypass_similarity_check(current_text, corrected_text)
+
+                    # v8.0: 유사도 기반 판정 (음차 변환은 면제)
+                    if similarity < self.SIMILARITY_REJECT and not is_phonetic_bypass:
+                        # 25% 미만: 거부! (음차 변환 제외)
                         result = CorrectionResult(
                             scene_id=scene_id,
                             original_text=current_text,
@@ -214,8 +285,12 @@ class FinalSRTValidator:
                         print(f"[FinalValidator]        교정: {corrected_text[:40]}...")
                         continue  # 원본 유지!
 
+                    elif is_phonetic_bypass:
+                        # 음차 변환 면제: 강제 적용
+                        print(f"[FinalValidator]     [BYPASS] 씬 {scene_id}: 음차 변환 면제 (유사도 {similarity:.0%})")
+
                     elif similarity < self.SIMILARITY_WARN:
-                        # 50~70%: 경고 후 적용
+                        # 25~50%: 경고 후 적용
                         print(f"[FinalValidator]     [WARN] 씬 {scene_id}: 유사도 {similarity:.0%}")
 
                     # 교정 적용
@@ -267,10 +342,74 @@ class FinalSRTValidator:
         )
 
     def _calculate_similarity(self, text1: str, text2: str) -> float:
-        """두 텍스트의 유사도 계산"""
+        """
+        ⭐ v9.0: 숫자 매칭 가중치 강화 유사도 계산
+
+        숫자가 같으면 유사도 높게 평가 (오타 교정 우선)
+        """
         if not text1 or not text2:
             return 0.0
-        return SequenceMatcher(None, text1, text2).ratio()
+
+        # 1. 숫자 매칭 (가장 중요!)
+        import re
+        nums1 = set(re.findall(r'\d+', text1))
+        nums2 = set(re.findall(r'\d+', text2))
+
+        if nums1 and nums2:
+            num_match = len(nums1 & nums2) / max(len(nums1), len(nums2))
+        else:
+            num_match = 1.0 if not nums1 and not nums2 else 0
+
+        # 2. 핵심 단어 매칭 (2글자 이상 한글)
+        words1 = set(re.findall(r'[가-힣]{2,}', text1))
+        words2 = set(re.findall(r'[가-힣]{2,}', text2))
+
+        if words1 and words2:
+            word_match = len(words1 & words2) / max(len(words1), len(words2))
+        else:
+            word_match = 0
+
+        # 3. 시퀀스 유사도
+        seq_score = SequenceMatcher(None, text1.lower(), text2.lower()).ratio()
+
+        # ⭐ 숫자 매칭 가중치 50%로 높임!
+        combined = num_match * 0.5 + word_match * 0.3 + seq_score * 0.2
+
+        return combined
+
+    def _should_bypass_similarity_check(self, before: str, after: str) -> bool:
+        """
+        ⭐ v9.0: 음차 변환 + 오타 교정인 경우 유사도 검사 면제
+
+        영어↔한글 변환, 오타 교정은 유사도가 낮을 수밖에 없으므로 면제
+        """
+        # 1. 패턴 기반 면제
+        for korean, english in self.PHONETIC_BYPASS_PATTERNS:
+            # 한글 → 영어 변환
+            if korean in before and english in after:
+                return True
+            # 영어 → 한글 변환
+            if english in before and korean in after:
+                return True
+            # 오타 → 교정 (둘 다 한글인 경우)
+            if korean in before and english in after:
+                return True
+
+        # 2. v9.0: 숫자가 동일하면 면제 (오타 교정일 가능성 높음)
+        import re
+        nums_before = set(re.findall(r'\d+', before))
+        nums_after = set(re.findall(r'\d+', after))
+
+        if nums_before and nums_after and nums_before == nums_after:
+            # 숫자가 완전히 동일하면 면제
+            return True
+
+        # 3. v9.0: 길이 차이가 적으면 면제 (오타 교정)
+        len_diff = abs(len(before) - len(after))
+        if len_diff <= 5:
+            return True
+
+        return False
 
     def _extract_sentences(self, script: str) -> List[str]:
         """원문에서 문장 추출"""

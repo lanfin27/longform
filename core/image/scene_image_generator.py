@@ -1,11 +1,16 @@
 """
-씬 이미지 생성기 - 배경과 캐릭터를 조합한 씬 이미지 생성
+씬 이미지 생성기 - 배경과 캐릭터를 조합한 씬 이미지 생성 (v2.0)
 
 세모지 스타일 워크플로우:
 1. 씬 분석 결과에서 연출가이드 + 등장 캐릭터 정보 로드
 2. 캐릭터 프롬프트 + 배경/연출 프롬프트 조합
 3. 통합된 프롬프트로 이미지 생성
+
+v2.0: 한글/아시아 텍스트 생성 방지 강화
+- prompt_sanitizer 사용하여 텍스트 키워드 제거
+- 강력한 텍스트 차단 프롬프트 추가
 """
+import gc
 import json
 import time
 from pathlib import Path
@@ -17,18 +22,35 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from core.character.character_manager import CharacterManager
 from core.image.together_client import TogetherImageClient
+from utils.prompt_sanitizer import (
+    sanitize_scene_prompt,
+    get_text_blocking_suffix,
+    get_text_blocking_negative
+)
 
 
 @dataclass
 class SceneImageConfig:
-    """씬 이미지 생성 설정"""
-    style_prefix: str = "animation style, infographic illustration, clean lines, vibrant colors, no text"
+    """씬 이미지 생성 설정 (v2.0: 텍스트 차단 강화)"""
+    # v2.0: 텍스트 차단 지시를 스타일 prefix에 포함
+    style_prefix: str = (
+        "IMPORTANT: All surfaces must be completely blank with no text, signs, or writing of any kind, "
+        "animation style, infographic illustration, clean lines, vibrant colors, "
+        "blank surfaces without any text or symbols"
+    )
     width: int = 1280
     height: int = 720
     model: str = "black-forest-labs/FLUX.2-dev"
     include_characters: bool = True
     character_style: str = "full body, standing"
-    negative_prompt: str = "text, words, letters, watermark, low quality, blurry"
+    # v2.0: 강화된 텍스트 차단 네거티브 프롬프트
+    negative_prompt: str = (
+        "text, words, letters, writing, typography, signs, signage, logos, labels, "
+        "captions, titles, subtitles, banners, posters, billboards, watermarks, "
+        "Korean text, Japanese text, Chinese text, hangul, kanji, hiragana, katakana, "
+        "CJK characters, Asian script, any script, inscriptions, stamps, seals, "
+        "low quality, blurry"
+    )
 
 
 class SceneImageGenerator:
@@ -65,7 +87,7 @@ class SceneImageGenerator:
 
     def generate_scene_prompt(self, scene: Dict, config: SceneImageConfig) -> str:
         """
-        씬에 대한 통합 프롬프트 생성
+        씬에 대한 통합 프롬프트 생성 (v2.0: 텍스트 키워드 제거)
 
         구조: [스타일] + [배경/연출] + [캐릭터들] + [분위기]
         """
@@ -74,10 +96,11 @@ class SceneImageGenerator:
         # 1. 스타일 프리픽스
         parts.append(config.style_prefix)
 
-        # 2. 씬의 이미지 프롬프트 (연출가이드 기반)
+        # 2. 씬의 이미지 프롬프트 (연출가이드 기반) - v2.0: 텍스트 키워드 제거
         scene_prompt = scene.get("image_prompt_en", "")
         if scene_prompt:
-            parts.append(scene_prompt)
+            sanitized_prompt = sanitize_scene_prompt(scene_prompt)
+            parts.append(sanitized_prompt)
 
         # 3. 캐릭터 프롬프트 (씬에 등장하는 캐릭터)
         if config.include_characters:
@@ -98,10 +121,16 @@ class SceneImageGenerator:
         if mood:
             parts.append(f"{mood} mood")
 
-        # 5. 시각 요소
+        # 5. 시각 요소 - v2.0: 텍스트 키워드 제거
         visual_elements = scene.get("visual_elements", [])
         if visual_elements:
-            parts.append(", ".join(visual_elements))
+            sanitized_elements = [sanitize_scene_prompt(elem) for elem in visual_elements]
+            filtered_elements = [e for e in sanitized_elements if e.strip()]
+            if filtered_elements:
+                parts.append(", ".join(filtered_elements))
+
+        # v2.0: 텍스트 차단 suffix 추가
+        parts.append(get_text_blocking_suffix())
 
         return ", ".join(filter(None, parts))
 
@@ -200,6 +229,9 @@ class SceneImageGenerator:
 
             if on_progress:
                 on_progress(i + 1, total, result)
+
+            # 메모리 정리 (Out of Memory 방지)
+            gc.collect()
 
         # 결과 저장
         log_path = output_dir / "generation_log.json"

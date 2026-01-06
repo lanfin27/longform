@@ -11,6 +11,7 @@ from pathlib import Path
 from datetime import datetime
 import json
 import os
+import time
 
 from utils.style_manager import Style, StyleManager, get_style_manager, invalidate_style_cache
 from core.image.image_generator import ImageGenerator, ImageConfig
@@ -209,7 +210,7 @@ def render_add_style(manager: StyleManager, segment: str):
 
 
 def render_edit_style(manager: StyleManager):
-    """스타일 수정"""
+    """스타일 수정 (st.form 사용으로 안정적인 저장)"""
     style_id = st.session_state.get("editing_style_id")
     segment = st.session_state.get("editing_segment")
 
@@ -227,78 +228,118 @@ def render_edit_style(manager: StyleManager):
     if style.is_default:
         st.info("기본 스타일은 프롬프트/설명만 수정 가능합니다.")
 
-    col1, col2 = st.columns([2, 1])
+    # st.form 사용 - 폼 제출 시에만 rerun되므로 안정적
+    # 폼 키는 style_id를 포함하여 유니크하게 생성
+    form_key = f"edit_style_form_{style_id}"
+    with st.form(key=form_key):
+        col1, col2 = st.columns([2, 1])
 
-    with col1:
-        st.text_input("ID", value=style.id, disabled=True, key="edit_id_view")
+        with col1:
+            st.text_input("ID", value=style.id, disabled=True, key=f"{form_key}_id")
 
-        new_name = st.text_input(
-            "이름 (영문)",
-            value=style.name,
-            disabled=style.is_default,
-            key="edit_name"
-        )
-        new_name_ko = st.text_input(
-            "이름 (한글)",
-            value=style.name_ko,
-            disabled=style.is_default,
-            key="edit_name_ko"
-        )
+            new_name = st.text_input(
+                "이름 (영문)",
+                value=style.name,
+                disabled=style.is_default,
+                key=f"{form_key}_name"
+            )
+            new_name_ko = st.text_input(
+                "이름 (한글)",
+                value=style.name_ko,
+                disabled=style.is_default,
+                key=f"{form_key}_name_ko"
+            )
 
-        new_prefix = st.text_area(
-            "Prompt Prefix",
-            value=style.prompt_prefix,
-            height=100,
-            key="edit_prefix"
-        )
-        new_suffix = st.text_area(
-            "Prompt Suffix",
-            value=style.prompt_suffix,
-            height=80,
-            key="edit_suffix"
-        )
+            new_prefix = st.text_area(
+                "Prompt Prefix",
+                value=style.prompt_prefix,
+                height=100,
+                key=f"{form_key}_prefix"
+            )
+            new_suffix = st.text_area(
+                "Prompt Suffix",
+                value=style.prompt_suffix,
+                height=80,
+                key=f"{form_key}_suffix"
+            )
 
-    with col2:
-        new_negative = st.text_area(
-            "Negative Prompt",
-            value=style.negative_prompt,
-            height=80,
-            key="edit_neg"
-        )
-        new_desc = st.text_area(
-            "설명",
-            value=style.description,
-            height=80,
-            key="edit_desc"
-        )
+        with col2:
+            new_negative = st.text_area(
+                "Negative Prompt",
+                value=style.negative_prompt,
+                height=80,
+                key=f"{form_key}_neg"
+            )
+            new_desc = st.text_area(
+                "설명",
+                value=style.description,
+                height=80,
+                key=f"{form_key}_desc"
+            )
 
-    st.markdown("---")
+        st.markdown("---")
 
-    col_s, col_c = st.columns(2)
-    with col_s:
-        if st.button("💾 저장", type="primary", key="save_edit", use_container_width=True):
-            updates = {
-                "prompt_prefix": new_prefix,
-                "prompt_suffix": new_suffix,
-                "negative_prompt": new_negative,
-                "description": new_desc
-            }
-            if not style.is_default:
-                updates["name"] = new_name
-                updates["name_ko"] = new_name_ko
+        col_s, col_c = st.columns(2)
+        with col_s:
+            save_clicked = st.form_submit_button(
+                "💾 저장",
+                type="primary",
+                use_container_width=True
+            )
+        with col_c:
+            cancel_clicked = st.form_submit_button(
+                "↩️ 취소",
+                use_container_width=True
+            )
 
-            if manager.update_style(style_id, updates):
-                invalidate_style_cache()  # 다른 페이지에 알림
-                st.success("저장됨!")
+    # 폼 제출 처리 (폼 외부에서)
+    if save_clicked:
+        # ⭐ 현재 세그먼트 가져오기 (세그먼트 불일치 방지!)
+        target_segment = st.session_state.get("editing_segment")
+
+        # 디버깅: 저장할 값 확인
+        print(f"\n{'='*60}")
+        print(f"[스타일 관리] 저장 버튼 클릭됨")
+        print(f"[스타일 관리] style_id: {style_id}")
+        print(f"[스타일 관리] target_segment: {target_segment}")  # ⭐ 세그먼트 로그 추가
+        print(f"[스타일 관리] new_prefix (len={len(new_prefix)}): {new_prefix[:50]}...")
+        print(f"[스타일 관리] new_suffix (len={len(new_suffix)}): {new_suffix[:50] if new_suffix else 'empty'}...")
+        print(f"[스타일 관리] new_negative (len={len(new_negative)}): {new_negative[:50] if new_negative else 'empty'}...")
+        print(f"{'='*60}")
+
+        updates = {
+            "prompt_prefix": new_prefix,
+            "prompt_suffix": new_suffix,
+            "negative_prompt": new_negative,
+            "description": new_desc
+        }
+        if not style.is_default:
+            updates["name"] = new_name
+            updates["name_ko"] = new_name_ko
+
+        # ⭐ target_segment 전달하여 올바른 세그먼트 수정!
+        result = manager.update_style(style_id, updates, target_segment=target_segment)
+        print(f"[스타일 관리] update_style 결과: {result}")
+
+        if result:
+            invalidate_style_cache()  # 다른 페이지에 알림
+            st.success("✅ 저장되었습니다!")
+            # 세션 상태 정리
+            if "editing_style_id" in st.session_state:
                 del st.session_state["editing_style_id"]
-                st.rerun()
-            else:
-                st.error("저장 실패")
-
-    with col_c:
-        if st.button("↩️ 취소", key="cancel_edit", use_container_width=True):
-            del st.session_state["editing_style_id"]
+            if "editing_segment" in st.session_state:
+                del st.session_state["editing_segment"]
+            time.sleep(0.5)  # 저장 메시지를 보여주기 위한 짧은 대기
             st.rerun()
+        else:
+            st.error("❌ 저장에 실패했습니다. 콘솔 로그를 확인하세요.")
+
+    if cancel_clicked:
+        if "editing_style_id" in st.session_state:
+            del st.session_state["editing_style_id"]
+        if "editing_segment" in st.session_state:
+            del st.session_state["editing_segment"]
+        st.rerun()
 
 
 def render_test_style(manager: StyleManager, segment: str):

@@ -140,6 +140,9 @@ from utils.tts_naturalness import (
     TTSNaturalnessOptimizer
 )
 
+# ⭐ TTS 설정 프리셋 관리자
+from utils.preset_manager import get_preset_manager
+
 # 직접 생성기 (청크 분할 없음 - 속도 최적화)
 from utils.tts_direct_generator import (
     generate_scene_direct,
@@ -370,6 +373,32 @@ VOICE_QUALITY_PRESETS = {
             "repetition_penalty": 1.10,    # ⭐ 낮춤 → 자연스러운 반복
         }
     },
+    # ⭐⭐⭐ 새로운 프리셋: 표현력 (Expressive) ⭐⭐⭐
+    "expressive": {
+        "name": "🎭 표현력 (Expressive)",
+        "description": "감정 표현 풍부, 자연스러운 억양. 딱딱하지 않은 생동감 있는 음성.",
+        "badge": "표현력 ★★★★★",
+        "preprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.10,
+            "bandpass_low": 25,
+            "bandpass_high": 21000,
+            "noise_gate_db": -65,
+            "normalize_peak": 0.95,
+        },
+        "postprocess": {
+            "enabled": True,
+            "noisereduce_strength": 0.05,
+            "lowpass_cutoff": 21000,
+            "soft_clip": False,
+        },
+        "tts_params": {
+            "exaggeration": 0.65,          # ⭐ 높음 → 감정 표현 풍부
+            "temperature": 0.60,           # ⭐ 적당히 높음 → 자연스러운 변화
+            "cfg_weight": 0.75,            # ⭐ 높음 → 참조 음성 특성 강화
+            "repetition_penalty": 1.15,    # 자연스러운 반복
+        }
+    },
     "ultra_natural": {
         "name": "🎙️ 완전 자연스러운",
         "description": "매우 약한 처리. 원본 특성 최대 보존. 발음 일관성 강화됨.",
@@ -508,6 +537,281 @@ VOICE_QUALITY_PRESETS = {
         "tts_params": {},
     }
 }
+
+
+# ============================================================
+# TTS 설정 프리셋 저장/불러오기 함수
+# ============================================================
+
+def save_current_settings_as_preset(name: str, description: str = ""):
+    """
+    현재 세션의 TTS 설정을 프리셋으로 저장
+
+    Returns:
+        저장된 프리셋 ID 또는 None
+    """
+    try:
+        preset_manager = get_preset_manager()
+
+        # 현재 세션에서 설정 수집
+        voice_reference = {
+            "voice_name": st.session_state.get("selected_voice_name", ""),
+            "voice_path": st.session_state.get("selected_voice_path", ""),
+            "optimized_version": os.path.basename(
+                st.session_state.get("selected_reference_voice", "")
+            ) if st.session_state.get("selected_reference_voice") else "",
+            "optimized_path": st.session_state.get("selected_reference_voice", "")
+        }
+
+        voice_parameters = {
+            "cfg_weight": st.session_state.get("chatter_cfg", 0.5),
+            "temperature": st.session_state.get("chatter_temp", 0.85),
+            "exaggeration": st.session_state.get("chatter_exag", 0.5),
+            "speed": st.session_state.get("chatter_speed", 1.0),
+            "repetition_penalty": st.session_state.get("tts_repetition_penalty", 1.15)
+        }
+
+        quality_settings = {
+            "preset_key": st.session_state.get("chatter_quality_preset", 1),
+            "settings": st.session_state.get("chatter_quality_settings", {})
+        }
+
+        generation_options = {
+            "generation_mode": st.session_state.get("chatter_generation_mode", "씬별 개별 생성"),
+            "seed": st.session_state.get("chatter_seed_input"),
+            "use_random_seed": st.session_state.get("chatter_random_seed", True),
+        }
+
+        post_processing = {
+            "unified_processor_enabled": False,  # 현재 비활성화됨
+            "final_adjust_enabled": False,
+            "target_speed": st.session_state.get("target_speech_rate", 6.4),
+        }
+
+        # 저장
+        preset_id = preset_manager.save_preset(
+            name=name,
+            voice_reference=voice_reference,
+            voice_parameters=voice_parameters,
+            quality_settings=quality_settings,
+            generation_options=generation_options,
+            post_processing=post_processing,
+            description=description
+        )
+
+        return preset_id
+
+    except Exception as e:
+        print(f"[Preset] 저장 오류: {e}")
+        return None
+
+
+def apply_preset_to_session(preset: dict):
+    """
+    프리셋을 현재 세션에 적용
+
+    Args:
+        preset: 프리셋 딕셔너리
+
+    ⚠️ 중요: Streamlit 위젯 key는 session_state에 저장되어 value 파라미터를 무시함!
+    → 위젯 key를 삭제해야 value 파라미터가 다시 적용됨
+    """
+    try:
+        print(f"\n[Preset] 프리셋 적용 시작: {preset.get('preset_name')}")
+
+        # ⭐⭐⭐ 1단계: 위젯 key 삭제 (핵심!) ⭐⭐⭐
+        # Streamlit 위젯 key가 session_state에 있으면 value 파라미터 무시됨
+        # → 삭제해야 위젯이 value 파라미터로 다시 초기화됨
+        widget_keys_to_delete = [
+            "chatter_cfg_slider",
+            "chatter_speed_slider",
+            "chatter_exag_slider",
+            "chatter_temp_slider",
+            "chatter_quality_preset",
+            "chatter_random_seed",
+            "chatter_seed_input",
+        ]
+
+        for key in widget_keys_to_delete:
+            if key in st.session_state:
+                del st.session_state[key]
+                print(f"  🗑️ 위젯 key 삭제: {key}")
+
+        # ⭐⭐⭐ 2단계: 참조 음성 설정 ⭐⭐⭐
+        voice_ref = preset.get("voice_reference", {})
+        if voice_ref.get("voice_name"):
+            st.session_state["selected_voice_name"] = voice_ref.get("voice_name", "")
+            print(f"  ✅ 음성 이름: {voice_ref.get('voice_name')}")
+        if voice_ref.get("voice_path"):
+            st.session_state["selected_voice_path"] = voice_ref.get("voice_path", "")
+        if voice_ref.get("optimized_path") and os.path.exists(voice_ref.get("optimized_path", "")):
+            st.session_state["selected_reference_voice"] = voice_ref.get("optimized_path", "")
+            print(f"  ✅ 최적화 버전: {os.path.basename(voice_ref.get('optimized_path', ''))}")
+
+        # ⭐⭐⭐ 3단계: 음성 파라미터 설정 ⭐⭐⭐
+        # 위젯의 value 파라미터가 읽는 키에 저장!
+        params = preset.get("voice_parameters", {})
+        if "cfg_weight" in params:
+            st.session_state["chatter_cfg"] = params["cfg_weight"]
+        if "temperature" in params:
+            st.session_state["chatter_temp"] = params["temperature"]
+        if "exaggeration" in params:
+            st.session_state["chatter_exag"] = params["exaggeration"]
+        if "speed" in params:
+            st.session_state["chatter_speed"] = params["speed"]
+        if "repetition_penalty" in params:
+            st.session_state["tts_repetition_penalty"] = params["repetition_penalty"]
+
+        print(f"  ✅ 파라미터: cfg={params.get('cfg_weight')}, temp={params.get('temperature')}, exag={params.get('exaggeration')}")
+
+        # ⭐⭐⭐ 4단계: 품질 설정 ⭐⭐⭐
+        quality = preset.get("quality_settings", {})
+        if "preset_key" in quality:
+            # selectbox의 index 값으로 저장
+            st.session_state["_preset_quality_index"] = quality["preset_key"]
+        if "settings" in quality:
+            st.session_state["chatter_quality_settings"] = quality["settings"]
+
+        # ⭐⭐⭐ 5단계: 생성 옵션 ⭐⭐⭐
+        gen_opts = preset.get("generation_options", {})
+        if "use_random_seed" in gen_opts:
+            st.session_state["_preset_random_seed"] = gen_opts["use_random_seed"]
+        if "seed" in gen_opts and gen_opts["seed"] is not None:
+            st.session_state["_preset_seed"] = gen_opts["seed"]
+
+        # ⭐⭐⭐ 6단계: 프리셋 로드 플래그 설정 ⭐⭐⭐
+        st.session_state["loaded_preset"] = preset
+        st.session_state["_preset_just_loaded"] = True
+        st.session_state["_preset_loaded_name"] = preset.get("preset_name", "")
+
+        print(f"\n[Preset] ✅ 프리셋 적용 완료!")
+        print(f"  이름: {preset.get('preset_name')}")
+        print(f"  음성: {voice_ref.get('voice_name')}")
+
+    except Exception as e:
+        print(f"[Preset] ❌ 적용 오류: {e}")
+        import traceback
+        traceback.print_exc()
+
+
+def render_preset_ui():
+    """프리셋 저장/불러오기 UI 렌더링"""
+
+    st.markdown("---")
+    st.markdown("#### 💾 TTS 설정 프리셋")
+
+    preset_manager = get_preset_manager()
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("**📂 프리셋 불러오기**")
+
+        # 프리셋 목록 가져오기
+        presets = preset_manager.list_presets()
+
+        if presets:
+            preset_options = {
+                f"{p['preset_name']} ({p['voice_name']})": p['preset_id']
+                for p in presets
+            }
+
+            selected_preset_name = st.selectbox(
+                "저장된 프리셋",
+                options=["선택하세요..."] + list(preset_options.keys()),
+                key="preset_selector"
+            )
+
+            if selected_preset_name != "선택하세요...":
+                preset_id = preset_options[selected_preset_name]
+
+                btn_col1, btn_col2 = st.columns(2)
+                with btn_col1:
+                    if st.button("📥 불러오기", key="load_preset_btn", use_container_width=True):
+                        preset = preset_manager.load_preset(preset_id)
+
+                        if preset:
+                            apply_preset_to_session(preset)
+                            st.success(f"'{preset['preset_name']}' 불러옴!")
+                            st.rerun()
+
+                with btn_col2:
+                    if st.button("🗑️ 삭제", key="delete_preset_btn", use_container_width=True):
+                        if preset_manager.delete_preset(preset_id):
+                            st.success("프리셋 삭제됨")
+                            st.rerun()
+        else:
+            st.info("저장된 프리셋이 없습니다.")
+
+    with col2:
+        st.markdown("**💾 현재 설정 저장**")
+
+        voice_name = st.session_state.get("selected_voice_name", "음성")
+        preset_name = st.text_input(
+            "프리셋 이름",
+            value=f"{voice_name} - 커스텀",
+            key="new_preset_name"
+        )
+
+        preset_description = st.text_input(
+            "설명 (선택)",
+            value="",
+            key="new_preset_description"
+        )
+
+        if st.button("💾 현재 설정 저장", key="save_preset_btn", type="primary", use_container_width=True):
+            if preset_name:
+                preset_id = save_current_settings_as_preset(
+                    name=preset_name,
+                    description=preset_description
+                )
+
+                if preset_id:
+                    st.success(f"'{preset_name}' 저장됨!")
+                    st.balloons()
+                else:
+                    st.error("프리셋 저장 실패")
+            else:
+                st.warning("프리셋 이름을 입력하세요.")
+
+    # 적용된 프리셋 정보 표시
+    if st.session_state.get("loaded_preset"):
+        with st.expander("📋 현재 적용된 프리셋 정보", expanded=False):
+            preset = st.session_state.loaded_preset
+            st.caption(f"**이름:** {preset.get('preset_name', 'N/A')}")
+            st.caption(f"**음성:** {preset.get('voice_reference', {}).get('voice_name', 'N/A')}")
+            st.caption(f"**생성일:** {preset.get('created_at', 'N/A')[:10]}")
+            if preset.get("description"):
+                st.caption(f"**설명:** {preset.get('description')}")
+
+
+def render_preset_quick_buttons():
+    """프리셋 빠른 선택 버튼 (상단용)"""
+
+    preset_manager = get_preset_manager()
+    presets = preset_manager.list_presets()[:4]  # 최근 4개만
+
+    if presets:
+        st.markdown("**⚡ 빠른 프리셋:**")
+        cols = st.columns(min(len(presets), 4))
+
+        for i, preset_info in enumerate(presets):
+            with cols[i]:
+                display_name = preset_info['preset_name'][:12]
+                if len(preset_info['preset_name']) > 12:
+                    display_name += "..."
+
+                if st.button(
+                    f"📌 {display_name}",
+                    key=f"quick_preset_{preset_info['preset_id']}",
+                    help=f"음성: {preset_info['voice_name']}",
+                    use_container_width=True
+                ):
+                    preset = preset_manager.load_preset(preset_info['preset_id'])
+                    if preset:
+                        apply_preset_to_session(preset)
+                        st.success(f"프리셋 적용!")
+                        st.rerun()
 
 
 # ============================================================
@@ -2575,7 +2879,26 @@ def render_reference_voice_selector():
                 with col2:
                     st.success(f"✓ {selected_name}")
 
-                st.session_state["selected_reference_voice"] = selected_path
+                # ⭐⭐⭐ 최적화 버전 보존 로직 ⭐⭐⭐
+                # 이미 선택된 최적화 버전이 있으면 덮어쓰지 않음!
+                current_ref = st.session_state.get("selected_reference_voice", "")
+                voice_basename = os.path.splitext(os.path.basename(selected_path))[0].rstrip('_')
+
+                # 현재 저장된 경로가 같은 음성의 최적화 버전인지 확인
+                is_optimized_of_same_voice = (
+                    current_ref and
+                    os.path.exists(current_ref) and
+                    voice_basename in os.path.basename(current_ref) and
+                    any(p in current_ref for p in ["__manual_", "__opt_", "_최적화"])
+                )
+
+                if is_optimized_of_same_voice:
+                    # 이미 최적화 버전이 선택되어 있음 - 덮어쓰지 않음!
+                    print(f"[VoiceSelector] ⭐ 기존 최적화 버전 유지: {os.path.basename(current_ref)}")
+                else:
+                    # 원본 경로로 설정
+                    st.session_state["selected_reference_voice"] = selected_path
+                    print(f"[VoiceSelector] 원본 경로 설정: {os.path.basename(selected_path)}")
 
                 # ⭐ 텍스트 입력 UI (정확한 발화속도 측정용)
                 current_transcript = get_voice_transcript(selected_path) or ""
@@ -3109,14 +3432,20 @@ def render_reference_voice_selector():
                                         col_use, col_reset = st.columns(2)
                                         with col_use:
                                             if st.button("✅ 이 버전 사용", key="use_new_manual_opt", type="primary", use_container_width=True):
+                                                # ⭐ 선택된 버전 경로 저장
                                                 st.session_state["selected_reference_voice"] = result["filepath"]
                                                 st.session_state["_prev_analyzed_voice_path"] = None
                                                 st.session_state["show_manual_segment"] = False
-                                                st.session_state.manual_opt_result = None
+                                                # ⭐ 결과는 유지 (다음 rerun에서 표시됨)
+                                                # st.session_state.manual_opt_result = None  # 결과 유지!
+                                                st.success(f"✅ '{result['filename']}' 버전이 선택되었습니다!")
                                                 st.balloons()
+                                                import time
+                                                time.sleep(0.5)  # 메시지 표시 시간
+                                                st.session_state.manual_opt_result = None  # 결과 초기화
                                                 st.rerun()
                                         with col_reset:
-                                            if st.button("🔄 다시 생성", key="reset_manual_opt", use_container_width=True):
+                                            if st.button("🔄 다른 구간 선택", key="reset_manual_opt", use_container_width=True):
                                                 st.session_state.manual_opt_result = None
                                                 st.rerun()
                                     else:
@@ -3148,19 +3477,25 @@ def render_reference_voice_selector():
                                                 output_dir = os.path.join(base_dir, "optimized")
                                                 os.makedirs(output_dir, exist_ok=True)
 
-                                                # 파일명 생성
+                                                # 파일명 생성 (⭐ 끝의 언더스코어 제거하여 정규화)
                                                 clean_name = voice_name.replace(" ", "_")
                                                 if "_최적화" in clean_name:
                                                     clean_name = clean_name.split("_최적화")[0]
                                                 if "_opt_" in clean_name:
                                                     clean_name = clean_name.split("_opt_")[0]
+                                                if "__manual_" in clean_name:
+                                                    clean_name = clean_name.split("__manual_")[0]
+                                                # ⭐ 끝의 연속 언더스코어 제거
+                                                clean_name = clean_name.rstrip('_')
+
+                                                print(f"[ManualOpt] voice_name 정규화: '{voice_name}' → '{clean_name}'")
 
                                                 time_str = f"{int(start_sec)}-{int(end_sec)}s"
-                                                hash_str = hashlib.md5(f"{voice_name}{start_sec}{end_sec}{datetime.now().isoformat()}".encode()).hexdigest()[:8]
+                                                hash_str = hashlib.md5(f"{clean_name}{start_sec}{end_sec}{datetime.now().isoformat()}".encode()).hexdigest()[:8]
                                                 filename = f"{clean_name}__manual_{time_str}_{hash_str}.mp3"
                                                 output_path = os.path.join(output_dir, filename)
 
-                                                print(f"[ManualOpt] 출력: {filename}")
+                                                print(f"[ManualOpt] 출력 파일: {filename}")
 
                                                 # 오디오 로드 및 구간 추출
                                                 audio = AudioSegment.from_file(selected_path)
@@ -3334,6 +3669,12 @@ def _analyze_and_update_params(voice_path: str, voice_name: str):
 def render_chatterbox_tab():
     """Chatterbox 탭 렌더링"""
     st.markdown("### 🎤 Chatterbox TTS")
+
+    # ⭐ 프리셋 로드 성공 메시지 표시
+    if st.session_state.pop("_preset_just_loaded", False):
+        preset_name = st.session_state.get("_preset_loaded_name", "")
+        st.success(f"✅ '{preset_name}' 프리셋이 적용되었습니다!")
+
     st.info("Chatterbox는 고품질 음성 합성 서버입니다. 로컬 서버가 실행 중이어야 합니다.")
 
     # 서버 상태 확인 (캐싱 적용)
@@ -3518,6 +3859,10 @@ def render_chatterbox_tab():
     preset_keys = list(VOICE_QUALITY_PRESETS.keys())
     preset_names = [VOICE_QUALITY_PRESETS[k]["name"] for k in preset_keys]
 
+    # ⭐ 프리셋에서 로드된 인덱스 확인
+    preset_quality_idx = st.session_state.pop("_preset_quality_index", None)
+    default_quality_idx = preset_quality_idx if preset_quality_idx is not None else 1
+
     quality_col1, quality_col2 = st.columns([2, 1])
 
     with quality_col1:
@@ -3525,7 +3870,7 @@ def render_chatterbox_tab():
             "프리셋 선택",
             range(len(preset_keys)),
             format_func=lambda i: preset_names[i],
-            index=1,  # 기본: natural (자연스러운)
+            index=default_quality_idx,  # ⭐ 프리셋 값 또는 기본값
             key="chatter_quality_preset",
             help="미리 정의된 음성 품질 설정"
         )
@@ -3649,15 +3994,28 @@ def render_chatterbox_tab():
         }
         st.session_state["chatter_quality_settings"] = preset_settings
 
+    # ============================================================
+    # ⭐ TTS 설정 프리셋 저장/불러오기 UI
+    # ============================================================
+    render_preset_ui()
+
     st.markdown("---")
 
     # 시드 설정
+    # ⭐ 프리셋에서 로드된 값 확인
+    preset_random_seed = st.session_state.pop("_preset_random_seed", None)
+    preset_seed = st.session_state.pop("_preset_seed", None)
+
     col1, col2 = st.columns([1, 1])
     with col1:
-        use_random_seed = st.checkbox("🎲 랜덤 시드", value=True, key="chatter_random_seed")
+        # 프리셋 값이 있으면 사용, 없으면 기본값
+        default_random = preset_random_seed if preset_random_seed is not None else True
+        use_random_seed = st.checkbox("🎲 랜덤 시드", value=default_random, key="chatter_random_seed")
     with col2:
         if not use_random_seed:
-            seed = st.number_input("Seed", min_value=0, value=42, key="chatter_seed_input")
+            # 프리셋 값이 있으면 사용, 없으면 기본값
+            default_seed = preset_seed if preset_seed is not None else 42
+            seed = st.number_input("Seed", min_value=0, value=default_seed, key="chatter_seed_input")
         else:
             seed = None
 
@@ -4004,26 +4362,38 @@ def _handle_chatterbox_single_generation(text, voice_path, params, gen_options, 
 
         status_text.info(f"🎙️ {mode_label}{norm_label} TTS 생성 준비 중... (참조 음성: {voice_name})")
 
-        # ⭐ 참조 음성 최적화 (이미 최적화된 버전이 있으면 사용)
+        # ⭐⭐⭐ 참조 음성 최적화 - 사용자 선택 최우선! ⭐⭐⭐
         optimized_voice_path = voice_path
         if voice_path:
             try:
-                # 먼저 이미 최적화된 버전이 있는지 확인
-                existing_optimized = get_optimized_voice_path(voice_path)
-                if existing_optimized:
-                    optimized_voice_path = existing_optimized
-                    print(f"[VoiceOptimizer] ✅ 기존 최적화 버전 사용: {os.path.basename(existing_optimized)}")
+                # ⭐⭐⭐ 1순위: 사용자가 명시적으로 선택한 버전 ⭐⭐⭐
+                user_selected = st.session_state.get("selected_reference_voice")
+                if user_selected and os.path.exists(user_selected):
+                    optimized_voice_path = user_selected
+                    opt_type = "📌수동" if "__manual_" in user_selected else "🤖자동"
+                    print(f"\n{'='*60}")
+                    print(f"[VoiceOptimizer] ⭐ 사용자 선택 버전 사용!")
+                    print(f"  경로: {user_selected}")
+                    print(f"  파일: {os.path.basename(user_selected)}")
+                    print(f"  타입: {opt_type}")
+                    print(f"{'='*60}")
+                # 2순위: 기존 자동 최적화 버전
                 else:
-                    # 최적화 필요 여부 확인
-                    needs_opt, opt_reason = is_voice_optimization_needed(voice_path)
-                    if needs_opt:
-                        status_text.text(f"🔍 참조 음성 최적화 중...")
-                        optimized_voice_path = optimize_voice_for_cloning(voice_path)
+                    existing_optimized = get_optimized_voice_path(voice_path)
+                    if existing_optimized:
+                        optimized_voice_path = existing_optimized
+                        print(f"[VoiceOptimizer] ✅ 기존 자동 최적화 버전 사용: {os.path.basename(existing_optimized)}")
+                    else:
+                        # 3순위: 새로 최적화 생성
+                        needs_opt, opt_reason = is_voice_optimization_needed(voice_path)
+                        if needs_opt:
+                            status_text.text(f"🔍 참조 음성 최적화 중...")
+                            optimized_voice_path = optimize_voice_for_cloning(voice_path)
 
-                        if optimized_voice_path != voice_path:
-                            from pydub import AudioSegment
-                            opt_audio = AudioSegment.from_file(optimized_voice_path)
-                            print(f"[VoiceOptimizer] 최적화 적용: {len(opt_audio)/1000:.0f}초")
+                            if optimized_voice_path != voice_path:
+                                from pydub import AudioSegment
+                                opt_audio = AudioSegment.from_file(optimized_voice_path)
+                                print(f"[VoiceOptimizer] 최적화 적용: {len(opt_audio)/1000:.0f}초")
             except Exception as e:
                 print(f"[VoiceOptimizer] 최적화 실패: {e}")
                 optimized_voice_path = voice_path
@@ -4153,31 +4523,43 @@ def _handle_chatterbox_scenes_generation(scenes, voice_path, params, gen_options
     scene_params = params.copy()
     scene_params["seed"] = scene_seed
 
-    # ⭐ 참조 음성 최적화 (이미 최적화된 버전이 있으면 사용)
+    # ⭐⭐⭐ 참조 음성 최적화 - 사용자 선택 최우선! ⭐⭐⭐
     optimized_voice_path = voice_path
     if voice_path:
         try:
-            # 먼저 이미 최적화된 버전이 있는지 확인
-            existing_optimized = get_optimized_voice_path(voice_path)
-            if existing_optimized:
-                optimized_voice_path = existing_optimized
-                print(f"[VoiceOptimizer] 씬별 생성: ✅ 기존 최적화 버전 사용: {os.path.basename(existing_optimized)}")
+            # ⭐⭐⭐ 1순위: 사용자가 명시적으로 선택한 버전 ⭐⭐⭐
+            user_selected = st.session_state.get("selected_reference_voice")
+            if user_selected and os.path.exists(user_selected):
+                optimized_voice_path = user_selected
+                opt_type = "📌수동" if "__manual_" in user_selected else "🤖자동"
+                print(f"\n{'='*60}")
+                print(f"[VoiceOptimizer] 씬별 생성: ⭐ 사용자 선택 버전 사용!")
+                print(f"  경로: {user_selected}")
+                print(f"  파일: {os.path.basename(user_selected)}")
+                print(f"  타입: {opt_type}")
+                print(f"{'='*60}")
+            # 2순위: 기존 자동 최적화 버전
             else:
-                # 최적화 필요 여부 확인
-                needs_opt, opt_reason = is_voice_optimization_needed(voice_path)
-                if needs_opt:
-                    status_text.text(f"🔍 참조 음성 최적화 중...")
-                    optimized_voice_path = optimize_voice_for_cloning(voice_path)
+                existing_optimized = get_optimized_voice_path(voice_path)
+                if existing_optimized:
+                    optimized_voice_path = existing_optimized
+                    print(f"[VoiceOptimizer] 씬별 생성: ✅ 기존 자동 최적화 버전 사용: {os.path.basename(existing_optimized)}")
+                else:
+                    # 3순위: 새로 최적화 생성
+                    needs_opt, opt_reason = is_voice_optimization_needed(voice_path)
+                    if needs_opt:
+                        status_text.text(f"🔍 참조 음성 최적화 중...")
+                        optimized_voice_path = optimize_voice_for_cloning(voice_path)
 
-                    if optimized_voice_path != voice_path:
-                        from pydub import AudioSegment
-                        opt_audio = AudioSegment.from_file(optimized_voice_path)
-                        print(f"[VoiceOptimizer] 씬별 생성: 최적화 적용 {len(opt_audio)/1000:.0f}초")
+                        if optimized_voice_path != voice_path:
+                            from pydub import AudioSegment
+                            opt_audio = AudioSegment.from_file(optimized_voice_path)
+                            print(f"[VoiceOptimizer] 씬별 생성: 최적화 적용 {len(opt_audio)/1000:.0f}초")
         except Exception as e:
             print(f"[VoiceOptimizer] 씬별 생성: 최적화 실패 - {e}")
             optimized_voice_path = voice_path
 
-    scene_params["voice_ref_path"] = optimized_voice_path  # ⭐ 최적화된 음성 사용
+    scene_params["voice_ref_path"] = optimized_voice_path  # ⭐ 사용자 선택 or 최적화된 음성 사용
 
     # 처리 방식 옵션 확인
     use_sequential = gen_options.get("use_sequential", True)
@@ -4317,58 +4699,40 @@ def _handle_chatterbox_scenes_generation(scenes, voice_path, params, gen_options
     gen_time = time.time() - total_start
 
     # ============================================================
-    # ⭐ 통합 단일 패스 처리 (정규화 + 가속보정 + 미세조정)
+    # ⭐⭐⭐ 통합 처리 완전 비활성화 (Voice Clone 원본 보존!) ⭐⭐⭐
     # ============================================================
-    # 기존 파이프라인 (문제):
-    #   1단계: normalize_perfect (FFmpeg 2~3회)
-    #   2단계: correct_all_speed_acceleration (FFmpeg 4회)
-    #   3단계: normalize_segments_all (FFmpeg 1~2회)
-    #   → 총 6~9회 FFmpeg → 울림, 변조, 품질 저하
+    # 🔴 기존 문제:
+    #   - UnifiedProcessor: 속도 조정 ±15% → 리듬 변형
+    #   - FinalAdjust: 추가 속도 조정 ±5% → 추가 변형
+    #   - 총 20%+ 속도 변형 → 기계적 음성!
     #
-    # 새 파이프라인 (해결):
-    #   process_all_unified (구간당 FFmpeg 1회)
-    #   → 품질 유지, 울림 없음
+    # ✅ 해결:
+    #   - 모든 후처리 스킵!
+    #   - Chatterbox 생성 결과를 원본 그대로 사용
+    #   - "예전에 잘 되었을 때"와 동일한 상태로 복원
     # ============================================================
     if norm_options.get("enabled") and generated_files:
-        status_text.text("🔧 통합 처리 중... (정규화 + 가속보정 + 미세조정)")
         print("\n" + "="*60)
-        print("[TTS] ⭐ 통합 단일 패스 처리 시작")
-        print("[TTS] ⭐ FFmpeg 최소 호출 → 울림/변조 방지")
-        print("[TTS] ⭐ 적응형 가속 보정 → 정확한 속도 균일화")
+        print("[TTS] ⭐⭐⭐ Voice Clone 원본 보존 모드 (후처리 완전 비활성화!)")
+        print("[TTS] ❌ UnifiedProcessor 스킵 → 속도 조정 없음")
+        print("[TTS] ❌ FinalAdjust 스킵 → 추가 조정 없음")
+        print("[TTS] ✅ Chatterbox 원본 그대로 사용!")
         print("="*60)
 
-        # 처리 전 상태 분석
+        # 처리 전 상태만 분석 (참고용)
         pre_stats = analyze_normalization_stats(generated_files)
         if not pre_stats.get("error"):
-            print(f"[TTS] 처리 전 발화속도: {pre_stats['rate_min']:.2f} ~ {pre_stats['rate_max']:.2f} (±{pre_stats['rate_deviation_pct']:.1f}%)")
+            print(f"[TTS] 현재 발화속도: {pre_stats['rate_min']:.2f} ~ {pre_stats['rate_max']:.2f} (±{pre_stats['rate_deviation_pct']:.1f}%)")
+            print(f"[TTS] 💡 속도 편차가 있지만, 자연스러움 보존이 더 중요!")
 
-        def unified_progress(current, total, message):
-            base_progress = 0.75
-            step = (current / total) * 0.23  # 0.75 ~ 0.98
-            progress_bar.progress(min(base_progress + step, 0.98))
-            status_text.text(f"🔧 {message}")
+        # ⭐⭐⭐ 후처리 완전 스킵! ⭐⭐⭐
+        # generated_files = process_all_unified(...)  # ❌ 삭제!
 
-        # ⭐ 통합 단일 패스 처리
-        # 참조 음성 분석 결과 또는 기본값 사용
-        target_speed = st.session_state.get("target_speech_rate", 8.5)
-        print(f"[TTS] 목표 발화속도: {target_speed:.2f} 글자/초 (참조 음성 기반)")
+        for i, f in enumerate(generated_files):
+            if f and f.get("success"):
+                print(f"  씬 {i+1}: 원본 유지 ✅")
 
-        generated_files = process_all_unified(
-            generated_files,
-            target_speed=target_speed,  # ⭐ 참조 음성 기반 목표
-            accel_profile="adaptive",   # 적응형 가속 보정
-            progress_callback=unified_progress
-        )
-
-        # 처리 후 상태 확인
-        post_stats = analyze_normalization_stats(generated_files)
-        if not post_stats.get("error"):
-            print(f"[TTS] 처리 후 발화속도: {post_stats['rate_min']:.2f} ~ {post_stats['rate_max']:.2f} (±{post_stats['rate_deviation_pct']:.1f}%)")
-            improvement = pre_stats.get('rate_deviation_pct', 0) - post_stats.get('rate_deviation_pct', 0)
-            if improvement > 0:
-                print(f"[TTS] ✅ 편차 개선: {improvement:.1f}% 감소")
-
-        print("[TTS] 통합 처리 완료")
+        print("\n[TTS] ✅ 후처리 없이 원본 사용 완료")
         print("="*60 + "\n")
 
     total_time = time.time() - total_start

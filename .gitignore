@@ -67,3 +67,4 @@ NUL
 *.tmp
 *.tmp.*
 *.bak
+data/temp/*.wav

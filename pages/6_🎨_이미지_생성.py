@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-6단계: 이미지 생성 (리팩토링)
+6단계: 이미지 생성 (리팩토링) - v2.0
 
 탭 구조:
 - 🎬 씬별 생성: 개별 씬 선택 → 배경 → 캐릭터 배치 → 합성 → 편집 → 저장
 - 🚀 일괄 생성: 전체 씬 자동 생성
 - 🖼️ 갤러리: 생성된 이미지 관리
 - ⚙️ 설정: 스타일 및 API 설정
+
+v2.0: 메모리 관리 및 텍스트 차단 강화
+- memory_manager 통합
+- prompt_sanitizer 통합
 """
+import gc
 import streamlit as st
 from pathlib import Path
 import sys
@@ -40,7 +45,7 @@ from config.settings import TOGETHER_API_KEY, IMAGE_MODELS
 from utils.api_helper import require_api_key, show_api_status_sidebar
 from utils.progress_ui import render_api_selector, StreamlitProgressUI
 from core.api.api_manager import get_api_manager
-from utils.style_manager import get_style_manager
+from utils.style_manager import get_style_manager, check_and_clear_stale_style_cache
 from components.style_selector import style_radio_selector, get_selected_style
 from utils.prominent_people_sanitizer import (
     ProminentPeopleSanitizer,
@@ -91,6 +96,20 @@ from utils.scene_selector import (
     generate_preset_ranges,
     apply_range_to_selection,
     get_selection_stats
+)
+
+# v2.0: 메모리 관리 및 프롬프트 정제
+from utils.memory_manager import (
+    cleanup_session_images,
+    optimize_memory_for_batch,
+    cleanup_after_batch,
+    get_session_memory_stats,
+    force_gc
+)
+from utils.prompt_sanitizer import (
+    sanitize_scene_prompt,
+    enhance_prompt_for_no_text,
+    get_text_blocking_negative
 )
 
 # 이미지 프롬프트 메타데이터 관리
@@ -203,6 +222,13 @@ if not ensure_project_selected():
 render_lightbox_container()
 
 project_path = get_current_project()
+
+# ===================================================================
+# 스타일 캐시 동기화 (v2.1)
+# ===================================================================
+# 스타일 관리 페이지에서 변경된 내용이 있으면 자동으로 감지하여 새로고침
+if check_and_clear_stale_style_cache("image_generation"):
+    st.toast("🎨 스타일이 업데이트되었습니다!", icon="✨")
 
 # ===================================================================
 # 유틸리티 함수
@@ -2371,6 +2397,9 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
         use_container_width=True,
         disabled=len(selected_scenes) == 0
     ):
+        # v2.0: 배치 시작 전 메모리 최적화
+        optimize_memory_for_batch()
+
         progress = st.progress(0)
         status = st.empty()
 
@@ -2484,8 +2513,14 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                 st.error(f"씬 {scene_id} 처리 실패: {e}")
                 error_count += 1
 
+            # 메모리 정리 (Out of Memory 방지)
+            gc.collect()
+
         progress.progress(1.0)
         status.empty()
+
+        # v2.0: 배치 완료 후 메모리 정리
+        cleanup_after_batch()
 
         if success_count > 0:
             st.success(f"✅ {success_count}개 씬 처리 완료!")
@@ -2926,6 +2961,9 @@ def _render_batch_composite_only(scenes: List[Dict]):
         use_container_width=True,
         disabled=len(selected_scene_ids) == 0
     ):
+        # v2.0: 배치 시작 전 메모리 최적화
+        optimize_memory_for_batch()
+
         progress = st.progress(0)
         status = st.empty()
 
@@ -2968,8 +3006,14 @@ def _render_batch_composite_only(scenes: List[Dict]):
                 error_count += 1
                 results_log.append(f"❌ 씬 {scene_id}: {str(e)[:50]}")
 
+            # v2.0: 각 씬 처리 후 메모리 정리
+            gc.collect()
+
         progress.progress(1.0)
         status.empty()
+
+        # v2.0: 배치 완료 후 메모리 정리
+        cleanup_after_batch()
 
         # 결과 요약
         st.markdown("### 📊 처리 결과")
@@ -3828,11 +3872,13 @@ def generate_background_image(
 
             while True:
                 try:
+                    # ⭐ v6.2: 네거티브 프롬프트 전달
                     images = client.generate_image(
                         prompt=current_prompt,
                         model=model_enum,
                         aspect_ratio=aspect_ratio,
-                        num_images=1
+                        num_images=1,
+                        negative_prompt=negative_prompt  # ⭐ 네거티브 프롬프트 추가!
                     )
                     if images and len(images) > 0:
                         img_data = images[0].get_bytes()
@@ -3882,7 +3928,8 @@ def generate_background_image(
                 prompt=full_prompt,
                 model=model,
                 width=width,
-                height=height
+                height=height,
+                negative_prompt=negative_prompt  # ⭐ Together.ai도 네거티브 지원
             )
 
         # 저장
@@ -3988,11 +4035,13 @@ def generate_background_image_with_prompt(
             else:
                 aspect_ratio = AspectRatio.SQUARE
 
+            # ⭐ v6.2: 네거티브 프롬프트 전달
             images = client.generate_image(
                 prompt=full_prompt,
                 model=model_enum,
                 aspect_ratio=aspect_ratio,
-                num_images=1
+                num_images=1,
+                negative_prompt=negative_prompt  # ⭐ 네거티브 프롬프트 추가!
             )
 
             if images and len(images) > 0:
@@ -4010,7 +4059,8 @@ def generate_background_image_with_prompt(
                 prompt=full_prompt,
                 model=model,
                 width=width,
-                height=height
+                height=height,
+                negative_prompt=negative_prompt  # ⭐ Together.ai도 네거티브 지원
             )
 
         # 저장
@@ -4097,11 +4147,13 @@ def generate_scene_composite_image_with_prompt(
             else:
                 aspect_ratio = AspectRatio.SQUARE
 
+            # ⭐ v6.2: 네거티브 프롬프트 전달
             images = client.generate_image(
                 prompt=final_prompt,
                 model=model_enum,
                 aspect_ratio=aspect_ratio,
-                num_images=1
+                num_images=1,
+                negative_prompt=negative_prompt  # ⭐ 네거티브 프롬프트 추가!
             )
 
             if images and len(images) > 0:
@@ -4120,7 +4172,8 @@ def generate_scene_composite_image_with_prompt(
                 prompt=final_prompt,
                 model=model,
                 width=width,
-                height=height
+                height=height,
+                negative_prompt=negative_prompt  # ⭐ Together.ai도 네거티브 지원
             )
 
         # 저장 (합성 이미지 폴더에)
@@ -4289,11 +4342,13 @@ def generate_scene_composite_image(
 
             while True:
                 try:
+                    # ⭐ v6.2: 네거티브 프롬프트 전달
                     images = client.generate_image(
                         prompt=current_prompt,
                         model=model_enum,
                         aspect_ratio=aspect_ratio,
-                        num_images=1
+                        num_images=1,
+                        negative_prompt=negative_prompt  # ⭐ 네거티브 프롬프트 추가!
                     )
                     if images and len(images) > 0:
                         img_data = images[0].get_bytes()
@@ -4333,7 +4388,8 @@ def generate_scene_composite_image(
                 prompt=full_prompt,
                 model=model,
                 width=width,
-                height=height
+                height=height,
+                negative_prompt=negative_prompt  # ⭐ Together.ai도 네거티브 지원
             )
 
         # ==============================

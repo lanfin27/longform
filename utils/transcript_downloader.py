@@ -1647,11 +1647,17 @@ class YouTubeTranscriptDownloader:
         return transcript
 
     def _parse_vtt(self, file_path: Path) -> List[Dict]:
-        """VTT 파싱 (개선)"""
+        """VTT 파싱 (v4.5 - 개선된 타임스탬프 파싱)"""
         with open(file_path, "r", encoding="utf-8", errors="replace") as f:
             content = f.read()
 
         transcript = []
+
+        # 디버깅: 원본 파일 정보
+        file_size = len(content)
+        total_lines = content.count('\n')
+        print(f"[VTT 파싱] 파일: {file_path.name}")
+        print(f"[VTT 파싱] 크기: {file_size:,} bytes, 라인: {total_lines:,}")
 
         # VTT 헤더 제거
         if content.startswith("WEBVTT"):
@@ -1661,6 +1667,13 @@ class YouTubeTranscriptDownloader:
 
         # 블록 단위로 분리
         blocks = re.split(r'\n\s*\n', content)
+        print(f"[VTT 파싱] 블록 수: {len(blocks)}")
+
+        # 디버깅 카운터
+        blocks_with_timestamp = 0
+        blocks_with_text = 0
+        blocks_parsed_ok = 0
+        parse_errors = 0
 
         for block in blocks:
             block = block.strip()
@@ -1676,14 +1689,19 @@ class YouTubeTranscriptDownloader:
             for line in lines:
                 if "-->" in line:
                     timestamp_line = line
+                    blocks_with_timestamp += 1
                 elif timestamp_line and line.strip():
                     text_lines.append(line)
 
+            if text_lines:
+                blocks_with_text += 1
+
             if timestamp_line and text_lines:
-                # 타임스탬프 파싱
+                # ⭐ v4.5: 더 유연한 타임스탬프 파싱
+                # 형식: 00:00:00.000, 0:00:00.000, 00:00.000 등 지원
                 match = re.match(
-                    r'(\d{1,2}:)?(\d{2}):(\d{2})[.,](\d{3})\s*-->\s*(\d{1,2}:)?(\d{2}):(\d{2})[.,](\d{3})',
-                    timestamp_line
+                    r'(\d{1,2}:)?(\d{1,2}):(\d{1,2})[.,](\d{1,3})\s*-->\s*(\d{1,2}:)?(\d{1,2}):(\d{1,2})[.,](\d{1,3})',
+                    timestamp_line.strip()
                 )
 
                 if match:
@@ -1693,14 +1711,16 @@ class YouTubeTranscriptDownloader:
                     start_h = int(groups[0].replace(":", "")) if groups[0] else 0
                     start_m = int(groups[1])
                     start_s = int(groups[2])
-                    start_ms = int(groups[3])
+                    start_ms_str = groups[3].ljust(3, '0')[:3]  # 밀리초 3자리로 맞춤
+                    start_ms = int(start_ms_str)
                     start = start_h * 3600 + start_m * 60 + start_s + start_ms / 1000
 
                     # 종료 시간
                     end_h = int(groups[4].replace(":", "")) if groups[4] else 0
                     end_m = int(groups[5])
                     end_s = int(groups[6])
-                    end_ms = int(groups[7])
+                    end_ms_str = groups[7].ljust(3, '0')[:3]  # 밀리초 3자리로 맞춤
+                    end_ms = int(end_ms_str)
                     end = end_h * 3600 + end_m * 60 + end_s + end_ms / 1000
 
                     # 텍스트 정리 (HTML 태그 제거)
@@ -1712,9 +1732,22 @@ class YouTubeTranscriptDownloader:
                     if text:
                         transcript.append({
                             "start": start,
-                            "duration": end - start,
+                            "duration": max(0.1, end - start),  # 최소 0.1초
                             "text": text
                         })
+                        blocks_parsed_ok += 1
+                else:
+                    parse_errors += 1
+                    if parse_errors <= 3:  # 처음 3개 오류만 출력
+                        print(f"[VTT 파싱] ⚠️ 타임스탬프 파싱 실패: {timestamp_line[:60]}...")
+
+        # 디버깅 결과
+        print(f"[VTT 파싱] 결과: 타임스탬프={blocks_with_timestamp}, 텍스트={blocks_with_text}, 파싱성공={blocks_parsed_ok}, 오류={parse_errors}")
+        print(f"[VTT 파싱] ✅ 최종 세그먼트: {len(transcript)}개")
+
+        # 경고: 예상보다 적은 세그먼트
+        if len(transcript) < len(blocks) * 0.5 and len(blocks) > 20:
+            print(f"[VTT 파싱] ⚠️ 경고: 블록({len(blocks)}) 대비 세그먼트({len(transcript)}) 비율 낮음!")
 
         return transcript
 

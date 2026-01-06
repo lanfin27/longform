@@ -1,19 +1,29 @@
 # -*- coding: utf-8 -*-
 """
-HybridSRTGenerator v5.6 - WhisperV3 연동 버전 (VAD 극단적 민감도)
+HybridSRTGenerator v6.0 - 2단계 분리 SRT 생성기
 
 ⭐ 핵심 기능:
 1. WhisperTimestampV3 사용 (정확도 최적화)
 2. 오디오 전처리 자동 적용
 3. 갭 자동 감지 및 재분석
 4. 원문 기반 검증
-5. 기존 tts_to_srt_hybrid.py와 호환
+5. ⭐ v6.0: 2단계 분리 생성
+   - 1단계: generate_whisper_srt() - Whisper만으로 SRT 생성 (타임스탬프 정확!)
+   - 2단계: apply_ai_original_correction() - AI 원문 교정 (선택적)
 
 사용법:
     from utils.hybrid_srt_generator import HybridSRTGenerator
 
     generator = HybridSRTGenerator(whisper_model="small")
-    result = generator.process(audio_path, original_script, style="잘게")
+
+    # 1단계: Whisper SRT 생성 (타임스탬프 정확, 오타 있을 수 있음)
+    result1 = generator.generate_whisper_srt(audio_path, style="잘게")
+
+    # 2단계: AI 원문 교정 (선택적, 타임스탬프 유지!)
+    result2 = generator.apply_ai_original_correction(
+        scenes=result1['scenes'],
+        original_script=script
+    )
 """
 
 import os
@@ -97,13 +107,14 @@ class HybridResultV55:
 
 class HybridSRTGenerator:
     """
-    HybridV5.5 SRT 생성기 - WhisperV3 연동
+    HybridV6.0 SRT 생성기 - 2단계 분리
 
     ⭐ 개선사항:
     1. WhisperTimestampV3 사용 (VAD 최적화)
     2. 오디오 전처리 자동 적용
     3. 갭 자동 감지 및 재분석
     4. 원문 기반 검증
+    5. ⭐ v6.0: 2단계 분리 (generate_whisper_srt + apply_ai_original_correction)
     """
 
     def __init__(
@@ -112,7 +123,7 @@ class HybridSRTGenerator:
         vad_threshold: float = 0.05,
         min_speech_duration_ms: int = 30,
         reanalyze_gaps: bool = True,
-        auto_enhance_audio: bool = True
+        auto_enhance_audio: bool = False  # ⭐ v6.10: 기본값 False (VAD 정확도 우선!)
     ):
         """
         초기화 (v5.6 - 극단적 VAD 민감도)
@@ -124,11 +135,13 @@ class HybridSRTGenerator:
             reanalyze_gaps: 갭 자동 재분석 여부
             auto_enhance_audio: 저볼륨 구간 자동 향상 여부
         """
-        # WhisperV3 설정
+        # WhisperV3 설정 (⭐ v6.9: 명시적 VAD 파라미터 전달)
         self.whisper_config = WhisperConfigV3(
             model_size=whisper_model,
             vad_threshold=vad_threshold,
             min_speech_duration_ms=min_speech_duration_ms,
+            min_silence_duration_ms=50,   # ⭐ v6.9: 핵심! 50ms 무음이면 분리
+            speech_pad_ms=30,             # ⭐ v6.9: 패딩 최소화
             word_timestamps=True,
             reanalyze_gaps=reanalyze_gaps
         )
@@ -140,11 +153,13 @@ class HybridSRTGenerator:
         self.auto_enhance_audio = auto_enhance_audio
 
         print(f"\n{'='*60}")
-        print(f"[HybridV5.6] 초기화 완료 (극단적 VAD 민감도)")
+        print(f"[HybridV6.0] 초기화 완료 (2단계 분리)")
         print(f"{'='*60}")
         print(f"  Whisper 모델: {whisper_model}")
         print(f"  VAD threshold: {vad_threshold} (극도로 민감)")
+        print(f"  min_silence: {self.whisper_config.min_silence_duration_ms}ms")  # ⭐ 핵심 로그!
         print(f"  min_speech: {min_speech_duration_ms}ms")
+        print(f"  speech_pad: {self.whisper_config.speech_pad_ms}ms")
         print(f"  갭 재분석: {reanalyze_gaps}")
         print(f"  오디오 향상: {auto_enhance_audio}")
         print(f"{'='*60}")
@@ -170,7 +185,7 @@ class HybridSRTGenerator:
         """
         try:
             print(f"\n{'='*60}")
-            print(f"[HybridV5.6] 파이프라인 시작")
+            print(f"[HybridV6.0] 파이프라인 시작")
             print(f"{'='*60}")
             print(f"  오디오: {Path(audio_path).name}")
             print(f"  스타일: {style}")
@@ -240,13 +255,45 @@ class HybridSRTGenerator:
             if fixes:
                 print(f"  수정사항: {len(fixes)}개")
 
+            # Step 2.5: 원문 기반 텍스트 교정 (NEW!)
+            if original_script and len(original_script) > 50:
+                print(f"\n📍 Step 2.5: 원문 기반 텍스트 교정")
+                validated_scenes, corrections = self._apply_original_text_matching(
+                    validated_scenes,
+                    original_script
+                )
+                if corrections:
+                    print(f"  교정 완료: {len(corrections)}개")
+                else:
+                    print(f"  교정 필요 없음")
+
             # Step 3: 결과 변환
             print(f"\n📍 Step 3: 결과 변환")
 
+            # ⭐ 디버깅: 첫 번째 씬의 키 확인
+            if validated_scenes:
+                sample = validated_scenes[0]
+                print(f"  [DEBUG] 첫 번째 씬 키: {list(sample.keys())}")
+                print(f"  [DEBUG] start_time: {sample.get('start_time')}, start: {sample.get('start')}")
+                print(f"  [DEBUG] end_time: {sample.get('end_time')}, end: {sample.get('end')}")
+
             scenes = []
             for i, scene in enumerate(validated_scenes):
-                start_sec = scene.get('_start_seconds', 0)
-                end_sec = scene.get('_end_seconds', 0)
+                # ⭐ v6.1: 올바른 타임스탬프 키 사용 (srt_validator가 start_time/end_time 설정)
+                # 우선순위: start_time > start > _start_seconds
+                start_sec = scene.get('start_time')
+                if start_sec is None:
+                    start_sec = scene.get('start', 0)
+                if not isinstance(start_sec, (int, float)):
+                    start_sec = 0
+                start_sec = float(start_sec)
+
+                end_sec = scene.get('end_time')
+                if end_sec is None:
+                    end_sec = scene.get('end', 0)
+                if not isinstance(end_sec, (int, float)):
+                    end_sec = 0
+                end_sec = float(end_sec)
 
                 # 타임코드 생성
                 start_tc = self._format_timecode(start_sec)
@@ -277,7 +324,7 @@ class HybridSRTGenerator:
             )
 
             print(f"\n{'='*60}")
-            print(f"[HybridV5.6] ✅ 파이프라인 완료")
+            print(f"[HybridV6.0] ✅ 파이프라인 완료")
             print(f"{'='*60}")
             print(f"  총 씬: {result.scene_count}개")
             print(f"  복구 씬: {recovered_count}개")
@@ -287,7 +334,7 @@ class HybridSRTGenerator:
             return result
 
         except Exception as e:
-            print(f"\n[HybridV5.6] ❌ 오류: {e}")
+            print(f"\n[HybridV6.0] ❌ 오류: {e}")
             import traceback
             traceback.print_exc()
 
@@ -313,6 +360,48 @@ class HybridSRTGenerator:
         millis = int((secs - whole_secs) * 1000)
         return f"{hours:02d}:{minutes:02d}:{whole_secs:02d},{millis:03d}"
 
+    def _apply_original_text_matching(
+        self,
+        scenes: List[Dict],
+        original_script: str
+    ) -> Tuple[List[Dict], List[Dict]]:
+        """
+        Step 2.5: 원문 기반 텍스트 교정 (v5.6)
+
+        타임스탬프는 절대 변경하지 않음!
+        텍스트만 원문과 일치시킴!
+
+        Args:
+            scenes: 씬 리스트 (dict)
+            original_script: 원문 스크립트
+
+        Returns:
+            (교정된 씬 리스트, 교정 내역)
+        """
+        try:
+            from utils.original_text_matcher import get_original_text_matcher
+
+            matcher = get_original_text_matcher()
+            corrected_scenes, corrections = matcher.match_and_correct(scenes, original_script)
+
+            # 교정 내역 일부 출력
+            if corrections:
+                for c in corrections[:3]:
+                    before = c['before'][:25] + '...' if len(c['before']) > 25 else c['before']
+                    after = c['after'][:25] + '...' if len(c['after']) > 25 else c['after']
+                    print(f"    씬 {c['scene_id']}: {before} → {after}")
+                if len(corrections) > 3:
+                    print(f"    ... 외 {len(corrections) - 3}개")
+
+            return corrected_scenes, corrections
+
+        except ImportError as e:
+            print(f"  ⚠️ OriginalTextMatcher 로드 실패: {e}")
+            return scenes, []
+        except Exception as e:
+            print(f"  ⚠️ 원문 매칭 오류: {e}")
+            return scenes, []
+
     def save_srt(self, result: HybridResultV55, output_path: str) -> str:
         """
         결과를 SRT 파일로 저장
@@ -332,8 +421,280 @@ class HybridSRTGenerator:
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(srt_content)
 
-        print(f"[HybridV5.6] SRT 저장: {output_path}")
+        print(f"[HybridV6.0] SRT 저장: {output_path}")
         return output_path
+
+    # ============================================================
+    # v6.0: 2단계 분리 메서드
+    # ============================================================
+
+    def generate_whisper_srt(self,
+                              audio_path: str,
+                              style: str = "잘게",
+                              language: str = "ko") -> Dict:
+        """
+        ⭐ 1단계: Whisper SRT 생성 (AI 교정 없이!)
+
+        ⭐ 타임스탬프 100% 정확
+        ⚠️ 텍스트에 오타 있을 수 있음 (나중에 AI 교정)
+
+        Args:
+            audio_path: 오디오 파일 경로
+            style: 분리 스타일 (잘게, 기본, 크게)
+            language: 언어 코드
+
+        Returns:
+            {
+                'success': True,
+                'scenes': [...],           # 씬 리스트 (dict)
+                'srt_content': '...',      # SRT 파일 내용
+                'srt_path': '...',         # SRT 파일 경로
+                'stats': {...}             # 통계
+            }
+        """
+
+        print(f"\n{'='*60}")
+        print(f"[HybridV6.0] 1단계: Whisper SRT 생성 시작")
+        print(f"{'='*60}")
+        print(f"  오디오: {Path(audio_path).name}")
+        print(f"  스타일: {style}")
+
+        try:
+            # 기존 process 메서드 활용 (원문 없이!)
+            result = self.process(
+                audio_path=audio_path,
+                original_script=None,  # ⭐ 원문 없이 생성!
+                style=style,
+                language=language
+            )
+
+            if not result.success:
+                return {
+                    'success': False,
+                    'error': result.error or '알 수 없는 오류'
+                }
+
+            # 씬을 dict 형태로 변환
+            scenes_dict = [scene.to_dict() for scene in result.scenes]
+
+            # SRT 내용 생성
+            srt_content = result.to_srt()
+
+            # 파일 저장
+            audio_name = Path(audio_path).stem
+            output_dir = Path(audio_path).parent / 'analysis'
+            output_dir.mkdir(parents=True, exist_ok=True)
+
+            srt_path = output_dir / f'{audio_name}_whisper.srt'
+            with open(srt_path, 'w', encoding='utf-8') as f:
+                f.write(srt_content)
+
+            # JSON도 저장 (나중에 AI 교정용)
+            import json
+            json_path = output_dir / f'{audio_name}_whisper.json'
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(scenes_dict, f, ensure_ascii=False, indent=2)
+
+            print(f"\n{'='*60}")
+            print(f"[HybridV6.0] ✅ 1단계 완료: Whisper SRT 생성")
+            print(f"{'='*60}")
+            print(f"  씬: {len(scenes_dict)}개")
+            print(f"  SRT: {srt_path}")
+            print(f"  JSON: {json_path}")
+
+            return {
+                'success': True,
+                'scenes': scenes_dict,
+                'srt_content': srt_content,
+                'srt_path': str(srt_path),
+                'json_path': str(json_path),
+                'stats': {
+                    'whisper_segments': result.whisper_segments,
+                    'merged_scenes': result.scene_count,
+                    'recovered_segments': result.recovered_segments,
+                    'audio_duration': result.audio_duration,
+                    'style': style
+                }
+            }
+
+        except Exception as e:
+            print(f"[HybridV6.0] ❌ 1단계 오류: {e}")
+            import traceback
+            traceback.print_exc()
+            return {'success': False, 'error': str(e)}
+
+    def apply_ai_original_correction(self,
+                                      scenes: List[Dict],
+                                      original_script: str,
+                                      output_path: str = None) -> Dict:
+        """
+        ⭐ 2단계: AI 원문 교정 (선택적!)
+
+        ⭐ 타임스탬프는 절대 변경하지 않음!
+        ⭐ 텍스트만 원문과 일치시킴!
+
+        Args:
+            scenes: 1단계에서 생성된 Whisper SRT 씬 리스트
+            original_script: 사용자가 입력한 원문 스크립트
+            output_path: 저장 경로 (없으면 자동 생성)
+
+        Returns:
+            {
+                'success': True,
+                'scenes': [...],           # 교정된 씬 리스트
+                'srt_content': '...',      # 교정된 SRT 내용
+                'srt_path': '...',         # 저장 경로
+                'corrections': [...],      # 교정 내역
+                'stats': {...}
+            }
+        """
+
+        print(f"\n{'='*60}")
+        print(f"[HybridV6.0] 2단계: AI 원문 교정 시작")
+        print(f"{'='*60}")
+        print(f"  입력 씬: {len(scenes)}개")
+        print(f"  원문 길이: {len(original_script) if original_script else 0}자")
+
+        # 디버깅: 입력 씬의 타임스탬프 확인
+        if scenes:
+            sample = scenes[0]
+            print(f"  [DEBUG 입력] 첫 번째 씬 키: {list(sample.keys())}")
+            print(f"  [DEBUG 입력] timecode: {sample.get('timecode')}")
+            print(f"  [DEBUG 입력] start_time: {sample.get('start_time')}")
+            print(f"  [DEBUG 입력] end_time: {sample.get('end_time')}")
+
+        if not original_script or not original_script.strip():
+            print(f"[HybridV6.0] ⚠️ 원문 스크립트가 없습니다!")
+            return {'success': False, 'error': '원문 스크립트가 필요합니다.'}
+
+        if not scenes:
+            print(f"[HybridV6.0] ⚠️ 씬 데이터가 없습니다!")
+            return {'success': False, 'error': '씬 데이터가 필요합니다.'}
+
+        try:
+            # AI 원문 교정기 생성
+            from utils.ai_original_corrector import AIOriginalCorrector
+            corrector = AIOriginalCorrector(provider='google')
+
+            # AI 교정 실행
+            corrected_scenes, corrections = corrector.correct_with_original(
+                scenes=scenes,
+                original_script=original_script,
+                batch_size=5
+            )
+
+            # 디버깅: 교정 후 타임스탬프 확인
+            if corrected_scenes:
+                sample = corrected_scenes[0]
+                print(f"  [DEBUG 교정후] 첫 번째 씬 키: {list(sample.keys())}")
+                print(f"  [DEBUG 교정후] timecode: {sample.get('timecode')}")
+                print(f"  [DEBUG 교정후] start_time: {sample.get('start_time')}")
+                print(f"  [DEBUG 교정후] end_time: {sample.get('end_time')}")
+
+            # SRT 내용 생성
+            srt_content = self._generate_srt_from_dict(corrected_scenes)
+
+            # 파일 저장
+            if output_path:
+                srt_path = output_path
+            else:
+                # 기본 경로 생성
+                from datetime import datetime
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                srt_path = f"output/corrected_{timestamp}.srt"
+
+            Path(srt_path).parent.mkdir(parents=True, exist_ok=True)
+
+            with open(srt_path, 'w', encoding='utf-8') as f:
+                f.write(srt_content)
+
+            print(f"\n{'='*60}")
+            print(f"[HybridV6.0] ✅ 2단계 완료: AI 원문 교정")
+            print(f"{'='*60}")
+            print(f"  총 교정: {len(corrections)}개")
+            print(f"  저장: {srt_path}")
+
+            return {
+                'success': True,
+                'scenes': corrected_scenes,
+                'srt_content': srt_content,
+                'srt_path': srt_path,
+                'corrections': corrections,
+                'stats': {
+                    'total_scenes': len(corrected_scenes),
+                    'corrected_scenes': len(corrections)
+                }
+            }
+
+        except Exception as e:
+            print(f"[HybridV6.0] ❌ 2단계 오류: {e}")
+            import traceback
+            traceback.print_exc()
+            return {'success': False, 'error': str(e)}
+
+    def _generate_srt_from_dict(self, scenes: List[Dict]) -> str:
+        """씬 딕셔너리 리스트를 SRT 문자열로 변환"""
+
+        srt_blocks = []
+
+        # 디버깅: 첫 번째 씬 구조 확인
+        if scenes:
+            sample = scenes[0]
+            print(f"[_generate_srt_from_dict] 첫 번째 씬 키: {list(sample.keys())}")
+            print(f"[_generate_srt_from_dict] timecode: {sample.get('timecode')}")
+            print(f"[_generate_srt_from_dict] start_time: {sample.get('start_time')}")
+            print(f"[_generate_srt_from_dict] end_time: {sample.get('end_time')}")
+
+        for i, scene in enumerate(scenes, 1):
+            # 타임코드 가져오기 (여러 형식 지원)
+            timecode = None
+
+            # 1순위: timecode 필드 (이미 포맷된 문자열)
+            if 'timecode' in scene and scene['timecode'] and '-->' in str(scene['timecode']):
+                timecode = scene['timecode']
+            else:
+                # 2순위: start_time, end_time에서 생성
+                start = self._get_timestamp_value(scene, 'start')
+                end = self._get_timestamp_value(scene, 'end')
+
+                start_tc = self._format_timecode(start)
+                end_tc = self._format_timecode(end)
+
+                timecode = f"{start_tc} --> {end_tc}"
+
+            text = scene.get('text', '')
+
+            srt_blocks.append(f"{i}\n{timecode}\n{text}\n")
+
+        return "\n".join(srt_blocks)
+
+    def _get_timestamp_value(self, scene: Dict, prefix: str) -> float:
+        """
+        씬에서 타임스탬프 값 추출 (다양한 키 지원)
+
+        Args:
+            scene: 씬 딕셔너리
+            prefix: 'start' 또는 'end'
+
+        Returns:
+            초 단위 float 값
+        """
+        # 1순위: start_time / end_time
+        val = scene.get(f'{prefix}_time')
+        if val is not None and isinstance(val, (int, float)):
+            return float(val)
+
+        # 2순위: start / end
+        val = scene.get(prefix)
+        if val is not None and isinstance(val, (int, float)):
+            return float(val)
+
+        # 3순위: start_sec / end_sec
+        val = scene.get(f'{prefix}_sec')
+        if val is not None and isinstance(val, (int, float)):
+            return float(val)
+
+        return 0.0
 
 
 # ============================================================
@@ -345,7 +706,7 @@ def get_hybrid_generator(
     vad_threshold: float = 0.05,
     min_speech_duration_ms: int = 30,
     reanalyze_gaps: bool = True,
-    auto_enhance_audio: bool = True
+    auto_enhance_audio: bool = False  # ⭐ v6.10: 기본값 False (VAD 정확도 우선!)
 ) -> HybridSRTGenerator:
     """
     HybridSRTGenerator 인스턴스 생성 (v5.6)

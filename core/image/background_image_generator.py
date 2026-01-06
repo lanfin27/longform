@@ -1,9 +1,14 @@
 """
-배경 이미지 생성기 (캐릭터 제외)
+배경 이미지 생성기 (캐릭터 제외) - v2.0
 
 씬의 배경/환경만 생성하여 나중에 캐릭터와 합성
 주인공 캐릭터는 제외하고 엑스트라/군중은 선택적으로 포함
+
+v2.0: 한글/아시아 텍스트 생성 방지 강화
+- prompt_sanitizer 사용하여 텍스트 키워드 제거
+- 강력한 텍스트 차단 프롬프트 추가
 """
+import gc
 import json
 import time
 from pathlib import Path
@@ -14,6 +19,12 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from core.image.together_client import TogetherImageClient
+from utils.prompt_sanitizer import (
+    sanitize_scene_prompt,
+    enhance_prompt_for_no_text,
+    get_text_blocking_suffix,
+    get_text_blocking_negative
+)
 
 
 @dataclass
@@ -139,17 +150,22 @@ class BackgroundImageGenerator:
         # === 프롬프트 구성: 씬 내용을 가장 앞에! ===
         prompt_parts = []
 
+        # v2.0: 텍스트 차단 지시 (맨 앞에 배치)
+        prompt_parts.append("IMPORTANT: All surfaces must be completely blank with no text, signs, or writing of any kind")
+
         # 0. 스타일 prefix (맨 앞)
         if style_prefix:
             prompt_parts.append(style_prefix.strip())
 
-        # 1. 씬 내용 (가장 중요!)
+        # 1. 씬 내용 (가장 중요!) - 텍스트 키워드 제거
         if base_prompt:
-            prompt_parts.append(base_prompt)
+            sanitized_base = sanitize_scene_prompt(base_prompt)
+            prompt_parts.append(sanitized_base)
 
-        # 2. 시각 요소
+        # 2. 시각 요소 - 텍스트 키워드 제거
         if visual_text:
-            prompt_parts.append(visual_text)
+            sanitized_visual = sanitize_scene_prompt(visual_text)
+            prompt_parts.append(sanitized_visual)
 
         # 3. 분위기
         if mood:
@@ -174,6 +190,9 @@ class BackgroundImageGenerator:
         # 7. 스타일 suffix (맨 뒤)
         if style_suffix:
             prompt_parts.append(style_suffix.strip())
+
+        # v2.0: 텍스트 차단 suffix 추가
+        prompt_parts.append(get_text_blocking_suffix())
 
         # 최종 프롬프트 구성
         prompt = ", ".join(filter(None, [p.strip() for p in prompt_parts if p.strip()]))
@@ -372,6 +391,9 @@ class BackgroundImageGenerator:
 
             if on_progress:
                 on_progress(i + 1, total, result)
+
+            # 메모리 정리 (Out of Memory 방지)
+            gc.collect()
 
         # 로그 저장
         if output_dir is None and self.project_path:

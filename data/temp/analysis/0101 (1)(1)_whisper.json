@@ -1,0 +1,2864 @@
+[
+  {
+    "scene_id": 1,
+    "text": "여러분 삼성전자 하면은 뭐가 떠오르세요?",
+    "start_time": 0.1,
+    "end_time": 2.58,
+    "duration": 2.48,
+    "timecode": "00:00:00,100 --> 00:00:02,580",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 2,
+    "text": "스마트폰, 반도체, TV?",
+    "start_time": 3.04,
+    "end_time": 5.28,
+    "duration": 2.24,
+    "timecode": "00:00:03,040 --> 00:00:05,280",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 3,
+    "text": "근데요 지금 삼성이 2조 원을 들여서 사려는 게 뭔지 아세요?",
+    "start_time": 5.679,
+    "end_time": 9.58,
+    "duration": 3.901,
+    "timecode": "00:00:05,679 --> 00:00:09,580",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 4,
+    "text": "자동차 눈이에요",
+    "start_time": 10.019,
+    "end_time": 10.8,
+    "duration": 0.7810000000000006,
+    "timecode": "00:00:10,019 --> 00:00:10,800",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 5,
+    "text": "자동차가 세상을 보는 눈",
+    "start_time": 10.8,
+    "end_time": 12.5,
+    "duration": 1.6999999999999993,
+    "timecode": "00:00:10,800 --> 00:00:12,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 6,
+    "text": "2025년 12월 삼성전자 자회사 하마니",
+    "start_time": 13.019,
+    "end_time": 16.059,
+    "duration": 3.040000000000001,
+    "timecode": "00:00:13,019 --> 00:00:16,059",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 7,
+    "text": "독일의 명문 부품사 GF의 자율주행 사업부를",
+    "start_time": 16.059,
+    "end_time": 19.46,
+    "duration": 3.401,
+    "timecode": "00:00:16,059 --> 00:00:19,460",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 8,
+    "text": "15억 유로 우리 돈으로 약 2조 원에 인수한다고 발표했거든요",
+    "start_time": 19.46,
+    "end_time": 23.3,
+    "duration": 3.84,
+    "timecode": "00:00:19,460 --> 00:00:23,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 9,
+    "text": "근데 이게 왜 중요하냐",
+    "start_time": 23.3,
+    "end_time": 24.839,
+    "duration": 1.538999999999998,
+    "timecode": "00:00:23,300 --> 00:00:24,838",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 10,
+    "text": "자 지금부터 제가 하는 얘기 끝까지 들으시면요",
+    "start_time": 24.839,
+    "end_time": 27.3,
+    "duration": 2.461000000000002,
+    "timecode": "00:00:24,838 --> 00:00:27,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 11,
+    "text": "삼성이 왜 갑자기 자동차에 미쳤는지",
+    "start_time": 27.3,
+    "end_time": 29.399,
+    "duration": 2.099,
+    "timecode": "00:00:27,300 --> 00:00:29,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 12,
+    "text": "그리고 이게 테슬라, BMW, 현대차한테 어떤 의미인지",
+    "start_time": 29.399,
+    "end_time": 33.32,
+    "duration": 3.9209999999999994,
+    "timecode": "00:00:29,399 --> 00:00:33,320",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 13,
+    "text": "완전히 이해하시게 될 거예요",
+    "start_time": 33.32,
+    "end_time": 35.039,
+    "duration": 1.7190000000000012,
+    "timecode": "00:00:33,320 --> 00:00:35,039",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 14,
+    "text": "아 그리고 솔직히 말씀드리면요",
+    "start_time": 35.039,
+    "end_time": 37.179,
+    "duration": 2.1400000000000006,
+    "timecode": "00:00:35,039 --> 00:00:37,179",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 15,
+    "text": "저도 이거 조사하면서 좀 소름 돋았어요",
+    "start_time": 37.179,
+    "end_time": 39.1,
+    "duration": 1.9209999999999994,
+    "timecode": "00:00:37,179 --> 00:00:39,100",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 16,
+    "text": "삼성이 진짜 무서운 회사구나",
+    "start_time": 39.6,
+    "end_time": 41.1,
+    "duration": 1.5,
+    "timecode": "00:00:39,600 --> 00:00:41,100",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 17,
+    "text": "이런 생각이 들더라고요",
+    "start_time": 41.1,
+    "end_time": 42.5,
+    "duration": 1.3999999999999986,
+    "timecode": "00:00:41,100 --> 00:00:42,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 18,
+    "text": "자 시작해볼게요",
+    "start_time": 42.84,
+    "end_time": 44.119,
+    "duration": 1.2789999999999964,
+    "timecode": "00:00:42,840 --> 00:00:44,118",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 19,
+    "text": "자 일단 기본부터 깔고 가야 해요",
+    "start_time": 44.439,
+    "end_time": 46.78,
+    "duration": 2.341000000000001,
+    "timecode": "00:00:44,439 --> 00:00:46,780",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 20,
+    "text": "하마니 뭐하는 회사인지 아시는 분 계세요?",
+    "start_time": 47.2,
+    "end_time": 49.119,
+    "duration": 1.918999999999997,
+    "timecode": "00:00:47,200 --> 00:00:49,118",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 21,
+    "text": "JBL 스피커 아시죠?",
+    "start_time": 49.64,
+    "end_time": 50.78,
+    "duration": 1.1400000000000006,
+    "timecode": "00:00:49,640 --> 00:00:50,780",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 22,
+    "text": "하마니 카돈 사운드바 AKG 헤드폰 다 하마인 거예요",
+    "start_time": 51.259,
+    "end_time": 54.7,
+    "duration": 3.4410000000000025,
+    "timecode": "00:00:51,259 --> 00:00:54,700",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 23,
+    "text": "음향기기 덕후들 사이에서는 전설적인 브랜드들이거든요",
+    "start_time": 54.7,
+    "end_time": 57.939,
+    "duration": 3.238999999999997,
+    "timecode": "00:00:54,700 --> 00:00:57,939",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 24,
+    "text": "근데요, 하마니의 진짜 정체는 따로 있어요",
+    "start_time": 57.939,
+    "end_time": 60.579,
+    "duration": 2.6400000000000006,
+    "timecode": "00:00:57,939 --> 00:01:00,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 25,
+    "text": "자동차 안에 들어가는 모든 전자 장치",
+    "start_time": 61.179,
+    "end_time": 63.02,
+    "duration": 1.841000000000001,
+    "timecode": "00:01:01,179 --> 00:01:03,020",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 26,
+    "text": "이걸 전문용어로 전장이라고 하는데요",
+    "start_time": 63.02,
+    "end_time": 65.14,
+    "duration": 2.1199999999999974,
+    "timecode": "00:01:03,020 --> 00:01:05,140",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 27,
+    "text": "하마니는 이 전장 분야에 절대 강자예요",
+    "start_time": 65.659,
+    "end_time": 67.76,
+    "duration": 2.100999999999999,
+    "timecode": "00:01:05,659 --> 00:01:07,760",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 28,
+    "text": "여러분이 요즘 차 타시면",
+    "start_time": 67.76,
+    "end_time": 69.159,
+    "duration": 1.399000000000001,
+    "timecode": "00:01:07,760 --> 00:01:09,159",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 29,
+    "text": "계기판 대신 커다란 화면이 있잖아요",
+    "start_time": 69.159,
+    "end_time": 71.319,
+    "duration": 2.1599999999999966,
+    "timecode": "00:01:09,159 --> 00:01:11,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 30,
+    "text": "내비게이션도 나오고, 음악도 나오고",
+    "start_time": 71.319,
+    "end_time": 74.159,
+    "duration": 2.8400000000000034,
+    "timecode": "00:01:11,319 --> 00:01:14,159",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 31,
+    "text": "에어컨 조절도 하고",
+    "start_time": 74.159,
+    "end_time": 75.34,
+    "duration": 1.1809999999999974,
+    "timecode": "00:01:14,159 --> 00:01:15,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 32,
+    "text": "이걸 디지털 콕피시라고 하는데요",
+    "start_time": 75.34,
+    "end_time": 77.15899999999999,
+    "duration": 1.8189999999999884,
+    "timecode": "00:01:15,340 --> 00:01:17,158",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 33,
+    "text": "하마니 이 분야 세계 1등이에요",
+    "start_time": 77.15899999999999,
+    "end_time": 79.42,
+    "duration": 2.26100000000001,
+    "timecode": "00:01:17,158 --> 00:01:19,420",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 34,
+    "text": "자 BMW 타시면 하마니 시스템이 들어가 있고요",
+    "start_time": 79.42,
+    "end_time": 82.12,
+    "duration": 2.700000000000003,
+    "timecode": "00:01:19,420 --> 00:01:22,120",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 35,
+    "text": "메르세데스 벤츠도, 아우디도, 현대차도",
+    "start_time": 82.12,
+    "end_time": 85.03999999999999,
+    "duration": 2.9199999999999875,
+    "timecode": "00:01:22,120 --> 00:01:25,039",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 36,
+    "text": "다 하마니 시스템 써요",
+    "start_time": 85.03999999999999,
+    "end_time": 86.4,
+    "duration": 1.3600000000000136,
+    "timecode": "00:01:25,039 --> 00:01:26,400",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 37,
+    "text": "그럼 삼성이 이 회사를 언제 샀느냐?",
+    "start_time": 86.4,
+    "end_time": 88.239,
+    "duration": 1.8389999999999986,
+    "timecode": "00:01:26,400 --> 00:01:28,239",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 38,
+    "text": "2017년이에요",
+    "start_time": 89.099,
+    "end_time": 89.76,
+    "duration": 0.6610000000000014,
+    "timecode": "00:01:29,099 --> 00:01:29,760",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 39,
+    "text": "80억 달러",
+    "start_time": 90.35900000000001,
+    "end_time": 91.06,
+    "duration": 0.7009999999999934,
+    "timecode": "00:01:30,359 --> 00:01:31,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 40,
+    "text": "우리 돈으로 거의 10조 원 가까이 주고 샀어요",
+    "start_time": 91.06,
+    "end_time": 93.5,
+    "duration": 2.4399999999999977,
+    "timecode": "00:01:31,060 --> 00:01:33,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 41,
+    "text": "근데 진짜 웃긴 게요",
+    "start_time": 93.5,
+    "end_time": 94.85900000000001,
+    "duration": 1.3590000000000089,
+    "timecode": "00:01:33,500 --> 00:01:34,859",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 42,
+    "text": "당시에 사람들이 뭐라고 했냐면요",
+    "start_time": 94.85900000000001,
+    "end_time": 96.799,
+    "duration": 1.9399999999999977,
+    "timecode": "00:01:34,859 --> 00:01:36,799",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 43,
+    "text": "삼성이 왜 스피커 회사를 사?",
+    "start_time": 96.799,
+    "end_time": 98.47999999999999,
+    "duration": 1.6809999999999832,
+    "timecode": "00:01:36,799 --> 00:01:38,479",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 44,
+    "text": "무슨 생각이야?",
+    "start_time": 99.0,
+    "end_time": 99.68,
+    "duration": 0.6800000000000068,
+    "timecode": "00:01:39,000 --> 00:01:39,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 45,
+    "text": "이런 반응이었거든요",
+    "start_time": 100.25999999999999,
+    "end_time": 101.37899999999999,
+    "duration": 1.1189999999999998,
+    "timecode": "00:01:40,259 --> 00:01:41,378",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 46,
+    "text": "근데요, 이재용 회장 생각은 달랐어요",
+    "start_time": 101.37899999999999,
+    "end_time": 103.87899999999999,
+    "duration": 2.5,
+    "timecode": "00:01:41,378 --> 00:01:43,878",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 47,
+    "text": "당시 이재용 부회장이었는데",
+    "start_time": 103.87899999999999,
+    "end_time": 105.87899999999999,
+    "duration": 2.0,
+    "timecode": "00:01:43,878 --> 00:01:45,878",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 48,
+    "text": "이 사람이 본 건 스피커가 아니었어요",
+    "start_time": 105.87899999999999,
+    "end_time": 107.68,
+    "duration": 1.8010000000000161,
+    "timecode": "00:01:45,878 --> 00:01:47,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 49,
+    "text": "자동차의 미래를 본 거예요",
+    "start_time": 108.2,
+    "end_time": 109.299,
+    "duration": 1.0990000000000038,
+    "timecode": "00:01:48,200 --> 00:01:49,299",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 50,
+    "text": "그때 이미 자동차 산업이 어떻게 바뀔지 읽은 거죠",
+    "start_time": 109.75,
+    "end_time": 112.56,
+    "duration": 2.8100000000000023,
+    "timecode": "00:01:49,750 --> 00:01:52,560",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 51,
+    "text": "앞으로 자동차는 그냥 굴러가는 기계가 아니라",
+    "start_time": 112.95,
+    "end_time": 115.25999999999999,
+    "duration": 2.309999999999988,
+    "timecode": "00:01:52,950 --> 00:01:55,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 52,
+    "text": "바퀴 달린 컴퓨터가 된다",
+    "start_time": 115.25999999999999,
+    "end_time": 117.239,
+    "duration": 1.9790000000000134,
+    "timecode": "00:01:55,259 --> 00:01:57,239",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 53,
+    "text": "그리고 그 컴퓨터의 두뇌와",
+    "start_time": 117.239,
+    "end_time": 118.75999999999999,
+    "duration": 1.5209999999999866,
+    "timecode": "00:01:57,239 --> 00:01:58,759",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 54,
+    "text": "신경망을 만드는 회사가",
+    "start_time": 118.75999999999999,
+    "end_time": 120.359,
+    "duration": 1.5990000000000038,
+    "timecode": "00:01:58,759 --> 00:02:00,358",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 55,
+    "text": "미래의 강자가 된다",
+    "start_time": 120.359,
+    "end_time": 122.019,
+    "duration": 1.6600000000000108,
+    "timecode": "00:02:00,358 --> 00:02:02,019",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 56,
+    "text": "이걸 2017년에 이미 본 거예요",
+    "start_time": 122.019,
+    "end_time": 123.62,
+    "duration": 1.600999999999999,
+    "timecode": "00:02:02,019 --> 00:02:03,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 57,
+    "text": "실제로 하만 인수 이후에 어떻게 됐냐면요",
+    "start_time": 123.62,
+    "end_time": 126.519,
+    "duration": 2.899000000000001,
+    "timecode": "00:02:03,620 --> 00:02:06,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 58,
+    "text": "2025년 1분기 하만 매출이 3조 4천억 원이에요",
+    "start_time": 126.519,
+    "end_time": 129.9,
+    "duration": 3.3810000000000002,
+    "timecode": "00:02:06,519 --> 00:02:09,900",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 59,
+    "text": "영업이익이 3천억 원이고요",
+    "start_time": 129.9,
+    "end_time": 131.4,
+    "duration": 1.5,
+    "timecode": "00:02:09,900 --> 00:02:11,400",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 60,
+    "text": "이게 어느 정도냐면요",
+    "start_time": 131.4,
+    "end_time": 133.12,
+    "duration": 1.7199999999999989,
+    "timecode": "00:02:11,400 --> 00:02:13,120",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 61,
+    "text": "삼성전자에서 TV 만드는 사업부랑 비슷한 수준이에요",
+    "start_time": 133.12,
+    "end_time": 136.159,
+    "duration": 3.0389999999999873,
+    "timecode": "00:02:13,120 --> 00:02:16,158",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 62,
+    "text": "스피커 회사가 TV 사업부만큼 돈을 버는 거예요",
+    "start_time": 136.159,
+    "end_time": 139.199,
+    "duration": 3.0400000000000205,
+    "timecode": "00:02:16,158 --> 00:02:19,199",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 63,
+    "text": "근데요, 삼성은 여기서 멈추지 않았어요",
+    "start_time": 139.199,
+    "end_time": 141.699,
+    "duration": 2.5,
+    "timecode": "00:02:19,199 --> 00:02:21,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 64,
+    "text": "하만이 자라는 게 뭐였죠?",
+    "start_time": 141.699,
+    "end_time": 143.02,
+    "duration": 1.320999999999998,
+    "timecode": "00:02:21,699 --> 00:02:23,020",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 65,
+    "text": "디지털 콕핏",
+    "start_time": 143.02,
+    "end_time": 144.07999999999998,
+    "duration": 1.0599999999999739,
+    "timecode": "00:02:23,020 --> 00:02:24,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 66,
+    "text": "그러니까 차 안에서 운전자한테 정보 보여주는 거잖아요",
+    "start_time": 144.07999999999998,
+    "end_time": 147.25900000000001,
+    "duration": 3.1790000000000305,
+    "timecode": "00:02:24,079 --> 00:02:27,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 67,
+    "text": "근데 자율주행 시대가 오면 이것만으로는 부족해요",
+    "start_time": 147.25900000000001,
+    "end_time": 150.74,
+    "duration": 3.4809999999999945,
+    "timecode": "00:02:27,259 --> 00:02:30,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 68,
+    "text": "차가 스스로 운전하려면 뭐가 필요하겠어요?",
+    "start_time": 150.74,
+    "end_time": 153.34,
+    "duration": 2.5999999999999943,
+    "timecode": "00:02:30,740 --> 00:02:33,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 69,
+    "text": "눈이 필요해요",
+    "start_time": 153.74,
+    "end_time": 154.75900000000001,
+    "duration": 1.0190000000000055,
+    "timecode": "00:02:33,740 --> 00:02:34,759",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 70,
+    "text": "차가 세상을 봐야 한다고요",
+    "start_time": 154.75900000000001,
+    "end_time": 156.68,
+    "duration": 1.9209999999999923,
+    "timecode": "00:02:34,759 --> 00:02:36,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 71,
+    "text": "카메라, 레이더, 센서 이런 것들이 필요한 거죠",
+    "start_time": 156.68,
+    "end_time": 160.12,
+    "duration": 3.4399999999999977,
+    "timecode": "00:02:36,680 --> 00:02:40,120",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 72,
+    "text": "근데 하만은 이게 없었어요",
+    "start_time": 160.12,
+    "end_time": 161.659,
+    "duration": 1.5389999999999873,
+    "timecode": "00:02:40,120 --> 00:02:41,658",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 73,
+    "text": "차 안쪽은 잘 보는데 차 바깥쪽을 못 보는 거예요",
+    "start_time": 161.659,
+    "end_time": 164.719,
+    "duration": 3.0600000000000023,
+    "timecode": "00:02:41,658 --> 00:02:44,718",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 74,
+    "text": "그래서 삼성이 뭘 했었냐?",
+    "start_time": 164.719,
+    "end_time": 166.57999999999998,
+    "duration": 1.86099999999999,
+    "timecode": "00:02:44,718 --> 00:02:46,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 75,
+    "text": "ZF를 노린 거예요",
+    "start_time": 167.099,
+    "end_time": 167.86,
+    "duration": 0.7610000000000241,
+    "timecode": "00:02:47,098 --> 00:02:47,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 76,
+    "text": "자, ZF가 뭔지 설명해 드릴게요",
+    "start_time": 168.159,
+    "end_time": 170.8,
+    "duration": 2.6410000000000196,
+    "timecode": "00:02:48,158 --> 00:02:50,800",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 77,
+    "text": "ZF 프리드리 히스 핫펜",
+    "start_time": 171.3,
+    "end_time": 173.099,
+    "duration": 1.7989999999999782,
+    "timecode": "00:02:51,300 --> 00:02:53,098",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 78,
+    "text": "독일 회사예요",
+    "start_time": 173.439,
+    "end_time": 174.439,
+    "duration": 1.0,
+    "timecode": "00:02:53,438 --> 00:02:54,438",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 79,
+    "text": "자동차 부품 분야에서는 진짜 명가 중에 명가거든요",
+    "start_time": 174.439,
+    "end_time": 177.68,
+    "duration": 3.241000000000014,
+    "timecode": "00:02:54,438 --> 00:02:57,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 80,
+    "text": "설립이 1915년이에요",
+    "start_time": 178.24,
+    "end_time": 180.24,
+    "duration": 2.0,
+    "timecode": "00:02:58,240 --> 00:03:00,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 81,
+    "text": "100년이 넘은 회사예요",
+    "start_time": 180.24,
+    "end_time": 181.96,
+    "duration": 1.7199999999999989,
+    "timecode": "00:03:00,240 --> 00:03:01,960",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 82,
+    "text": "변속기, 조양장치, 샤시",
+    "start_time": 181.96,
+    "end_time": 184.75900000000001,
+    "duration": 2.7990000000000066,
+    "timecode": "00:03:01,960 --> 00:03:04,759",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 83,
+    "text": "자, 자동차의 핵심 부품은 다 만들어요",
+    "start_time": 184.75900000000001,
+    "end_time": 187.34,
+    "duration": 2.580999999999989,
+    "timecode": "00:03:04,759 --> 00:03:07,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 84,
+    "text": "근데 최근에 ZF가 좀 힘들었어요",
+    "start_time": 187.34,
+    "end_time": 189.84,
+    "duration": 2.5,
+    "timecode": "00:03:07,340 --> 00:03:09,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 85,
+    "text": "왜냐하면 전기차 시대가 오면서 변속기 수요가 확 줄었거든요",
+    "start_time": 189.84,
+    "end_time": 193.34,
+    "duration": 3.5,
+    "timecode": "00:03:09,840 --> 00:03:13,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 86,
+    "text": "전기차는 변속기가 필요 없잖아요",
+    "start_time": 193.34,
+    "end_time": 195.3,
+    "duration": 1.960000000000008,
+    "timecode": "00:03:13,340 --> 00:03:15,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 87,
+    "text": "그래서 ZF가 구조조정을 하기 시작한 거예요",
+    "start_time": 195.3,
+    "end_time": 197.919,
+    "duration": 2.6189999999999998,
+    "timecode": "00:03:15,300 --> 00:03:17,919",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 88,
+    "text": "그 와중에 ADS 사업부를 매각하기로 한 거죠",
+    "start_time": 197.919,
+    "end_time": 200.96,
+    "duration": 3.040999999999997,
+    "timecode": "00:03:17,919 --> 00:03:20,960",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 89,
+    "text": "ADS가 뭐냐면요",
+    "start_time": 200.96,
+    "end_time": 203.319,
+    "duration": 2.3589999999999804,
+    "timecode": "00:03:20,960 --> 00:03:23,318",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 90,
+    "text": "어드벤스드 드라이버 어시스턴스 시스템의 약자예요",
+    "start_time": 203.319,
+    "end_time": 206.3,
+    "duration": 2.981000000000023,
+    "timecode": "00:03:23,318 --> 00:03:26,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 91,
+    "text": "우리말로 하면 첨단운전자 보조 시스템이에요",
+    "start_time": 206.3,
+    "end_time": 209.5,
+    "duration": 3.1999999999999886,
+    "timecode": "00:03:26,300 --> 00:03:29,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 92,
+    "text": "쉽게 말해서 자율주행의 기초 기술이에요",
+    "start_time": 209.5,
+    "end_time": 212.34,
+    "duration": 2.8400000000000034,
+    "timecode": "00:03:29,500 --> 00:03:32,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 93,
+    "text": "차선 이탈경고 아시죠?",
+    "start_time": 212.34,
+    "end_time": 213.57999999999998,
+    "duration": 1.2399999999999807,
+    "timecode": "00:03:32,340 --> 00:03:33,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 94,
+    "text": "이게 ADS예요",
+    "start_time": 214.07999999999998,
+    "end_time": 215.47899999999998,
+    "duration": 1.399000000000001,
+    "timecode": "00:03:34,079 --> 00:03:35,478",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 95,
+    "text": "앞차랑 거리 유지해주는 스마트 크루즈",
+    "start_time": 215.47899999999998,
+    "end_time": 217.62,
+    "duration": 2.1410000000000196,
+    "timecode": "00:03:35,478 --> 00:03:37,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 96,
+    "text": "이것도 ADS예요",
+    "start_time": 217.62,
+    "end_time": 219.41899999999998,
+    "duration": 1.7989999999999782,
+    "timecode": "00:03:37,620 --> 00:03:39,418",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 97,
+    "text": "금브레이크 자동으로 밟아주는 거",
+    "start_time": 219.41899999999998,
+    "end_time": 221.439,
+    "duration": 2.0200000000000102,
+    "timecode": "00:03:39,418 --> 00:03:41,438",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 98,
+    "text": "ZF는 이 분야에서 레이더, 카메라, 고성능, 컴퓨팅 솔루션을 다 갖고 있었어요",
+    "start_time": 222.96,
+    "end_time": 227.639,
+    "duration": 4.679000000000002,
+    "timecode": "00:03:42,960 --> 00:03:47,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 99,
+    "text": "자, 그럼요",
+    "start_time": 227.639,
+    "end_time": 228.639,
+    "duration": 1.0,
+    "timecode": "00:03:47,639 --> 00:03:48,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 100,
+    "text": "이게 하만이랑 합쳐지면 어떻게 되냐",
+    "start_time": 228.639,
+    "end_time": 230.879,
+    "duration": 2.2399999999999807,
+    "timecode": "00:03:48,639 --> 00:03:50,878",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 101,
+    "text": "이게 진짜 핵심이에요",
+    "start_time": 230.879,
+    "end_time": 232.28,
+    "duration": 1.4010000000000105,
+    "timecode": "00:03:50,878 --> 00:03:52,280",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 102,
+    "text": "집중하셔야 해요",
+    "start_time": 232.28,
+    "end_time": 233.36,
+    "duration": 1.0800000000000125,
+    "timecode": "00:03:52,280 --> 00:03:53,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 103,
+    "text": "하만은 차 안쪽을 봐요",
+    "start_time": 233.36,
+    "end_time": 234.639,
+    "duration": 1.2789999999999964,
+    "timecode": "00:03:53,360 --> 00:03:54,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 104,
+    "text": "운전자를 본다고요",
+    "start_time": 235.159,
+    "end_time": 236.4,
+    "duration": 1.2410000000000139,
+    "timecode": "00:03:55,158 --> 00:03:56,400",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 105,
+    "text": "운전자가 졸린지, 집중하는지, 스트레스 받는지 감지해요",
+    "start_time": 236.4,
+    "end_time": 240.219,
+    "duration": 3.8189999999999884,
+    "timecode": "00:03:56,400 --> 00:04:00,218",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 106,
+    "text": "이걸 레디캐라는 시스템으로 하거든요",
+    "start_time": 240.219,
+    "end_time": 242.56,
+    "duration": 2.341000000000008,
+    "timecode": "00:04:00,218 --> 00:04:02,560",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 107,
+    "text": "ZF는 차 바깥쪽을 봐요",
+    "start_time": 243.08,
+    "end_time": 244.62,
+    "duration": 1.539999999999992,
+    "timecode": "00:04:03,080 --> 00:04:04,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 108,
+    "text": "도로를 본다고요",
+    "start_time": 244.62,
+    "end_time": 246.36,
+    "duration": 1.740000000000009,
+    "timecode": "00:04:04,620 --> 00:04:06,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 109,
+    "text": "앞에 차가 있는지, 보행자가 있는지, 신호등이 뭔지 감지해요",
+    "start_time": 246.36,
+    "end_time": 249.9,
+    "duration": 3.539999999999992,
+    "timecode": "00:04:06,360 --> 00:04:09,900",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 110,
+    "text": "이 두 개가 합쳐지면요",
+    "start_time": 249.9,
+    "end_time": 251.539,
+    "duration": 1.6389999999999816,
+    "timecode": "00:04:09,900 --> 00:04:11,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 111,
+    "text": "차가 안과 밖을 동시에 보는 거예요",
+    "start_time": 251.539,
+    "end_time": 253.639,
+    "duration": 2.1000000000000227,
+    "timecode": "00:04:11,538 --> 00:04:13,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 112,
+    "text": "예를 들어 볼게요",
+    "start_time": 253.639,
+    "end_time": 254.419,
+    "duration": 0.7800000000000011,
+    "timecode": "00:04:13,639 --> 00:04:14,419",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 113,
+    "text": "네, ZF레이더가 앞에 복잡한 교통 상황을 감지해요",
+    "start_time": 254.75900000000001,
+    "end_time": 258.56,
+    "duration": 3.8009999999999877,
+    "timecode": "00:04:14,759 --> 00:04:18,560",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 114,
+    "text": "동시에 하만, 카메라가 운전자가 피곤한 상태인 걸 감지해요",
+    "start_time": 258.56,
+    "end_time": 262.06,
+    "duration": 3.5,
+    "timecode": "00:04:18,560 --> 00:04:22,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 115,
+    "text": "그러면 시스템이 자동으로 뭘 하냐면요",
+    "start_time": 262.06,
+    "end_time": 264.66,
+    "duration": 2.6000000000000227,
+    "timecode": "00:04:22,060 --> 00:04:24,660",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 116,
+    "text": "음악 볼륨을 낮추고 실내 조명을 밝게 하고",
+    "start_time": 264.66,
+    "end_time": 267.699,
+    "duration": 3.0389999999999873,
+    "timecode": "00:04:24,660 --> 00:04:27,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 117,
+    "text": "자율주행 보조 기능을 더 강하게 개입시켜요",
+    "start_time": 267.699,
+    "end_time": 270.6,
+    "duration": 2.9010000000000105,
+    "timecode": "00:04:27,699 --> 00:04:30,600",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 118,
+    "text": "사고를 미리 막는 거예요",
+    "start_time": 270.6,
+    "end_time": 271.779,
+    "duration": 1.1789999999999736,
+    "timecode": "00:04:30,600 --> 00:04:31,778",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 119,
+    "text": "이게 왜 대단하냐면요",
+    "start_time": 271.779,
+    "end_time": 273.259,
+    "duration": 1.4800000000000182,
+    "timecode": "00:04:31,778 --> 00:04:33,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 120,
+    "text": "지금까지 자동차 회사들은 이걸 따로따로 사왔어요",
+    "start_time": 273.259,
+    "end_time": 276.22,
+    "duration": 2.9610000000000127,
+    "timecode": "00:04:33,259 --> 00:04:36,220",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 121,
+    "text": "콕핏 시스템은 A 회사한테",
+    "start_time": 276.22,
+    "end_time": 278.439,
+    "duration": 2.218999999999994,
+    "timecode": "00:04:36,220 --> 00:04:38,439",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 122,
+    "text": "ADADS는 B 회사한테",
+    "start_time": 278.439,
+    "end_time": 280.519,
+    "duration": 2.079999999999984,
+    "timecode": "00:04:38,439 --> 00:04:40,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 123,
+    "text": "그리고 이걸 통합하는 게 엄청 어려웠거든요",
+    "start_time": 280.519,
+    "end_time": 282.959,
+    "duration": 2.4399999999999977,
+    "timecode": "00:04:40,519 --> 00:04:42,959",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 124,
+    "text": "근데 하만 JP가 합쳐지면요",
+    "start_time": 282.959,
+    "end_time": 284.899,
+    "duration": 1.9399999999999977,
+    "timecode": "00:04:42,959 --> 00:04:44,899",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 125,
+    "text": "한 번에 다 해결이 돼요",
+    "start_time": 284.899,
+    "end_time": 286.24,
+    "duration": 1.3410000000000082,
+    "timecode": "00:04:44,899 --> 00:04:46,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 126,
+    "text": "자, 자동차 회사 입장에서는 엄청 편해지는 거죠",
+    "start_time": 286.24,
+    "end_time": 288.74,
+    "duration": 2.5,
+    "timecode": "00:04:46,240 --> 00:04:48,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 127,
+    "text": "개발기간도 줄고, 비용도 줄고",
+    "start_time": 289.36,
+    "end_time": 291.62,
+    "duration": 2.259999999999991,
+    "timecode": "00:04:49,360 --> 00:04:51,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 128,
+    "text": "그래서 이번 인수가 완료되면요",
+    "start_time": 291.62,
+    "end_time": 293.939,
+    "duration": 2.319000000000017,
+    "timecode": "00:04:51,620 --> 00:04:53,939",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 129,
+    "text": "하만 매출이 70억 달러에서",
+    "start_time": 293.939,
+    "end_time": 295.699,
+    "duration": 1.759999999999991,
+    "timecode": "00:04:53,939 --> 00:04:55,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 130,
+    "text": "110억 달러 이상으로 뛰어요",
+    "start_time": 295.699,
+    "end_time": 297.62,
+    "duration": 1.9209999999999923,
+    "timecode": "00:04:55,699 --> 00:04:57,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 131,
+    "text": "우리 돈으로 9조 원에서 14조 원으로 늘어나는 거예요",
+    "start_time": 297.62,
+    "end_time": 300.54,
+    "duration": 2.920000000000016,
+    "timecode": "00:04:57,620 --> 00:05:00,540",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 132,
+    "text": "근데 여기서 끝이 아니에요",
+    "start_time": 300.54,
+    "end_time": 302.3,
+    "duration": 1.759999999999991,
+    "timecode": "00:05:00,540 --> 00:05:02,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 133,
+    "text": "이게 다가 아닙니다",
+    "start_time": 302.3,
+    "end_time": 303.54,
+    "duration": 1.240000000000009,
+    "timecode": "00:05:02,300 --> 00:05:03,540",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 134,
+    "text": "진짜 이야기는 지금부터예요",
+    "start_time": 303.54,
+    "end_time": 305.06,
+    "duration": 1.5199999999999818,
+    "timecode": "00:05:03,540 --> 00:05:05,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 135,
+    "text": "삼성이 자동차 분야에서",
+    "start_time": 305.06,
+    "end_time": 306.379,
+    "duration": 1.3190000000000168,
+    "timecode": "00:05:05,060 --> 00:05:06,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 136,
+    "text": "뭘 더 하고 있는지 아시면요",
+    "start_time": 306.379,
+    "end_time": 308.48,
+    "duration": 2.100999999999999,
+    "timecode": "00:05:06,379 --> 00:05:08,480",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 137,
+    "text": "진짜 소름돋을 거예요",
+    "start_time": 308.48,
+    "end_time": 309.699,
+    "duration": 1.218999999999994,
+    "timecode": "00:05:08,480 --> 00:05:09,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 138,
+    "text": "자, 지금까지 얘기 들으시면",
+    "start_time": 309.699,
+    "end_time": 311.779,
+    "duration": 2.079999999999984,
+    "timecode": "00:05:09,699 --> 00:05:11,778",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 139,
+    "text": "삼성이 완전 승승장구하는 것 같죠?",
+    "start_time": 312.22,
+    "end_time": 314.399,
+    "duration": 2.1789999999999736,
+    "timecode": "00:05:12,220 --> 00:05:14,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 140,
+    "text": "근데요, 현실은 그렇게 녹록하지 않아요",
+    "start_time": 314.819,
+    "end_time": 317.1,
+    "duration": 2.281000000000006,
+    "timecode": "00:05:14,819 --> 00:05:17,100",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 141,
+    "text": "사실 삼성 내부에서도 엄청난 갈등과 도전이 있었거든요",
+    "start_time": 317.319,
+    "end_time": 320.899,
+    "duration": 3.579999999999984,
+    "timecode": "00:05:17,319 --> 00:05:20,899",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 142,
+    "text": "2025년 말에 무슨 일이 있었냐면요",
+    "start_time": 321.54,
+    "end_time": 323.959,
+    "duration": 2.4189999999999827,
+    "timecode": "00:05:21,540 --> 00:05:23,959",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 143,
+    "text": "삼성전자 시스템 LSI 사업부에서",
+    "start_time": 323.959,
+    "end_time": 326.279,
+    "duration": 2.319999999999993,
+    "timecode": "00:05:23,959 --> 00:05:26,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 144,
+    "text": "엑시노스 오토 개발팀이 축소됐다는 소문이 퍼졌어요",
+    "start_time": 326.279,
+    "end_time": 329.879,
+    "duration": 3.6000000000000227,
+    "timecode": "00:05:26,278 --> 00:05:29,879",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 145,
+    "text": "엑시노스 오토가 뭐냐면요",
+    "start_time": 330.48,
+    "end_time": 331.98,
+    "duration": 1.5,
+    "timecode": "00:05:30,480 --> 00:05:31,980",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 146,
+    "text": "삼성이 만드는 자동차용 반도체예요",
+    "start_time": 331.98,
+    "end_time": 334.439,
+    "duration": 2.459000000000003,
+    "timecode": "00:05:31,980 --> 00:05:34,439",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 147,
+    "text": "근데 이 팀이 AI 조직으로 흡수됐다라는 거예요",
+    "start_time": 334.439,
+    "end_time": 337.5,
+    "duration": 3.0609999999999786,
+    "timecode": "00:05:34,439 --> 00:05:37,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 148,
+    "text": "자, 업계에서는 삼성이 자동차 반도체 접는 거 아니냐",
+    "start_time": 337.68,
+    "end_time": 340.819,
+    "duration": 3.13900000000001,
+    "timecode": "00:05:37,680 --> 00:05:40,819",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 149,
+    "text": "이런 말이 돌았어요",
+    "start_time": 340.819,
+    "end_time": 341.639,
+    "duration": 0.8199999999999932,
+    "timecode": "00:05:40,819 --> 00:05:41,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 150,
+    "text": "솔직히 저도 이 부분 조사하면서 좀 당황했어요",
+    "start_time": 341.639,
+    "end_time": 344.339,
+    "duration": 2.6999999999999886,
+    "timecode": "00:05:41,639 --> 00:05:44,338",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 151,
+    "text": "아니, 하만 인수해서 전장사업 키운다면서",
+    "start_time": 344.339,
+    "end_time": 347.42,
+    "duration": 3.0810000000000173,
+    "timecode": "00:05:44,338 --> 00:05:47,420",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 152,
+    "text": "자동차 칩은 왜 축소해?",
+    "start_time": 347.42,
+    "end_time": 349.139,
+    "duration": 1.718999999999994,
+    "timecode": "00:05:47,420 --> 00:05:49,139",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 153,
+    "text": "이게 말이 돼요",
+    "start_time": 349.519,
+    "end_time": 350.199,
+    "duration": 0.6800000000000068,
+    "timecode": "00:05:49,519 --> 00:05:50,199",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 154,
+    "text": "근데요, 자세히 들여다보니까 다른 그림이 보이더라고요",
+    "start_time": 350.74,
+    "end_time": 353.639,
+    "duration": 2.899000000000001,
+    "timecode": "00:05:50,740 --> 00:05:53,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 155,
+    "text": "바로 그때 삼성이 BMW랑 대형 계약을 발표했거든요",
+    "start_time": 353.639,
+    "end_time": 357.819,
+    "duration": 4.180000000000007,
+    "timecode": "00:05:53,639 --> 00:05:57,819",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 156,
+    "text": "BMW의 차세대 전기차 플랫폼",
+    "start_time": 357.819,
+    "end_time": 360.06,
+    "duration": 2.2409999999999854,
+    "timecode": "00:05:57,819 --> 00:06:00,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 157,
+    "text": "노이의 클라세 이거 아세요?",
+    "start_time": 360.06,
+    "end_time": 362.079,
+    "duration": 2.0190000000000055,
+    "timecode": "00:06:00,060 --> 00:06:02,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 158,
+    "text": "2025년부터 나오는 BMW의 새로운 전기차 시리즈예요",
+    "start_time": 362.74,
+    "end_time": 366.18,
+    "duration": 3.4399999999999977,
+    "timecode": "00:06:02,740 --> 00:06:06,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 159,
+    "text": "여기에 들어가는 핵심 칩을 삼성이 공급하기로 한 거예요",
+    "start_time": 366.18,
+    "end_time": 369.74,
+    "duration": 3.5600000000000023,
+    "timecode": "00:06:06,180 --> 00:06:09,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 160,
+    "text": "엑시노스 오토, 구이썸 20이라는 칩인데요",
+    "start_time": 369.74,
+    "end_time": 372.8,
+    "duration": 3.0600000000000023,
+    "timecode": "00:06:09,740 --> 00:06:12,800",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 161,
+    "text": "5, 나노 공정으로 만든 고성능 칩이에요",
+    "start_time": 372.8,
+    "end_time": 375.319,
+    "duration": 2.5190000000000055,
+    "timecode": "00:06:12,800 --> 00:06:15,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 162,
+    "text": "BMW IX3",
+    "start_time": 375.319,
+    "end_time": 377.079,
+    "duration": 1.759999999999991,
+    "timecode": "00:06:15,319 --> 00:06:17,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 163,
+    "text": "이게 노이의 클라세의 첫 번째 양산 모델인데요",
+    "start_time": 377.079,
+    "end_time": 379.699,
+    "duration": 2.6200000000000045,
+    "timecode": "00:06:17,079 --> 00:06:19,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 164,
+    "text": "여기에 삼성 칩이 들어가요",
+    "start_time": 379.699,
+    "end_time": 381.699,
+    "duration": 2.0,
+    "timecode": "00:06:19,699 --> 00:06:21,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 165,
+    "text": "그리고 7 시리즈 같은 최상위 모델에는",
+    "start_time": 381.699,
+    "end_time": 384.06,
+    "duration": 2.36099999999999,
+    "timecode": "00:06:21,699 --> 00:06:24,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 166,
+    "text": "더 강력한 B920이 들어갈 거라는 얘기도 있어요",
+    "start_time": 384.06,
+    "end_time": 386.939,
+    "duration": 2.879000000000019,
+    "timecode": "00:06:24,060 --> 00:06:26,939",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 167,
+    "text": "자, 그러면 아까 그 철수설은 뭐냐?",
+    "start_time": 386.939,
+    "end_time": 388.959,
+    "duration": 2.019999999999982,
+    "timecode": "00:06:26,939 --> 00:06:28,959",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 168,
+    "text": "제가 분석해보니까요",
+    "start_time": 389.42,
+    "end_time": 390.519,
+    "duration": 1.0989999999999895,
+    "timecode": "00:06:29,420 --> 00:06:30,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 169,
+    "text": "이건 철수가 아니라 전략적 선택과 집중이에요",
+    "start_time": 390.519,
+    "end_time": 393.459,
+    "duration": 2.9399999999999977,
+    "timecode": "00:06:30,519 --> 00:06:33,459",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 170,
+    "text": "삼성이 뭘 한 거냐면요",
+    "start_time": 393.459,
+    "end_time": 395.339,
+    "duration": 1.8799999999999955,
+    "timecode": "00:06:33,459 --> 00:06:35,338",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 171,
+    "text": "그냥 아무나 쓸 수 있는 범용 칩 만드는 건 그만둔 거예요",
+    "start_time": 395.339,
+    "end_time": 398.459,
+    "duration": 3.1200000000000045,
+    "timecode": "00:06:35,338 --> 00:06:38,459",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 172,
+    "text": "대신 BMW, 테슬라, 현대차 같은 대형 고객한테",
+    "start_time": 398.98,
+    "end_time": 403.12,
+    "duration": 4.139999999999986,
+    "timecode": "00:06:38,980 --> 00:06:43,120",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 173,
+    "text": "맞춤형으로 만들어주는 칩에 집중하기로 한 거죠",
+    "start_time": 403.12,
+    "end_time": 406.399,
+    "duration": 3.2789999999999964,
+    "timecode": "00:06:43,120 --> 00:06:46,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 174,
+    "text": "그리고 자율주행의 핵심이 뭐예요? AI잖아요",
+    "start_time": 406.399,
+    "end_time": 409.259,
+    "duration": 2.8600000000000136,
+    "timecode": "00:06:46,399 --> 00:06:49,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 175,
+    "text": "그래서 자동차 칩 조직을 AI 조직이랑 합친 거예요",
+    "start_time": 409.259,
+    "end_time": 412.62,
+    "duration": 3.36099999999999,
+    "timecode": "00:06:49,259 --> 00:06:52,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 176,
+    "text": "사업 포기가 아니라 기술 융합을 위한 재배치였던 거죠",
+    "start_time": 412.62,
+    "end_time": 415.72,
+    "duration": 3.1000000000000227,
+    "timecode": "00:06:52,620 --> 00:06:55,720",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 177,
+    "text": "근데요, 진짜 대박은 테슬라예요",
+    "start_time": 415.72,
+    "end_time": 418.019,
+    "duration": 2.298999999999978,
+    "timecode": "00:06:55,720 --> 00:06:58,019",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 178,
+    "text": "테슬라 자율주행 칩 아시죠?",
+    "start_time": 418.019,
+    "end_time": 419.399,
+    "duration": 1.3799999999999955,
+    "timecode": "00:06:58,019 --> 00:06:59,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 179,
+    "text": "H.O.V.T.O, H.O.V.T.O, 이런 거요?",
+    "start_time": 419.8,
+    "end_time": 422.5,
+    "duration": 2.6999999999999886,
+    "timecode": "00:06:59,800 --> 00:07:02,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 180,
+    "text": "이거 누가 만드는지 아세요? 삼성이에요",
+    "start_time": 422.5,
+    "end_time": 424.56,
+    "duration": 2.0600000000000023,
+    "timecode": "00:07:02,500 --> 00:07:04,560",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 181,
+    "text": "테슬라가 설계하고 삼성 파운드리에서 찍어내는 거예요",
+    "start_time": 425.18,
+    "end_time": 428.079,
+    "duration": 2.899000000000001,
+    "timecode": "00:07:05,180 --> 00:07:08,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 182,
+    "text": "그리고 지금 테슬라가 준비하는 차세대 칩 AI5",
+    "start_time": 428.079,
+    "end_time": 431.579,
+    "duration": 3.5,
+    "timecode": "00:07:08,079 --> 00:07:11,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 183,
+    "text": "이게 기존보다 40배 성능이 올라간다고 하는데요",
+    "start_time": 431.579,
+    "end_time": 434.879,
+    "duration": 3.3000000000000114,
+    "timecode": "00:07:11,579 --> 00:07:14,879",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 184,
+    "text": "이것도 삼성이 만들 가능성이 높아요",
+    "start_time": 434.879,
+    "end_time": 437.5,
+    "duration": 2.620999999999981,
+    "timecode": "00:07:14,879 --> 00:07:17,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 185,
+    "text": "자 정리해 볼게요",
+    "start_time": 437.5,
+    "end_time": 438.36,
+    "duration": 0.8600000000000136,
+    "timecode": "00:07:17,500 --> 00:07:18,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 186,
+    "text": "BMW 전기차 눈에 삼성이 만들어요",
+    "start_time": 438.36,
+    "end_time": 441.62,
+    "duration": 3.259999999999991,
+    "timecode": "00:07:18,360 --> 00:07:21,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 187,
+    "text": "테슬라 자율주행 칩 삼성이 찍어요",
+    "start_time": 441.62,
+    "end_time": 444.339,
+    "duration": 2.718999999999994,
+    "timecode": "00:07:21,620 --> 00:07:24,338",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 188,
+    "text": "자동차 안에 디지털 콕핏 사만히 깔아요",
+    "start_time": 444.339,
+    "end_time": 447.259,
+    "duration": 2.920000000000016,
+    "timecode": "00:07:24,338 --> 00:07:27,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 189,
+    "text": "자동차에 눈? 이제 ZF한테서 가져와요",
+    "start_time": 447.259,
+    "end_time": 450.319,
+    "duration": 3.0600000000000023,
+    "timecode": "00:07:27,259 --> 00:07:30,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 190,
+    "text": "이게 지금 삼성이 그리고 있는 그림이에요",
+    "start_time": 450.319,
+    "end_time": 452.579,
+    "duration": 2.259999999999991,
+    "timecode": "00:07:30,319 --> 00:07:32,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 191,
+    "text": "근데요, 이렇게 좋은 얘기만 있는 건 아니에요",
+    "start_time": 452.579,
+    "end_time": 455.319,
+    "duration": 2.740000000000009,
+    "timecode": "00:07:32,579 --> 00:07:35,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 192,
+    "text": "리스크도 분명히 있거든요",
+    "start_time": 455.319,
+    "end_time": 457.019,
+    "duration": 1.6999999999999886,
+    "timecode": "00:07:35,319 --> 00:07:37,019",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 193,
+    "text": "첫 번째, 문화 충돌이에요",
+    "start_time": 457.399,
+    "end_time": 459.62,
+    "duration": 2.2210000000000036,
+    "timecode": "00:07:37,399 --> 00:07:39,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 194,
+    "text": "ZF는 독일 회사예요",
+    "start_time": 460.22,
+    "end_time": 461.62,
+    "duration": 1.3999999999999773,
+    "timecode": "00:07:40,220 --> 00:07:41,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 195,
+    "text": "100년 넘은 엔지니어링 강자고요",
+    "start_time": 461.62,
+    "end_time": 463.779,
+    "duration": 2.158999999999992,
+    "timecode": "00:07:41,620 --> 00:07:43,778",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 196,
+    "text": "하마는 미국 회사고 삼성은 한국 회사잖아요",
+    "start_time": 464.199,
+    "end_time": 466.86,
+    "duration": 2.6610000000000014,
+    "timecode": "00:07:44,199 --> 00:07:46,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 197,
+    "text": "이 세 가지 문화가 충돌하면 어떻게 될까요?",
+    "start_time": 467.079,
+    "end_time": 469.3,
+    "duration": 2.2210000000000036,
+    "timecode": "00:07:47,079 --> 00:07:49,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 198,
+    "text": "2017년에 하마는 인수했을 때도",
+    "start_time": 470.079,
+    "end_time": 471.939,
+    "duration": 1.8600000000000136,
+    "timecode": "00:07:50,079 --> 00:07:51,939",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 199,
+    "text": "통합하는 데 꽤 진통을 겪었거든요",
+    "start_time": 472.5,
+    "end_time": 474.36,
+    "duration": 1.8600000000000136,
+    "timecode": "00:07:52,500 --> 00:07:54,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 200,
+    "text": "핵심 인력들이 나갈 수도 있고",
+    "start_time": 474.36,
+    "end_time": 476.379,
+    "duration": 2.0190000000000055,
+    "timecode": "00:07:54,360 --> 00:07:56,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 201,
+    "text": "제품 개발이 지연될 수도 있어요",
+    "start_time": 476.379,
+    "end_time": 478.48,
+    "duration": 2.100999999999999,
+    "timecode": "00:07:56,379 --> 00:07:58,480",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 202,
+    "text": "자 두 번째, 경쟁이에요",
+    "start_time": 478.48,
+    "end_time": 480.48,
+    "duration": 2.0,
+    "timecode": "00:07:58,480 --> 00:08:00,480",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 203,
+    "text": "ADADS 시장에서 진짜 강자가 누구냐면요",
+    "start_time": 480.48,
+    "end_time": 483.439,
+    "duration": 2.959000000000003,
+    "timecode": "00:08:00,480 --> 00:08:03,439",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 204,
+    "text": "모비라이예요, 인텔 자회사고요",
+    "start_time": 483.439,
+    "end_time": 485.959,
+    "duration": 2.519999999999982,
+    "timecode": "00:08:03,439 --> 00:08:05,959",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 205,
+    "text": "그리고 보시, 독일에 또 다른 명가죠",
+    "start_time": 486.319,
+    "end_time": 488.86,
+    "duration": 2.540999999999997,
+    "timecode": "00:08:06,319 --> 00:08:08,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 206,
+    "text": "이 회사들이랑 어떻게 싸울 거냐 이거예요",
+    "start_time": 488.86,
+    "end_time": 491.279,
+    "duration": 2.4189999999999827,
+    "timecode": "00:08:08,860 --> 00:08:11,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 207,
+    "text": "세 번째, 지정학적 리스크예요",
+    "start_time": 491.279,
+    "end_time": 493.379,
+    "duration": 2.1000000000000227,
+    "timecode": "00:08:11,278 --> 00:08:13,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 208,
+    "text": "삼성이 중국 시 안에 넨드플래쉬 공장이 있거든요",
+    "start_time": 493.379,
+    "end_time": 496.259,
+    "duration": 2.8799999999999955,
+    "timecode": "00:08:13,379 --> 00:08:16,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 209,
+    "text": "근데 미중 반도체 전쟁 때문에",
+    "start_time": 496.66,
+    "end_time": 498.279,
+    "duration": 1.6189999999999714,
+    "timecode": "00:08:16,660 --> 00:08:18,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 210,
+    "text": "미국이 여기 장비 반입을 제한하고 있어요",
+    "start_time": 498.839,
+    "end_time": 500.819,
+    "duration": 1.9800000000000182,
+    "timecode": "00:08:18,838 --> 00:08:20,819",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 211,
+    "text": "2026년까지는 허가가 났는데",
+    "start_time": 501.939,
+    "end_time": 503.399,
+    "duration": 1.4599999999999795,
+    "timecode": "00:08:21,939 --> 00:08:23,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 212,
+    "text": "그 다음은 어떻게 될지 몰라요",
+    "start_time": 503.399,
+    "end_time": 505.279,
+    "duration": 1.8799999999999955,
+    "timecode": "00:08:23,399 --> 00:08:25,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 213,
+    "text": "중국 전기차 시장이 세계 최대잖아요",
+    "start_time": 505.279,
+    "end_time": 507.319,
+    "duration": 2.0400000000000205,
+    "timecode": "00:08:25,278 --> 00:08:27,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 214,
+    "text": "근데 여기 공급을 못 하게 되면 큰 타격이에요",
+    "start_time": 507.319,
+    "end_time": 510.24,
+    "duration": 2.9209999999999923,
+    "timecode": "00:08:27,319 --> 00:08:30,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 215,
+    "text": "그리고요, 이번 ZF 인수도",
+    "start_time": 510.8,
+    "end_time": 512.5,
+    "duration": 1.6999999999999886,
+    "timecode": "00:08:30,800 --> 00:08:32,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 216,
+    "text": "2026년 하반 기회나 완료돼요",
+    "start_time": 512.5,
+    "end_time": 514.659,
+    "duration": 2.158999999999992,
+    "timecode": "00:08:32,500 --> 00:08:34,658",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 217,
+    "text": "규제 당국 승인 받아야 하거든요",
+    "start_time": 514.659,
+    "end_time": 516.539,
+    "duration": 1.8799999999999955,
+    "timecode": "00:08:34,658 --> 00:08:36,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 218,
+    "text": "그 사이에 시장이 또 어떻게 바뀔지 모르는 거예요",
+    "start_time": 516.82,
+    "end_time": 519.259,
+    "duration": 2.4389999999999645,
+    "timecode": "00:08:36,820 --> 00:08:39,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 219,
+    "text": "자, 지금까지 얘기 종합해 볼게요",
+    "start_time": 519.62,
+    "end_time": 521.7,
+    "duration": 2.080000000000041,
+    "timecode": "00:08:39,620 --> 00:08:41,700",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 220,
+    "text": "삼성이 자동차 분야에서 뭘 갖고 있는지",
+    "start_time": 522.259,
+    "end_time": 524.32,
+    "duration": 2.0610000000000355,
+    "timecode": "00:08:42,259 --> 00:08:44,320",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 221,
+    "text": "한 번 쭉 나열해 볼게요",
+    "start_time": 524.32,
+    "end_time": 525.379,
+    "duration": 1.058999999999969,
+    "timecode": "00:08:44,320 --> 00:08:45,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 222,
+    "text": "첫째, 하반",
+    "start_time": 525.899,
+    "end_time": 526.539,
+    "duration": 0.6399999999999864,
+    "timecode": "00:08:45,899 --> 00:08:46,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 223,
+    "text": "디지털 콕핏의 절대 강자",
+    "start_time": 527.039,
+    "end_time": 528.84,
+    "duration": 1.8010000000000446,
+    "timecode": "00:08:47,038 --> 00:08:48,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 224,
+    "text": "둘째, ZF ADAS",
+    "start_time": 528.84,
+    "end_time": 531.419,
+    "duration": 2.578999999999951,
+    "timecode": "00:08:48,840 --> 00:08:51,418",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 225,
+    "text": "이제 자동차의 눈까지 갖게 된",
+    "start_time": 531.779,
+    "end_time": 533.5,
+    "duration": 1.7210000000000036,
+    "timecode": "00:08:51,778 --> 00:08:53,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 226,
+    "text": "셋째, 삼성 반도체",
+    "start_time": 533.5,
+    "end_time": 535.539,
+    "duration": 2.0389999999999873,
+    "timecode": "00:08:53,500 --> 00:08:55,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 227,
+    "text": "BMW랑 테슬라 칩 만들어줌",
+    "start_time": 535.539,
+    "end_time": 537.82,
+    "duration": 2.2810000000000628,
+    "timecode": "00:08:55,538 --> 00:08:57,820",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 228,
+    "text": "넷째, 삼성 디스플레이",
+    "start_time": 537.82,
+    "end_time": 539.759,
+    "duration": 1.9389999999999645,
+    "timecode": "00:08:57,820 --> 00:08:59,759",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 229,
+    "text": "차량용 OLED 시장 점유율 64%",
+    "start_time": 539.759,
+    "end_time": 542.82,
+    "duration": 3.0610000000000355,
+    "timecode": "00:08:59,759 --> 00:09:02,820",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 230,
+    "text": "다섯째, 삼성 SDI",
+    "start_time": 543.34,
+    "end_time": 545.2,
+    "duration": 1.8600000000000136,
+    "timecode": "00:09:03,340 --> 00:09:05,200",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 231,
+    "text": "배터리 만들, 전고체 배터리",
+    "start_time": 545.2,
+    "end_time": 547.559,
+    "duration": 2.3589999999999236,
+    "timecode": "00:09:05,200 --> 00:09:07,558",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 232,
+    "text": "2027년 양산 목표",
+    "start_time": 547.559,
+    "end_time": 549.179,
+    "duration": 1.6200000000000045,
+    "timecode": "00:09:07,558 --> 00:09:09,178",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 233,
+    "text": "여섯째, 숙지통신",
+    "start_time": 549.179,
+    "end_time": 551.6,
+    "duration": 2.421000000000049,
+    "timecode": "00:09:09,178 --> 00:09:11,600",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 234,
+    "text": "SK텔레콤이랑 같이 개발 중",
+    "start_time": 551.6,
+    "end_time": 553.639,
+    "duration": 2.0389999999999873,
+    "timecode": "00:09:11,600 --> 00:09:13,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 235,
+    "text": "일곱째, 스마트싱스",
+    "start_time": 553.639,
+    "end_time": 555.72,
+    "duration": 2.0810000000000173,
+    "timecode": "00:09:13,639 --> 00:09:15,720",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 236,
+    "text": "집이랑 차를 연결하는 플랫폼",
+    "start_time": 555.72,
+    "end_time": 557.84,
+    "duration": 2.1200000000000045,
+    "timecode": "00:09:15,720 --> 00:09:17,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 237,
+    "text": "이게 다 삼성 거예요",
+    "start_time": 557.84,
+    "end_time": 558.98,
+    "duration": 1.1399999999999864,
+    "timecode": "00:09:17,840 --> 00:09:18,980",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 238,
+    "text": "여러분, 이게 뭘 의미하냐면요",
+    "start_time": 559.379,
+    "end_time": 561.5,
+    "duration": 2.120999999999981,
+    "timecode": "00:09:19,379 --> 00:09:21,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 239,
+    "text": "유럽에서 프리미엄 전기차 한 대가 굴러간다고 생각해 보세요",
+    "start_time": 561.5,
+    "end_time": 564.44,
+    "duration": 2.9400000000000546,
+    "timecode": "00:09:21,500 --> 00:09:24,440",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 240,
+    "text": "이 차가 삼성 SDI 배터리로 달려요",
+    "start_time": 564.44,
+    "end_time": 567.6,
+    "duration": 3.159999999999968,
+    "timecode": "00:09:24,440 --> 00:09:27,600",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 241,
+    "text": "삼성 파운드리에서 만든 칩으로 생각해요",
+    "start_time": 567.6,
+    "end_time": 570.399,
+    "duration": 2.798999999999978,
+    "timecode": "00:09:27,600 --> 00:09:30,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 242,
+    "text": "하만세 F 센서랑 소프트웨어로 도로를 봐요",
+    "start_time": 570.399,
+    "end_time": 573.58,
+    "duration": 3.18100000000004,
+    "timecode": "00:09:30,399 --> 00:09:33,580",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 243,
+    "text": "삼성 디스플레이 OLED 화면으로",
+    "start_time": 573.58,
+    "end_time": 575.759,
+    "duration": 2.1789999999999736,
+    "timecode": "00:09:33,580 --> 00:09:35,759",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 244,
+    "text": "운전자한테 정보를 보여줘요",
+    "start_time": 575.759,
+    "end_time": 577.299,
+    "duration": 1.5399999999999636,
+    "timecode": "00:09:35,759 --> 00:09:37,298",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 245,
+    "text": "삼성 휴우이랑 스마트싱스로 집이랑 연결돼요",
+    "start_time": 577.299,
+    "end_time": 580.779,
+    "duration": 3.480000000000018,
+    "timecode": "00:09:37,298 --> 00:09:40,778",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 246,
+    "text": "자동차 한 대에 삼성이 다 들어가는 거예요",
+    "start_time": 582.519,
+    "end_time": 584.879,
+    "duration": 2.3600000000000136,
+    "timecode": "00:09:42,519 --> 00:09:44,879",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 247,
+    "text": "전문용어로 이걸 수직 계열화라고 하는데요",
+    "start_time": 584.879,
+    "end_time": 587.659,
+    "duration": 2.7799999999999727,
+    "timecode": "00:09:44,879 --> 00:09:47,658",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 248,
+    "text": "쉽게 말하면",
+    "start_time": 587.659,
+    "end_time": 588.899,
+    "duration": 1.240000000000009,
+    "timecode": "00:09:47,658 --> 00:09:48,899",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 249,
+    "text": "자동차 만드는데 필요한 핵심 부품을",
+    "start_time": 589.379,
+    "end_time": 591.539,
+    "duration": 2.159999999999968,
+    "timecode": "00:09:49,379 --> 00:09:51,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 250,
+    "text": "다 자기가 만드는 거예요",
+    "start_time": 591.539,
+    "end_time": 592.679,
+    "duration": 1.1399999999999864,
+    "timecode": "00:09:51,538 --> 00:09:52,678",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 251,
+    "text": "이러면 뭐가 좋으냐",
+    "start_time": 592.679,
+    "end_time": 593.799,
+    "duration": 1.1200000000000045,
+    "timecode": "00:09:52,678 --> 00:09:53,798",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 252,
+    "text": "협상력이 세죠",
+    "start_time": 593.799,
+    "end_time": 595.059,
+    "duration": 1.259999999999991,
+    "timecode": "00:09:53,798 --> 00:09:55,058",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 253,
+    "text": "가격도 조절할 수 있고요",
+    "start_time": 595.059,
+    "end_time": 596.84,
+    "duration": 1.7810000000000628,
+    "timecode": "00:09:55,058 --> 00:09:56,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 254,
+    "text": "한 곳에서 문제가 생겨도",
+    "start_time": 596.84,
+    "end_time": 598.539,
+    "duration": 1.6989999999999554,
+    "timecode": "00:09:56,840 --> 00:09:58,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 255,
+    "text": "다른 데서 커버가 돼요",
+    "start_time": 598.539,
+    "end_time": 599.94,
+    "duration": 1.4010000000000673,
+    "timecode": "00:09:58,538 --> 00:09:59,940",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 256,
+    "text": "그리고 부품들끼리 찰떡같이 연동이 되거든요",
+    "start_time": 600.279,
+    "end_time": 603.62,
+    "duration": 3.341000000000008,
+    "timecode": "00:10:00,278 --> 00:10:03,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 257,
+    "text": "근데 이런 전략을 쓸 수 있는 회사가",
+    "start_time": 603.96,
+    "end_time": 606.639,
+    "duration": 2.6789999999999736,
+    "timecode": "00:10:03,960 --> 00:10:06,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 258,
+    "text": "전 세계 몇 개나 될까요?",
+    "start_time": 606.879,
+    "end_time": 608.2,
+    "duration": 1.3210000000000264,
+    "timecode": "00:10:06,879 --> 00:10:08,200",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 259,
+    "text": "테슬라요",
+    "start_time": 608.879,
+    "end_time": 609.299,
+    "duration": 0.4199999999999591,
+    "timecode": "00:10:08,879 --> 00:10:09,298",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 260,
+    "text": "테슬라도 칩이랑 배터리는 자체 개발하지만",
+    "start_time": 609.86,
+    "end_time": 612.72,
+    "duration": 2.8600000000000136,
+    "timecode": "00:10:09,860 --> 00:10:12,720",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 261,
+    "text": "다른 건 왜 주죠?",
+    "start_time": 612.72,
+    "end_time": 613.74,
+    "duration": 1.0199999999999818,
+    "timecode": "00:10:12,720 --> 00:10:13,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 262,
+    "text": "애플?",
+    "start_time": 613.94,
+    "end_time": 614.679,
+    "duration": 0.738999999999919,
+    "timecode": "00:10:13,940 --> 00:10:14,678",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 263,
+    "text": "애플카는 아직 안 나왔잖아요",
+    "start_time": 614.96,
+    "end_time": 616.58,
+    "duration": 1.6200000000000045,
+    "timecode": "00:10:14,960 --> 00:10:16,580",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 264,
+    "text": "구글?",
+    "start_time": 617.12,
+    "end_time": 617.539,
+    "duration": 0.4189999999999827,
+    "timecode": "00:10:17,120 --> 00:10:17,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 265,
+    "text": "웨이모가 자율주행하지만",
+    "start_time": 618.039,
+    "end_time": 619.46,
+    "duration": 1.4210000000000491,
+    "timecode": "00:10:18,038 --> 00:10:19,460",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 266,
+    "text": "하드웨어는 다 왜 주예요",
+    "start_time": 619.46,
+    "end_time": 621.059,
+    "duration": 1.5989999999999327,
+    "timecode": "00:10:19,460 --> 00:10:21,058",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 267,
+    "text": "삼성만큼 처음부터 끝까지",
+    "start_time": 621.059,
+    "end_time": 623.139,
+    "duration": 2.080000000000041,
+    "timecode": "00:10:21,058 --> 00:10:23,139",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 268,
+    "text": "다 갖고 있는 회사가 없어요",
+    "start_time": 623.139,
+    "end_time": 624.36,
+    "duration": 1.2210000000000036,
+    "timecode": "00:10:23,139 --> 00:10:24,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 269,
+    "text": "이게 삼성의 진짜 경쟁력이에요",
+    "start_time": 624.639,
+    "end_time": 626.539,
+    "duration": 1.8999999999999773,
+    "timecode": "00:10:24,639 --> 00:10:26,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 270,
+    "text": "자 그러면 앞으로 어떻게 될까요?",
+    "start_time": 626.539,
+    "end_time": 628.279,
+    "duration": 1.740000000000009,
+    "timecode": "00:10:26,538 --> 00:10:28,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 271,
+    "text": "시나리오를 세 가지로 나눠볼게요",
+    "start_time": 628.799,
+    "end_time": 630.399,
+    "duration": 1.6000000000000227,
+    "timecode": "00:10:28,798 --> 00:10:30,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 272,
+    "text": "낙관적 시나리오요",
+    "start_time": 630.929,
+    "end_time": 632.22,
+    "duration": 1.2910000000000537,
+    "timecode": "00:10:30,928 --> 00:10:32,220",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 273,
+    "text": "자 ZF 인수가 순조롭게 끝나고",
+    "start_time": 632.22,
+    "end_time": 634.519,
+    "duration": 2.298999999999978,
+    "timecode": "00:10:32,220 --> 00:10:34,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 274,
+    "text": "하만히 ADS 시장에서 빠르게 점유율을 늘려요",
+    "start_time": 634.519,
+    "end_time": 637.399,
+    "duration": 2.8799999999999955,
+    "timecode": "00:10:34,519 --> 00:10:37,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 275,
+    "text": "2027년에 전고체 배터리 상용화되면서",
+    "start_time": 637.899,
+    "end_time": 640.279,
+    "duration": 2.3799999999999955,
+    "timecode": "00:10:37,899 --> 00:10:40,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 276,
+    "text": "삼성 SDI가 프리미엄 전기차 시장 석권해요",
+    "start_time": 640.279,
+    "end_time": 643.279,
+    "duration": 3.0,
+    "timecode": "00:10:40,278 --> 00:10:43,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 277,
+    "text": "삼성이 진짜 모빌리티 아키텍트가 되는 거죠",
+    "start_time": 643.279,
+    "end_time": 645.84,
+    "duration": 2.5610000000000355,
+    "timecode": "00:10:43,278 --> 00:10:45,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 278,
+    "text": "중립적 시나리오요",
+    "start_time": 646.389,
+    "end_time": 647.659,
+    "duration": 1.2699999999999818,
+    "timecode": "00:10:46,389 --> 00:10:47,658",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 279,
+    "text": "통합 과정에서 진통이 있지만",
+    "start_time": 647.659,
+    "end_time": 649.36,
+    "duration": 1.7010000000000218,
+    "timecode": "00:10:47,658 --> 00:10:49,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 280,
+    "text": "어떻게든 해네요",
+    "start_time": 649.36,
+    "end_time": 650.539,
+    "duration": 1.1789999999999736,
+    "timecode": "00:10:49,360 --> 00:10:50,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 281,
+    "text": "시장 점유율은 천천히 늘어나고",
+    "start_time": 650.87,
+    "end_time": 652.879,
+    "duration": 2.0090000000000146,
+    "timecode": "00:10:50,870 --> 00:10:52,879",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 282,
+    "text": "기존 강자들이랑 경쟁하면서",
+    "start_time": 652.879,
+    "end_time": 654.74,
+    "duration": 1.86099999999999,
+    "timecode": "00:10:52,879 --> 00:10:54,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 283,
+    "text": "2등 그룹으로 자리잡아요",
+    "start_time": 654.74,
+    "end_time": 656.799,
+    "duration": 2.058999999999969,
+    "timecode": "00:10:54,740 --> 00:10:56,798",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 284,
+    "text": "자 비관적 시나리오요",
+    "start_time": 656.799,
+    "end_time": 658.139,
+    "duration": 1.3400000000000318,
+    "timecode": "00:10:56,798 --> 00:10:58,139",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 285,
+    "text": "문화 충돌이 심해서",
+    "start_time": 658.139,
+    "end_time": 659.659,
+    "duration": 1.5199999999999818,
+    "timecode": "00:10:58,139 --> 00:10:59,658",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 286,
+    "text": "핵심 인력들이 다 빠져나가요",
+    "start_time": 659.659,
+    "end_time": 661.22,
+    "duration": 1.5610000000000355,
+    "timecode": "00:10:59,658 --> 00:11:01,220",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 287,
+    "text": "자 퀄컴이나 모비라이가 시장을 다 가져가고",
+    "start_time": 661.22,
+    "end_time": 664.419,
+    "duration": 3.1989999999999554,
+    "timecode": "00:11:01,220 --> 00:11:04,418",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 288,
+    "text": "삼성은 부품 공급사로 남아요",
+    "start_time": 664.419,
+    "end_time": 666.139,
+    "duration": 1.7200000000000273,
+    "timecode": "00:11:04,418 --> 00:11:06,139",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 289,
+    "text": "저요?",
+    "start_time": 666.139,
+    "end_time": 667.2,
+    "duration": 1.0610000000000355,
+    "timecode": "00:11:06,139 --> 00:11:07,200",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 290,
+    "text": "개인적으로는 중간쯤 될 것 같아요",
+    "start_time": 667.299,
+    "end_time": 669.0,
+    "duration": 1.7010000000000218,
+    "timecode": "00:11:07,298 --> 00:11:09,000",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 291,
+    "text": "삼성이 실행력 하나는 끝내주잖아요",
+    "start_time": 669.529,
+    "end_time": 671.379,
+    "duration": 1.8500000000000227,
+    "timecode": "00:11:09,528 --> 00:11:11,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 292,
+    "text": "근데 자동차 산업이 워낙 보수적이라서요",
+    "start_time": 671.379,
+    "end_time": 673.98,
+    "duration": 2.600999999999999,
+    "timecode": "00:11:11,379 --> 00:11:13,980",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 293,
+    "text": "시간이 좀 걸릴 거예요",
+    "start_time": 673.98,
+    "end_time": 675.139,
+    "duration": 1.1589999999999918,
+    "timecode": "00:11:13,980 --> 00:11:15,139",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 294,
+    "text": "하지만요",
+    "start_time": 675.86,
+    "end_time": 676.379,
+    "duration": 0.5190000000000055,
+    "timecode": "00:11:15,860 --> 00:11:16,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 295,
+    "text": "방향성은 확실해요",
+    "start_time": 676.379,
+    "end_time": 677.899,
+    "duration": 1.5199999999999818,
+    "timecode": "00:11:16,379 --> 00:11:17,899",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 296,
+    "text": "삼성은 이제 가전회사가 아니에요",
+    "start_time": 677.899,
+    "end_time": 679.779,
+    "duration": 1.8799999999999955,
+    "timecode": "00:11:17,899 --> 00:11:19,778",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 297,
+    "text": "바퀴 달린 컴퓨터를 만드는 회사로",
+    "start_time": 680.25,
+    "end_time": 682.399,
+    "duration": 2.149000000000001,
+    "timecode": "00:11:20,250 --> 00:11:22,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 298,
+    "text": "바뀌고 있는 거예요",
+    "start_time": 682.399,
+    "end_time": 683.559,
+    "duration": 1.1599999999999682,
+    "timecode": "00:11:22,399 --> 00:11:23,558",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 299,
+    "text": "자 오늘 얘기 정리해 볼게요",
+    "start_time": 683.82,
+    "end_time": 685.299,
+    "duration": 1.4789999999999281,
+    "timecode": "00:11:23,820 --> 00:11:25,298",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 300,
+    "text": "삼성이 2조 원 들여서",
+    "start_time": 685.899,
+    "end_time": 687.34,
+    "duration": 1.441000000000031,
+    "timecode": "00:11:25,899 --> 00:11:27,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 301,
+    "text": "ZF-AIS 사업부를 사는 건요",
+    "start_time": 687.34,
+    "end_time": 689.46,
+    "duration": 2.1200000000000045,
+    "timecode": "00:11:27,340 --> 00:11:29,460",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 302,
+    "text": "단순히 회사 하나 인수하는 게 아니에요",
+    "start_time": 689.46,
+    "end_time": 691.539,
+    "duration": 2.078999999999951,
+    "timecode": "00:11:29,460 --> 00:11:31,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 303,
+    "text": "삼성이 자동차의 미래를 통째로 삼키겠다는 선언이에요",
+    "start_time": 692.139,
+    "end_time": 694.919,
+    "duration": 2.7799999999999727,
+    "timecode": "00:11:32,139 --> 00:11:34,918",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 304,
+    "text": "배터리, 반도체, 센서, 디스플레이, 통신",
+    "start_time": 695.48,
+    "end_time": 698.759,
+    "duration": 3.2789999999999964,
+    "timecode": "00:11:35,480 --> 00:11:38,759",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 305,
+    "text": "자동차를 구성하는 모든 핵심 기술을 다 갖춘 회사",
+    "start_time": 699.32,
+    "end_time": 702.24,
+    "duration": 2.919999999999959,
+    "timecode": "00:11:39,320 --> 00:11:42,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 306,
+    "text": "그게 삼성이 되고 싶은 모습이에요",
+    "start_time": 702.24,
+    "end_time": 704.08,
+    "duration": 1.8400000000000318,
+    "timecode": "00:11:42,240 --> 00:11:44,080",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 307,
+    "text": "결국 이 이야기는요",
+    "start_time": 704.08,
+    "end_time": 705.82,
+    "duration": 1.740000000000009,
+    "timecode": "00:11:44,080 --> 00:11:45,820",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 308,
+    "text": "기술 회사가 어디까지 확장할 수 있는가에 대한 이야기이기도 해요",
+    "start_time": 705.82,
+    "end_time": 709.6,
+    "duration": 3.7799999999999727,
+    "timecode": "00:11:45,820 --> 00:11:49,600",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 309,
+    "text": "스마트폰 만들던 회사가",
+    "start_time": 710.2,
+    "end_time": 711.46,
+    "duration": 1.259999999999991,
+    "timecode": "00:11:50,200 --> 00:11:51,460",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 310,
+    "text": "자동차 눈애를 만들고",
+    "start_time": 711.46,
+    "end_time": 713.7,
+    "duration": 2.240000000000009,
+    "timecode": "00:11:51,460 --> 00:11:53,700",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 311,
+    "text": "TV 만들던 회사가 자동차 눈을 장악하는 세상",
+    "start_time": 713.7,
+    "end_time": 717.039,
+    "duration": 3.338999999999942,
+    "timecode": "00:11:53,700 --> 00:11:57,038",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 312,
+    "text": "여러분은 어떻게 생각하세요?",
+    "start_time": 717.58,
+    "end_time": 718.86,
+    "duration": 1.2799999999999727,
+    "timecode": "00:11:57,580 --> 00:11:58,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 313,
+    "text": "삼성이 거대한 도박에서 성공할 수 있을까요?",
+    "start_time": 719.34,
+    "end_time": 722.159,
+    "duration": 2.81899999999996,
+    "timecode": "00:11:59,340 --> 00:12:02,158",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 314,
+    "text": "댓글로 의견 남겨주시고요",
+    "start_time": 722.639,
+    "end_time": 724.279,
+    "duration": 1.6399999999999864,
+    "timecode": "00:12:02,639 --> 00:12:04,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 315,
+    "text": "이런 기업 분석 콘텐츠 더 보고 싶으시면",
+    "start_time": 724.279,
+    "end_time": 726.539,
+    "duration": 2.259999999999991,
+    "timecode": "00:12:04,278 --> 00:12:06,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 316,
+    "text": "구독이랑 좋아요 눌러주세요",
+    "start_time": 726.539,
+    "end_time": 728.24,
+    "duration": 1.7010000000000218,
+    "timecode": "00:12:06,538 --> 00:12:08,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 317,
+    "text": "다음에 또 재밌는 얘기로 찾아올게요",
+    "start_time": 728.24,
+    "end_time": 730.179,
+    "duration": 1.9389999999999645,
+    "timecode": "00:12:08,240 --> 00:12:10,178",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 318,
+    "text": "감사합니다",
+    "start_time": 730.48,
+    "end_time": 730.94,
+    "duration": 0.4600000000000364,
+    "timecode": "00:12:10,480 --> 00:12:10,940",
+    "is_recovered": false
+  }
+]

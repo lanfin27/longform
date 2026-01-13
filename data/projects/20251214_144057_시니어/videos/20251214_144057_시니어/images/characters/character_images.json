@@ -53,5 +53,144 @@
     "background": "solid_gray",
     "generation_time": 6.793590545654297,
     "api_provider": "Google ImageFX"
+  },
+  "발표자": {
+    "success": true,
+    "character_name": "발표자",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_pointing_1767696501733.png",
+    "pose": "pointing",
+    "generation_time": 6.787370824813843
+  },
+  "화자": {
+    "success": true,
+    "character_name": "화자",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+    "prompt": "English text and logos are allowed, but absolutely NO Korean text (Hangul), NO Chinese characters, NO Japanese text. Any Asian language text will appear corrupted - avoid completely. Korean webtoon manhwa background illustration, clean bold black outlines on all elements,flat solid color fills with minimal shading, simplified shapes with clear silhouettes, 2D digital illustration style,consistent 2-3px black lineart throughout, Middle-aged person, gender neutral, wearing casual clothes, expressive face, slightly surprised expression., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, Muted desaturated color palette, clean cel-shaded look with minimal gradients, teal-gray and warm beige neutral tones, muted accent colors for focal points,\nSTRICT: If any text appears in the image, it must be in English only. Absolutely no Korean (한글), Chinese (汉字), or Japanese (ひらがな/カタカナ) characters anywhere in the image.",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 9.434894561767578,
+    "api_provider": "Google ImageFX"
+  },
+  "운전자": {
+    "success": true,
+    "character_name": "운전자",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+    "prompt": "English text and logos are allowed, but absolutely NO Korean text (Hangul), NO Chinese characters, NO Japanese text. Any Asian language text will appear corrupted - avoid completely. Korean webtoon manhwa background illustration, clean bold black outlines on all elements,flat solid color fills with minimal shading, simplified shapes with clear silhouettes, 2D digital illustration style,consistent 2-3px black lineart throughout, Generic hands gripping a modern car steering wheel. No specific gender or race implied., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, Muted desaturated color palette, clean cel-shaded look with minimal gradients, teal-gray and warm beige neutral tones, muted accent colors for focal points,\nSTRICT: If any text appears in the image, it must be in English only. Absolutely no Korean (한글), Chinese (汉字), or Japanese (ひらがな/カタカナ) characters anywhere in the image.",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 6.6469011306762695,
+    "api_provider": "Google ImageFX"
+  },
+  "청중 1": {
+    "success": true,
+    "character_name": "청중 1",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_청중_1_standing_1767685243799.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_청중_1_standing_1767685243799.png",
+    "prompt": "English text and logos are allowed, but absolutely NO Korean text (Hangul), NO Chinese characters, NO Japanese text. Any Asian language text will appear corrupted - avoid completely. Korean webtoon manhwa background illustration, clean bold black outlines on all elements,flat solid color fills with minimal shading, simplified shapes with clear silhouettes, 2D digital illustration style,consistent 2-3px black lineart throughout, Middle-aged woman, wearing a business casual outfit, thoughtful expression., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, Muted desaturated color palette, clean cel-shaded look with minimal gradients, teal-gray and warm beige neutral tones, muted accent colors for focal points,\nSTRICT: If any text appears in the image, it must be in English only. Absolutely no Korean (한글), Chinese (汉字), or Japanese (ひらがな/カタカナ) characters anywhere in the image.",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 7.833892345428467,
+    "api_provider": "Google ImageFX"
+  },
+  "내레이터": {
+    "success": true,
+    "character_name": "내레이터",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_내레이터_standing_1767685247857.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_내레이터_standing_1767685247857.png",
+    "prompt": "English text and logos are allowed, but absolutely NO Korean text (Hangul), NO Chinese characters, NO Japanese text. Any Asian language text will appear corrupted - avoid completely. Korean webtoon manhwa background illustration, clean bold black outlines on all elements,flat solid color fills with minimal shading, simplified shapes with clear silhouettes, 2D digital illustration style,consistent 2-3px black lineart throughout, Voice only, not visible., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, Muted desaturated color palette, clean cel-shaded look with minimal gradients, teal-gray and warm beige neutral tones, muted accent colors for focal points,\nSTRICT: If any text appears in the image, it must be in English only. Absolutely no Korean (한글), Chinese (汉字), or Japanese (ひらがな/カタカナ) characters anywhere in the image.",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 6.655494689941406,
+    "api_provider": "Google ImageFX"
+  },
+  "ZF 직원": {
+    "success": true,
+    "character_name": "ZF 직원",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_ZF_직원_standing_1767685256788.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_ZF_직원_standing_1767685256788.png",
+    "prompt": "English text and logos are allowed, but absolutely NO Korean text (Hangul), NO Chinese characters, NO Japanese text. Any Asian language text will appear corrupted - avoid completely. Korean webtoon manhwa background illustration, clean bold black outlines on all elements,flat solid color fills with minimal shading, simplified shapes with clear silhouettes, 2D digital illustration style,consistent 2-3px black lineart throughout, Worried-looking ZF employee, holding a box with personal belongings., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, Muted desaturated color palette, clean cel-shaded look with minimal gradients, teal-gray and warm beige neutral tones, muted accent colors for focal points,\nSTRICT: If any text appears in the image, it must be in English only. Absolutely no Korean (한글), Chinese (汉字), or Japanese (ひらがな/カタカナ) characters anywhere in the image.",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 10.487154245376587,
+    "api_provider": "Google ImageFX"
+  },
+  "ZF 대표": {
+    "success": true,
+    "character_name": "ZF 대표",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_ZF_대표_standing_1767685259074.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_ZF_대표_standing_1767685259074.png",
+    "prompt": "English text and logos are allowed, but absolutely NO Korean text (Hangul), NO Chinese characters, NO Japanese text. Any Asian language text will appear corrupted - avoid completely. Korean webtoon manhwa background illustration, clean bold black outlines on all elements,flat solid color fills with minimal shading, simplified shapes with clear silhouettes, 2D digital illustration style,consistent 2-3px black lineart throughout, Middle-aged man, wearing a suit, standing in front of a screen displaying ZF technology, confident and knowledgeable expression., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, Muted desaturated color palette, clean cel-shaded look with minimal gradients, teal-gray and warm beige neutral tones, muted accent colors for focal points,\nSTRICT: If any text appears in the image, it must be in English only. Absolutely no Korean (한글), Chinese (汉字), or Japanese (ひらがな/カタカナ) characters anywhere in the image.",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 8.2161545753479,
+    "api_provider": "Google ImageFX"
+  },
+  "조수석 탑승자": {
+    "success": true,
+    "character_name": "조수석 탑승자",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_조수석_탑승자_standing_1767687555248.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_조수석_탑승자_standing_1767687555248.png",
+    "prompt": "animation style character,, Middle-aged woman, slight smile, wearing a seatbelt., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 9.94217824935913,
+    "api_provider": "Google ImageFX"
+  },
+  "임원/직원": {
+    "success": true,
+    "character_name": "임원/직원",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_임원_직원_standing_1767687558710.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_임원_직원_standing_1767687558710.png",
+    "prompt": "animation style character,, Middle-aged person, wearing business attire, stressed expression, sitting at a messy desk., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 12.903522968292236,
+    "api_provider": "Google ImageFX"
+  },
+  "또 다른 삼성 임원": {
+    "success": true,
+    "character_name": "또 다른 삼성 임원",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_또_다른_삼성_임원_standing_1767687567754.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_또_다른_삼성_임원_standing_1767687567754.png",
+    "prompt": "animation style character,, Middle-aged Korean woman, wearing a business suit, concerned expression, looking down at the table., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 11.505141973495483,
+    "api_provider": "Google ImageFX"
+  },
+  "미래 도시 시민": {
+    "success": true,
+    "character_name": "미래 도시 시민",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_미래_도시_시민_standing_1767687576119.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_미래_도시_시민_standing_1767687576119.png",
+    "prompt": "animation style character,, Young adult, wearing futuristic clothing, looking up at the cityscape with a sense of wonder., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 15.908002376556396,
+    "api_provider": "Google ImageFX"
+  },
+  "뉴스 읽는 사람": {
+    "success": true,
+    "character_name": "뉴스 읽는 사람",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_뉴스_읽는_사람_standing_1767687582709.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_뉴스_읽는_사람_standing_1767687582709.png",
+    "prompt": "animation style character,, Middle-aged Korean man, wearing glasses, reading a news article on a computer screen, with a worried expression., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 12.953109741210938,
+    "api_provider": "Google ImageFX"
+  },
+  "여성": {
+    "success": true,
+    "character_name": "여성",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_여성_standing_1767687585295.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_여성_standing_1767687585295.png",
+    "prompt": "animation style character,, A woman in her 30s, wearing glasses, neatly dressed in business casual attire, with a surprised and slightly shocked expression, holding investigation documents., full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 6.675052881240845,
+    "api_provider": "Google ImageFX"
   }
 }

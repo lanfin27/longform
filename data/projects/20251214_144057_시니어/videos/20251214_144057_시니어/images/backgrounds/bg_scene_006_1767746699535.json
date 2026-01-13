@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-07T09:44:59.535994",
+  "image_file": "bg_scene_006_1767746699535.png",
+  "scene_id": 6,
+  "prompts": {
+    "original": "News screen capture with headlines about Samsung Electronics' acquisition of ZF's autonomous driving division. Includes the Samsung Electronics logo, Harman logo, and ZF logo, along with an image of a self-driving car. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "Webtoon comic art style, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, 2D digital comic aesthetic, solid color fills without texture, crisp vector-like lineart, stylized character designs, completely text-free artwork, no speech bubbles no sound effects no signatures anywhere, News screen capture with headlines about Samsung Electronics' acquisition of ZF's autonomous driving division. Includes the Samsung Electronics logo, Harman logo, and ZF logo, along with an image of a self-driving car. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot",
+    "negative": ""
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "Webtoon comic art style, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, 2D digital comic aesthetic, solid color fills without texture, crisp vector-like lineart, stylized character designs, completely text-free artwork, no speech bubbles no sound effects no signatures anywhere,",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

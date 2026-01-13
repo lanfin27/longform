@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-07T09:38:51.652582",
+  "image_file": "bg_scene_006_1767746331651.png",
+  "scene_id": 6,
+  "prompts": {
+    "original": "News screen capture with headlines about Samsung Electronics' acquisition of ZF's autonomous driving division. Includes the Samsung Electronics logo, Harman logo, and ZF logo, along with an image of a self-driving car. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "2D animation visual style, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, stylized character visuals, clean commercial graphics aesthetic, pristine corners without any marks or signatures, News screen capture with headlines about Samsung Electronics' acquisition of ZF's autonomous driving division. Includes the Samsung Electronics logo, Harman logo, and ZF logo, along with an image of a self-driving car. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot, Muted desaturated color palette, clean cel-shaded look with minimal gradients,\nteal-gray and warm beige neutral tones, muted accent colors for focal points,\nsimple solid light gray background, clean background without text or watermarks,\nno speech bubbles, no dialogue boxes, no thought bubbles, no caption boxes,\nno signature, no watermark, no corner text, clean corners, empty corners,\npristine image edges, no artist marks, unsigned artwork,\nno text of any kind, no logos, no brand names, no labels on products,\nblank screens on devices, generic unbranded products, text-free design. absolutely clean corners, no corner watermarks, no corner signatures, no artist signatures, no copyright marks, pristine image edges, completely unmarked borders,",
+    "negative": "artist signature, corner signature, watermark in corner, copyright mark, artist mark, signature text, handwritten name, creator signature, illustrator signature, bottom right signature, bottom left signature, corner text, corner watermark,, any text, any letters, any words, any numbers, any symbols, any labels,\nany watermarks, any logos, any signs, any writing of any kind,\nKorean text, Chinese text, Japanese text, English text, all text,\ntext overlay, text in image, visible text, readable text, no outlines, missing lineart, gradient only no lines,\nrealistic photograph, 3D render,\npainterly watercolor, sketchy rough lines,\ncomplex cluttered details, bright saturated colors,\nKorean text, Hangul, Korean characters, Korean letters, Korean writing, Korean labels,\nChinese text, Chinese characters, Hanzi, simplified Chinese, traditional Chinese,\nJapanese text, Hiragana, Katakana, Kanji, Japanese characters,\nAsian text, Asian characters, Asian writing, non-English text,\ncorrupted text, garbled text, distorted text, unreadable Asian text,\nphotorealistic, soft shading, blurry line,\nspeech bubble, speech balloon, dialogue bubble, word balloon, text balloon,\nthought bubble, caption box, narration box, comic speech, manga speech,\ntalk bubble, speaking bubble, conversation bubble,\nonomatopoeia, sound effects text, sfx text,\nsubtitles, captions, title text, credits,\nsignature, artist signature, corner signature, handwritten signature,\ncopyright symbol, © mark, artist name, creator mark,\nbrand name, brand logo, product label, clothing text, text on objects"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, stylized character visuals, clean commercial graphics aesthetic, pristine corners without any marks or signatures,",
+    "suffix": "Muted desaturated color palette, clean cel-shaded look with minimal gradients,\nteal-gray and warm beige neutral tones, muted accent colors for focal points,\nsimple solid light gray background, clean background without text or watermarks,\nno speech bubbles, no dialogue boxes, no thought bubbles, no caption boxes,\nno signature, no watermark, no corner text, clean corners, empty corners,\npristine image edges, no artist marks, unsigned artwork,\nno text of any kind, no logos, no brand names, no labels on products,\nblank screens on devices, generic unbranded products, text-free design. absolutely clean corners, no corner watermarks, no corner signatures, no artist signatures, no copyright marks, pristine image edges, completely unmarked borders,"
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

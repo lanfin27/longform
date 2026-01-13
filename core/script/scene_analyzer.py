@@ -1079,17 +1079,21 @@ JSON 형식으로만 응답해주세요. 다른 텍스트는 포함하지 마세
                     ]
 
             # === 비디오 프롬프트 정규화 ===
-            # video_prompt_character가 없거나 N/A면 기본값 생성
+            # video_prompt_character가 없거나 N/A이거나 한글이면 기본값 생성
             video_char = scene.get("video_prompt_character", "")
-            if not video_char or video_char == "N/A":
+            if not video_char or video_char == "N/A" or self._contains_korean(video_char):
+                if self._contains_korean(video_char):
+                    debug_log(f"  씬 {scene.get('scene_id', '?')}: video_prompt_character에 한글 감지 → 영어로 재생성")
                 scene["video_prompt_character"] = self._generate_default_video_prompt_character(scene)
-                debug_log(f"  씬 {scene.get('scene_id', '?')}: video_prompt_character 자동 생성")
+                debug_log(f"  씬 {scene.get('scene_id', '?')}: video_prompt_character 자동 생성 (영어)")
 
-            # video_prompt_full이 없거나 N/A면 기본값 생성
+            # video_prompt_full이 없거나 N/A이거나 한글이면 기본값 생성
             video_full = scene.get("video_prompt_full", "")
-            if not video_full or video_full == "N/A":
+            if not video_full or video_full == "N/A" or self._contains_korean(video_full):
+                if self._contains_korean(video_full):
+                    debug_log(f"  씬 {scene.get('scene_id', '?')}: video_prompt_full에 한글 감지 → 영어로 재생성")
                 scene["video_prompt_full"] = self._generate_default_video_prompt_full(scene)
-                debug_log(f"  씬 {scene.get('scene_id', '?')}: video_prompt_full 자동 생성")
+                debug_log(f"  씬 {scene.get('scene_id', '?')}: video_prompt_full 자동 생성 (영어)")
 
             # === 글자 수 검증 ===
             script_text = scene.get("script_text", "")
@@ -1570,8 +1574,24 @@ JSON 형식으로만 응답해주세요."""
         debug_log("  부분 추출 실패")
         return '{"scenes": [], "characters": []}'
 
+    def _contains_korean(self, text: str) -> bool:
+        """
+        텍스트에 한글이 포함되어 있는지 확인
+
+        Args:
+            text: 확인할 텍스트
+
+        Returns:
+            한글 포함 여부
+        """
+        if not text:
+            return False
+        # 한글 유니코드 범위: 가-힣 (완성형), ㄱ-ㅎ (자음), ㅏ-ㅣ (모음)
+        korean_pattern = re.compile('[가-힣ㄱ-ㅎㅏ-ㅣ]')
+        return bool(korean_pattern.search(text))
+
     def _generate_default_video_prompt_character(self, scene: dict) -> str:
-        """기본 캐릭터 비디오 프롬프트 생성"""
+        """기본 캐릭터 비디오 프롬프트 생성 (영어)"""
         mood = scene.get("mood", "neutral")
 
         mood_prompts = {
@@ -1591,7 +1611,7 @@ JSON 형식으로만 응답해주세요."""
         return mood_prompts.get(mood, "Calm expression, natural eye blinks, subtle head movements, mouth moving naturally while speaking")
 
     def _generate_default_video_prompt_full(self, scene: dict) -> str:
-        """기본 전체 비디오 프롬프트 생성"""
+        """기본 전체 비디오 프롬프트 생성 (영어)"""
         camera = scene.get("camera_suggestion", "medium shot")
         mood = scene.get("mood", "neutral")
 

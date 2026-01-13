@@ -1,19 +1,436 @@
 [
   {
+    "name": "프레젠터",
+    "name_ko": "프레젠터",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged man, business casual attire, confident expression, clean-shaven, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "관람객",
+    "name_ko": "관람객",
+    "role": "등장인물",
+    "visual_prompt": "Diverse group of people, various ages and ethnicities, expressions of surprise and curiosity, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "시청자",
+    "name_ko": "시청자",
+    "role": "등장인물",
+    "visual_prompt": "Man, looking directly at the camera, expression of surprise and excitement, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "분석가",
+    "name_ko": "분석가",
+    "role": "등장인물",
+    "visual_prompt": "Man, serious and contemplative expression, deep in thought, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "음향 덕후",
+    "name_ko": "음향 덕후",
+    "role": "등장인물",
+    "visual_prompt": "A diverse group of people, various ages, expressions of appreciation for audio equipment, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "사람들",
+    "name_ko": "사람들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse group of people with surprised and questioning expressions, various ages and backgrounds, questioning looks on their faces",
+    "description": ""
+  },
+  {
     "name": "이재용",
     "name_ko": "이재용",
-    "name_en": "",
-    "type": "person",
-    "role": "회장",
-    "description": "스크립트에서 추출된 인물: 이재용 (회장)",
-    "appearance": "",
-    "nationality": "",
-    "era": "",
-    "character_prompt": "Modern professional, business attire, contemporary appearance",
-    "visual_prompt": "Modern professional, business attire, contemporary appearance",
-    "appearance_scenes": [
-      34,
-      35
-    ]
+    "role": "등장인물",
+    "visual_prompt": "Lee Jae-yong (then Vice Chairman), determined and visionary expression, wearing a suit",
+    "description": ""
+  },
+  {
+    "name": "자율주행차",
+    "name_ko": "자율주행차",
+    "role": "등장인물",
+    "visual_prompt": "Sleek, futuristic self-driving car, embedded with glowing network cables, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "하만",
+    "name_ko": "하만",
+    "role": "등장인물",
+    "visual_prompt": "Abstract representation of Harman as a successful and growing company, represented by rising graphs and charts, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "삼성 TV 사업부",
+    "name_ko": "삼성 TV 사업부",
+    "role": "등장인물",
+    "visual_prompt": "Stylized representation of Samsung's TV division, represented by a large, modern TV screen, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "하만 디지털 콕핏",
+    "name_ko": "하만 디지털 콕핏",
+    "role": "등장인물",
+    "visual_prompt": "Stylized representation of Harman's digital cockpit, represented by a high-tech car dashboard with advanced displays, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "ZF",
+    "name_ko": "ZF",
+    "role": "등장인물",
+    "visual_prompt": "Stylized representation of ZF, represented by a collection of advanced sensors and radar systems, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "발표자",
+    "name_ko": "발표자",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged man, wearing a neat suit, confident expression, short dark hair, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "role": "등장인물",
+    "visual_prompt": "Male driver in his 30s, focused expression, looking at the road. no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "보행자",
+    "name_ko": "보행자",
+    "role": "등장인물",
+    "visual_prompt": "Pedestrians crossing a crosswalk, diverse ages and appearances. no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "자동차",
+    "name_ko": "자동차",
+    "role": "등장인물",
+    "visual_prompt": "The car autonomously adjusting its settings, smooth and subtle movements. no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "통합 시스템",
+    "name_ko": "통합 시스템",
+    "role": "등장인물",
+    "visual_prompt": "Futuristic interface with abstract data visualization, seamless integration. no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "CEO",
+    "name_ko": "CEO",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged man, sharp suit, confident expression, short hair, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "개발자",
+    "name_ko": "개발자",
+    "role": "등장인물",
+    "visual_prompt": "Worried developer, tired eyes, casual attire, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "자동차 디자이너",
+    "name_ko": "자동차 디자이너",
+    "role": "등장인물",
+    "visual_prompt": "Young, stylish designer, holding a tablet PC, confident expression, modern clothing, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "반도체 엔지니어",
+    "name_ko": "반도체 엔지니어",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged engineer, wearing a lab coat, holding a wafer, focused expression, clean-shaven, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "전략 분석가",
+    "name_ko": "전략 분석가",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged analyst, wearing glasses, professional attire, serious expression, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "칩 디자이너",
+    "name_ko": "칩 디자이너",
+    "role": "등장인물",
+    "visual_prompt": "Young designer, working at a computer, focused expression, modern attire, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "IT 전문가",
+    "name_ko": "IT 전문가",
+    "role": "등장인물",
+    "visual_prompt": "Enthusiastic IT expert, wearing glasses, smart casual outfit, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "경영진",
+    "name_ko": "경영진",
+    "role": "등장인물",
+    "visual_prompt": "Worried executive, wearing a business suit, concerned expression, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "전문가",
+    "name_ko": "전문가",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged man, wearing a suit, confident expression, gesturing with his hands, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "삼성 임원",
+    "name_ko": "삼성 임원",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged Asian man, Samsung executive, futuristic suit, confident expression, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "다국적 임원",
+    "name_ko": "다국적 임원",
+    "role": "등장인물",
+    "visual_prompt": "Diverse group of business executives, serious expressions, engaged in a heated discussion, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "떠나는 인력",
+    "name_ko": "떠나는 인력",
+    "role": "등장인물",
+    "visual_prompt": "Disappointed employee carrying a box of belongings, leaving the office, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "좌절한 임원",
+    "name_ko": "좌절한 임원",
+    "role": "등장인물",
+    "visual_prompt": "Frustrated Samsung executive, looking out the window, wearing a suit, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "자동차 관계자",
+    "name_ko": "자동차 관계자",
+    "role": "등장인물",
+    "visual_prompt": "Experienced automotive industry representatives, listening intently, skeptical expressions, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "삼성 엔지니어",
+    "name_ko": "삼성 엔지니어",
+    "role": "등장인물",
+    "visual_prompt": "Young, innovative Samsung engineer, working on futuristic technology, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "미래 기술 경영자",
+    "name_ko": "미래 기술 경영자",
+    "role": "등장인물",
+    "visual_prompt": "Futuristic technology executive, sharp eyes, wearing a suit, confident expression, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "기술 전문가",
+    "name_ko": "기술 전문가",
+    "role": "등장인물",
+    "visual_prompt": "Technology expert, thoughtful expression, visualizing data streams, conceptualizing innovative ideas, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "유튜버 아바타",
+    "name_ko": "유튜버 아바타",
+    "role": "등장인물",
+    "visual_prompt": "Youtuber avatar, bright smile, expression of gratitude, positive energy, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "청취자 1",
+    "name_ko": "청취자 1",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged woman with glasses, attentive expression, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "청취자 2",
+    "name_ko": "청취자 2",
+    "role": "등장인물",
+    "visual_prompt": "Young man with a beard, focused gaze, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "청취자 3",
+    "name_ko": "청취자 3",
+    "role": "등장인물",
+    "visual_prompt": "Elderly man with a kind smile, listening intently, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "강사",
+    "name_ko": "강사",
+    "role": "등장인물",
+    "visual_prompt": "A male lecturer in his late 30s, wearing a casual shirt and slacks, clean-shaven, with a friendly and approachable demeanor, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "삼성전자 로고",
+    "name_ko": "삼성전자 로고",
+    "role": "등장인물",
+    "visual_prompt": "Holographic Samsung logo, bright and futuristic, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "하만 로고",
+    "name_ko": "하만 로고",
+    "role": "등장인물",
+    "visual_prompt": "Holographic Harman logo, sleek and modern, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "ZF 건물",
+    "name_ko": "ZF 건물",
+    "role": "등장인물",
+    "visual_prompt": "Modern architectural building, German design, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "계약 당사자",
+    "name_ko": "계약 당사자",
+    "role": "등장인물",
+    "visual_prompt": "Business people shaking hands, professional attire, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "물음표",
+    "name_ko": "물음표",
+    "role": "등장인물",
+    "visual_prompt": "Floating question marks, abstract, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "경청하는 사람",
+    "name_ko": "경청하는 사람",
+    "role": "등장인물",
+    "visual_prompt": "Silhouette of a person, listening intently, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "질문자 실루엣",
+    "name_ko": "질문자 실루엣",
+    "role": "등장인물",
+    "visual_prompt": "Silhouette of a person, gender neutral, inquisitive pose, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "제품 소개 손",
+    "name_ko": "제품 소개 손",
+    "role": "등장인물",
+    "visual_prompt": "A disembodied hand, pointing and gesturing, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "놀란 사람 실루엣",
+    "name_ko": "놀란 사람 실루엣",
+    "role": "등장인물",
+    "visual_prompt": "Silhouette of a person, surprised expression, pointing gesture, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "관찰자",
+    "name_ko": "관찰자",
+    "role": "등장인물",
+    "visual_prompt": "A person looking intently, curious expression, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "생각하는 사람",
+    "name_ko": "생각하는 사람",
+    "role": "등장인물",
+    "visual_prompt": "Silhouette of a person, gender neutral, deep in thought, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "전자제품 사용자",
+    "name_ko": "전자제품 사용자",
+    "role": "등장인물",
+    "visual_prompt": "Abstract representation of a person interacting with technology, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "궁금해하는 사람",
+    "name_ko": "궁금해하는 사람",
+    "role": "등장인물",
+    "visual_prompt": "A person with a surprised and curious expression, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "미래 자동차",
+    "name_ko": "미래 자동차",
+    "role": "등장인물",
+    "visual_prompt": "Abstract representation of a futuristic car, sleek and modern, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "자율주행 자동차",
+    "name_ko": "자율주행 자동차",
+    "role": "등장인물",
+    "visual_prompt": "A modern self-driving car navigating a city street, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "다양한 사람들",
+    "name_ko": "다양한 사람들",
+    "role": "등장인물",
+    "visual_prompt": "A diverse group of men and women of varying ages and ethnicities, looking thoughtful, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "뇌",
+    "name_ko": "뇌",
+    "role": "등장인물",
+    "visual_prompt": "A glowing, intelligent brain with intricate neural connections, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "사람",
+    "name_ko": "사람",
+    "role": "등장인물",
+    "visual_prompt": "A person with wide eyes and goosebumps, looking shocked and slightly fearful, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "해설자",
+    "name_ko": "해설자",
+    "role": "등장인물",
+    "visual_prompt": "A friendly and approachable male narrator in his late 30s, wearing a casual shirt, clean-shaven, smiling slightly, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "내레이터",
+    "name_ko": "내레이터",
+    "role": "등장인물",
+    "visual_prompt": "A person looking directly at the camera with a questioning look. neutral clothing, no text, no logos.",
+    "description": ""
+  },
+  {
+    "name": "ZF 임원진",
+    "name_ko": "ZF 임원진",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged German business executives in professional attire, serious expressions, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "투자자들",
+    "name_ko": "투자자들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse group of investors, reacting with surprise and excitement, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "학생들",
+    "name_ko": "학생들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse group of students, listening attentively, no text, no logos on clothing, no name tags",
+    "description": ""
   }
 ]

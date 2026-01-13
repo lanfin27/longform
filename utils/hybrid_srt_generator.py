@@ -122,26 +122,30 @@ class HybridSRTGenerator:
         whisper_model: str = "small",
         vad_threshold: float = 0.05,
         min_speech_duration_ms: int = 30,
+        min_silence_duration_ms: int = 50,   # ⭐ v6.11: 사용자 조정 가능! 기본값 50ms
+        speech_pad_ms: int = 30,             # ⭐ v6.11: 사용자 조정 가능! 기본값 30ms
         reanalyze_gaps: bool = True,
-        auto_enhance_audio: bool = False  # ⭐ v6.10: 기본값 False (VAD 정확도 우선!)
+        auto_enhance_audio: bool = False     # ⭐ v6.10: 기본값 False (VAD 정확도 우선!)
     ):
         """
-        초기화 (v5.6 - 극단적 VAD 민감도)
+        초기화 (v6.11 - VAD 파라미터 사용자 조정 가능)
 
         Args:
             whisper_model: Whisper 모델 크기 (small 권장)
             vad_threshold: VAD 임계값 (0.05 권장, 극도로 민감)
             min_speech_duration_ms: 최소 음성 길이 (30ms 권장)
+            min_silence_duration_ms: 무음 감지 최소 시간 (50ms 권장) ⭐ NEW!
+            speech_pad_ms: 문장 앞뒤 패딩 (30ms 권장) ⭐ NEW!
             reanalyze_gaps: 갭 자동 재분석 여부
-            auto_enhance_audio: 저볼륨 구간 자동 향상 여부
+            auto_enhance_audio: 저볼륨 구간 자동 향상 여부 (False 권장!)
         """
-        # WhisperV3 설정 (⭐ v6.9: 명시적 VAD 파라미터 전달)
+        # WhisperV3 설정 (⭐ v6.11: 사용자 조정 가능한 VAD 파라미터)
         self.whisper_config = WhisperConfigV3(
             model_size=whisper_model,
             vad_threshold=vad_threshold,
             min_speech_duration_ms=min_speech_duration_ms,
-            min_silence_duration_ms=50,   # ⭐ v6.9: 핵심! 50ms 무음이면 분리
-            speech_pad_ms=30,             # ⭐ v6.9: 패딩 최소화
+            min_silence_duration_ms=min_silence_duration_ms,   # ⭐ 사용자 조정 가능!
+            speech_pad_ms=speech_pad_ms,                       # ⭐ 사용자 조정 가능!
             word_timestamps=True,
             reanalyze_gaps=reanalyze_gaps
         )
@@ -153,13 +157,13 @@ class HybridSRTGenerator:
         self.auto_enhance_audio = auto_enhance_audio
 
         print(f"\n{'='*60}")
-        print(f"[HybridV6.0] 초기화 완료 (2단계 분리)")
+        print(f"[HybridV6.11] 초기화 완료 (2단계 분리 + VAD 조정 UI)")
         print(f"{'='*60}")
         print(f"  Whisper 모델: {whisper_model}")
         print(f"  VAD threshold: {vad_threshold} (극도로 민감)")
-        print(f"  min_silence: {self.whisper_config.min_silence_duration_ms}ms")  # ⭐ 핵심 로그!
+        print(f"  min_silence: {min_silence_duration_ms}ms")  # ⭐ 핵심 로그!
         print(f"  min_speech: {min_speech_duration_ms}ms")
-        print(f"  speech_pad: {self.whisper_config.speech_pad_ms}ms")
+        print(f"  speech_pad: {speech_pad_ms}ms")
         print(f"  갭 재분석: {reanalyze_gaps}")
         print(f"  오디오 향상: {auto_enhance_audio}")
         print(f"{'='*60}")
@@ -705,18 +709,22 @@ def get_hybrid_generator(
     whisper_model: str = "small",
     vad_threshold: float = 0.05,
     min_speech_duration_ms: int = 30,
+    min_silence_duration_ms: int = 50,   # ⭐ v6.11: 사용자 조정 가능!
+    speech_pad_ms: int = 30,             # ⭐ v6.11: 사용자 조정 가능!
     reanalyze_gaps: bool = True,
-    auto_enhance_audio: bool = False  # ⭐ v6.10: 기본값 False (VAD 정확도 우선!)
+    auto_enhance_audio: bool = False     # ⭐ v6.10: 기본값 False (VAD 정확도 우선!)
 ) -> HybridSRTGenerator:
     """
-    HybridSRTGenerator 인스턴스 생성 (v5.6)
+    HybridSRTGenerator 인스턴스 생성 (v6.11)
 
     Args:
         whisper_model: Whisper 모델 크기
         vad_threshold: VAD 임계값 (0.05 권장)
         min_speech_duration_ms: 최소 음성 길이 (30ms 권장)
+        min_silence_duration_ms: 무음 감지 최소 시간 (50ms 권장) ⭐ NEW!
+        speech_pad_ms: 문장 앞뒤 패딩 (30ms 권장) ⭐ NEW!
         reanalyze_gaps: 갭 재분석 여부
-        auto_enhance_audio: 오디오 향상 여부
+        auto_enhance_audio: 오디오 향상 여부 (False 권장!)
 
     Returns:
         HybridSRTGenerator 인스턴스
@@ -725,6 +733,8 @@ def get_hybrid_generator(
         whisper_model=whisper_model,
         vad_threshold=vad_threshold,
         min_speech_duration_ms=min_speech_duration_ms,
+        min_silence_duration_ms=min_silence_duration_ms,
+        speech_pad_ms=speech_pad_ms,
         reanalyze_gaps=reanalyze_gaps,
         auto_enhance_audio=auto_enhance_audio
     )

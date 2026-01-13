@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-07T09:40:21.088628",
+  "image_file": "bg_scene_013_1767746421087.png",
+  "scene_id": 13,
+  "prompts": {
+    "original": "Images of various car parts, Tesla car, BMW car, Hyundai car, Samsung logo, and question marks floating around. The scene represents the impact of Samsung's automotive investments on the automotive industry. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Images of various car parts, Tesla car, BMW car, Hyundai car, Samsung logo, and question marks floating around. The scene represents the impact of Samsung's automotive investments on the automotive industry. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot",
+    "negative": ""
+  },
+  "style": {
+    "id": "세모지배경",
+    "name": "세모지배경",
+    "prefix": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

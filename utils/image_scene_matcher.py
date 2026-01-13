@@ -27,6 +27,8 @@ class ImageSceneMatcher:
 
     # 씬 번호 추출 패턴 (우선순위 순)
     SCENE_PATTERNS = [
+        # bg_scene_001 (배경 이미지 - 최우선)
+        r'bg[_-]?scene[_-]?(\d+)',
         # scene_001, scene_1, scene001
         r'scene[_-]?(\d+)',
         # seg_001, seg_1
@@ -53,6 +55,21 @@ class ImageSceneMatcher:
         self.scenes_images_dir = self.images_dir / "scenes"
         self.content_images_dir = self.images_dir / "content"
         self.composited_dir = self.images_dir / "composited"
+        # ⭐ backgrounds 폴더 (bg_scene_001_xxx.png 형식)
+        self.backgrounds_dir = self.images_dir / "backgrounds"
+        # ⭐ 캐릭터 씬 폴더
+        self.character_scenes_dir = self.images_dir / "character_scenes"
+
+        # ⭐ 글로벌 이미지 폴더들 (루트 기준)
+        # utils/image_scene_matcher.py → parent.parent = longform/
+        root_dir = Path(__file__).parent.parent
+        self.global_images_dir = root_dir / "data" / "images"
+        self.global_imagefx_dir = self.global_images_dir / "imagefx"
+        self.global_generated_dir = self.global_images_dir / "generated"
+        self.global_backgrounds_dir = self.global_images_dir / "backgrounds"
+
+        # ⭐ 성능 최적화: 로그 제거 (Streamlit rerun마다 출력 방지)
+        # 디버깅 시에만 활성화: print(f"[ImageSceneMatcher] project={self.project_path.name}")
 
     def extract_scene_number(self, filename: str) -> Optional[int]:
         """
@@ -77,64 +94,93 @@ class ImageSceneMatcher:
 
         return None
 
-    def find_all_images(self) -> List[Dict]:
+    def find_all_images(self, include_global: bool = True, use_cache: bool = True) -> List[Dict]:
         """
-        프로젝트 내 모든 이미지 찾기
+        프로젝트 내 모든 이미지 찾기 (최신 이미지 우선)
+
+        Args:
+            include_global: 글로벌 이미지 폴더 포함 여부
+            use_cache: 캐시 사용 여부 (기본: True, 성능 최적화)
 
         Returns:
-            이미지 정보 목록
+            이미지 정보 목록 (최신 수정 시간 순으로 정렬됨)
             [
                 {
                     "path": Path,
                     "filename": str,
                     "scene_number": int or None,
-                    "source": "composited" | "scenes" | "content",
-                    "created": datetime
+                    "source": "composited" | "backgrounds" | "scenes" | "content" | "imagefx" | "generated",
+                    "created": datetime,
+                    "mtime": float  # 정렬용
                 }
             ]
         """
+        # ⭐ 성능 최적화: 캐시된 결과 반환 (동일 호출 반복 방지)
+        if use_cache and hasattr(self, '_last_images') and self._last_images:
+            return self._last_images
+
         images = []
 
-        # 디렉토리 우선순위: composited > scenes > content
+        # 디렉토리 목록 (우선순위 순)
+        # 프로젝트 폴더 우선, 글로벌 폴더는 나중에
         dirs_to_search = [
             (self.composited_dir, "composited"),
+            (self.backgrounds_dir, "backgrounds"),  # bg_scene_xxx.png
+            (self.character_scenes_dir, "character_scenes"),  # 캐릭터 씬
             (self.scenes_images_dir, "scenes"),
             (self.content_images_dir, "content"),
         ]
 
+        # 글로벌 폴더 추가
+        if include_global:
+            dirs_to_search.extend([
+                (self.global_imagefx_dir, "imagefx"),      # ⭐ 글로벌 ImageFX
+                (self.global_generated_dir, "generated"),  # ⭐ 글로벌 generated
+                (self.global_backgrounds_dir, "global_backgrounds"),  # ⭐ 글로벌 backgrounds
+            ])
+
         for img_dir, source in dirs_to_search:
-            if not img_dir.exists():
+            if not img_dir or not img_dir.exists():
                 continue
 
-            for img_path in img_dir.glob("*.png"):
-                scene_num = self.extract_scene_number(img_path.name)
-
-                images.append({
-                    "path": img_path,
-                    "filename": img_path.name,
-                    "scene_number": scene_num,
-                    "source": source,
-                    "created": datetime.fromtimestamp(img_path.stat().st_mtime)
-                })
-
-            # jpg, webp도 지원
-            for ext in ["*.jpg", "*.jpeg", "*.webp"]:
+            # 모든 이미지 확장자
+            for ext in ["*.png", "*.jpg", "*.jpeg", "*.webp"]:
                 for img_path in img_dir.glob(ext):
-                    scene_num = self.extract_scene_number(img_path.name)
-                    images.append({
-                        "path": img_path,
-                        "filename": img_path.name,
-                        "scene_number": scene_num,
-                        "source": source,
-                        "created": datetime.fromtimestamp(img_path.stat().st_mtime)
-                    })
+                    try:
+                        stat = img_path.stat()
+                        mtime = stat.st_mtime
+                        scene_num = self.extract_scene_number(img_path.name)
+
+                        images.append({
+                            "path": img_path,
+                            "filename": img_path.name,
+                            "scene_number": scene_num,
+                            "source": source,
+                            "created": datetime.fromtimestamp(mtime),
+                            "mtime": mtime  # 정렬용
+                        })
+                    except (OSError, IOError):
+                        # 파일 접근 오류 무시
+                        continue
+
+        # ⭐ 핵심: 수정 시간 기준 내림차순 정렬 (최신 이미지 먼저!)
+        images.sort(key=lambda x: x["mtime"], reverse=True)
+
+        # ⭐ 성능 최적화: 결과 캐시 저장
+        self._last_images = images
 
         return images
+
+    def invalidate_cache(self):
+        """이미지 캐시 무효화 (새로고침 시 호출)"""
+        if hasattr(self, '_last_images'):
+            self._last_images = None
 
     def match_images_to_scenes(
         self,
         scenes: List[Dict],
-        prefer_composited: bool = True
+        prefer_composited: bool = True,
+        prefer_latest: bool = True
     ) -> Dict[int, Dict]:
         """
         씬 데이터에 이미지 매칭
@@ -142,6 +188,7 @@ class ImageSceneMatcher:
         Args:
             scenes: 씬 목록 (scene_id 포함)
             prefer_composited: 합성 이미지 우선 사용
+            prefer_latest: 최신 이미지 우선 사용 (기본: True)
 
         Returns:
             {
@@ -154,6 +201,8 @@ class ImageSceneMatcher:
             }
         """
         all_images = self.find_all_images()
+        # ⭐ 성능 최적화: 캐시 저장 (get_matching_summary에서 재사용)
+        self._last_images = all_images
         result = {}
 
         # 씬 번호별 이미지 그룹화
@@ -165,14 +214,33 @@ class ImageSceneMatcher:
                     images_by_scene[scene_num] = []
                 images_by_scene[scene_num].append(img)
 
-        # 씬별 정렬 (composited 우선, 최신 우선)
+        # ⭐ 소스 우선순위 (프로젝트 폴더 > 글로벌 폴더)
+        source_priority = {
+            "composited": 0,
+            "backgrounds": 1,
+            "character_scenes": 2,
+            "scenes": 3,
+            "content": 4,
+            "imagefx": 5,
+            "generated": 6,
+            "global_backgrounds": 7,
+        }
+
+        # 씬별 정렬
         for scene_num in images_by_scene:
-            images_by_scene[scene_num].sort(
-                key=lambda x: (
-                    0 if x["source"] == "composited" else (1 if x["source"] == "scenes" else 2),
-                    -x["created"].timestamp()  # 최신 우선
+            if prefer_latest:
+                # ⭐ 최신 이미지 우선 (mtime 기준)
+                images_by_scene[scene_num].sort(
+                    key=lambda x: -x["mtime"]
                 )
-            )
+            else:
+                # 소스 우선순위 > 최신 순
+                images_by_scene[scene_num].sort(
+                    key=lambda x: (
+                        source_priority.get(x["source"], 99),
+                        -x["mtime"]
+                    )
+                )
 
         # 각 씬에 이미지 매칭
         for scene in scenes:
@@ -288,12 +356,13 @@ class ImageSceneMatcher:
             "errors": errors
         }
 
-    def get_matching_summary(self, scenes: List[Dict]) -> Dict:
+    def get_matching_summary(self, scenes: List[Dict], _cached_images: List[Dict] = None) -> Dict:
         """
         매칭 상태 요약
 
         Args:
             scenes: 씬 목록
+            _cached_images: 캐시된 이미지 목록 (성능 최적화용)
 
         Returns:
             {
@@ -306,7 +375,9 @@ class ImageSceneMatcher:
             }
         """
         match_results = self.match_images_to_scenes(scenes)
-        all_images = self.find_all_images()
+        # ⭐ 성능 최적화: match_images_to_scenes가 이미 find_all_images를 호출하므로
+        # 캐시된 결과를 사용하거나 재호출 방지
+        all_images = _cached_images if _cached_images else self._last_images if hasattr(self, '_last_images') else self.find_all_images()
 
         exact = sum(1 for m in match_results.values() if m["match_type"] == "exact")
         sequential = sum(1 for m in match_results.values() if m["match_type"] == "sequential")

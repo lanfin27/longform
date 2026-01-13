@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-06T17:22:18.565782",
+  "image_file": "bg_scene_004_1767687738565.png",
+  "scene_id": 4,
+  "prompts": {
+    "original": "Close-up of a self-driving car's camera sensor. Futuristic, high-tech.",
+    "final": "Korean webtoon manhwa style illustration, clean bold black outlines on all elements,\nflat solid color fills with minimal shading, simplified shapes with clear silhouettes,\n2D digital illustration style, consistent 2-3px black lineart throughout,\nmale character by default, man, masculine features unless specified otherwise., Close-up of a self-driving car's camera sensor. Futuristic, high-tech., background scene, no characters, wide shot, Muted desaturated color palette, clean cel-shaded look with minimal gradients,\nteal-gray and warm beige neutral tones, muted accent colors for focal points,\nsimple solid light gray background, clean background without text or watermarks.",
+    "negative": "any text, any letters, any words, any numbers, any symbols, any labels,\nany watermarks, any logos, any signs, any writing of any kind,\nKorean text, Chinese text, Japanese text, English text, all text,\ntext overlay, text in image, visible text, readable text, no outlines, missing lineart, gradient only no lines,\nrealistic photograph, 3D render,\npainterly watercolor, sketchy rough lines,\ncomplex cluttered details, bright saturated colors,\nKorean text, Hangul, Korean characters, Korean letters, Korean writing, Korean labels,\nChinese text, Chinese characters, Hanzi, simplified Chinese, traditional Chinese,\nJapanese text, Hiragana, Katakana, Kanji, Japanese characters,\nAsian text, Asian characters, Asian writing, non-English text,\ncorrupted text, garbled text, distorted text, unreadable Asian text,\nphotorealistic, soft shading, blurry line"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "Korean webtoon manhwa style illustration, clean bold black outlines on all elements,\nflat solid color fills with minimal shading, simplified shapes with clear silhouettes,\n2D digital illustration style, consistent 2-3px black lineart throughout,\nmale character by default, man, masculine features unless specified otherwise.",
+    "suffix": "Muted desaturated color palette, clean cel-shaded look with minimal gradients,\nteal-gray and warm beige neutral tones, muted accent colors for focal points,\nsimple solid light gray background, clean background without text or watermarks."
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

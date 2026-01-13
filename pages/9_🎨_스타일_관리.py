@@ -218,10 +218,22 @@ def render_edit_style(manager: StyleManager):
         st.info("수정할 스타일을 선택하세요.")
         return
 
-    style = manager.get_style_by_id(style_id)
+    # ⭐ BUG FIX: 세그먼트를 지정하여 올바른 스타일 로드
+    # 같은 ID가 여러 세그먼트에 있을 수 있으므로 segment 기준으로 찾아야 함
+    style = None
+    if segment:
+        # 해당 세그먼트에서만 스타일 찾기
+        style = manager.get_style_by_id_in_segment(style_id, segment)
+
+    # 세그먼트가 없거나 찾지 못한 경우 fallback
+    if not style:
+        style = manager.get_style_by_id(style_id)
+
     if not style:
         st.error("스타일을 찾을 수 없습니다.")
         return
+
+    print(f"[스타일 관리] 편집 로드: style_id={style_id}, segment={segment}, loaded_segment={style.segment}")
 
     st.subheader(f"✏️ '{style.name_ko}' 수정")
 

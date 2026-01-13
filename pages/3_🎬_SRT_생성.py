@@ -228,6 +228,229 @@ with col_set3:
         help="오디오의 언어"
     )
 
+# ============================================================
+# VAD 고급 설정 (v6.11)
+# ============================================================
+
+with st.expander("🎛️ 고급 설정: VAD (음성 활동 감지)", expanded=False):
+    st.markdown("""
+    **VAD 설정**으로 Whisper가 문장을 어떻게 분리할지 조정할 수 있습니다.
+    기본값으로도 잘 작동하지만, 필요시 조정하세요.
+    """)
+
+    # 세션 상태 초기화 (기본값 설정)
+    if "vad_threshold" not in st.session_state:
+        st.session_state["vad_threshold"] = 0.05
+    if "min_silence_ms" not in st.session_state:
+        st.session_state["min_silence_ms"] = 50
+    if "min_speech_ms" not in st.session_state:
+        st.session_state["min_speech_ms"] = 30
+    if "speech_pad_ms" not in st.session_state:
+        st.session_state["speech_pad_ms"] = 30
+    if "auto_enhance" not in st.session_state:
+        st.session_state["auto_enhance"] = False
+
+    col_vad1, col_vad2 = st.columns(2)
+
+    with col_vad1:
+        # 1. VAD 민감도
+        vad_threshold = st.slider(
+            "🎚️ VAD 민감도",
+            min_value=0.01,
+            max_value=0.5,
+            value=st.session_state.get('vad_threshold', 0.05),
+            step=0.01,
+            key="vad_threshold_slider",
+            help="""
+**낮을수록 민감** (더 많은 음성 감지)
+
+| 값 | 효과 |
+|-----|------|
+| 0.01~0.05 | 매우 민감 (조용한 음성도 감지) |
+| 0.1~0.2 | 보통 |
+| 0.3~0.5 | 둔감 (명확한 음성만) |
+
+**권장: 0.05**
+            """
+        )
+        st.session_state["vad_threshold"] = vad_threshold
+
+        # 2. 무음 감지 최소 시간
+        min_silence_ms = st.slider(
+            "⏱️ 무음 감지 최소 시간 (ms)",
+            min_value=30,
+            max_value=500,
+            value=st.session_state.get('min_silence_ms', 50),
+            step=10,
+            key="min_silence_slider",
+            help="""
+**문장 분리 기준이 되는 무음 길이** ⭐ 가장 큰 영향!
+
+| 값 | 효과 | 예상 씬 수 |
+|-----|------|----------|
+| 30~50ms | 짧은 pause도 분리 | 300개↑ |
+| 100~200ms | 보통 | 250~300개 |
+| 300~500ms | 긴 pause만 분리 | 200개↓ |
+
+**권장: 50ms**
+            """
+        )
+        st.session_state["min_silence_ms"] = min_silence_ms
+
+    with col_vad2:
+        # 3. 음성 감지 최소 시간
+        min_speech_ms = st.slider(
+            "🎤 음성 감지 최소 시간 (ms)",
+            min_value=10,
+            max_value=200,
+            value=st.session_state.get('min_speech_ms', 30),
+            step=10,
+            key="min_speech_slider",
+            help="""
+**음성으로 인식되는 최소 길이**
+
+| 값 | 효과 |
+|-----|------|
+| 10~30ms | 짧은 발화도 감지 |
+| 50~100ms | 보통 |
+| 150~200ms | 긴 발화만 감지 |
+
+**권장: 30ms**
+            """
+        )
+        st.session_state["min_speech_ms"] = min_speech_ms
+
+        # 4. 문장 패딩
+        speech_pad_ms = st.slider(
+            "📐 문장 앞뒤 패딩 (ms)",
+            min_value=10,
+            max_value=200,
+            value=st.session_state.get('speech_pad_ms', 30),
+            step=10,
+            key="speech_pad_slider",
+            help="""
+**문장 시작/끝에 추가되는 여유 시간**
+
+| 값 | 효과 |
+|-----|------|
+| 10~30ms | 타이트한 분리 |
+| 50~100ms | 보통 |
+| 150~200ms | 여유로운 분리 |
+
+**권장: 30ms**
+            """
+        )
+        st.session_state["speech_pad_ms"] = speech_pad_ms
+
+    # 5. 오디오 향상 옵션
+    auto_enhance = st.checkbox(
+        "🔊 오디오 향상 (저볼륨 구간 증폭)",
+        value=st.session_state.get('auto_enhance', False),
+        key="auto_enhance_checkbox",
+        help="""
+**저볼륨 구간을 자동으로 증폭합니다.**
+
+⚠️ **주의**: 활성화하면 VAD 정확도가 떨어질 수 있습니다!
+- ✅ **권장: 비활성화** (기본값)
+- 볼륨이 매우 낮은 오디오에서만 사용하세요.
+        """
+    )
+    st.session_state["auto_enhance"] = auto_enhance
+
+    # 설정 요약
+    st.divider()
+    st.markdown("**📊 현재 설정 요약:**")
+
+    setting_col1, setting_col2, setting_col3 = st.columns(3)
+    with setting_col1:
+        st.metric("VAD 민감도", f"{vad_threshold}")
+        st.metric("무음 감지", f"{min_silence_ms}ms")
+    with setting_col2:
+        st.metric("음성 감지", f"{min_speech_ms}ms")
+        st.metric("패딩", f"{speech_pad_ms}ms")
+    with setting_col3:
+        st.metric("오디오 향상", "활성화" if auto_enhance else "비활성화")
+
+        # 예상 씬 수 표시
+        if min_silence_ms <= 50:
+            expected = "300개↑"
+        elif min_silence_ms <= 150:
+            expected = "250~300개"
+        else:
+            expected = "200개↓"
+        st.metric("예상 씬 수", expected)
+
+    # 프리셋 버튼
+    st.divider()
+    st.markdown("**⚡ 빠른 설정 (프리셋):**")
+
+    preset_col1, preset_col2, preset_col3 = st.columns(3)
+
+    with preset_col1:
+        if st.button("🔬 잘게 쪼개기", use_container_width=True, key="preset_fine"):
+            st.session_state["vad_threshold"] = 0.03
+            st.session_state["min_silence_ms"] = 30
+            st.session_state["min_speech_ms"] = 20
+            st.session_state["speech_pad_ms"] = 20
+            st.session_state["auto_enhance"] = False
+            st.rerun()
+
+    with preset_col2:
+        if st.button("⚖️ 기본값 (권장)", use_container_width=True, key="preset_default"):
+            st.session_state["vad_threshold"] = 0.05
+            st.session_state["min_silence_ms"] = 50
+            st.session_state["min_speech_ms"] = 30
+            st.session_state["speech_pad_ms"] = 30
+            st.session_state["auto_enhance"] = False
+            st.rerun()
+
+    with preset_col3:
+        if st.button("📦 크게 묶기", use_container_width=True, key="preset_coarse"):
+            st.session_state["vad_threshold"] = 0.1
+            st.session_state["min_silence_ms"] = 200
+            st.session_state["min_speech_ms"] = 50
+            st.session_state["speech_pad_ms"] = 100
+            st.session_state["auto_enhance"] = False
+            st.rerun()
+
+    # 파라미터 영향 가이드
+    with st.expander("📖 파라미터 영향 가이드", expanded=False):
+        st.markdown("""
+### 🎯 어떤 값을 조정하면 결과가 어떻게 바뀌나요?
+
+#### 1. VAD 민감도 (threshold)
+- **낮추면** (0.01~0.03): 작은 소리도 음성으로 인식 → 씬 수 증가
+- **높이면** (0.2~0.5): 큰 소리만 음성으로 인식 → 씬 수 감소
+
+#### 2. 무음 감지 최소 시간 (min_silence_duration_ms) ⭐ 가장 큰 영향!
+- **낮추면** (30~50ms): 짧은 숨소리도 문장 경계 → 씬 많이 쪼개짐
+- **높이면** (200~500ms): 긴 침묵만 문장 경계 → 씬 합쳐짐
+
+#### 3. 음성 감지 최소 시간 (min_speech_duration_ms)
+- **낮추면** (10~20ms): 짧은 "음", "어" 도 인식
+- **높이면** (100~200ms): 긴 발화만 인식
+
+#### 4. 문장 패딩 (speech_pad_ms)
+- **낮추면** (10~20ms): 문장이 타이트하게 잘림
+- **높이면** (100~200ms): 문장 앞뒤에 여유 시간 추가
+
+#### 5. 오디오 향상 (auto_enhance_audio) ⚠️ 주의!
+- **비활성화 (권장)**: VAD가 정확하게 작동
+- **활성화**: 저볼륨 증폭 → VAD 정확도 저하 가능
+
+---
+
+### 📋 상황별 권장 설정
+
+| 상황 | 민감도 | 무음 | 음성 | 패딩 | 향상 |
+|------|--------|------|------|------|------|
+| **일반 (권장)** | 0.05 | 50ms | 30ms | 30ms | ❌ |
+| 빠른 말투 | 0.03 | 30ms | 20ms | 20ms | ❌ |
+| 느린 말투 | 0.1 | 150ms | 50ms | 80ms | ❌ |
+| 조용한 음성 | 0.02 | 50ms | 30ms | 30ms | ✅ |
+| 배경 소음 많음 | 0.2 | 100ms | 50ms | 50ms | ❌ |
+        """)
+
 st.markdown("---")
 
 # ============================================================
@@ -262,9 +485,21 @@ with col_status1:
 if btn_whisper and GENERATOR_AVAILABLE and audio_path:
     with st.spinner("🎤 Whisper SRT 생성 중..."):
         try:
-            # Generator 생성
+            # VAD 설정 가져오기 (v6.11)
+            vad_threshold_val = st.session_state.get('vad_threshold', 0.05)
+            min_silence_ms_val = st.session_state.get('min_silence_ms', 50)
+            min_speech_ms_val = st.session_state.get('min_speech_ms', 30)
+            speech_pad_ms_val = st.session_state.get('speech_pad_ms', 30)
+            auto_enhance_val = st.session_state.get('auto_enhance', False)
+
+            # Generator 생성 (VAD 설정 전달)
             generator = get_hybrid_generator(
-                whisper_model=whisper_model
+                whisper_model=whisper_model,
+                vad_threshold=vad_threshold_val,
+                min_speech_duration_ms=min_speech_ms_val,
+                min_silence_duration_ms=min_silence_ms_val,
+                speech_pad_ms=speech_pad_ms_val,
+                auto_enhance_audio=auto_enhance_val
             )
 
             # 1단계: Whisper SRT 생성

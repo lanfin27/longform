@@ -3,9 +3,12 @@
 ImageFX UI 컴포넌트
 
 쿠키 만료 알림, 갱신 팝업 등 UI 관련 기능
+시드 잠금 기능 (v1.1) - 이미지 일관성 유지
 """
 
 import streamlit as st
+import random
+from typing import Tuple, Optional
 from utils.imagefx_cookie_manager import (
     get_cookie_state,
     CookieStatus,
@@ -190,4 +193,200 @@ def render_cookie_status_indicator():
         st.warning("ImageFX: 미설정")
         if st.button("설정", key="sidebar_cookie_setup"):
             st.session_state["show_cookie_renewal_modal"] = True
+            st.rerun()
+
+
+# ============================================================
+# 시드 잠금 기능 (v1.1) - 이미지 일관성 유지
+# ============================================================
+
+def render_seed_lock_options(key_prefix: str = "seed") -> Tuple[bool, Optional[int]]:
+    """
+    시드 잠금 옵션 UI 렌더링
+
+    Args:
+        key_prefix: Streamlit 위젯 키 접두사
+
+    Returns:
+        (seed_lock_enabled: bool, locked_seed: int or None)
+    """
+    st.markdown("### 🔒 이미지 일관성 유지 (시드 잠금)")
+    st.caption("동일한 시드를 사용하여 이미지 스타일/캐릭터 일관성을 유지합니다.")
+
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        # 시드 잠금 활성화
+        seed_lock_enabled = st.checkbox(
+            "🔒 시드 잠금 활성화",
+            value=st.session_state.get(f'{key_prefix}_lock_enabled', False),
+            key=f"{key_prefix}_lock_checkbox",
+            help="첫 번째 이미지 생성 후 시드를 잠가 이후 이미지들의 스타일/캐릭터 일관성을 유지합니다."
+        )
+
+        st.session_state[f'{key_prefix}_lock_enabled'] = seed_lock_enabled
+
+    with col2:
+        # 현재 잠긴 시드 표시
+        locked_seed = st.session_state.get(f'{key_prefix}_locked_seed', None)
+        if locked_seed:
+            st.metric("잠긴 시드", f"{locked_seed:,}")
+        else:
+            st.caption("시드 없음")
+
+    if seed_lock_enabled:
+        # 시드 잠금 모드 선택
+        seed_mode = st.radio(
+            "시드 모드",
+            options=["auto", "manual", "first_image"],
+            format_func=lambda x: {
+                "auto": "🔄 자동 (첫 이미지 시드 자동 잠금)",
+                "manual": "✏️ 수동 (시드 직접 입력)",
+                "first_image": "🖼️ 첫 이미지 기준"
+            }[x],
+            key=f"{key_prefix}_mode_radio",
+            horizontal=True,
+            label_visibility="collapsed"
+        )
+
+        st.session_state[f'{key_prefix}_mode'] = seed_mode
+
+        if seed_mode == "manual":
+            # 수동 시드 입력
+            manual_seed = st.number_input(
+                "시드 값 입력",
+                min_value=1,
+                max_value=2147483647,
+                value=st.session_state.get(f'{key_prefix}_locked_seed', 12345),
+                key=f"{key_prefix}_manual_input",
+                help="1 ~ 2,147,483,647 사이의 정수"
+            )
+            st.session_state[f'{key_prefix}_locked_seed'] = manual_seed
+            locked_seed = manual_seed
+
+        elif seed_mode == "first_image":
+            # 첫 이미지 시드 사용
+            if locked_seed:
+                st.success(f"✅ 첫 이미지 시드 잠금됨: {locked_seed:,}")
+            else:
+                st.info("ℹ️ 첫 번째 이미지 생성 시 시드가 자동으로 잠깁니다.")
+
+        elif seed_mode == "auto":
+            if locked_seed:
+                st.success(f"✅ 자동 잠금된 시드: {locked_seed:,}")
+            else:
+                st.info("ℹ️ 첫 번째 이미지 생성 시 시드가 자동으로 잠깁니다.")
+
+        # 버튼 행
+        btn_col1, btn_col2 = st.columns(2)
+
+        with btn_col1:
+            if st.button("🔓 시드 잠금 해제", key=f"{key_prefix}_unlock_btn", use_container_width=True):
+                st.session_state[f'{key_prefix}_locked_seed'] = None
+                st.session_state[f'{key_prefix}_lock_enabled'] = False
+                st.success("시드 잠금이 해제되었습니다.")
+                st.rerun()
+
+        with btn_col2:
+            if st.button("🎲 새 시드 생성", key=f"{key_prefix}_new_btn", use_container_width=True):
+                new_seed = random.randint(1, 2147483647)
+                st.session_state[f'{key_prefix}_locked_seed'] = new_seed
+                st.success(f"새 시드 생성됨: {new_seed:,}")
+                st.rerun()
+
+        # 일관성 유지 팁
+        with st.expander("💡 일관성 유지 팁", expanded=False):
+            st.markdown("""
+            **시드 잠금 사용 시 팁:**
+
+            1. **첫 이미지가 중요**: 마음에 드는 첫 이미지가 나올 때까지 시도 후 시드 잠금
+            2. **프롬프트 일관성**: 시드가 같아도 프롬프트가 크게 다르면 결과 달라짐
+            3. **캐릭터 설명 유지**: 캐릭터 외모 설명은 모든 프롬프트에 포함
+            4. **스타일 키워드 고정**: "cinematic", "anime style" 등 스타일 키워드 일관되게 사용
+
+            **권장 워크플로우:**
+            ```
+            1. 시드 잠금 OFF로 여러 이미지 생성
+            2. 마음에 드는 이미지 선택
+            3. 해당 이미지의 시드 확인 (메타데이터)
+            4. 시드 잠금 ON + 해당 시드 입력
+            5. 이후 씬들 일괄 생성
+            ```
+            """)
+
+    return seed_lock_enabled, locked_seed
+
+
+def lock_seed(seed: int, key_prefix: str = "seed"):
+    """시드 잠금 설정"""
+    st.session_state[f'{key_prefix}_locked_seed'] = seed
+    st.session_state[f'{key_prefix}_lock_enabled'] = True
+    print(f"[시드 잠금] 🔒 시드 잠금: {seed}", flush=True)
+
+
+def unlock_seed(key_prefix: str = "seed"):
+    """시드 잠금 해제"""
+    st.session_state[f'{key_prefix}_locked_seed'] = None
+    st.session_state[f'{key_prefix}_lock_enabled'] = False
+    print("[시드 잠금] 🔓 시드 잠금 해제", flush=True)
+
+
+def get_seed_for_generation(key_prefix: str = "seed") -> Optional[int]:
+    """
+    이미지 생성에 사용할 시드 반환
+
+    Returns:
+        잠긴 시드 값 또는 None (랜덤 시드 사용)
+    """
+    if not st.session_state.get(f'{key_prefix}_lock_enabled', False):
+        return None
+
+    return st.session_state.get(f'{key_prefix}_locked_seed', None)
+
+
+def update_locked_seed_from_result(seed: int, key_prefix: str = "seed"):
+    """
+    이미지 생성 결과에서 시드를 잠금 (자동/첫 이미지 모드용)
+
+    첫 번째 이미지 생성 후 호출하여 시드 자동 잠금
+    """
+    seed_mode = st.session_state.get(f'{key_prefix}_mode', 'auto')
+    locked_seed = st.session_state.get(f'{key_prefix}_locked_seed', None)
+
+    # 아직 시드가 잠기지 않은 경우에만 자동 잠금
+    if locked_seed is None and seed_mode in ['auto', 'first_image']:
+        st.session_state[f'{key_prefix}_locked_seed'] = seed
+        print(f"[시드 잠금] 🔒 첫 이미지 시드 자동 잠금: {seed}", flush=True)
+
+
+def render_image_with_seed_info(
+    image_path: str,
+    seed: int,
+    scene_id: int,
+    key_prefix: str = "seed"
+):
+    """
+    이미지 표시 + 시드 정보 및 잠금 버튼
+
+    Args:
+        image_path: 이미지 경로
+        seed: 사용된 시드
+        scene_id: 씬 ID
+        key_prefix: 키 접두사
+    """
+    col1, col2 = st.columns([3, 1])
+
+    with col1:
+        st.image(image_path, caption=f"씬 {scene_id}")
+
+    with col2:
+        st.metric("시드", f"{seed:,}" if seed else "N/A")
+
+        if seed and st.button(
+            "🔒 이 시드 잠금",
+            key=f"lock_seed_{key_prefix}_{scene_id}",
+            use_container_width=True
+        ):
+            lock_seed(seed, key_prefix)
+            st.success(f"시드 {seed:,} 잠금됨!")
             st.rerun()

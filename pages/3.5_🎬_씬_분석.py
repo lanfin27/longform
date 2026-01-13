@@ -131,6 +131,62 @@ def extract_prompts_from_scenes(scenes: list) -> str:
     return "\n".join(prompt_lines)
 
 
+# ============================================================
+# 캐릭터 이름 추출 헬퍼 함수 (v3.15)
+# ============================================================
+
+def extract_character_names(characters: list) -> list:
+    """캐릭터 리스트에서 이름만 추출
+
+    characters가 문자열 리스트 또는 딕셔너리 리스트일 수 있음:
+    - ["발표자", "화자"] → 그대로 반환
+    - [{"name": "발표자"}, {"name": "화자"}] → ["발표자", "화자"]
+
+    Args:
+        characters: 캐릭터 리스트 (문자열 또는 딕셔너리)
+
+    Returns:
+        캐릭터 이름 문자열 리스트
+    """
+    if not characters:
+        return []
+
+    names = []
+    for c in characters:
+        if isinstance(c, dict):
+            name = c.get("name", "")
+            if name:
+                names.append(str(name))
+        elif c:
+            names.append(str(c))
+    return names
+
+
+def format_character_names(characters: list, max_count: int = None) -> str:
+    """캐릭터 리스트를 포맷된 문자열로 변환
+
+    Args:
+        characters: 캐릭터 리스트 (문자열 또는 딕셔너리)
+        max_count: 최대 표시 개수 (None이면 전체)
+
+    Returns:
+        "이름1, 이름2, 이름3..." 형태의 문자열
+    """
+    names = extract_character_names(characters)
+    if not names:
+        return ""
+
+    if max_count:
+        display_names = names[:max_count]
+        result = ", ".join(display_names)
+        if len(names) > max_count:
+            result += "..."
+    else:
+        result = ", ".join(names)
+
+    return result
+
+
 def check_api_availability() -> dict:
     """각 AI API의 사용 가능 여부 확인"""
     availability = {}
@@ -835,7 +891,11 @@ with tab2:
         if not srt_scenes:
             st.warning("⚠️ SRT 데이터가 없습니다. '스크립트 입력' 탭에서 SRT 파일을 업로드하세요.")
         else:
-            from utils.srt_parser import SRTParser, convert_srt_to_scene_structure
+            from utils.srt_parser import (
+                SRTParser, convert_srt_to_scene_structure,
+                create_bundles, get_bundle_primary_scenes,
+                apply_bundle_analysis_result, get_bundle_summary
+            )
 
             st.info(f"""
             **SRT 직접 적용이란?**
@@ -846,18 +906,37 @@ with tab2:
             **현재 SRT 데이터**: {len(srt_scenes)}개 씬
             """)
 
-            # SRT 씬 미리보기
+            # SRT 씬 미리보기 (묶음 표시 포함)
             with st.expander("📋 적용될 씬 목록", expanded=True):
-                for scene in srt_scenes[:5]:
+                # 미리보기용 임시 묶음 계산
+                preview_bundle_size = st.session_state.get("srt_bundle_size", 2) or 2
+                current_bundle = 1
+
+                for i, scene in enumerate(srt_scenes[:10]):
+                    # 묶음 번호 계산
+                    if preview_bundle_size > 1:
+                        bundle_num = (i // preview_bundle_size) + 1
+                        is_bundle_start = (i % preview_bundle_size == 0)
+                        bundle_indicator = f"📦{bundle_num}" if is_bundle_start else "  └─"
+                    else:
+                        bundle_indicator = ""
+
                     char_count = len(scene.get('narration', ''))
                     char_warning = " ⚠️" if char_count > 250 else ""
-                    st.markdown(f"""
-                    **씬 {scene['scene_id']}** `{scene['start_time']} → {scene['end_time']}` ({scene['duration']:.1f}초){char_warning}
-                    > {scene['narration'][:80]}{'...' if len(scene['narration']) > 80 else ''}
-                    """)
 
-                if len(srt_scenes) > 5:
-                    st.caption(f"... 외 {len(srt_scenes) - 5}개 씬")
+                    if preview_bundle_size > 1:
+                        st.markdown(f"""
+                        {bundle_indicator} **씬 {scene['scene_id']}** `{scene['start_time']} → {scene['end_time']}` ({scene['duration']:.1f}초){char_warning}
+                        > {scene['narration'][:80]}{'...' if len(scene['narration']) > 80 else ''}
+                        """)
+                    else:
+                        st.markdown(f"""
+                        **씬 {scene['scene_id']}** `{scene['start_time']} → {scene['end_time']}` ({scene['duration']:.1f}초){char_warning}
+                        > {scene['narration'][:80]}{'...' if len(scene['narration']) > 80 else ''}
+                        """)
+
+                if len(srt_scenes) > 10:
+                    st.caption(f"... 외 {len(srt_scenes) - 10}개 씬")
 
             st.divider()
 
@@ -870,6 +949,416 @@ with tab2:
                 help="각 씬에 대해 AI가 이미지 프롬프트와 캐릭터 프롬프트를 생성합니다.",
                 key="srt_generate_prompts"
             )
+
+            # ═══════════════════════════════════════════════════════════════════
+            # SRT 프롬프트 설정 UI (프롬프트 생성 시에만 표시)
+            # ═══════════════════════════════════════════════════════════════════
+            if generate_prompts:
+                from core.prompt.prompt_template_manager import get_template_manager
+
+                with st.expander("📝 SRT 분석 프롬프트 설정", expanded=False):
+                    template_manager = get_template_manager()
+
+                    # SRT 템플릿 목록 가져오기
+                    srt_templates = template_manager.get_srt_templates()
+
+                    if not srt_templates:
+                        st.info("기본 SRT 분석 프롬프트를 사용합니다.")
+                    else:
+                        st.caption("현재 적용된 SRT 분석 프롬프트를 확인하고 수정할 수 있습니다.")
+
+                        # 단일 씬 프롬프트 표시/수정
+                        st.markdown("**📌 단일 씬 분석 프롬프트**")
+                        st.caption("순차/병렬 처리 시 각 씬에 적용되는 프롬프트")
+
+                        single_template = template_manager.get_srt_single_template()
+                        if single_template:
+                            single_prompt_key = "srt_single_prompt_edit"
+                            edited_single = st.text_area(
+                                "단일 씬 프롬프트",
+                                value=single_template.prompt,
+                                height=200,
+                                key=single_prompt_key,
+                                label_visibility="collapsed"
+                            )
+
+                            # 수정 여부 확인
+                            single_modified = edited_single != single_template.prompt
+
+                            if single_modified:
+                                col_s1, col_s2 = st.columns(2)
+                                with col_s1:
+                                    if st.button("💾 단일 프롬프트 저장", key="save_single_prompt"):
+                                        if template_manager.update_template(
+                                            single_template.id,
+                                            edited_single,
+                                            name=single_template.name,
+                                            description=single_template.description
+                                        ):
+                                            st.success("✅ 저장됨!")
+                                            st.rerun()
+                                        else:
+                                            st.error("저장 실패")
+                                with col_s2:
+                                    if st.button("🔄 되돌리기", key="revert_single_prompt"):
+                                        st.rerun()
+
+                        st.markdown("---")
+
+                        # 배치 프롬프트 표시/수정
+                        st.markdown("**📦 배치 분석 프롬프트**")
+                        st.caption("배치 처리 시 여러 씬을 한 번에 분석하는 프롬프트")
+
+                        batch_template = template_manager.get_srt_batch_template()
+                        if batch_template:
+                            batch_prompt_key = "srt_batch_prompt_edit"
+                            edited_batch = st.text_area(
+                                "배치 프롬프트",
+                                value=batch_template.prompt,
+                                height=200,
+                                key=batch_prompt_key,
+                                label_visibility="collapsed"
+                            )
+
+                            # 수정 여부 확인
+                            batch_modified = edited_batch != batch_template.prompt
+
+                            if batch_modified:
+                                col_b1, col_b2 = st.columns(2)
+                                with col_b1:
+                                    if st.button("💾 배치 프롬프트 저장", key="save_batch_prompt"):
+                                        if template_manager.update_template(
+                                            batch_template.id,
+                                            edited_batch,
+                                            name=batch_template.name,
+                                            description=batch_template.description
+                                        ):
+                                            st.success("✅ 저장됨!")
+                                            st.rerun()
+                                        else:
+                                            st.error("저장 실패")
+                                with col_b2:
+                                    if st.button("🔄 되돌리기", key="revert_batch_prompt"):
+                                        st.rerun()
+
+                        st.markdown("---")
+
+                        # 새 버전 생성
+                        st.markdown("**➕ 새 프롬프트 버전 생성**")
+                        new_name = st.text_input(
+                            "새 프롬프트 이름",
+                            placeholder="예: SRT 분석 프롬프트 (상세 버전)",
+                            key="new_srt_template_name"
+                        )
+                        new_prompt = st.text_area(
+                            "프롬프트 내용",
+                            placeholder="새 프롬프트 내용을 입력하세요...",
+                            height=150,
+                            key="new_srt_template_content"
+                        )
+                        if st.button("➕ 새 버전 추가", key="add_new_srt_template"):
+                            if new_name and new_prompt:
+                                new_template = template_manager.create_srt_template(
+                                    name=new_name,
+                                    description="사용자 정의 SRT 분석 프롬프트",
+                                    prompt=new_prompt
+                                )
+                                if new_template:
+                                    st.success(f"✅ '{new_name}' 생성 완료!")
+                                    st.rerun()
+                                else:
+                                    st.error("생성 실패")
+                            else:
+                                st.warning("이름과 내용을 모두 입력하세요.")
+
+            # ═══════════════════════════════════════════════════════════════════
+            # 🔀 분석 모드 선택 (v3.18 추가)
+            # ═══════════════════════════════════════════════════════════════════
+            st.markdown("##### 🔀 분석 모드 선택")
+            st.caption("기존 분석 데이터 처리 방식을 선택합니다.")
+
+            analysis_mode = st.radio(
+                "분석 모드",
+                options=["overwrite", "new"],
+                format_func=lambda x: {
+                    "overwrite": "📝 덮어쓰기 (기존 분석 유지, 선택된 씬만 업데이트)",
+                    "new": "🆕 새로운 분석 (기존 분석 삭제 후 새로 시작)"
+                }[x],
+                horizontal=False,
+                key="srt_analysis_mode",
+                help="덮어쓰기: 기존 분석 결과 유지하며 선택된 씬만 업데이트 | 새로운 분석: 기존 분석 완전 삭제"
+            )
+
+            # 새로운 분석 모드 경고
+            new_analysis_confirmed = True  # 기본값: 덮어쓰기 모드면 확인 불필요
+            if analysis_mode == "new":
+                st.warning("""
+                ⚠️ **주의**: '새로운 분석' 모드는 기존 분석 데이터를 **완전히 삭제**합니다.
+                - scenes.json, characters.json, full_analysis.json 삭제
+                - 되돌릴 수 없습니다!
+                """)
+                new_analysis_confirmed = st.checkbox(
+                    "✅ 기존 분석 데이터 삭제에 동의합니다",
+                    key="confirm_new_analysis",
+                    value=False
+                )
+                if not new_analysis_confirmed:
+                    st.info("💡 위 체크박스를 선택해야 분석을 실행할 수 있습니다.")
+
+            st.divider()
+
+            # ═══════════════════════════════════════════════════════════════════
+            # 🎯 분석 범위 선택 (v3.16 추가)
+            # ═══════════════════════════════════════════════════════════════════
+            st.markdown("##### 🎯 분석 범위 선택")
+            st.caption("전체 씬 또는 특정 범위만 분석할 수 있습니다.")
+
+            # 기존 분석 결과 로드 (미분석/실패 씬 확인용)
+            existing_analysis = {}
+            analysis_path = project_path / "analysis" / "scenes.json"
+            if analysis_path.exists():
+                try:
+                    with open(analysis_path, "r", encoding="utf-8") as f:
+                        existing_scenes = json.load(f)
+                        for scene in existing_scenes:
+                            sid = scene.get("scene_id") or scene.get("scene_num")
+                            if sid:
+                                existing_analysis[sid] = scene
+                except:
+                    pass
+
+            # 분석 범위 선택 라디오
+            range_mode = st.radio(
+                "범위 선택 모드",
+                options=["all", "range", "individual"],
+                format_func=lambda x: {"all": "🌐 전체", "range": "📏 구간 지정", "individual": "☑️ 개별 선택"}[x],
+                horizontal=True,
+                key="srt_range_mode",
+                label_visibility="collapsed"
+            )
+
+            # 선택된 씬 ID 저장용
+            selected_scene_ids = []
+            total_scenes = len(srt_scenes)
+
+            if range_mode == "all":
+                # 전체 선택
+                selected_scene_ids = [s.get("scene_id", i+1) for i, s in enumerate(srt_scenes)]
+                st.info(f"✅ 전체 {total_scenes}개 씬이 선택되었습니다.")
+
+            elif range_mode == "range":
+                # 구간 지정
+                range_col1, range_col2 = st.columns(2)
+
+                with range_col1:
+                    start_scene = st.number_input(
+                        "시작 씬 번호",
+                        min_value=1,
+                        max_value=total_scenes,
+                        value=1,
+                        key="srt_range_start"
+                    )
+
+                with range_col2:
+                    end_scene = st.number_input(
+                        "종료 씬 번호",
+                        min_value=1,
+                        max_value=total_scenes,
+                        value=min(10, total_scenes),
+                        key="srt_range_end"
+                    )
+
+                # 빠른 선택 버튼
+                st.markdown("**⚡ 빠른 선택**")
+                quick_col1, quick_col2, quick_col3, quick_col4 = st.columns(4)
+
+                with quick_col1:
+                    if st.button("처음 10개", key="quick_first_10", use_container_width=True):
+                        st.session_state["srt_range_start"] = 1
+                        st.session_state["srt_range_end"] = min(10, total_scenes)
+                        st.rerun()
+
+                with quick_col2:
+                    if st.button("처음 50개", key="quick_first_50", use_container_width=True):
+                        st.session_state["srt_range_start"] = 1
+                        st.session_state["srt_range_end"] = min(50, total_scenes)
+                        st.rerun()
+
+                with quick_col3:
+                    if st.button("마지막 50개", key="quick_last_50", use_container_width=True):
+                        st.session_state["srt_range_start"] = max(1, total_scenes - 49)
+                        st.session_state["srt_range_end"] = total_scenes
+                        st.rerun()
+
+                with quick_col4:
+                    if st.button("전체 선택", key="quick_all", use_container_width=True):
+                        st.session_state["srt_range_start"] = 1
+                        st.session_state["srt_range_end"] = total_scenes
+                        st.rerun()
+
+                # 구간 유효성 검사
+                if start_scene <= end_scene:
+                    selected_scene_ids = [
+                        s.get("scene_id", i+1)
+                        for i, s in enumerate(srt_scenes)
+                        if start_scene <= s.get("scene_id", i+1) <= end_scene
+                    ]
+                    st.success(f"✅ 씬 {start_scene} ~ {end_scene} ({len(selected_scene_ids)}개) 선택됨")
+                else:
+                    st.error("❌ 시작 씬 번호가 종료 씬 번호보다 큽니다.")
+                    selected_scene_ids = []
+
+            else:  # individual
+                # 개별 선택
+                st.markdown("**⚡ 빠른 선택 버튼**")
+                quick_col1, quick_col2, quick_col3, quick_col4 = st.columns(4)
+
+                # 미분석 씬 계산
+                unanalyzed_ids = []
+                failed_ids = []
+                for i, s in enumerate(srt_scenes):
+                    sid = s.get("scene_id", i+1)
+                    if sid not in existing_analysis:
+                        unanalyzed_ids.append(sid)
+                    else:
+                        # 분석 실패 여부 확인 (프롬프트가 없거나 에러 표시가 있는 경우)
+                        existing = existing_analysis[sid]
+                        has_prompt = existing.get("image_prompt_en") or existing.get("image_prompt")
+                        has_error = existing.get("analysis_error") or existing.get("error")
+                        if not has_prompt or has_error:
+                            failed_ids.append(sid)
+
+                with quick_col1:
+                    if st.button(f"📭 미분석 ({len(unanalyzed_ids)})", key="quick_unanalyzed", use_container_width=True):
+                        if unanalyzed_ids:
+                            st.session_state["srt_individual_selection"] = unanalyzed_ids
+                            st.rerun()
+                        else:
+                            st.toast("모든 씬이 이미 분석되었습니다.")
+
+                with quick_col2:
+                    if st.button(f"❌ 실패 ({len(failed_ids)})", key="quick_failed", use_container_width=True):
+                        if failed_ids:
+                            st.session_state["srt_individual_selection"] = failed_ids
+                            st.rerun()
+                        else:
+                            st.toast("분석 실패한 씬이 없습니다.")
+
+                with quick_col3:
+                    if st.button("✅ 전체 선택", key="quick_select_all", use_container_width=True):
+                        all_ids = [s.get("scene_id", i+1) for i, s in enumerate(srt_scenes)]
+                        st.session_state["srt_individual_selection"] = all_ids
+                        st.rerun()
+
+                with quick_col4:
+                    if st.button("🔄 전체 해제", key="quick_deselect_all", use_container_width=True):
+                        st.session_state["srt_individual_selection"] = []
+                        st.rerun()
+
+                # 개별 씬 체크박스 (페이지네이션)
+                st.markdown("---")
+                st.markdown("**☑️ 개별 씬 선택**")
+
+                # 페이지네이션 설정
+                page_size = 20
+                total_pages = (total_scenes + page_size - 1) // page_size
+
+                page_col1, page_col2 = st.columns([3, 1])
+                with page_col1:
+                    current_page = st.number_input(
+                        f"페이지 (1-{total_pages})",
+                        min_value=1,
+                        max_value=max(1, total_pages),
+                        value=1,
+                        key="srt_individual_page"
+                    )
+                with page_col2:
+                    st.markdown(f"<br>", unsafe_allow_html=True)
+                    st.caption(f"총 {total_scenes}개 씬")
+
+                # 현재 페이지의 씬 표시
+                start_idx = (current_page - 1) * page_size
+                end_idx = min(start_idx + page_size, total_scenes)
+                page_scenes = srt_scenes[start_idx:end_idx]
+
+                # 이전 선택 상태 로드
+                prev_selection = st.session_state.get("srt_individual_selection", [])
+
+                # 체크박스 표시 (3열)
+                checkbox_cols = st.columns(3)
+                new_selection = list(prev_selection)  # 복사본 생성
+
+                for i, scene in enumerate(page_scenes):
+                    col_idx = i % 3
+                    sid = scene.get("scene_id", start_idx + i + 1)
+
+                    # 분석 상태 아이콘
+                    status_icon = ""
+                    if sid not in existing_analysis:
+                        status_icon = "📭"  # 미분석
+                    else:
+                        existing = existing_analysis[sid]
+                        has_prompt = existing.get("image_prompt_en") or existing.get("image_prompt")
+                        has_error = existing.get("analysis_error") or existing.get("error")
+                        if has_error or not has_prompt:
+                            status_icon = "❌"  # 실패
+                        else:
+                            status_icon = "✅"  # 성공
+
+                    with checkbox_cols[col_idx]:
+                        is_checked = st.checkbox(
+                            f"{status_icon} 씬 {sid}",
+                            value=sid in prev_selection,
+                            key=f"scene_checkbox_{sid}"
+                        )
+
+                        if is_checked and sid not in new_selection:
+                            new_selection.append(sid)
+                        elif not is_checked and sid in new_selection:
+                            new_selection.remove(sid)
+
+                # 선택 상태 업데이트
+                st.session_state["srt_individual_selection"] = new_selection
+                selected_scene_ids = new_selection
+
+                st.info(f"✅ {len(selected_scene_ids)}개 씬 선택됨")
+
+                # 선택된 씬 미리보기
+                if selected_scene_ids and len(selected_scene_ids) <= 30:
+                    with st.expander("📋 선택된 씬 목록", expanded=False):
+                        sorted_ids = sorted(selected_scene_ids)
+                        st.write(", ".join([f"씬 {sid}" for sid in sorted_ids]))
+
+            # 선택된 씬 ID를 세션에 저장
+            st.session_state["srt_selected_scene_ids"] = selected_scene_ids
+
+            st.divider()
+
+            # 묶음 분석 옵션 (v3.15 추가)
+            st.markdown("##### 📦 묶음 씬분석 옵션")
+
+            bundle_col1, bundle_col2 = st.columns([1, 2])
+
+            with bundle_col1:
+                bundle_size = st.selectbox(
+                    "묶음 크기",
+                    options=[1, 2, 3, 4, 5],
+                    index=1,  # 기본값 2
+                    help="N개의 씬을 묶어서 하나의 분석 단위로 처리합니다. 안정적인 이미지 전환(5-10초)에 효과적입니다.",
+                    key="srt_bundle_size"
+                )
+
+            with bundle_col2:
+                if bundle_size == 1:
+                    st.info("📍 개별 분석: 각 씬을 독립적으로 분석합니다.")
+                else:
+                    total_bundles = (len(srt_scenes) + bundle_size - 1) // bundle_size
+                    st.info(f"""
+                    📦 **묶음 분석**: {len(srt_scenes)}개 씬 → {total_bundles}개 묶음
+                    - 묶음당 평균 길이: ~{sum(s['duration'] for s in srt_scenes) / total_bundles:.1f}초
+                    - AI 호출 횟수 감소 → 비용 절감
+                    - 묶음 내 씬들은 동일한 프롬프트 공유
+                    """)
 
             # AI 모델 및 처리 모드 선택 (프롬프트 생성 시에만 표시)
             selected_model = "claude-sonnet-4-20250514"
@@ -910,16 +1399,29 @@ with tab2:
                         provider_icon = {"anthropic": "🟠", "google": "🔵", "openai": "🟢"}.get(model_info.provider.value, "")
                         st.caption(f"{provider_icon} 선택된 모델: **{model_info.name}** - {model_info.description}")
 
-                    # 속도 예상 표시
+                    # 속도 예상 표시 (선택된 씬 수 기반)
+                    selected_count = len(st.session_state.get("srt_selected_scene_ids", srt_scenes))
                     speed_info = {
-                        "sequential": f"⏱️ 예상 시간: ~{len(srt_scenes) * 3}초 (순차 처리)",
-                        "batch": f"⚡ 예상 시간: ~{(len(srt_scenes) // 5 + 1) * 5}초 (배치 처리)",
-                        "parallel": f"🚀 예상 시간: ~{max(len(srt_scenes) // 3, 5)}초 (병렬 처리)"
+                        "sequential": f"⏱️ 예상 시간: ~{selected_count * 3}초 (순차 처리)",
+                        "batch": f"⚡ 예상 시간: ~{(selected_count // 5 + 1) * 5}초 (배치 처리)",
+                        "parallel": f"🚀 예상 시간: ~{max(selected_count // 3, 5)}초 (병렬 처리)"
                     }
                     st.caption(speed_info.get(processing_mode, ""))
 
             # 적용 버튼
-            if st.button("🚀 SRT 씬 적용하기", type="primary", use_container_width=True):
+            selected_scene_ids_final = st.session_state.get("srt_selected_scene_ids", [])
+            btn_label = f"🚀 SRT 씬 적용하기 ({len(selected_scene_ids_final)}개 선택됨)"
+
+            if not selected_scene_ids_final:
+                st.warning("⚠️ 분석할 씬을 선택해주세요.")
+                st.stop()
+
+            # 새로운 분석 모드 확인 (v3.18)
+            if analysis_mode == "new" and not new_analysis_confirmed:
+                st.error("❌ '새로운 분석' 모드를 사용하려면 데이터 삭제에 동의해주세요.")
+                st.stop()
+
+            if st.button(btn_label, type="primary", use_container_width=True):
                 progress = st.progress(0)
                 status = st.empty()
 
@@ -927,13 +1429,71 @@ with tab2:
                     import time as time_module
                     start_time = time_module.time()
 
-                    # SRT 씬을 분석 결과 형식으로 변환
+                    # ⭐ 선택된 씬만 필터링 (v3.16)
+                    status.text("선택된 씬 필터링 중...")
+                    filtered_srt_scenes = [
+                        s for s in srt_scenes
+                        if s.get("scene_id", srt_scenes.index(s) + 1) in selected_scene_ids_final
+                    ]
+
+                    if not filtered_srt_scenes:
+                        st.error("❌ 선택된 씬을 찾을 수 없습니다.")
+                        st.stop()
+
+                    st.info(f"📊 {len(filtered_srt_scenes)}개 씬 분석 시작 (전체 {len(srt_scenes)}개 중)")
+
+                    # ⭐ 분석 모드에 따른 기존 데이터 처리 (v3.18)
+                    existing_scenes_dict = {}
+                    existing_characters = []
+                    analysis_dir = project_path / "analysis"
+                    existing_full_path = analysis_dir / "full_analysis.json"
+                    existing_scenes_path = analysis_dir / "scenes.json"
+                    existing_chars_path = analysis_dir / "characters.json"
+
+                    if analysis_mode == "new":
+                        # 🆕 새로운 분석 모드: 기존 파일 삭제
+                        status.text("기존 분석 데이터 삭제 중...")
+                        deleted_files = []
+                        for fpath in [existing_full_path, existing_scenes_path, existing_chars_path]:
+                            if fpath.exists():
+                                try:
+                                    fpath.unlink()
+                                    deleted_files.append(fpath.name)
+                                except Exception as e:
+                                    print(f"[씬 분석] 파일 삭제 실패: {fpath} - {e}", flush=True)
+
+                        if deleted_files:
+                            st.toast(f"🗑️ 삭제됨: {', '.join(deleted_files)}")
+                        print(f"[씬 분석] 새로운 분석 모드 - 기존 파일 삭제: {deleted_files}", flush=True)
+                        # existing_scenes_dict, existing_characters는 빈 상태 유지
+
+                    elif analysis_mode == "overwrite":
+                        # 📝 덮어쓰기 모드: 기존 분석 결과 로드 (병합용)
+                        if existing_full_path.exists():
+                            try:
+                                with open(existing_full_path, "r", encoding="utf-8") as f:
+                                    existing_data = json.load(f)
+                                    for scene in existing_data.get("scenes", []):
+                                        sid = scene.get("scene_id") or scene.get("scene_num")
+                                        if sid:
+                                            existing_scenes_dict[sid] = scene
+                                    existing_characters = existing_data.get("characters", [])
+                                print(f"[씬 분석] 덮어쓰기 모드 - 기존 {len(existing_scenes_dict)}개 씬 로드", flush=True)
+                            except:
+                                pass
+
+                    # SRT 씬을 분석 결과 형식으로 변환 (선택된 씬만)
                     status.text("씬 데이터 변환 중...")
-                    analysis_scenes = convert_srt_to_scene_structure(srt_scenes)
+                    analysis_scenes = convert_srt_to_scene_structure(filtered_srt_scenes)
+
+                    # 묶음 생성 (v3.15)
+                    status.text(f"씬 묶음 생성 중 (묶음 크기: {bundle_size})...")
+                    analysis_scenes = create_bundles(analysis_scenes, bundle_size)
+                    bundle_summary = get_bundle_summary(analysis_scenes)
 
                     # 프롬프트 생성 (옵션)
                     if generate_prompts:
-                        from utils.scene_speed_analyzer import analyze_scenes_with_mode
+                        from utils.scene_speed_analyzer import analyze_scenes_with_mode, get_analysis_metadata
                         from utils.character_visual_prompt import post_process_analysis_characters
                         from utils.ai_providers import get_available_models, get_model
 
@@ -945,16 +1505,42 @@ with tab2:
                             model_info = get_model(selected_model) if selected_model else None
                             model_display = model_info.name if model_info else selected_model
                             provider_display = model_info.provider.value if model_info else "unknown"
-                            status.text(f"AI 프롬프트 생성 중... ({model_display})")
+
+                            # 묶음 분석: 대표 씬만 분석
+                            primary_scenes = get_bundle_primary_scenes(analysis_scenes)
+                            total_bundles = len(primary_scenes)
+
+                            if bundle_size > 1:
+                                status.text(f"AI 프롬프트 생성 중... ({model_display}) - {total_bundles}개 묶음 분석")
+                            else:
+                                status.text(f"AI 프롬프트 생성 중... ({model_display})")
+
+                            # 대표 씬들에 bundle_text를 narration으로 사용 (더 많은 컨텍스트)
+                            for ps in primary_scenes:
+                                ps['_original_narration'] = ps.get('narration', '')
+                                ps['narration'] = ps.get('bundle_text', ps.get('narration', ''))
 
                             # 새로운 속도 개선 분석기 사용 (멀티 프로바이더 지원)
-                            analysis_scenes = analyze_scenes_with_mode(
-                                scenes=analysis_scenes,
+                            analyzed_primary = analyze_scenes_with_mode(
+                                scenes=primary_scenes,
                                 mode=processing_mode,
                                 model=selected_model,
-                                progress_callback=lambda p: progress.progress(p * 0.8),  # 80%까지
+                                progress_callback=lambda p: progress.progress(p * 0.7),  # 70%까지
                                 status_callback=lambda s: status.text(s)
                             )
+
+                            # 대표 씬 narration 복원
+                            for ps in analyzed_primary:
+                                if '_original_narration' in ps:
+                                    ps['narration'] = ps['_original_narration']
+                                    del ps['_original_narration']
+
+                            # 묶음 결과를 모든 씬에 적용 (v3.15)
+                            progress.progress(0.75)
+                            status.text("묶음 분석 결과 적용 중...")
+
+                            for analyzed in analyzed_primary:
+                                apply_bundle_analysis_result(analysis_scenes, analyzed)
 
                             # 캐릭터 visual_prompt 후처리 (빠른 모델 사용)
                             progress.progress(0.85)
@@ -1012,6 +1598,39 @@ with tab2:
                                         "visual_prompt": ""
                                     })
 
+                    # ⭐ 분석 메타데이터 수집
+                    analysis_metadata = {}
+                    if generate_prompts:
+                        try:
+                            analysis_metadata = get_analysis_metadata()
+                        except Exception as e:
+                            print(f"[씬 분석] 메타데이터 수집 실패: {e}")
+
+                    # ⭐ 부분 분석 시 기존 데이터와 병합 (v3.16)
+                    if existing_scenes_dict:
+                        status.text("기존 분석 결과와 병합 중...")
+
+                        # 새로 분석된 씬으로 기존 데이터 업데이트
+                        for scene in analysis_scenes:
+                            sid = scene.get("scene_id") or scene.get("scene_num")
+                            if sid:
+                                existing_scenes_dict[sid] = scene
+
+                        # scene_id 순으로 정렬하여 최종 리스트 생성
+                        merged_scenes = sorted(
+                            existing_scenes_dict.values(),
+                            key=lambda x: x.get("scene_id") or x.get("scene_num") or 0
+                        )
+                        analysis_scenes = merged_scenes
+
+                        # 기존 캐릭터와 새 캐릭터 병합
+                        existing_char_names = {c.get('name') for c in existing_characters if c.get('name')}
+                        for char in all_characters:
+                            if char.get('name') and char.get('name') not in existing_char_names:
+                                existing_characters.append(char)
+                                existing_char_names.add(char.get('name'))
+                        all_characters = existing_characters
+
                     result = {
                         "scenes": analysis_scenes,
                         "characters": all_characters,
@@ -1020,7 +1639,18 @@ with tab2:
                             "total_scenes": len(srt_scenes),
                             "total_duration": srt_scenes[-1]['end_seconds'] if srt_scenes else 0,
                             "has_time_codes": True
-                        }
+                        },
+                        "bundle_metadata": {
+                            "bundle_size": bundle_size,
+                            "total_bundles": bundle_summary.get('total_bundles', len(analysis_scenes)),
+                            "bundles": bundle_summary.get('bundles', [])
+                        },
+                        # ⭐ AI 분석 메타데이터 추가
+                        "analysis_metadata": analysis_metadata if analysis_metadata else None,
+                        "prompt_used": analysis_metadata.get('prompt_template', None) if analysis_metadata else None,
+                        # ⭐ 분석 모드 정보 추가 (v3.18)
+                        "analysis_mode": analysis_mode,
+                        "was_merged": analysis_mode == "overwrite" and len(existing_scenes_dict) > 0
                     }
 
                     with open(analysis_dir / "scenes.json", "w", encoding="utf-8") as f:
@@ -1039,12 +1669,42 @@ with tab2:
                     st.session_state["scene_characters"] = all_characters
                     st.session_state["extracted_characters"] = all_characters
                     st.session_state["analysis_source"] = "srt"
+                    # ⭐ 분석 메타데이터 세션에 저장
+                    if analysis_metadata:
+                        st.session_state["analysis_metadata"] = analysis_metadata
+
+                    # 부분 분석 여부에 따른 통계 (v3.17.1 - 변수 정의 순서 수정)
+                    analyzed_count = len(filtered_srt_scenes)
+                    total_count = len(analysis_scenes)
+                    is_partial = analyzed_count < total_count
+
+                    # ⭐ 분석 완료 플래그 및 타임스탬프 (v3.17 - UI 즉시 갱신용)
+                    import time as time_mod
+                    st.session_state["analysis_timestamp"] = time_mod.time()
+                    st.session_state["analysis_complete"] = True
+                    st.session_state["last_analyzed_count"] = analyzed_count
+                    st.session_state["last_total_count"] = total_count
+                    st.session_state["last_analyzed_ids"] = [s.get("scene_id") for s in filtered_srt_scenes]
 
                     # 다른 페이지 캐시 클리어 (Problem 56)
                     clear_scene_cache(str(project_path))
 
                     status.empty()
-                    st.success(f"✅ SRT 씬 적용 완료! {len(analysis_scenes)}개 씬이 저장되었습니다.")
+
+                    # 모드별 아이콘
+                    mode_icon = "🆕" if analysis_mode == "new" else "📝"
+                    mode_text = "새로운 분석" if analysis_mode == "new" else "덮어쓰기"
+
+                    if bundle_size > 1:
+                        if is_partial:
+                            st.success(f"✅ SRT 씬 적용 완료! [{mode_icon} {mode_text}] {analyzed_count}개 씬 분석 → 전체 {total_count}개 씬 ({bundle_summary.get('total_bundles', 0)}개 묶음) 저장됨")
+                        else:
+                            st.success(f"✅ SRT 씬 적용 완료! [{mode_icon} {mode_text}] {total_count}개 씬 ({bundle_summary.get('total_bundles', 0)}개 묶음)이 저장되었습니다.")
+                    else:
+                        if is_partial:
+                            st.success(f"✅ SRT 씬 적용 완료! [{mode_icon} {mode_text}] {analyzed_count}개 씬 분석 → 전체 {total_count}개 씬 저장됨")
+                        else:
+                            st.success(f"✅ SRT 씬 적용 완료! [{mode_icon} {mode_text}] {total_count}개 씬이 저장되었습니다.")
                     st.balloons()
 
                     time.sleep(1)
@@ -1073,7 +1733,16 @@ with tab2:
                 else:
                     source_label = "🤖 AI 자동 분석"
 
-                col1, col2, col3, col4 = st.columns(4)
+                # 묶음 메타데이터 확인
+                bundle_meta = saved_analysis.get("bundle_metadata", {})
+                has_bundles = bundle_meta.get("bundle_size", 1) > 1
+
+                if has_bundles:
+                    col1, col2, col3, col4, col5 = st.columns(5)
+                else:
+                    col1, col2, col3, col4 = st.columns(4)
+                    col5 = None
+
                 col1.metric("씬 수", len(saved_analysis.get("scenes", [])))
                 col2.metric("캐릭터 수", len(saved_analysis.get("characters", [])))
                 col3.metric("소스", source_label)
@@ -1083,6 +1752,24 @@ with tab2:
                 if srt_meta.get("has_time_codes"):
                     total_duration = srt_meta.get("total_duration", 0)
                     col4.metric("전체 길이", f"{int(total_duration // 60)}:{int(total_duration % 60):02d}")
+
+                # 묶음 메타데이터 표시
+                if has_bundles and col5:
+                    col5.metric("📦 묶음", f"{bundle_meta.get('total_bundles', 0)}개 (x{bundle_meta.get('bundle_size', 1)})")
+
+                # 묶음 상세 정보 표시
+                if has_bundles:
+                    with st.expander("📦 묶음 상세 정보"):
+                        bundles_info = bundle_meta.get("bundles", [])
+                        if bundles_info:
+                            for bundle in bundles_info[:10]:  # 최대 10개까지 표시
+                                scene_ids = bundle.get("scene_ids", [])
+                                duration = bundle.get("duration", 0)
+                                st.markdown(f"""
+                                **묶음 {bundle.get('bundle_id')}**: 씬 {scene_ids[0] if scene_ids else '?'}-{scene_ids[-1] if scene_ids else '?'} | {duration:.1f}초 | {len(scene_ids)}개 씬
+                                """)
+                            if len(bundles_info) > 10:
+                                st.caption(f"... 외 {len(bundles_info) - 10}개 묶음")
 
     # ═══════════════════════════════════════════════════════════════════
     # AI 자동 분석 모드
@@ -1339,6 +2026,13 @@ with tab2:
             with open(analysis_path, "r", encoding="utf-8") as f:
                 saved_analysis = json.load(f)
 
+            # ⭐ 저장된 분석 메타데이터 세션에 복원
+            saved_metadata = saved_analysis.get("analysis_metadata", {})
+            if saved_metadata:
+                if saved_analysis.get("prompt_used") and 'prompt_template' not in saved_metadata:
+                    saved_metadata['prompt_template'] = saved_analysis.get("prompt_used")
+                st.session_state["analysis_metadata"] = saved_metadata
+
             st.divider()
             st.subheader("📊 분석 결과")
 
@@ -1417,7 +2111,7 @@ with tab2:
 
                         st.markdown("**👤 등장 캐릭터**")
                         if chars:
-                            st.write(", ".join(chars))
+                            st.write(format_character_names(chars))
                         else:
                             st.caption("없음")
 
@@ -1586,22 +2280,42 @@ with tab4:
     scenes_path = project_path / "analysis" / "scenes.json"
     characters_path = project_path / "analysis" / "characters.json"
 
-    # 데이터 로드
+    # ⭐ 데이터 로드 - 세션 스테이트 우선 (v3.17)
     scenes_data = []
     characters_data = []
     full_result = None
+    data_source = "file"  # 데이터 소스 추적
 
-    if scenes_path.exists():
-        with open(scenes_path, "r", encoding="utf-8") as f:
-            scenes_data = json.load(f)
+    # 1. 세션 스테이트에서 먼저 확인 (가장 최신 데이터)
+    if st.session_state.get("scenes") and st.session_state.get("analysis_complete"):
+        scenes_data = st.session_state["scenes"]
+        characters_data = st.session_state.get("characters", [])
+        full_result = st.session_state.get("scene_analysis_result")
+        data_source = "session"
+    # 2. 파일에서 로드 (폴백)
+    else:
+        if scenes_path.exists():
+            with open(scenes_path, "r", encoding="utf-8") as f:
+                scenes_data = json.load(f)
 
-    if characters_path.exists():
-        with open(characters_path, "r", encoding="utf-8") as f:
-            characters_data = json.load(f)
+        if characters_path.exists():
+            with open(characters_path, "r", encoding="utf-8") as f:
+                characters_data = json.load(f)
 
-    if analysis_path.exists():
-        with open(analysis_path, "r", encoding="utf-8") as f:
-            full_result = json.load(f)
+        if analysis_path.exists():
+            with open(analysis_path, "r", encoding="utf-8") as f:
+                full_result = json.load(f)
+
+    # ⭐ 최근 분석 정보 표시
+    last_analyzed_count = st.session_state.get("last_analyzed_count", 0)
+    last_total_count = st.session_state.get("last_total_count", 0)
+    last_analyzed_ids = st.session_state.get("last_analyzed_ids", [])
+
+    if last_analyzed_count > 0 and last_total_count > 0:
+        if last_analyzed_count < last_total_count:
+            st.info(f"🔄 최근 분석: {last_analyzed_count}개 씬 (전체 {last_total_count}개 중) | 소스: {data_source}")
+        else:
+            st.success(f"✅ 전체 {last_total_count}개 씬 분석 완료 | 소스: {data_source}")
 
     if scenes_data or full_result:
         # 서브 탭으로 구성
@@ -1681,12 +2395,31 @@ with tab4:
                 st.markdown("---")
 
             if scenes_data:
+                # ⭐ 최근 분석된 씬 필터링 옵션 (v3.17)
+                if last_analyzed_ids and last_analyzed_count < len(scenes_data):
+                    filter_option = st.radio(
+                        "씬 표시 범위",
+                        ["전체 씬", "최근 분석된 씬만"],
+                        horizontal=True,
+                        key="scene_filter_option"
+                    )
+                    if filter_option == "최근 분석된 씬만":
+                        scenes_data = [s for s in scenes_data if s.get("scene_id") in last_analyzed_ids]
+                        st.caption(f"📍 최근 분석된 {len(scenes_data)}개 씬만 표시 중")
+
                 for scene in scenes_data:
                     scene_id = scene.get("scene_id", "?")
                     script_text = get_prompt(scene, "script_text") or scene.get("narration", "")
                     preview = script_text[:80] + "..." if len(script_text) > 80 else script_text
 
-                    with st.expander(f"씬 {scene_id}: {preview}", expanded=False):
+                    # ⭐ 최근 분석된 씬 하이라이트
+                    is_recently_analyzed = scene_id in last_analyzed_ids if last_analyzed_ids else False
+                    label_prefix = "🆕 " if is_recently_analyzed else ""
+
+                    with st.expander(f"{label_prefix}씬 {scene_id}: {preview}", expanded=is_recently_analyzed):
+                        if is_recently_analyzed:
+                            st.success("✨ 최근 분석됨")
+
                         st.write("**스크립트:**")
                         st.write(script_text)
 
@@ -1741,6 +2474,103 @@ with tab4:
                     mime="application/json",
                     key="download_combined_json"
                 )
+
+        # ============================================================
+        # ⭐ 사용된 AI 프롬프트 확인 섹션
+        # ============================================================
+        st.divider()
+
+        # 메타데이터 로드 (세션 또는 full_result에서)
+        metadata = st.session_state.get('analysis_metadata', {})
+        if not metadata and full_result:
+            metadata = full_result.get('analysis_metadata', {})
+            prompt_used = full_result.get('prompt_used', '')
+            if prompt_used and 'prompt_template' not in metadata:
+                metadata['prompt_template'] = prompt_used
+
+        with st.expander("🔍 사용된 AI 프롬프트 확인", expanded=False):
+            if metadata:
+                # 메타데이터 요약 카드
+                meta_col1, meta_col2, meta_col3, meta_col4 = st.columns(4)
+
+                with meta_col1:
+                    model_name = metadata.get('model_name', 'N/A')
+                    st.metric("모델", model_name)
+
+                with meta_col2:
+                    mode = metadata.get('processing_mode', metadata.get('mode', 'N/A'))
+                    mode_display = {
+                        'batch': '배치',
+                        'single': '단일',
+                        'sequential': '순차',
+                        'parallel': '병렬'
+                    }.get(mode, mode)
+                    st.metric("분석 모드", mode_display)
+
+                with meta_col3:
+                    template_name = metadata.get('template_name', 'N/A')
+                    st.metric("템플릿", template_name)
+
+                with meta_col4:
+                    char_count = metadata.get('prompt_char_count', 0)
+                    st.metric("프롬프트 길이", f"{char_count:,}자")
+
+                # 프롬프트 상세
+                prompt_tab_template, prompt_tab_example = st.tabs(["📝 프롬프트 템플릿", "🔄 실제 적용 예시"])
+
+                with prompt_tab_template:
+                    prompt_template = metadata.get('prompt_template', '')
+                    if prompt_template:
+                        st.code(prompt_template, language='markdown')
+
+                        # 복사 버튼 (Streamlit은 직접 클립보드 복사가 안되므로 다운로드로 대체)
+                        st.download_button(
+                            "📋 프롬프트 템플릿 다운로드",
+                            data=prompt_template,
+                            file_name="prompt_template.txt",
+                            mime="text/plain",
+                            key="download_prompt_template"
+                        )
+                    else:
+                        st.info("프롬프트 템플릿 정보가 없습니다.")
+
+                with prompt_tab_example:
+                    prompt_example = metadata.get('prompt_example', '')
+                    if prompt_example:
+                        st.code(prompt_example, language='markdown')
+                        st.caption("※ 첫 번째 씬(또는 배치)에 적용된 프롬프트 예시입니다.")
+
+                        st.download_button(
+                            "📋 적용 예시 다운로드",
+                            data=prompt_example,
+                            file_name="prompt_example.txt",
+                            mime="text/plain",
+                            key="download_prompt_example"
+                        )
+                    else:
+                        st.info("적용 예시 정보가 없습니다.")
+
+                # 추가 정보
+                st.markdown("---")
+                info_col1, info_col2 = st.columns(2)
+
+                with info_col1:
+                    timestamp = metadata.get('timestamp', '')
+                    if timestamp:
+                        try:
+                            dt = datetime.fromisoformat(timestamp)
+                            st.caption(f"📅 분석 시간: {dt.strftime('%Y-%m-%d %H:%M:%S')}")
+                        except:
+                            st.caption(f"📅 분석 시간: {timestamp}")
+
+                with info_col2:
+                    processing_time = metadata.get('processing_time_seconds', 0)
+                    if processing_time:
+                        st.caption(f"⏱️ 처리 시간: {processing_time:.1f}초")
+
+            else:
+                st.info("분석 메타데이터가 없습니다. AI 프롬프트 생성을 포함한 씬 분석을 실행하면 여기에 사용된 프롬프트가 표시됩니다.")
+
     else:
         st.info("분석 결과가 없습니다. 씬 분석을 먼저 실행하세요.")
 

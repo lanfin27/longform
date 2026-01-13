@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-07T09:44:51.413251",
+  "image_file": "bg_scene_001_1767746691412.png",
+  "scene_id": 1,
+  "prompts": {
+    "original": "Brain structure with question marks hovering around it, Samsung Electronics logo, smartphones, semiconductor chips, and TV screens floating around, representing different associations. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "Webtoon comic art style, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, 2D digital comic aesthetic, solid color fills without texture, crisp vector-like lineart, stylized character designs, completely text-free artwork, no speech bubbles no sound effects no signatures anywhere, Brain structure with question marks hovering around it, Samsung Electronics logo, smartphones, semiconductor chips, and TV screens floating around, representing different associations. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot",
+    "negative": ""
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "Webtoon comic art style, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, 2D digital comic aesthetic, solid color fills without texture, crisp vector-like lineart, stylized character designs, completely text-free artwork, no speech bubbles no sound effects no signatures anywhere,",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

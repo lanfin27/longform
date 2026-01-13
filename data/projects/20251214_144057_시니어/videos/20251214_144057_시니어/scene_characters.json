@@ -12,6 +12,14 @@
             "updated_at": "2025-12-27T21:30:50.388361"
           }
         }
+      },
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113486"
+          }
+        }
       }
     }
   },
@@ -42,6 +50,14 @@
           "talking": {
             "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_김정빈_talking_1766838629558.png",
             "updated_at": "2025-12-27T21:30:50.388373"
+          }
+        }
+      },
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113498"
           }
         }
       }
@@ -104,6 +120,14 @@
             "updated_at": "2026-01-02T19:10:39.538233"
           }
         }
+      },
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177961"
+          }
+        }
       }
     }
   },
@@ -114,6 +138,922 @@
           "standing": {
             "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_이재용_standing_1767348639492.png",
             "updated_at": "2026-01-02T19:10:39.538248"
+          }
+        }
+      }
+    }
+  },
+  "24": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113501"
+          }
+        }
+      }
+    }
+  },
+  "37": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113504"
+          }
+        }
+      },
+      "청중 1": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_청중_1_standing_1767685243799.png",
+            "updated_at": "2026-01-06T16:40:59.209344"
+          }
+        }
+      }
+    }
+  },
+  "38": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113506"
+          }
+        }
+      }
+    }
+  },
+  "171": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113508"
+          }
+        }
+      }
+    }
+  },
+  "191": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113510"
+          }
+        }
+      }
+    }
+  },
+  "192": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113512"
+          }
+        }
+      }
+    }
+  },
+  "196": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113514"
+          }
+        }
+      }
+    }
+  },
+  "202": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867995"
+          }
+        }
+      }
+    }
+  },
+  "203": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867997"
+          }
+        }
+      }
+    }
+  },
+  "204": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867998"
+          }
+        }
+      }
+    }
+  },
+  "205": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868000"
+          }
+        }
+      }
+    }
+  },
+  "207": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868003"
+          }
+        }
+      }
+    }
+  },
+  "221": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113526"
+          }
+        }
+      }
+    }
+  },
+  "238": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113529"
+          }
+        }
+      }
+    }
+  },
+  "266": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113532"
+          }
+        }
+      },
+      "청중 1": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_청중_1_standing_1767685243799.png",
+            "updated_at": "2026-01-06T16:40:59.209352"
+          }
+        }
+      }
+    }
+  },
+  "299": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113534"
+          }
+        }
+      }
+    }
+  },
+  "301": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868020"
+          }
+        }
+      }
+    }
+  },
+  "312": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767685231551.png",
+            "updated_at": "2026-01-06T16:40:59.113538"
+          }
+        }
+      }
+    }
+  },
+  "16": {
+    "characters": {
+      "화자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+            "updated_at": "2026-01-06T16:40:59.146665"
+          }
+        }
+      },
+      "발표자": {
+        "poses": {
+          "thinking": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_thinking_1767696494726.png",
+            "updated_at": "2026-01-06T19:48:21.927293"
+          }
+        }
+      }
+    }
+  },
+  "17": {
+    "characters": {
+      "화자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+            "updated_at": "2026-01-06T16:40:59.146675"
+          }
+        }
+      }
+    }
+  },
+  "18": {
+    "characters": {
+      "화자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+            "updated_at": "2026-01-06T16:40:59.146678"
+          }
+        }
+      }
+    }
+  },
+  "19": {
+    "characters": {
+      "화자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+            "updated_at": "2026-01-06T16:40:59.146681"
+          }
+        }
+      }
+    }
+  },
+  "20": {
+    "characters": {
+      "화자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+            "updated_at": "2026-01-06T16:40:59.146683"
+          }
+        }
+      }
+    }
+  },
+  "136": {
+    "characters": {
+      "화자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+            "updated_at": "2026-01-06T16:40:59.146686"
+          }
+        }
+      },
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867991"
+          }
+        }
+      }
+    }
+  },
+  "137": {
+    "characters": {
+      "화자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+            "updated_at": "2026-01-06T16:40:59.146688"
+          }
+        }
+      }
+    }
+  },
+  "138": {
+    "characters": {
+      "화자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+            "updated_at": "2026-01-06T16:40:59.146690"
+          }
+        }
+      }
+    }
+  },
+  "251": {
+    "characters": {
+      "화자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png",
+            "updated_at": "2026-01-06T16:40:59.146692"
+          }
+        }
+      }
+    }
+  },
+  "31": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177972"
+          }
+        }
+      }
+    }
+  },
+  "32": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177975"
+          }
+        }
+      }
+    }
+  },
+  "66": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177977"
+          }
+        }
+      }
+    }
+  },
+  "97": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177979"
+          }
+        }
+      }
+    }
+  },
+  "104": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177982"
+          }
+        }
+      }
+    }
+  },
+  "105": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177984"
+          }
+        }
+      }
+    }
+  },
+  "111": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177986"
+          }
+        }
+      },
+      "조수석 탑승자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_조수석_탑승자_standing_1767687555248.png",
+            "updated_at": "2026-01-06T17:19:45.329373"
+          }
+        }
+      }
+    }
+  },
+  "114": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177988"
+          }
+        }
+      }
+    }
+  },
+  "244": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177991"
+          }
+        }
+      }
+    }
+  },
+  "305": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_운전자_standing_1767685239200.png",
+            "updated_at": "2026-01-06T16:40:59.177993"
+          }
+        }
+      }
+    }
+  },
+  "63": {
+    "characters": {
+      "내레이터": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_내레이터_standing_1767685247857.png",
+            "updated_at": "2026-01-06T16:40:59.240834"
+          }
+        }
+      }
+    }
+  },
+  "87": {
+    "characters": {
+      "ZF 직원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_ZF_직원_standing_1767685256788.png",
+            "updated_at": "2026-01-06T16:40:59.270992"
+          }
+        }
+      }
+    }
+  },
+  "98": {
+    "characters": {
+      "ZF 대표": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_ZF_대표_standing_1767685259074.png",
+            "updated_at": "2026-01-06T16:40:59.300689"
+          }
+        }
+      }
+    }
+  },
+  "140": {
+    "characters": {
+      "임원/직원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_임원_직원_standing_1767687558710.png",
+            "updated_at": "2026-01-06T17:19:45.364087"
+          }
+        }
+      }
+    }
+  },
+  "141": {
+    "characters": {
+      "또 다른 삼성 임원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_또_다른_삼성_임원_standing_1767687567754.png",
+            "updated_at": "2026-01-06T17:19:45.395411"
+          }
+        }
+      }
+    }
+  },
+  "142": {
+    "characters": {
+      "미래 도시 시민": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_미래_도시_시민_standing_1767687576119.png",
+            "updated_at": "2026-01-06T17:19:45.429803"
+          }
+        }
+      }
+    }
+  },
+  "144": {
+    "characters": {
+      "뉴스 읽는 사람": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_뉴스_읽는_사람_standing_1767687582709.png",
+            "updated_at": "2026-01-06T17:19:45.464322"
+          }
+        }
+      }
+    }
+  },
+  "84": {
+    "characters": {
+      "여성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_여성_standing_1767687585295.png",
+            "updated_at": "2026-01-06T17:19:45.503297"
+          }
+        }
+      }
+    }
+  },
+  "9": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "talking": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_talking_1767696474734.png",
+            "updated_at": "2026-01-06T19:48:21.838521"
+          }
+        }
+      }
+    }
+  },
+  "43": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "talking": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_talking_1767696474734.png",
+            "updated_at": "2026-01-06T19:48:21.838532"
+          }
+        }
+      }
+    }
+  },
+  "44": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "talking": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_talking_1767696474734.png",
+            "updated_at": "2026-01-06T19:48:21.838535"
+          }
+        }
+      }
+    }
+  },
+  "302": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "talking": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_talking_1767696474734.png",
+            "updated_at": "2026-01-06T19:48:21.838537"
+          }
+        }
+      }
+    }
+  },
+  "10": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867968"
+          }
+        }
+      }
+    }
+  },
+  "11": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867977"
+          }
+        }
+      }
+    }
+  },
+  "12": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867980"
+          }
+        }
+      }
+    }
+  },
+  "13": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867981"
+          }
+        }
+      }
+    }
+  },
+  "14": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867983"
+          }
+        }
+      }
+    }
+  },
+  "41": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867985"
+          }
+        }
+      }
+    }
+  },
+  "42": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867987"
+          }
+        }
+      }
+    }
+  },
+  "135": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867989"
+          }
+        }
+      }
+    }
+  },
+  "201": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.867993"
+          }
+        }
+      }
+    }
+  },
+  "206": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868002"
+          }
+        }
+      }
+    }
+  },
+  "208": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868005"
+          }
+        }
+      }
+    }
+  },
+  "261": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868007"
+          }
+        }
+      }
+    }
+  },
+  "262": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868009"
+          }
+        }
+      }
+    }
+  },
+  "263": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868011"
+          }
+        }
+      }
+    }
+  },
+  "264": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868013"
+          }
+        }
+      }
+    }
+  },
+  "270": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868014"
+          }
+        }
+      }
+    }
+  },
+  "271": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868016"
+          }
+        }
+      }
+    }
+  },
+  "272": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868018"
+          }
+        }
+      }
+    }
+  },
+  "304": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_standing_1767696481679.png",
+            "updated_at": "2026-01-06T19:48:21.868022"
+          }
+        }
+      }
+    }
+  },
+  "15": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "surprised": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_surprised_1767696488755.png",
+            "updated_at": "2026-01-06T19:48:21.897165"
+          }
+        }
+      }
+    }
+  },
+  "133": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "pointing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_pointing_1767696501733.png",
+            "updated_at": "2026-01-06T19:48:21.956502"
+          }
+        }
+      }
+    }
+  },
+  "134": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "pointing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_pointing_1767696501733.png",
+            "updated_at": "2026-01-06T19:48:21.956512"
+          }
+        }
+      }
+    }
+  },
+  "269": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "pointing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_pointing_1767696501733.png",
+            "updated_at": "2026-01-06T19:48:21.956515"
+          }
+        }
+      }
+    }
+  },
+  "303": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "pointing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_pointing_1767696501733.png",
+            "updated_at": "2026-01-06T19:48:21.956517"
           }
         }
       }

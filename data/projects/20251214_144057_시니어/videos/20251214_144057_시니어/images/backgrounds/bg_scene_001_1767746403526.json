@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-07T09:40:03.527317",
+  "image_file": "bg_scene_001_1767746403526.png",
+  "scene_id": 1,
+  "prompts": {
+    "original": "Brain structure with question marks hovering around it, Samsung Electronics logo, smartphones, semiconductor chips, and TV screens floating around, representing different associations. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Brain structure with question marks hovering around it, Samsung Electronics logo, smartphones, semiconductor chips, and TV screens floating around, representing different associations. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot",
+    "negative": ""
+  },
+  "style": {
+    "id": "세모지배경",
+    "name": "세모지배경",
+    "prefix": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

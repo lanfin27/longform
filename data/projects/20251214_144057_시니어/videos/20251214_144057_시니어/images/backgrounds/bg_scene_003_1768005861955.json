@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-10T09:44:21.956630",
+  "image_file": "bg_scene_003_1768005861955.png",
+  "scene_id": 3,
+  "prompts": {
+    "original": "Image of stacks of money, a giant eye, and question mark symbols raining down. Dramatic lighting, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish, Image of stacks of money, a giant eye, and question mark symbols raining down. Dramatic lighting, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot",
+    "negative": ""
+  },
+  "style": {
+    "id": "세모지배경",
+    "name": "세모지배경",
+    "prefix": "Motion graphics flat vector illustration, geometric simplified shapes, solid color fills only, NO outlines NO lineart NO strokes\n\nSimplified architectural details, clean minimal forms, smooth color blocks with subtle value shifts for depth\n\nMuted dusty desaturated color palette, warm earth tones, soft atmospheric perspective (distant objects lighter and less saturated), subtle paper grain texture overlay, chalky matte finish",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

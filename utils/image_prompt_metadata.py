@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-이미지 프롬프트 메타데이터 관리 (v1.0)
+이미지 프롬프트 메타데이터 관리 (v1.1)
 
 이미지 생성 시 사용된 프롬프트를 JSON 파일로 저장하고 관리합니다.
 
@@ -9,12 +9,14 @@
 - 원본 프롬프트, 최종 프롬프트, 네거티브 프롬프트 저장
 - 스타일, 모델, API 정보 저장
 - 메타데이터 조회 및 UI 표시 지원
+- v1.1: 역방향 검색 (scene_id로 메타데이터 찾기) 지원
 """
 
 import json
 import os
+import re
 from pathlib import Path
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, List
 from datetime import datetime
 import streamlit as st
 
@@ -123,33 +125,170 @@ class ImagePromptMetadata:
             print(f"[ImagePromptMetadata] 메타데이터 저장 실패: {e}")
             return False
 
-    def load_metadata(self, image_path: str) -> Optional[Dict[str, Any]]:
+    def load_metadata(self, image_path: str, project_path: str = None) -> Optional[Dict[str, Any]]:
         """
         이미지 프롬프트 메타데이터 로드
 
+        v1.1: 직접 경로에서 찾지 못하면 scene_id 기반 역방향 검색 수행
+
         Args:
             image_path: 이미지 파일 경로
+            project_path: 프로젝트 경로 (역방향 검색에 사용)
 
         Returns:
             메타데이터 딕셔너리 또는 None
         """
         try:
+            # 1단계: 직접 경로에서 찾기 (기존 방식)
             metadata_path = self.get_metadata_path(image_path)
+            if metadata_path.exists():
+                with open(metadata_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
 
-            if not metadata_path.exists():
-                return None
+            # 2단계: 대체 경로 시도 (_meta.json 형식)
+            alt_path = Path(image_path).with_name(Path(image_path).stem + "_meta.json")
+            if alt_path.exists():
+                with open(alt_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
 
-            with open(metadata_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+            # 3단계: 역방향 검색 (scene_id 기반)
+            return self._reverse_lookup_metadata(image_path, project_path)
 
         except Exception as e:
             print(f"[ImagePromptMetadata] 메타데이터 로드 실패: {e}")
             return None
 
-    def has_metadata(self, image_path: str) -> bool:
+    def _extract_scene_id_from_filename(self, filename: str) -> Optional[int]:
+        """파일명에서 씬 ID 추출"""
+        name = Path(filename).stem.lower()
+
+        # 씬 번호 추출 패턴들
+        patterns = [
+            r'bg[_-]?scene[_-]?(\d+)',      # bg_scene_001
+            r'scene[_-]?(\d+)',              # scene_001
+            r'composited[_-]?scene[_-]?(\d+)', # composited_scene_001
+            r'seg[_-]?(\d+)',                # seg_001
+            r'^(\d+)$',                      # 001 (숫자만)
+            r'[_-](\d{3})(?:[_-]|$)',        # _001_ 또는 _001
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, name, re.IGNORECASE)
+            if match:
+                try:
+                    return int(match.group(1))
+                except ValueError:
+                    continue
+
+        return None
+
+    def _reverse_lookup_metadata(self, image_path: str, project_path: str = None) -> Optional[Dict[str, Any]]:
+        """
+        역방향 검색: 이미지 파일명에서 scene_id를 추출하고,
+        프로젝트 폴더의 메타데이터 파일들에서 해당 scene_id와 매칭되는 것을 찾음
+
+        Args:
+            image_path: 이미지 파일 경로
+            project_path: 프로젝트 경로
+
+        Returns:
+            메타데이터 딕셔너리 또는 None
+        """
+        image_filename = Path(image_path).name
+
+        # scene_id 추출
+        scene_id = self._extract_scene_id_from_filename(image_filename)
+
+        # 프로젝트 경로 결정
+        if project_path is None:
+            # Streamlit session에서 프로젝트 경로 가져오기
+            try:
+                project_path = st.session_state.get("current_project_path")
+                if not project_path:
+                    # 이미지 경로에서 프로젝트 경로 추론
+                    img_path = Path(image_path)
+                    # data/projects/{project}/images/... 패턴 찾기
+                    parts = img_path.parts
+                    if "projects" in parts:
+                        idx = parts.index("projects")
+                        if idx + 1 < len(parts):
+                            project_path = Path(*parts[:idx+2])
+            except Exception:
+                pass
+
+        if not project_path:
+            return None
+
+        project_path = Path(project_path)
+
+        # 메타데이터 검색 폴더
+        metadata_dirs = [
+            project_path / "images" / "backgrounds",
+            project_path / "images" / "composited",
+            project_path / "images" / "scenes",
+        ]
+
+        # 최신 매칭 결과 저장
+        best_match = None
+        best_mtime = 0
+
+        for meta_dir in metadata_dirs:
+            if not meta_dir.exists():
+                continue
+
+            # JSON 파일 검색
+            for json_file in meta_dir.glob("*.json"):
+                # metadata_index.json 같은 인덱스 파일 제외
+                if json_file.name.startswith("metadata_"):
+                    continue
+
+                try:
+                    with open(json_file, "r", encoding="utf-8") as f:
+                        metadata = json.load(f)
+
+                    # ⭐ 타입 체크: list인 경우 첫 번째 요소 사용 (v1.2)
+                    if isinstance(metadata, list):
+                        if len(metadata) > 0 and isinstance(metadata[0], dict):
+                            metadata = metadata[0]
+                        else:
+                            continue  # 빈 리스트이거나 잘못된 형식
+
+                    # dict가 아니면 스킵
+                    if not isinstance(metadata, dict):
+                        continue
+
+                    # scene_id 매칭 확인
+                    meta_scene_id = metadata.get("scene_id")
+                    if meta_scene_id is not None and scene_id is not None:
+                        if int(meta_scene_id) == int(scene_id):
+                            # 최신 파일 선택
+                            mtime = json_file.stat().st_mtime
+                            if mtime > best_mtime:
+                                best_match = metadata
+                                best_mtime = mtime
+
+                except (json.JSONDecodeError, KeyError, ValueError, OSError):
+                    continue
+
+        if best_match:
+            print(f"[ImagePromptMetadata] 역방향 검색 성공: scene_id={scene_id}")
+
+        return best_match
+
+    def has_metadata(self, image_path: str, project_path: str = None) -> bool:
         """메타데이터 존재 여부 확인"""
-        metadata_path = self.get_metadata_path(image_path)
-        return metadata_path.exists()
+        try:
+            # 직접 경로 확인
+            metadata_path = self.get_metadata_path(image_path)
+            if metadata_path.exists():
+                return True
+
+            # 역방향 검색
+            return self._reverse_lookup_metadata(image_path, project_path) is not None
+        except Exception as e:
+            # 에러 발생 시 False 반환 (안전 처리)
+            print(f"[ImagePromptMetadata] has_metadata 에러: {e}")
+            return False
 
 
 # 싱글톤 인스턴스
@@ -209,24 +348,27 @@ def save_image_with_prompt(
     )
 
 
-def get_image_prompt_info(image_path: str) -> Optional[Dict[str, Any]]:
+def get_image_prompt_info(image_path: str, project_path: str = None) -> Optional[Dict[str, Any]]:
     """
     이미지의 프롬프트 정보 조회
 
+    v1.1: 직접 경로에서 찾지 못하면 scene_id 기반 역방향 검색 수행
+
     Args:
         image_path: 이미지 파일 경로
+        project_path: 프로젝트 경로 (역방향 검색에 사용, 없으면 세션에서 자동 추출)
 
     Returns:
         프롬프트 정보 딕셔너리 또는 None
     """
     manager = get_metadata_manager()
-    return manager.load_metadata(image_path)
+    return manager.load_metadata(image_path, project_path)
 
 
-def has_prompt_metadata(image_path: str) -> bool:
-    """이미지에 프롬프트 메타데이터가 있는지 확인"""
+def has_prompt_metadata(image_path: str, project_path: str = None) -> bool:
+    """이미지에 프롬프트 메타데이터가 있는지 확인 (v1.1: 역방향 검색 지원)"""
     manager = get_metadata_manager()
-    return manager.has_metadata(image_path)
+    return manager.has_metadata(image_path, project_path)
 
 
 # =====================================================

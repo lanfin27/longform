@@ -267,34 +267,44 @@ with tab1:
 
         with col_sel1:
             if st.button("✅ 전체 선택", key="select_all_del"):
-                for i in range(len(characters)):
-                    st.session_state[f"del_char_{i}"] = True
+                for char in characters:
+                    st.session_state[f"del_char_{char.id}"] = True
                 st.rerun()
 
         with col_sel2:
             if st.button("❎ 전체 해제", key="deselect_all_del"):
-                for i in range(len(characters)):
-                    st.session_state[f"del_char_{i}"] = False
+                for char in characters:
+                    st.session_state[f"del_char_{char.id}"] = False
                 st.rerun()
 
         with col_sel3:
-            # 선택된 캐릭터 수 계산
+            # 선택된 캐릭터 수 계산 (ID 기반)
             selected_del_count = sum(
-                1 for i in range(len(characters))
-                if st.session_state.get(f"del_char_{i}", False)
+                1 for char in characters
+                if st.session_state.get(f"del_char_{char.id}", False)
             )
+
+            # 디버그 로그
+            selected_debug = [char.name for char in characters if st.session_state.get(f"del_char_{char.id}", False)]
+            print(f"[캐릭터 삭제] 선택된 캐릭터: {selected_debug} (총 {selected_del_count}명)")
 
             if st.button(f"🗑️ 선택 삭제 ({selected_del_count}명)", key="delete_selected",
                         disabled=selected_del_count == 0, type="secondary"):
                 st.session_state.show_bulk_delete_confirm = True
+                print(f"[캐릭터 삭제] 삭제 확인 다이얼로그 표시")
 
         # 삭제 확인 다이얼로그
         if st.session_state.get("show_bulk_delete_confirm", False):
-            selected_indices = [
-                i for i in range(len(characters))
-                if st.session_state.get(f"del_char_{i}", False)
+            # ID 기반으로 선택된 캐릭터 찾기
+            selected_chars = [
+                char for char in characters
+                if st.session_state.get(f"del_char_{char.id}", False)
             ]
-            selected_names = [characters[i].name for i in selected_indices]
+            selected_names = [char.name for char in selected_chars]
+            selected_ids = [char.id for char in selected_chars]
+
+            print(f"[캐릭터 삭제] 확인 다이얼로그 - 선택된 ID: {selected_ids}")
+            print(f"[캐릭터 삭제] 확인 다이얼로그 - 선택된 이름: {selected_names}")
 
             st.warning(f"⚠️ 다음 {len(selected_names)}명의 캐릭터를 삭제하시겠습니까?")
             st.write(", ".join(selected_names))
@@ -303,17 +313,29 @@ with tab1:
 
             with col_confirm:
                 if st.button("🗑️ 삭제 확인", type="primary", key="confirm_bulk_delete"):
-                    # 역순으로 삭제
-                    for idx in sorted(selected_indices, reverse=True):
-                        manager.delete_character(characters[idx].id)
+                    print(f"[캐릭터 삭제] ⚡ 삭제 실행 시작")
 
-                    # 상태 초기화
+                    # ID 기반으로 삭제 (순서 무관)
+                    deleted_count = 0
+                    for char in selected_chars:
+                        print(f"[캐릭터 삭제] 삭제 중: {char.name} (id={char.id})")
+
+                        success = manager.delete_character(char.id)
+                        if success:
+                            deleted_count += 1
+                            print(f"[캐릭터 삭제] ✅ '{char.name}' 삭제 성공")
+                        else:
+                            print(f"[캐릭터 삭제] ❌ '{char.name}' 삭제 실패")
+
+                    # 상태 초기화 (ID 기반)
                     st.session_state.show_bulk_delete_confirm = False
-                    for i in range(len(characters)):
-                        if f"del_char_{i}" in st.session_state:
-                            del st.session_state[f"del_char_{i}"]
+                    for char in characters:
+                        key = f"del_char_{char.id}"
+                        if key in st.session_state:
+                            del st.session_state[key]
 
-                    st.success(f"✅ {len(selected_names)}명의 캐릭터가 삭제되었습니다.")
+                    print(f"[캐릭터 삭제] ✅ 총 {deleted_count}명 삭제 완료")
+                    st.success(f"✅ {deleted_count}명의 캐릭터가 삭제되었습니다.")
                     st.rerun()
 
             with col_cancel:
@@ -330,9 +352,10 @@ with tab1:
             col_check, col_expand = st.columns([0.1, 3.9])
 
             with col_check:
+                # ⭐ ID 기반 키 사용으로 인덱스 변경 시에도 안정적
                 st.checkbox(
                     "선택",
-                    key=f"del_char_{idx}",
+                    key=f"del_char_{char.id}",
                     label_visibility="collapsed"
                 )
 

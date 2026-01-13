@@ -283,6 +283,27 @@ class PromptTemplateManager:
 
 ---
 
+## 🎬 비디오 프롬프트 규칙 (⭐ 반드시 영어로!)
+
+각 씬에 대해 AI 비디오 생성 도구(Runway, Pika, Kling)용 프롬프트를 생성하세요:
+
+### video_prompt_character (캐릭터 비디오 프롬프트)
+- **⭐ 반드시 영어(English)로 작성**
+- 캐릭터/인물의 동작, 표정, 말하는 모습 묘사
+- 카메라 움직임 포함 (zoom in, pan, dolly 등)
+- 예시: "Character speaking with confident expression, subtle hand gestures, camera slowly zooms in, natural eye blinks"
+
+### video_prompt_full (전체 씬 비디오 프롬프트)
+- **⭐ 반드시 영어(English)로 작성**
+- 전체 씬의 움직임, 전환, 효과 묘사
+- 배경 움직임, 조명, 분위기 포함
+- 예시: "Dynamic montage of tech products, smooth camera pan across scene, soft ambient lighting, subtle background particles"
+
+⚠️ **중요**: video_prompt_character와 video_prompt_full은 **절대 한글로 작성하지 마세요!**
+AI 비디오 생성 도구는 영어 프롬프트에서만 최적의 결과를 생성합니다.
+
+---
+
 ## 📤 출력 형식 (JSON) - 🔴 persons + characters 분리!
 
 ```json
@@ -300,7 +321,9 @@ class PromptTemplateManager:
       "visual_elements": ["배경 요소"],
       "mood": "분위기",
       "camera_suggestion": "카메라 앵글",
-      "image_prompt_en": "..., no text, no letters..."
+      "image_prompt_en": "..., no text, no letters...",
+      "video_prompt_character": "Character speaking with natural expression, subtle head movements, mouth moving naturally, camera slowly zooms in (MUST BE IN ENGLISH)",
+      "video_prompt_full": "Dynamic scene with smooth camera movement, natural lighting, atmospheric mood, subtle background motion (MUST BE IN ENGLISH)"
     }
   ],
   "persons": [
@@ -383,7 +406,12 @@ class PromptTemplateManager:
 - [ ] `char_count`가 100-250 범위인가?
 
 ### 프롬프트 체크
-- [ ] 모든 프롬프트에 "no text, no letters" 있는가?
+- [ ] 모든 이미지 프롬프트에 "no text, no letters" 있는가?
+
+### 🔴 비디오 프롬프트 체크 (⭐ 영어 필수!)
+- [ ] video_prompt_character가 **영어**로 작성되었는가? (한글 ❌)
+- [ ] video_prompt_full이 **영어**로 작성되었는가? (한글 ❌)
+- [ ] 카메라 움직임이 포함되어 있는가? (zoom, pan, dolly 등)
 
 ---
 
@@ -545,6 +573,102 @@ JSON 배열로만 응답해주세요.'''
 - 기술적 용어
 
 프롬프트만 출력하세요.'''
+        ),
+
+        # ═══════════════════════════════════════════════════════════════════
+        # SRT 직접 적용용 프롬프트 템플릿 (v1.0)
+        # ═══════════════════════════════════════════════════════════════════
+
+        "srt_scene_single": PromptTemplate(
+            id="srt_scene_single",
+            name="SRT 단일 씬 분석 프롬프트 v1.0",
+            category="srt_scene_analysis",
+            description="SRT 직접 적용 시 단일 씬에 대한 이미지/캐릭터/비디오 프롬프트를 생성합니다.",
+            prompt='''# SRT 씬 분석 프롬프트 (v1.0)
+
+다음 씬을 분석하고 JSON으로 응답해주세요.
+
+## 씬 정보
+- 씬 번호: {scene_id}
+- 시간: {start_time} - {end_time}
+- 나레이션: {narration}
+
+## 출력 형식 (반드시 JSON만 출력)
+{{
+    "image_prompt": "한국어 이미지 프롬프트 (상세한 시각적 묘사)",
+    "image_prompt_en": "English image prompt for FLUX (detailed visual description, cinematic style)",
+    "character_prompt": "한국어 캐릭터 프롬프트 (인물이 있다면)",
+    "character_prompt_en": "English character prompt (if characters present)",
+    "direction_guide": "연출가이드 (카메라 앵글, 조명, 분위기 등)",
+    "visual_elements": ["시각요소1", "시각요소2"],
+    "mood": "분위기 (예: 밝은, 어두운, 긴장감 등)",
+    "characters": [
+        {{"name": "캐릭터명", "visual_prompt": "English visual description of character appearance..."}}
+    ],
+    "location": "배경 장소",
+    "video_prompt_character": "Character animation description in ENGLISH for Kling/Runway",
+    "video_prompt_full": "Full scene video description in ENGLISH for Kling/Runway"
+}}
+
+## ⚠️ 중요 규칙
+1. characters 배열의 각 캐릭터에는 반드시 visual_prompt를 영문으로 포함
+2. video_prompt_character와 video_prompt_full은 반드시 영어로 작성
+3. 카메라 움직임 포함 (zoom, pan, dolly 등)
+
+JSON으로만 응답해주세요. 추가 설명 없이 JSON만 출력하세요.'''
+        ),
+
+        "srt_scene_batch": PromptTemplate(
+            id="srt_scene_batch",
+            name="SRT 배치 씬 분석 프롬프트 v1.0",
+            category="srt_scene_analysis",
+            description="SRT 직접 적용 시 여러 씬을 배치로 분석하여 프롬프트를 생성합니다.",
+            prompt='''# SRT 배치 씬 분석 프롬프트 (v1.0)
+
+다음 씬들을 분석하고 JSON 배열로 응답해주세요.
+
+## 각 씬에 대해 포함할 필드
+- scene_id: 씬 번호
+- image_prompt: 한국어 이미지 생성 프롬프트
+- image_prompt_en: 영문 이미지 프롬프트 (FLUX용, 상세하게)
+- character_prompt: 한국어 캐릭터 프롬프트
+- character_prompt_en: 영문 캐릭터 프롬프트
+- visual_elements: 시각 요소 리스트
+- direction_guide: 연출 가이드
+- video_prompt_character: Character animation description (ENGLISH)
+- video_prompt_full: Full scene video description (ENGLISH)
+- characters: 등장 캐릭터 리스트 (각 캐릭터에 name, visual_prompt 포함!)
+- location: 배경 장소
+- mood: 분위기
+
+## ⚠️ 중요 규칙
+1. characters 배열의 각 캐릭터에는 반드시 visual_prompt를 영문으로 포함
+   예: {{"name": "자말 카슈크지", "visual_prompt": "Middle-aged Middle Eastern man, journalist, salt-and-pepper beard..."}}
+2. video_prompt_character와 video_prompt_full은 반드시 영어로 작성
+3. 카메라 움직임 포함 (zoom, pan, dolly 등)
+
+=== 분석할 씬들 ===
+
+{scenes_content}
+
+=== 응답 형식 ===
+JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하세요.
+```json
+[
+  {{
+    "scene_id": 1,
+    "image_prompt": "...",
+    "image_prompt_en": "...",
+    "characters": [
+      {{"name": "캐릭터명", "visual_prompt": "영문 외모 설명..."}}
+    ],
+    "video_prompt_character": "English character animation...",
+    "video_prompt_full": "English full scene description...",
+    ...
+  }},
+  ...
+]
+```'''
         ),
     }
 
@@ -917,6 +1041,36 @@ JSON 배열로만 응답해주세요.'''
     def get_templates_by_category(self, category: str) -> List[PromptTemplate]:
         """카테고리별 템플릿 목록 반환"""
         return [t for t in self.templates.values() if t.category == category]
+
+    # ═══════════════════════════════════════════════════════════════════
+    # SRT 분석 프롬프트 관련 헬퍼 메서드
+    # ═══════════════════════════════════════════════════════════════════
+
+    def get_srt_templates(self) -> List[PromptTemplate]:
+        """SRT 분석 프롬프트 템플릿 목록 반환"""
+        return self.get_templates_by_category("srt_scene_analysis")
+
+    def get_srt_single_template(self) -> Optional[PromptTemplate]:
+        """SRT 단일 씬 분석 프롬프트 반환 (기본값)"""
+        return self.get_template("srt_scene_single")
+
+    def get_srt_batch_template(self) -> Optional[PromptTemplate]:
+        """SRT 배치 씬 분석 프롬프트 반환 (기본값)"""
+        return self.get_template("srt_scene_batch")
+
+    def get_srt_single_prompt(self) -> str:
+        """SRT 단일 씬 분석 프롬프트 텍스트 반환"""
+        return self.get_prompt("srt_scene_single")
+
+    def get_srt_batch_prompt(self) -> str:
+        """SRT 배치 씬 분석 프롬프트 텍스트 반환"""
+        return self.get_prompt("srt_scene_batch")
+
+    def create_srt_template(self, name: str, description: str, prompt: str) -> Optional[PromptTemplate]:
+        """새 SRT 분석 프롬프트 템플릿 생성"""
+        return self.create_template("srt_scene_analysis", name, description, prompt)
+
+    # ═══════════════════════════════════════════════════════════════════
 
     def create_template(self, category: str, name: str, description: str, prompt: str) -> Optional[PromptTemplate]:
         """새 템플릿 생성"""

@@ -45,13 +45,15 @@ async function main() {
             model,
             aspectRatio,
             count = "1",
-            seed
+            seed,
+            negativePrompt  // ⭐ 네거티브 프롬프트 추가
         } = options;
 
         console.log("[ImageFX-Node] 이미지 생성 시작...");
         console.log("[ImageFX-Node] 프롬프트:", prompt.substring(0, 50) + "...");
         console.log("[ImageFX-Node] 모델:", model || "기본값");
         console.log("[ImageFX-Node] 비율:", aspectRatio || "기본값");
+        console.log("[ImageFX-Node] 네거티브:", negativePrompt ? negativePrompt.substring(0, 50) + "..." : "없음");
 
         // ImageFX 클라이언트 생성
         const fx = new ImageFX(cookie);
@@ -76,7 +78,13 @@ async function main() {
             generateOptions.seed = parseInt(seed, 10);
         }
 
+        // ⭐ 네거티브 프롬프트 설정 (라이브러리가 지원하는 경우)
+        if (negativePrompt) {
+            generateOptions.negativePrompt = negativePrompt;
+        }
+
         console.log("[ImageFX-Node] 옵션:", JSON.stringify(generateOptions));
+        console.log("[ImageFX-Node] 네거티브 포함:", generateOptions.negativePrompt ? "✅" : "❌");
 
         // ============================================
         // 핵심 수정: generate() → generateImage()

@@ -93,7 +93,7 @@ class ImageCache:
                 return buffer.getvalue()
 
         except Exception as e:
-            print(f"[ImageCache] 썸네일 생성 오류: {e}")
+            print(f"[ImageCache] 썸네일 생성 오류: {e}", flush=True)
             return None
 
     @classmethod

@@ -360,6 +360,11 @@ class ImageFXClient:
         if seed is not None:
             cmd.extend(["--seed", str(seed)])
 
+        # ⭐ 네거티브 프롬프트도 별도로 전달 (라이브러리 지원 시 사용)
+        if negative_prompt:
+            cmd.extend(["--negativePrompt", negative_prompt])
+            print(f"[ImageFX v6.3] ✅ 네거티브 프롬프트를 Node.js에 전달 ({len(negative_prompt)}자)")
+
         last_error = None
 
         for attempt in range(retry_count):

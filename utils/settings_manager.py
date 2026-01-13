@@ -86,12 +86,12 @@ class SettingsManager:
             try:
                 with open(API_PREFERENCES_FILE, 'r', encoding='utf-8') as f:
                     self._settings = json.load(f)
-                print(f"[Settings] 설정 로드됨: {API_PREFERENCES_FILE}")
+                print(f"[Settings] 설정 로드됨 (최초 1회)", flush=True)
             except Exception as e:
-                print(f"[Settings] 설정 로드 실패, 기본값 사용: {e}")
+                print(f"[Settings] 설정 로드 실패, 기본값 사용: {e}", flush=True)
                 self._settings = self._deep_copy_defaults()
         else:
-            print("[Settings] 설정 파일 없음, 기본값으로 생성")
+            print("[Settings] 설정 파일 없음, 기본값으로 생성", flush=True)
             self._settings = self._deep_copy_defaults()
             self._save_settings()
 
@@ -106,9 +106,9 @@ class SettingsManager:
         try:
             with open(API_PREFERENCES_FILE, 'w', encoding='utf-8') as f:
                 json.dump(self._settings, f, ensure_ascii=False, indent=2)
-            print(f"[Settings] 설정 저장됨")
+            # print(f"[Settings] 설정 저장됨", flush=True)  # 빈번한 저장은 로그 생략
         except Exception as e:
-            print(f"[Settings] 설정 저장 실패: {e}")
+            print(f"[Settings] 설정 저장 실패: {e}", flush=True)
 
     def get(self, page: str, key: str, default: Any = None) -> Any:
         """
@@ -147,7 +147,7 @@ class SettingsManager:
         # 값이 변경된 경우에만 저장
         if self._settings[page].get(key) != value:
             self._settings[page][key] = value
-            print(f"[Settings] {page}.{key} = {value}")
+            # print(f"[Settings] {page}.{key} = {value}", flush=True)  # 빈번한 설정은 로그 생략
 
             if auto_save:
                 self._save_settings()
@@ -169,13 +169,13 @@ class SettingsManager:
         if page in DEFAULT_SETTINGS:
             self._settings[page] = DEFAULT_SETTINGS[page].copy()
             self._save_settings()
-            print(f"[Settings] {page} 설정 초기화됨")
+            print(f"[Settings] {page} 설정 초기화됨", flush=True)
 
     def reset_all(self):
         """모든 설정을 기본값으로 초기화"""
         self._settings = self._deep_copy_defaults()
         self._save_settings()
-        print("[Settings] 모든 설정 초기화됨")
+        print("[Settings] 모든 설정 초기화됨", flush=True)
 
 
 # 전역 인스턴스 가져오기 함수

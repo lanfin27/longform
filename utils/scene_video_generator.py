@@ -235,7 +235,7 @@ def get_video_prompt_for_scene(
 
 
 def get_scene_image_path(scene: Dict, project_path: str = None) -> Optional[str]:
-    """씬의 이미지 경로 추출"""
+    """씬의 이미지 경로 추출 (최신 이미지 우선)"""
     # 다양한 이미지 경로 필드 확인
     image_path = (
         scene.get("composited_image_path") or
@@ -252,18 +252,49 @@ def get_scene_image_path(scene: Dict, project_path: str = None) -> Optional[str]
     scene_id = scene.get("scene_id") or scene.get("scene_num") or scene.get("scene_number")
 
     if scene_id and project_path:
-        # 가능한 이미지 경로 패턴
-        patterns = [
+        project = Path(project_path)
+
+        # 1. 정확한 파일명 패턴 먼저 확인 (AI 매핑 패턴 포함)
+        exact_patterns = [
             f"images/composited/scene_{scene_id:03d}.png",
             f"images/composited/{scene_id}.png",
             f"images/scenes/scene_{scene_id:03d}.png",
+            f"images/scenes/{scene_id:03d}_scene.png",  # AI 매핑 패턴
+            f"images/scenes/{scene_id:03d}_scene.jpg",  # AI 매핑 패턴
+            f"images/scenes/{scene_id:03d}_scene_composed.jpg",  # 합성 이미지 패턴
             f"images/backgrounds/scene_{scene_id:03d}.png",
         ]
 
-        for pattern in patterns:
-            full_path = Path(project_path) / pattern
+        for pattern in exact_patterns:
+            full_path = project / pattern
             if full_path.exists():
                 return str(full_path)
+
+        # 2. ⭐ 타임스탬프가 포함된 파일 검색 (최신 이미지 선택)
+        search_dirs = [
+            project / "images" / "composited",
+            project / "images" / "backgrounds",
+            project / "images" / "scenes",
+        ]
+
+        all_matches = []
+        for search_dir in search_dirs:
+            if not search_dir.exists():
+                continue
+
+            # bg_scene_017_*, scene_017_*, 017_scene* 패턴 검색
+            for pattern in [f"*scene_{scene_id:03d}_*.png", f"*_{scene_id:03d}_*.png", f"{scene_id:03d}_scene*"]:
+                for img in search_dir.glob(pattern):
+                    try:
+                        mtime = img.stat().st_mtime
+                        all_matches.append((img, mtime))
+                    except (OSError, IOError):
+                        continue
+
+        if all_matches:
+            # 최신 이미지 선택
+            all_matches.sort(key=lambda x: x[1], reverse=True)
+            return str(all_matches[0][0])
 
     return None
 

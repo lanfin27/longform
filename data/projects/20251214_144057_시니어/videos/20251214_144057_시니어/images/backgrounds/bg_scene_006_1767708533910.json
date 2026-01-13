@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-06T23:08:53.911375",
+  "image_file": "bg_scene_006_1767708533910.png",
+  "scene_id": 6,
+  "prompts": {
+    "original": "A futuristic autonomous car driving on a highway, with its front cameras actively scanning and processing the road ahead. Overlay the logos of Harman and ZF prominently, symbolizing their collaboration in autonomous driving technology. The scene should convey a sense of innovation and technological advancement.",
+    "final": "animation style background, A futuristic autonomous car driving on a highway, with its front cameras actively scanning and processing the road ahead. Overlay the logos of Harman and ZF prominently, symbolizing their collaboration in autonomous driving technology. The scene should convey a sense of innovation and technological advancement., background scene, no characters, wide shot, vibrant colors, cinematic composition, no characters",
+    "negative": "people, characters, realistic"
+  },
+  "style": {
+    "id": "bg_animation",
+    "name": "애니메이션",
+    "prefix": "animation style background,",
+    "suffix": "vibrant colors, cinematic composition, no characters"
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

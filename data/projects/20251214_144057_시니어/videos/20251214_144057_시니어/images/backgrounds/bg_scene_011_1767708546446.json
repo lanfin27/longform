@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-06T23:09:06.447670",
+  "image_file": "bg_scene_011_1767708546446.png",
+  "scene_id": 11,
+  "prompts": {
+    "original": "A presenter standing on a stage, gesturing and posing a question to an unseen audience. The Samsung logo is subtly visible in the background, suggesting the context of the presentation. The presenter's expression should be engaging and thought-provoking.",
+    "final": "animation style background, A presenter standing on a stage, gesturing and posing a question to an unseen audience. The Samsung logo is subtly visible in the background, suggesting the context of the presentation. The presenter's expression should be engaging and thought-provoking., background scene, no characters, wide shot, vibrant colors, cinematic composition, no characters",
+    "negative": "people, characters, realistic"
+  },
+  "style": {
+    "id": "bg_animation",
+    "name": "애니메이션",
+    "prefix": "animation style background,",
+    "suffix": "vibrant colors, cinematic composition, no characters"
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

@@ -601,13 +601,20 @@ def get_scene_image_paths_fast(project_path: str) -> Dict:
                     if img.stat().st_mtime > existing.stat().st_mtime:
                         result["composites"][scene_num] = str(img)
 
-    # ✅ scenes 폴더 이미지
+    # ✅ scenes 폴더 이미지 (AI 매핑 jpg 포함)
     if scenes_path.exists():
-        for img in scenes_path.glob("*.png"):
-            match = re.search(r'(\d+)', img.stem)
-            if match:
-                scene_num = int(match.group(1))
-                result["scenes"][scene_num] = str(img)
+        for ext in ["*.png", "*.jpg", "*.jpeg", "*.webp"]:
+            for img in scenes_path.glob(ext):
+                match = re.search(r'(\d+)', img.stem)
+                if match:
+                    scene_num = int(match.group(1))
+                    # 이미 있으면 최신 파일 우선
+                    if scene_num not in result["scenes"]:
+                        result["scenes"][scene_num] = str(img)
+                    else:
+                        existing = Path(result["scenes"][scene_num])
+                        if img.stat().st_mtime > existing.stat().st_mtime:
+                            result["scenes"][scene_num] = str(img)
 
     _debug_log(f"[SceneImageManager] 📂 이미지 경로 캐시 생성: "
                f"배경 {len(result['backgrounds'])}개, "

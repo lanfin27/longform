@@ -597,6 +597,165 @@ def analyze_speaking_rate_from_srt(srt_content: str) -> Dict:
     return analyzer.analyze()
 
 
+# ============================================================
+# 묶음(Bundle) 씬 분석 지원
+# ============================================================
+
+def create_bundles(scenes: List[Dict], bundle_size: int = 2) -> List[Dict]:
+    """
+    씬 목록을 묶음 단위로 그룹화
+
+    묶음 씬분석 기능:
+    - N개의 씬을 하나의 묶음으로 그룹화
+    - 묶음 내 첫 번째 씬이 대표 씬(primary)이 됨
+    - AI 분석 시 묶음 단위로 분석하여 일관성 확보
+
+    Args:
+        scenes: 씬 데이터 리스트
+        bundle_size: 묶음 크기 (1-5, 기본 2)
+
+    Returns:
+        묶음 메타데이터가 추가된 씬 리스트
+    """
+    if not scenes:
+        return []
+
+    # bundle_size 범위 제한
+    bundle_size = max(1, min(5, bundle_size))
+
+    if bundle_size <= 1:
+        # 묶음 없음 (개별 분석)
+        for scene in scenes:
+            scene['bundle_id'] = scene['scene_id']
+            scene['bundle_size'] = 1
+            scene['bundle_scenes'] = [scene['scene_id']]
+            scene['bundle_text'] = scene.get('narration', '')
+            scene['bundle_start_time'] = scene.get('start_time', '')
+            scene['bundle_end_time'] = scene.get('end_time', '')
+            scene['bundle_start_seconds'] = scene.get('start_seconds', 0)
+            scene['bundle_end_seconds'] = scene.get('end_seconds', 0)
+            scene['bundle_duration'] = scene.get('duration', 0)
+            scene['is_bundle_primary'] = True
+        return scenes
+
+    bundle_id = 1
+
+    for i in range(0, len(scenes), bundle_size):
+        bundle_scenes_list = scenes[i:i + bundle_size]
+
+        # 묶음 정보 계산
+        bundle_scene_ids = [s['scene_id'] for s in bundle_scenes_list]
+        bundle_text = ' '.join([s.get('narration', '') for s in bundle_scenes_list])
+        bundle_start_time = bundle_scenes_list[0].get('start_time', '')
+        bundle_end_time = bundle_scenes_list[-1].get('end_time', '')
+        bundle_start_seconds = bundle_scenes_list[0].get('start_seconds', 0)
+        bundle_end_seconds = bundle_scenes_list[-1].get('end_seconds', 0)
+        bundle_duration = bundle_end_seconds - bundle_start_seconds
+
+        # 묶음 내 각 씬에 메타데이터 추가
+        for j, scene in enumerate(bundle_scenes_list):
+            scene['bundle_id'] = bundle_id
+            scene['bundle_size'] = len(bundle_scenes_list)
+            scene['bundle_scenes'] = bundle_scene_ids
+            scene['bundle_text'] = bundle_text
+            scene['bundle_start_time'] = bundle_start_time
+            scene['bundle_end_time'] = bundle_end_time
+            scene['bundle_start_seconds'] = bundle_start_seconds
+            scene['bundle_end_seconds'] = bundle_end_seconds
+            scene['bundle_duration'] = bundle_duration
+            scene['is_bundle_primary'] = (j == 0)  # 첫 번째 씬이 대표
+
+        bundle_id += 1
+
+    total_bundles = bundle_id - 1
+    print(f"[Bundle] {len(scenes)}개 씬 → {total_bundles}개 묶음 (묶음 크기: {bundle_size})")
+
+    return scenes
+
+
+def get_bundle_primary_scenes(scenes: List[Dict]) -> List[Dict]:
+    """
+    묶음의 대표 씬들만 반환 (AI 분석용)
+
+    Args:
+        scenes: 묶음 메타데이터가 포함된 씬 리스트
+
+    Returns:
+        대표 씬 리스트 (is_bundle_primary=True인 씬들)
+    """
+    return [s for s in scenes if s.get('is_bundle_primary', True)]
+
+
+def apply_bundle_analysis_result(scenes: List[Dict], analyzed_primary: Dict) -> None:
+    """
+    대표 씬의 분석 결과를 묶음 내 모든 씬에 적용
+
+    Args:
+        scenes: 전체 씬 리스트
+        analyzed_primary: 분석된 대표 씬 데이터
+    """
+    bundle_id = analyzed_primary.get('bundle_id')
+    if bundle_id is None:
+        return
+
+    # 분석 결과 필드들
+    analysis_fields = [
+        'image_prompt', 'image_prompt_en',
+        'character_prompt', 'character_prompt_en',
+        'visual_elements', 'direction_guide',
+        'camera_suggestion', 'video_prompt_character',
+        'video_prompt_full', 'characters', 'location', 'mood'
+    ]
+
+    # 동일 묶음의 모든 씬에 결과 적용
+    for scene in scenes:
+        if scene.get('bundle_id') == bundle_id:
+            for field in analysis_fields:
+                if field in analyzed_primary:
+                    scene[field] = analyzed_primary[field]
+            scene['needs_analysis'] = False
+
+
+def get_bundle_summary(scenes: List[Dict]) -> Dict:
+    """
+    묶음 현황 요약
+
+    Returns:
+        {
+            'total_scenes': int,
+            'total_bundles': int,
+            'bundle_size': int,
+            'bundles': [{bundle_id, scene_ids, duration, char_count}, ...]
+        }
+    """
+    if not scenes:
+        return {'total_scenes': 0, 'total_bundles': 0, 'bundle_size': 1, 'bundles': []}
+
+    # 묶음별로 그룹화
+    bundles_map = {}
+    for scene in scenes:
+        bid = scene.get('bundle_id', scene['scene_id'])
+        if bid not in bundles_map:
+            bundles_map[bid] = {
+                'bundle_id': bid,
+                'scene_ids': scene.get('bundle_scenes', [scene['scene_id']]),
+                'duration': scene.get('bundle_duration', scene.get('duration', 0)),
+                'char_count': len(scene.get('bundle_text', scene.get('narration', ''))),
+                'start_time': scene.get('bundle_start_time', scene.get('start_time', '')),
+                'end_time': scene.get('bundle_end_time', scene.get('end_time', '')),
+            }
+
+    bundles_list = sorted(bundles_map.values(), key=lambda x: x['bundle_id'])
+    bundle_size = scenes[0].get('bundle_size', 1) if scenes else 1
+
+    return {
+        'total_scenes': len(scenes),
+        'total_bundles': len(bundles_list),
+        'bundle_size': bundle_size,
+        'bundles': bundles_list
+    }
+
+
 # 헬퍼 함수들
 def parse_srt_file(file_path: str, merge_short: bool = False, min_duration: float = 3.0) -> List[Dict]:
     """

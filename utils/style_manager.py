@@ -103,7 +103,16 @@ def _get_storage_path() -> str:
 
 
 def _get_default_styles() -> Dict[str, List[dict]]:
-    """기본 스타일 데이터"""
+    """기본 스타일 데이터 (v2.2: 텍스트 차단 강화)"""
+
+    # 공통 텍스트 차단 네거티브 프롬프트
+    TEXT_BLOCK_NEGATIVE = (
+        "text, words, letters, writing, typography, signs, signage, logos, labels, "
+        "captions, titles, subtitles, banners, watermarks, stamps, seals, inscriptions, "
+        "Korean text, hangul, Japanese text, Chinese text, kanji, hiragana, katakana, "
+        "CJK characters, Asian script, any script"
+    )
+
     return {
         "character": [
             {
@@ -112,8 +121,8 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name_ko": "애니메이션",
                 "segment": "character",
                 "prompt_prefix": "animation style character, full body,",
-                "prompt_suffix": "standing pose, simple solid gray background",
-                "negative_prompt": "complex background, realistic",
+                "prompt_suffix": "standing pose, simple solid gray background, no text or signs",
+                "negative_prompt": f"complex background, realistic, {TEXT_BLOCK_NEGATIVE}",
                 "description": "깔끔한 애니메이션 캐릭터",
                 "is_default": True
             },
@@ -123,8 +132,8 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name_ko": "실사",
                 "segment": "character",
                 "prompt_prefix": "photorealistic portrait,",
-                "prompt_suffix": "professional studio lighting, high detail",
-                "negative_prompt": "cartoon, anime, drawing",
+                "prompt_suffix": "professional studio lighting, high detail, clean background",
+                "negative_prompt": f"cartoon, anime, drawing, {TEXT_BLOCK_NEGATIVE}",
                 "description": "실사 스타일의 캐릭터",
                 "is_default": False
             },
@@ -134,8 +143,8 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name_ko": "일러스트",
                 "segment": "character",
                 "prompt_prefix": "digital illustration character,",
-                "prompt_suffix": "detailed artwork, vibrant colors",
-                "negative_prompt": "photo, 3d render",
+                "prompt_suffix": "detailed artwork, vibrant colors, blank background",
+                "negative_prompt": f"photo, 3d render, {TEXT_BLOCK_NEGATIVE}",
                 "description": "디지털 일러스트레이션 스타일",
                 "is_default": False
             },
@@ -145,8 +154,8 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name_ko": "미니멀",
                 "segment": "character",
                 "prompt_prefix": "minimalist character design,",
-                "prompt_suffix": "simple shapes, limited palette, clean",
-                "negative_prompt": "complex, detailed, realistic",
+                "prompt_suffix": "simple shapes, limited palette, clean, no decorations",
+                "negative_prompt": f"complex, detailed, realistic, {TEXT_BLOCK_NEGATIVE}",
                 "description": "간결한 미니멀 스타일",
                 "is_default": False
             }
@@ -157,9 +166,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Animation",
                 "name_ko": "애니메이션",
                 "segment": "background",
-                "prompt_prefix": "animation style background,",
-                "prompt_suffix": "vibrant colors, cinematic composition, no characters",
-                "negative_prompt": "people, characters, realistic",
+                "prompt_prefix": "animation style background, blank surfaces,",
+                "prompt_suffix": "vibrant colors, cinematic composition, no characters, no signage",
+                "negative_prompt": f"people, characters, realistic, {TEXT_BLOCK_NEGATIVE}",
                 "description": "애니메이션 스타일의 배경",
                 "is_default": True
             },
@@ -168,9 +177,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Realistic",
                 "name_ko": "실사",
                 "segment": "background",
-                "prompt_prefix": "photorealistic environment,",
-                "prompt_suffix": "natural lighting, detailed scenery, cinematic",
-                "negative_prompt": "cartoon, anime, people",
+                "prompt_prefix": "photorealistic environment, clean surfaces,",
+                "prompt_suffix": "natural lighting, detailed scenery, cinematic, no visible text",
+                "negative_prompt": f"cartoon, anime, people, {TEXT_BLOCK_NEGATIVE}",
                 "description": "실사 스타일의 배경",
                 "is_default": False
             },
@@ -180,8 +189,8 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name_ko": "페인터리",
                 "segment": "background",
                 "prompt_prefix": "painterly background, digital painting,",
-                "prompt_suffix": "impressionistic, artistic, atmospheric",
-                "negative_prompt": "photo, sharp, characters",
+                "prompt_suffix": "impressionistic, artistic, atmospheric, unmarked surfaces",
+                "negative_prompt": f"photo, sharp, characters, {TEXT_BLOCK_NEGATIVE}",
                 "description": "회화적인 배경 스타일",
                 "is_default": False
             },
@@ -190,9 +199,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Infographic",
                 "name_ko": "인포그래픽",
                 "segment": "background",
-                "prompt_prefix": "infographic style background,",
-                "prompt_suffix": "modern design, clean visuals, minimal",
-                "negative_prompt": "realistic, complex, people",
+                "prompt_prefix": "infographic style background, clean design, blank center,",
+                "prompt_suffix": "modern design, clean visuals, minimal, blank areas for overlay, no built-in labels",
+                "negative_prompt": f"realistic, complex, people, {TEXT_BLOCK_NEGATIVE}",
                 "description": "인포그래픽 스타일의 배경",
                 "is_default": False
             }
@@ -203,9 +212,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Animation",
                 "name_ko": "애니메이션",
                 "segment": "scene_composite",
-                "prompt_prefix": "animation style scene,",
-                "prompt_suffix": "vibrant colors, clean composition, cinematic",
-                "negative_prompt": "realistic, photo",
+                "prompt_prefix": "animation style scene, blank surfaces without text,",
+                "prompt_suffix": "vibrant colors, clean composition, cinematic, no signs or writing",
+                "negative_prompt": f"realistic, photo, {TEXT_BLOCK_NEGATIVE}",
                 "description": "애니메이션 스타일의 씬",
                 "is_default": True
             },
@@ -214,9 +223,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Realistic",
                 "name_ko": "실사",
                 "segment": "scene_composite",
-                "prompt_prefix": "photorealistic scene,",
-                "prompt_suffix": "natural lighting, cinematic, high detail",
-                "negative_prompt": "cartoon, anime, drawing",
+                "prompt_prefix": "photorealistic scene, clean environment,",
+                "prompt_suffix": "natural lighting, cinematic, high detail, no visible text or signs",
+                "negative_prompt": f"cartoon, anime, drawing, {TEXT_BLOCK_NEGATIVE}",
                 "description": "실사 스타일의 씬",
                 "is_default": False
             },
@@ -225,9 +234,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Cinematic",
                 "name_ko": "시네마틱",
                 "segment": "scene_composite",
-                "prompt_prefix": "cinematic scene, movie still,",
-                "prompt_suffix": "dramatic lighting, film grain, widescreen",
-                "negative_prompt": "cartoon, flat",
+                "prompt_prefix": "cinematic scene, movie still, unmarked surfaces,",
+                "prompt_suffix": "dramatic lighting, film grain, widescreen, no text overlays",
+                "negative_prompt": f"cartoon, flat, {TEXT_BLOCK_NEGATIVE}",
                 "description": "영화적인 시네마틱 스타일",
                 "is_default": False
             },
@@ -236,9 +245,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Illustration",
                 "name_ko": "일러스트",
                 "segment": "scene_composite",
-                "prompt_prefix": "illustrated scene,",
-                "prompt_suffix": "detailed artwork, vivid colors, professional",
-                "negative_prompt": "photo, 3d",
+                "prompt_prefix": "illustrated scene, clean artwork,",
+                "prompt_suffix": "detailed artwork, vivid colors, professional, no text elements",
+                "negative_prompt": f"photo, 3d, {TEXT_BLOCK_NEGATIVE}",
                 "description": "일러스트레이션 스타일의 씬",
                 "is_default": False
             }
@@ -249,9 +258,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Minimal",
                 "name_ko": "미니멀",
                 "segment": "infographic",
-                "prompt_prefix": "minimal clean design, simple geometric shapes, flat colors, modern aesthetic,",
-                "prompt_suffix": "professional infographic background, edge-focused decorative elements, space for text overlay",
-                "negative_prompt": "cluttered, busy, complex patterns, realistic photo, centered subject",
+                "prompt_prefix": "minimal clean design, simple geometric shapes, flat colors, modern aesthetic, blank center,",
+                "prompt_suffix": "professional infographic background, edge-focused decorative elements, space for text overlay, no built-in text",
+                "negative_prompt": f"cluttered, busy, complex patterns, realistic photo, centered subject, {TEXT_BLOCK_NEGATIVE}",
                 "description": "깔끔하고 단순한 인포그래픽 배경",
                 "is_default": True
             },
@@ -260,9 +269,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Corporate",
                 "name_ko": "비즈니스",
                 "segment": "infographic",
-                "prompt_prefix": "corporate business style, professional, clean lines, blue and gray tones,",
-                "prompt_suffix": "business presentation background, modern office aesthetic, subtle gradients",
-                "negative_prompt": "casual, playful, bright colors, cartoon, centered elements",
+                "prompt_prefix": "corporate business style, professional, clean lines, blue and gray tones, unmarked surfaces,",
+                "prompt_suffix": "business presentation background, modern office aesthetic, subtle gradients, no labels",
+                "negative_prompt": f"casual, playful, bright colors, cartoon, centered elements, {TEXT_BLOCK_NEGATIVE}",
                 "description": "비즈니스/기업용 인포그래픽 배경",
                 "is_default": False
             },
@@ -271,9 +280,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Creative",
                 "name_ko": "크리에이티브",
                 "segment": "infographic",
-                "prompt_prefix": "creative dynamic style, colorful abstract shapes, artistic elements, vibrant,",
-                "prompt_suffix": "creative infographic background, artistic flair, modern design",
-                "negative_prompt": "boring, monochrome, corporate, plain, centered focus",
+                "prompt_prefix": "creative dynamic style, colorful abstract shapes, artistic elements, vibrant, blank areas,",
+                "prompt_suffix": "creative infographic background, artistic flair, modern design, no writing",
+                "negative_prompt": f"boring, monochrome, corporate, plain, centered focus, {TEXT_BLOCK_NEGATIVE}",
                 "description": "창의적이고 역동적인 인포그래픽 배경",
                 "is_default": False
             },
@@ -282,9 +291,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Tech",
                 "name_ko": "테크/IT",
                 "segment": "infographic",
-                "prompt_prefix": "technology style, digital elements, circuit patterns, futuristic, neon accents,",
-                "prompt_suffix": "tech infographic background, cyber aesthetic, modern digital design",
-                "negative_prompt": "organic, natural, vintage, rustic, centered elements",
+                "prompt_prefix": "technology style, digital elements, circuit patterns, futuristic, neon accents, abstract,",
+                "prompt_suffix": "tech infographic background, cyber aesthetic, modern digital design, no text overlays",
+                "negative_prompt": f"organic, natural, vintage, rustic, centered elements, {TEXT_BLOCK_NEGATIVE}",
                 "description": "기술/IT 관련 인포그래픽 배경",
                 "is_default": False
             },
@@ -293,9 +302,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Education",
                 "name_ko": "교육/학습",
                 "segment": "infographic",
-                "prompt_prefix": "educational style, books, learning icons, friendly approachable design, warm colors,",
-                "prompt_suffix": "educational infographic background, school theme, knowledge elements",
-                "negative_prompt": "dark, scary, complex, corporate, centered subject",
+                "prompt_prefix": "educational style, books, learning icons, friendly approachable design, warm colors, blank center,",
+                "prompt_suffix": "educational infographic background, school theme, knowledge elements, no visible text",
+                "negative_prompt": f"dark, scary, complex, corporate, centered subject, {TEXT_BLOCK_NEGATIVE}",
                 "description": "교육/학습 콘텐츠용 인포그래픽 배경",
                 "is_default": False
             },
@@ -304,9 +313,9 @@ def _get_default_styles() -> Dict[str, List[dict]]:
                 "name": "Webtoon",
                 "name_ko": "웹툰/만화",
                 "segment": "infographic",
-                "prompt_prefix": "Korean webtoon manhwa style, comic illustration, bold outlines, cel shading,",
-                "prompt_suffix": "webtoon style infographic background, cartoon aesthetic, manga influence",
-                "negative_prompt": "realistic, photo, 3D render, dark, cluttered center",
+                "prompt_prefix": "Korean webtoon manhwa style, comic illustration, bold outlines, cel shading, blank speech bubbles,",
+                "prompt_suffix": "webtoon style infographic background, cartoon aesthetic, manga influence, no text",
+                "negative_prompt": f"realistic, photo, 3D render, dark, cluttered center, {TEXT_BLOCK_NEGATIVE}",
                 "description": "웹툰/만화 스타일 인포그래픽 배경",
                 "is_default": False
             }
@@ -431,6 +440,28 @@ def get_style_by_id(style_id: str) -> Optional[Style]:
         for style in styles:
             if style.id == style_id:
                 return style
+
+    return None
+
+
+def get_style_by_id_in_segment(style_id: str, segment: str) -> Optional[Style]:
+    """
+    특정 세그먼트에서 ID로 스타일 찾기
+
+    같은 ID가 여러 세그먼트에 존재할 수 있으므로, 특정 세그먼트에서만 찾을 때 사용.
+
+    Args:
+        style_id: 스타일 ID
+        segment: 세그먼트 (character, background, scene_composite, infographic)
+
+    Returns:
+        Style 객체 또는 None
+    """
+    styles = get_styles_by_segment(segment)
+
+    for style in styles:
+        if style.id == style_id:
+            return style
 
     return None
 
@@ -750,6 +781,10 @@ class StyleManager:
     def get_style_by_id(self, style_id: str) -> Optional[Style]:
         return get_style_by_id(style_id)
 
+    def get_style_by_id_in_segment(self, style_id: str, segment: str) -> Optional[Style]:
+        """특정 세그먼트에서 ID로 스타일 찾기"""
+        return get_style_by_id_in_segment(style_id, segment)
+
     def get_default_style(self, segment: str) -> Optional[Style]:
         return get_default_style(segment)
 
@@ -788,10 +823,12 @@ def get_style_manager(project_path: str = None) -> StyleManager:
 
 def invalidate_style_cache():
     """
-    스타일 캐시 무효화 (v2.1)
+    스타일 캐시 무효화 (v2.2)
 
     세션 스테이트의 스타일 관련 캐시를 무효화합니다.
     다른 페이지에서 스타일 변경을 감지할 수 있도록 버전을 갱신합니다.
+
+    v2.2: 더 포괄적인 패턴 + 파일 mtime 기반 검증
     """
     if not _HAS_STREAMLIT:
         print("[StyleManager] Streamlit 없음 - 캐시 무효화 스킵")
@@ -802,16 +839,28 @@ def invalidate_style_cache():
         new_version = time.time()
         st.session_state[_STYLE_CACHE_VERSION_KEY] = new_version
 
-        # 스타일 관련 세션 키 클리어
+        # 파일 mtime도 저장 (파일 기반 검증용)
+        storage_path = _get_storage_path()
+        if os.path.exists(storage_path):
+            st.session_state["_style_file_mtime"] = os.path.getmtime(storage_path)
+
+        # 스타일 관련 세션 키 클리어 (v2.2: 더 포괄적인 패턴)
+        # 모든 스타일 관련 위젯 키를 클리어
         keys_to_clear = []
         for key in list(st.session_state.keys()):
             # 스타일 선택 관련 키 찾기
-            if any(pattern in key for pattern in [
-                'selected_style_',
-                'style_select',
-                'bg_style',
-                '_style_radio',
-                '_style_selectbox'
+            if any(pattern in key.lower() for pattern in [
+                'selected_style',      # selected_style_*
+                'style_select',        # style_select*
+                'bg_style',            # bg_style_* (배경 스타일)
+                'scene_style',         # scene_style_* (씬 스타일)
+                'char_style',          # char_style_* (캐릭터 스타일)
+                'composite_style',     # composite_style_* (합성 스타일)
+                'infographic_style',   # infographic_style_* (인포그래픽 스타일)
+                '_style_radio',        # *_style_radio
+                '_style_selectbox',    # *_style_selectbox
+                'style_radio',         # style_radio_*
+                'style_selectbox',     # style_selectbox_*
             ]):
                 keys_to_clear.append(key)
 
@@ -819,6 +868,8 @@ def invalidate_style_cache():
             del st.session_state[key]
 
         print(f"[StyleManager] ✅ 캐시 무효화 완료 (버전: {new_version:.2f}, 클리어된 키: {len(keys_to_clear)}개)")
+        if keys_to_clear:
+            print(f"[StyleManager] 클리어된 키: {keys_to_clear[:10]}{'...' if len(keys_to_clear) > 10 else ''}")
 
     except Exception as e:
         print(f"[StyleManager] 캐시 무효화 오류: {e}")
@@ -840,14 +891,17 @@ def get_style_cache_version() -> float:
         return 0.0
 
 
-def check_and_clear_stale_style_cache(page_key: str = "default") -> bool:
+def check_and_clear_stale_style_cache(page_key: str = "default", clear_keys: bool = True) -> bool:
     """
-    스타일 캐시가 변경되었는지 확인하고 필요시 로컬 캐시 클리어
+    스타일 캐시가 변경되었는지 확인하고 필요시 로컬 캐시 클리어 (v2.2)
 
     각 페이지에서 호출하여 스타일 변경 감지
 
+    v2.2: 파일 mtime 기반 추가 검증 + 세션 키 클리어 옵션
+
     Args:
         page_key: 페이지 고유 키
+        clear_keys: True면 스타일 관련 세션 키도 클리어 (기본: True)
 
     Returns:
         True if cache was invalidated (스타일이 변경됨)
@@ -856,18 +910,66 @@ def check_and_clear_stale_style_cache(page_key: str = "default") -> bool:
         return False
 
     try:
+        is_stale = False
+
+        # 1. 버전 기반 체크
         current_version = get_style_cache_version()
         last_seen_key = f"_style_version_seen_{page_key}"
         last_seen = st.session_state.get(last_seen_key, 0.0)
 
         if current_version > last_seen:
-            # 버전이 업데이트됨 - 이 페이지의 스타일 관련 캐시 클리어
+            is_stale = True
             st.session_state[last_seen_key] = current_version
+
+        # 2. 파일 mtime 기반 체크 (추가 안전장치)
+        storage_path = _get_storage_path()
+        if os.path.exists(storage_path):
+            file_mtime = os.path.getmtime(storage_path)
+            last_mtime_key = f"_style_file_mtime_seen_{page_key}"
+            last_mtime = st.session_state.get(last_mtime_key, 0.0)
+
+            if file_mtime > last_mtime:
+                is_stale = True
+                st.session_state[last_mtime_key] = file_mtime
+
+        if is_stale:
             print(f"[StyleManager] 📢 스타일 변경 감지 (페이지: {page_key})")
+
+            # 스타일 관련 세션 키 클리어 (요청 시)
+            if clear_keys:
+                keys_to_clear = []
+                for key in list(st.session_state.keys()):
+                    if any(pattern in key.lower() for pattern in [
+                        'selected_style',
+                        'style_select',
+                        'bg_style',
+                        'scene_style',
+                        'char_style',
+                        'composite_style',
+                        'infographic_style',
+                        '_style_radio',
+                        '_style_selectbox',
+                        'style_radio',
+                        'style_selectbox',
+                    ]):
+                        # 버전 관련 키는 제외
+                        if '_version_seen_' not in key and '_mtime_seen_' not in key:
+                            keys_to_clear.append(key)
+
+                for key in keys_to_clear:
+                    try:
+                        del st.session_state[key]
+                    except Exception:
+                        pass
+
+                if keys_to_clear:
+                    print(f"[StyleManager] 클리어된 키 ({page_key}): {len(keys_to_clear)}개")
+
             return True
 
         return False
-    except Exception:
+    except Exception as e:
+        print(f"[StyleManager] 캐시 체크 오류: {e}")
         return False
 
 

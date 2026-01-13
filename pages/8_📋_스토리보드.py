@@ -51,6 +51,61 @@ try:
 except ImportError:
     PROMPT_METADATA_AVAILABLE = False
 
+# 배치 비디오 업로드 (v1.1)
+try:
+    from utils.batch_video_upload import (
+        analyze_batch_video_upload,
+        quick_analyze_batch_video_upload,
+        get_batch_video_stats,
+        apply_batch_videos,
+        apply_batch_videos_direct,
+        get_existing_videos,
+        get_scene_media_info
+    )
+    BATCH_VIDEO_AVAILABLE = True
+except ImportError:
+    BATCH_VIDEO_AVAILABLE = False
+
+# 실사 이미지 관리 (v1.0)
+try:
+    from utils.real_image_manager import (
+        quick_analyze_real_images,
+        get_real_image_stats,
+        apply_real_images,
+        save_single_real_image,
+        restore_ai_image,
+        get_scene_image_status,
+        get_existing_ai_images
+    )
+    REAL_IMAGE_MANAGER_AVAILABLE = True
+except ImportError:
+    REAL_IMAGE_MANAGER_AVAILABLE = False
+
+# AI 씬-이미지 매핑 파서 (v1.0)
+try:
+    from utils.image_mapping_parser import (
+        ImageMappingParser,
+        parse_ai_mapping,
+        generate_mapping_template,
+        get_image_folder_listing
+    )
+    AI_MAPPING_PARSER_AVAILABLE = True
+except ImportError:
+    AI_MAPPING_PARSER_AVAILABLE = False
+
+# 실사 이미지 합성 모듈 (v1.1)
+try:
+    from utils.image_composer import (
+        ImageComposer,
+        IMAGE_SIZE_PRESETS,
+        batch_compose_real_images,
+        compose_real_image_scene,
+        hex_to_rgb
+    )
+    IMAGE_COMPOSER_AVAILABLE = True
+except ImportError:
+    IMAGE_COMPOSER_AVAILABLE = False
+
 # 인포그래픽 관련 import
 try:
     from utils.models.infographic import VisualType, MediaType, InfographicData, SceneVisualSelection
@@ -81,7 +136,7 @@ try:
     INFOGRAPHIC_AVAILABLE = True
 except ImportError as e:
     INFOGRAPHIC_AVAILABLE = False
-    print(f"[스토리보드] 인포그래픽 모듈 로드 실패: {e}")
+    print(f"[스토리보드] 인포그래픽 모듈 로드 실패: {e}", flush=True)
 
 # AI Video API imports
 try:
@@ -98,7 +153,7 @@ try:
     from utils.video_api import ALL_MODELS, PLATFORM_CONFIGS
 except ImportError as e:
     VIDEO_API_AVAILABLE = False
-    print(f"[스토리보드] Video API 모듈 로드 실패: {e}")
+    print(f"[스토리보드] Video API 모듈 로드 실패: {e}", flush=True)
 
 # Settings Manager (영구 저장)
 from utils.settings_manager import (
@@ -109,6 +164,84 @@ from utils.settings_manager import (
 )
 
 import subprocess
+
+
+# ============================================================
+# 성능 최적화: 캐싱된 싱글톤 객체들 (v3.17)
+# ============================================================
+
+@st.cache_resource
+def get_cached_image_scene_matcher(_project_path_str: str):
+    """
+    ImageSceneMatcher 캐싱 (프로젝트당 1회만 생성)
+    - Streamlit rerun마다 새로 생성하지 않음
+    - 프로젝트 변경 시에만 새로 생성
+    """
+    from pathlib import Path
+    return ImageSceneMatcher(Path(_project_path_str))
+
+
+@st.cache_data(ttl=120, show_spinner=False)
+def get_metadata_index(_project_path_str: str, _cache_key: str = "") -> dict:
+    """
+    메타데이터 인덱스 사전 구축 (역방향 검색 최적화)
+    - 모든 JSON 파일을 한 번 스캔하여 scene_id → metadata 매핑 생성
+    - 이후 O(1) 검색 가능
+    """
+    from pathlib import Path
+    import json
+
+    project_path = Path(_project_path_str)
+    index = {}
+
+    metadata_dirs = [
+        project_path / "images" / "backgrounds",
+        project_path / "images" / "composited",
+        project_path / "images" / "scenes",
+    ]
+
+    for meta_dir in metadata_dirs:
+        if not meta_dir.exists():
+            continue
+
+        for json_file in meta_dir.glob("*.json"):
+            if json_file.name.startswith("metadata_"):
+                continue
+
+            try:
+                with open(json_file, "r", encoding="utf-8") as f:
+                    metadata = json.load(f)
+
+                if isinstance(metadata, list):
+                    metadata = metadata[0] if metadata else {}
+
+                if not isinstance(metadata, dict):
+                    continue
+
+                scene_id = metadata.get("scene_id")
+                if scene_id is not None:
+                    scene_id = int(scene_id)
+                    mtime = json_file.stat().st_mtime
+
+                    # 같은 scene_id가 있으면 최신 것 유지
+                    if scene_id not in index or mtime > index[scene_id]["mtime"]:
+                        index[scene_id] = {
+                            "metadata": metadata,
+                            "mtime": mtime,
+                            "json_path": str(json_file)
+                        }
+
+            except Exception:
+                continue
+
+    return index
+
+
+def get_metadata_by_scene_id(project_path: str, scene_id: int, cache_key: str = "") -> dict:
+    """scene_id로 메타데이터 즉시 조회 (O(1))"""
+    index = get_metadata_index(project_path, cache_key)
+    entry = index.get(scene_id)
+    return entry["metadata"] if entry else None
 
 
 # ============================================================
@@ -130,6 +263,34 @@ def open_folder(folder_path: str):
         subprocess.Popen(f'explorer "{folder_path}"')
     except Exception as e:
         st.error(f"폴더 열기 실패: {e}")
+
+
+# ============================================================
+# 유틸리티: 캐릭터 목록 안전하게 문자열 변환
+# ============================================================
+
+def safe_join_characters(characters: list) -> str:
+    """
+    캐릭터 목록을 안전하게 문자열로 변환
+
+    characters가 str 리스트이든 dict 리스트이든 처리
+    """
+    if not characters:
+        return ""
+
+    names = []
+    for char in characters:
+        if isinstance(char, str):
+            names.append(char)
+        elif isinstance(char, dict):
+            # name, character_name, id 순으로 시도
+            name = char.get('name') or char.get('character_name') or char.get('id', '')
+            if name:
+                names.append(str(name))
+        elif char is not None:
+            names.append(str(char))
+
+    return ', '.join(names)
 
 
 # ============================================================
@@ -238,6 +399,91 @@ def get_image_cache_buster(image_path: str) -> str:
         return ""
     ts = st.session_state["image_refresh_timestamps"].get(image_path, "")
     return f"?t={ts}" if ts else ""
+
+
+def invalidate_image_list_cache_light():
+    """
+    가벼운 이미지 캐시 무효화 (파일 목록만)
+
+    새 이미지 추가/삭제 후 파일 목록만 갱신할 때 사용
+    ImageSceneMatcher나 세션 상태는 유지하여 성능 보장
+    """
+    # 세션 기반 캐시 버전만 증가 (파일 목록 갱신)
+    current_version = st.session_state.get("image_cache_version", 0)
+    st.session_state["image_cache_version"] = current_version + 1
+    print(f"[스토리보드] 이미지 목록 캐시 갱신 (버전: {current_version + 1})", flush=True)
+    return 1
+
+
+def invalidate_all_image_caches(full_reset: bool = False):
+    """
+    이미지 관련 캐시 무효화
+
+    Args:
+        full_reset: True면 모든 캐시 완전 초기화 (새로고침 버튼용)
+                   False면 가벼운 갱신만 (파일 변경 후)
+    """
+    cleared_count = 0
+
+    # 세션 기반 캐시 버전 증가 (항상 실행)
+    current_version = st.session_state.get("image_cache_version", 0)
+    st.session_state["image_cache_version"] = current_version + 1
+    cleared_count += 1
+
+    # full_reset이 아니면 여기서 종료 (가벼운 갱신)
+    if not full_reset:
+        print(f"[스토리보드] 이미지 캐시 갱신 (버전: {current_version + 1})", flush=True)
+        return cleared_count
+
+    # === 아래는 full_reset=True 일 때만 실행 ===
+    print(f"[스토리보드] 전체 캐시 초기화 시작...", flush=True)
+
+    # 1. st.cache_data 함수 캐시 클리어
+    try:
+        load_image_files_cached.clear()
+        cleared_count += 1
+    except Exception:
+        pass
+
+    # 1-2. 메타데이터 인덱스 캐시 클리어 (v3.17)
+    try:
+        get_metadata_index.clear()
+        cleared_count += 1
+    except Exception:
+        pass
+
+    # 1-3. ImageSceneMatcher 캐시 클리어 (v3.17)
+    try:
+        get_cached_image_scene_matcher.clear()
+        cleared_count += 1
+    except Exception:
+        pass
+
+    # 2. 세션 상태에서 이미지 관련 키 삭제 (full_reset만)
+    keys_to_delete = []
+    for key in list(st.session_state.keys()):
+        # 중요 설정은 유지
+        if key.startswith('compose_') or key == 'image_cache_version':
+            continue
+        if any(keyword in key.lower() for keyword in [
+            'scene_img', 'matched', '_storyboard_images_dir_logged',
+            'matching_summary_', 'ai_folder_files_',  # ⭐ 매칭 요약 + AI 폴더 캐시
+            'backup_count_', 'export_media_list_'  # ⭐ 백업 카운트 + 내보내기 목록 캐시
+        ]):
+            keys_to_delete.append(key)
+
+    for key in keys_to_delete:
+        try:
+            del st.session_state[key]
+            cleared_count += 1
+        except KeyError:
+            pass
+
+    # ⭐ 성능 최적화: ImageSceneMatcher 플래그 리셋 제거 (불필요한 재초기화 방지)
+    # _init_logged는 더 이상 사용하지 않음
+
+    print(f"[스토리보드] 전체 캐시 초기화 완료 ({cleared_count}개 항목)", flush=True)
+    return cleared_count
 
 
 # ============================================================
@@ -1019,12 +1265,13 @@ def render_ai_video_generation_section(scenes: list, project_path, visual_manage
 
             for col_idx, scene_info in enumerate(row_scenes):
                 scene_id = scene_info["scene_id"]
+                unique_idx = row_start + col_idx  # 고유 인덱스
 
                 with cols[col_idx]:
                     is_selected = st.checkbox(
                         f"씬 {scene_id}",
                         value=st.session_state.get(f"ai_video_select_{scene_id}", False),
-                        key=f"ai_video_cb_{scene_id}"
+                        key=f"ai_video_cb_{scene_id}_{unique_idx}"
                     )
 
                     if is_selected:
@@ -1919,11 +2166,22 @@ def init_media_cache():
 
         # 기존 미디어 캐시 정리 (Streamlit 내부 캐시)
         try:
-            if hasattr(st, 'cache_data'):
-                # 필요시 캐시 클리어 (옵션)
-                pass
+            # MediaFileStorageError 방지를 위한 세션 정리
+            keys_to_remove = []
+            for key in st.session_state.keys():
+                # 업로드된 파일 참조 제거 (만료된 참조 방지)
+                if '_uploader' in key.lower() or 'uploaded_file' in key.lower():
+                    keys_to_remove.append(key)
+            for key in keys_to_remove:
+                try:
+                    del st.session_state[key]
+                except Exception:
+                    pass
         except Exception:
             pass
+
+        # ⭐ 성능 최적화: 초기화 로그 제거 (불필요한 콘솔 출력 방지)
+        # print("[DEBUG] 미디어 캐시 초기화 완료", flush=True)
 
 # 캐시 초기화 호출
 init_media_cache()
@@ -1931,30 +2189,90 @@ init_media_cache()
 # ============================================================
 # 이미지 로딩 캐시 (중복 로드 방지)
 # ============================================================
-@st.cache_data(ttl=60, show_spinner=False)
-def load_image_files_cached(scenes_dir: str, content_dir: str) -> tuple:
-    """이미지 파일 목록 캐싱 (중복 로드 방지)"""
+@st.cache_data(ttl=300, show_spinner=False)  # ⭐ TTL 5분으로 증가
+def load_image_files_cached(backgrounds_dir: str, scenes_dir: str, content_dir: str, _cache_key: str = "") -> tuple:
+    """
+    이미지 파일 목록 캐싱 (중복 로드 방지)
+
+    Args:
+        backgrounds_dir: 배경 이미지 폴더
+        scenes_dir: 씬 이미지 폴더
+        content_dir: 콘텐츠 이미지 폴더
+        _cache_key: 캐시 무효화용 키 (폴더 mtime 등)
+    """
+    import re
+
     image_files = []
 
-    scenes_path = Path(scenes_dir)
-    content_path = Path(content_dir)
+    # 우선순위: backgrounds > scenes > content
+    dirs_to_search = [
+        (Path(backgrounds_dir), "backgrounds"),
+        (Path(scenes_dir), "scenes"),
+        (Path(content_dir), "content"),
+    ]
 
-    if scenes_path.exists():
-        image_files.extend(sorted(scenes_path.glob("*.png")))
-    if content_path.exists():
-        image_files.extend(sorted(content_path.glob("*.png")))
+    for dir_path, source in dirs_to_search:
+        if dir_path.exists():
+            for ext in ["*.png", "*.jpg", "*.jpeg", "*.webp"]:
+                for img in dir_path.glob(ext):
+                    try:
+                        mtime = img.stat().st_mtime
+                        image_files.append((img, mtime))
+                    except (OSError, IOError):
+                        continue
 
-    # 중복 제거 (같은 이름 파일이 있을 경우 scenes 우선)
-    seen_names = set()
+    # ⭐ 핵심 수정: 수정 시간 기준 내림차순 정렬 (최신 이미지 먼저!)
+    image_files.sort(key=lambda x: x[1], reverse=True)
+
+    # 중복 제거 (같은 씬 번호 파일이 있으면 최신 이미지 사용)
+    # ⭐ 씬 번호 기반 중복 제거 (bg_scene_001, scene_001 → 001로 통합)
+    seen_scene_ids = set()
     unique_images = []
-    for img in image_files:
-        if img.stem not in seen_names:
-            unique_images.append(str(img))  # 문자열로 변환 (캐싱 안정성)
-            seen_names.add(img.stem)
+
+    # 씬 번호 추출 패턴 (AI 매핑 파일명 "001_scene.jpg" 포함)
+    patterns = [r'bg[_-]?scene[_-]?(\d+)', r'scene[_-]?(\d+)', r'^(\d+)[_-]', r'^(\d+)$', r'[_-](\d+)$']
+
+    for img, mtime in image_files:
+        # 씬 번호 추출
+        scene_num = None
+        name = img.stem.lower()
+
+        for p in patterns:
+            m = re.search(p, name)
+            if m:
+                scene_num = int(m.group(1))
+                break
+
+        # 씬 번호가 없거나 처음 보는 씬 번호면 추가
+        # (이미 mtime 정렬되어 있으므로 처음 만나는 것이 최신)
+        if scene_num is None or scene_num not in seen_scene_ids:
+            unique_images.append(str(img))
+            if scene_num is not None:
+                seen_scene_ids.add(scene_num)
 
     image_map = {Path(img).stem: img for img in unique_images}
 
+    # ⭐ 성능 최적화: 캐시 내 로그 완전 제거 (Streamlit rerun마다 출력 방지)
+    # 디버깅 필요 시에만 활성화:
+    # print(f"[DEBUG] 이미지 캐시 로드: {len(unique_images)}개", flush=True)
+
     return tuple(unique_images), image_map
+
+
+def get_image_dirs_mtime(project_path: Path) -> str:
+    """
+    이미지 캐시 키 반환 (세션 기반)
+
+    성능 개선: 매 렌더링마다 파일 mtime 읽지 않고,
+    invalidate_all_image_caches() 호출 시에만 캐시 무효화
+    """
+    # 세션 기반 캐시 버전 (invalidate 시 증가)
+    cache_version = st.session_state.get("image_cache_version", 0)
+
+    # 프로젝트 경로도 포함 (프로젝트 전환 시 캐시 갱신)
+    project_key = str(project_path).replace("\\", "/")
+
+    return f"{project_key}_{cache_version}"
 
 
 def get_paginated_scenes(scenes: list, page: int, per_page: int = 10) -> tuple:
@@ -3933,7 +4251,7 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
                                 f"시각 자료 타입 (씬 {scene_id})",
                                 type_options,
                                 index=current_idx,
-                                key=f"visual_type_{scene_id}",
+                                key=f"visual_type_{scene_id}_{i}",
                                 horizontal=True,
                                 label_visibility="collapsed"
                             )
@@ -3964,12 +4282,12 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
 
                                 if ai_img and ai_img.exists():
                                     st.image(str(ai_img), width=120)
-                                    if st.button("🔍", key=f"zoom_ai_{scene_id}", help="확대"):
-                                        st.session_state[f"zoom_ai_{scene_id}"] = True
-                                    if st.session_state.get(f"zoom_ai_{scene_id}", False):
+                                    if st.button("🔍", key=f"zoom_ai_{scene_id}_{i}", help="확대"):
+                                        st.session_state[f"zoom_ai_{scene_id}_{i}"] = True
+                                    if st.session_state.get(f"zoom_ai_{scene_id}_{i}", False):
                                         from utils.image_viewer import show_image_modal
                                         show_image_modal(str(ai_img), scene_id, None, f"씬 {scene_id} AI 이미지")
-                                        st.session_state[f"zoom_ai_{scene_id}"] = False
+                                        st.session_state[f"zoom_ai_{scene_id}_{i}"] = False
                                     if selection:
                                         visual_manager.state.selections[scene_id].ai_image_path = str(ai_img)
                                 else:
@@ -4001,12 +4319,12 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
 
                                 if info_thumb and os.path.exists(info_thumb):
                                     st.image(info_thumb, width=120)
-                                    if st.button("🔍", key=f"zoom_info_{scene_id}", help="확대"):
-                                        st.session_state[f"zoom_info_{scene_id}"] = True
-                                    if st.session_state.get(f"zoom_info_{scene_id}", False):
+                                    if st.button("🔍", key=f"zoom_info_{scene_id}_{i}", help="확대"):
+                                        st.session_state[f"zoom_info_{scene_id}_{i}"] = True
+                                    if st.session_state.get(f"zoom_info_{scene_id}_{i}", False):
                                         from utils.image_viewer import show_image_modal
                                         show_image_modal(info_thumb, scene_id, None, f"씬 {scene_id} 인포그래픽")
-                                        st.session_state[f"zoom_info_{scene_id}"] = False
+                                        st.session_state[f"zoom_info_{scene_id}_{i}"] = False
                                     if selection:
                                         visual_manager.state.selections[scene_id].infographic_thumbnail = info_thumb
                                         if info_video_exists:
@@ -4038,12 +4356,12 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
 
                                 if comp_thumb and os.path.exists(comp_thumb):
                                     st.image(comp_thumb, width=120)
-                                    if st.button("🔍", key=f"zoom_comp_{scene_id}", help="확대"):
-                                        st.session_state[f"zoom_comp_{scene_id}"] = True
-                                    if st.session_state.get(f"zoom_comp_{scene_id}", False):
+                                    if st.button("🔍", key=f"zoom_comp_{scene_id}_{i}", help="확대"):
+                                        st.session_state[f"zoom_comp_{scene_id}_{i}"] = True
+                                    if st.session_state.get(f"zoom_comp_{scene_id}_{i}", False):
                                         from utils.image_viewer import show_image_modal
                                         show_image_modal(comp_thumb, scene_id, None, f"씬 {scene_id} 합성")
-                                        st.session_state[f"zoom_comp_{scene_id}"] = False
+                                        st.session_state[f"zoom_comp_{scene_id}_{i}"] = False
                                     if selection:
                                         visual_manager.state.selections[scene_id].composite_thumbnail = comp_thumb
                                         if comp_video_exists:
@@ -4117,18 +4435,47 @@ with tab_auto:
 
     # 씬 데이터 로드
     scenes_path = project_path / "analysis" / "scenes.json"
-    # 이미지 디렉토리 (scenes 우선, content 폴백)
+    # 이미지 디렉토리 (backgrounds > scenes > content 순 우선)
+    backgrounds_images_dir = project_path / "images" / "backgrounds"
     scenes_images_dir = project_path / "images" / "scenes"
     content_images_dir = project_path / "images" / "content"
     audio_dir = project_path / "audio"
 
-    # 이미지 디렉토리 선택 (scenes에 이미지가 있으면 우선, 없으면 content)
-    if scenes_images_dir.exists() and any(scenes_images_dir.glob("*.png")):
-        images_dir = scenes_images_dir
-        print(f"[스토리보드] scenes 폴더 사용: {scenes_images_dir}")
-    else:
-        images_dir = content_images_dir
-        print(f"[스토리보드] content 폴더 사용: {content_images_dir}")
+    # ⭐ 이미지 디렉토리 선택 (세션 캐싱으로 반복 로그 방지)
+    def get_images_dir_cached():
+        """이미지 디렉토리 결정 (세션당 한 번만 로그)"""
+        cache_key = f"_storyboard_images_dir_{project_path}"
+        log_key = f"_storyboard_images_dir_logged_{project_path}"
+
+        # 캐시에 있으면 바로 반환 (로그 없음)
+        if cache_key in st.session_state:
+            return st.session_state[cache_key]
+
+        def has_images(d):
+            return d.exists() and (any(d.glob("*.png")) or any(d.glob("*.jpg")) or any(d.glob("*.webp")))
+
+        if has_images(backgrounds_images_dir):
+            selected_dir = backgrounds_images_dir
+            source = "backgrounds"
+        elif has_images(scenes_images_dir):
+            selected_dir = scenes_images_dir
+            source = "scenes"
+        else:
+            selected_dir = content_images_dir
+            source = "content"
+
+        # 세션에 저장
+        st.session_state[cache_key] = selected_dir
+
+        # ⭐ 성능 최적화: 로그 제거 (불필요한 콘솔 출력 방지)
+        # 디버깅 필요 시에만 활성화:
+        # if log_key not in st.session_state:
+        #     st.session_state[log_key] = True
+        #     print(f"[DEBUG] {source} 폴더: {selected_dir}", flush=True)
+
+        return selected_dir
+
+    images_dir = get_images_dir_cached()
 
     # 씬 분석 결과 확인
     if not scenes_path.exists():
@@ -4177,10 +4524,27 @@ with tab_auto:
             st.warning("씬 데이터가 비어있습니다.")
         else:
             # === 이미지 자동 동기화 섹션 ===
-            st.subheader("🔄 이미지 자동 동기화")
+            sync_header_col1, sync_header_col2 = st.columns([4, 1])
+            with sync_header_col1:
+                st.subheader("🔄 이미지 자동 동기화")
+            with sync_header_col2:
+                if st.button("🔄 새로고침", key="refresh_image_cache_sync", help="이미지 캐시 새로고침 (새 이미지 반영)"):
+                    # ⭐ 전체 캐시 초기화 (명시적 새로고침)
+                    cleared = invalidate_all_image_caches(full_reset=True)
+                    st.toast(f"✅ 이미지 캐시 새로고침 완료! ({cleared}개 항목)")
+                    st.rerun()
 
-            matcher = ImageSceneMatcher(project_path)
-            summary = matcher.get_matching_summary(scenes)
+            # ⭐ 캐싱된 ImageSceneMatcher 사용 (v3.17 성능 최적화)
+            matcher = get_cached_image_scene_matcher(str(project_path))
+
+            # ⭐ 매칭 요약 캐싱 (성능 개선 v3.18)
+            # get_matching_summary()는 파일 시스템을 스캔하므로 매 렌더링마다 호출하지 않음
+            summary_cache_key = f"matching_summary_{str(project_path)}_{st.session_state.get('image_cache_version', 0)}"
+            if summary_cache_key not in st.session_state:
+                summary = matcher.get_matching_summary(scenes)
+                st.session_state[summary_cache_key] = summary
+            else:
+                summary = st.session_state[summary_cache_key]
 
             # 매칭 상태 표시
             sync_col1, sync_col2, sync_col3, sync_col4 = st.columns(4)
@@ -4202,15 +4566,23 @@ with tab_auto:
 
             with sync_btn_col1:
                 if st.button("🔄 이미지 자동 매칭", type="primary", use_container_width=True,
-                            help="생성된 이미지를 씬에 자동으로 매칭합니다"):
+                            help="생성된 이미지를 씬에 자동으로 매칭합니다 (최신 이미지 우선)"):
                     with st.spinner("이미지 매칭 중..."):
+                        # ⭐ 먼저 캐시 무효화 (최신 이미지 반영)
+                        invalidate_all_image_caches()
+
+                        # 최신 이미지 우선 매칭
                         sync_result = auto_sync_images_to_storyboard(
                             project_path, scenes, copy_to_scenes=True
                         )
 
+                        # 결과 표시
                         copy_info = sync_result.get("copy_results", {})
+                        summary = sync_result.get("summary", {})
+
                         if copy_info:
                             st.success(f"✅ 동기화 완료! 복사: {copy_info.get('copied', 0)}개, 스킵: {copy_info.get('skipped', 0)}개")
+                            st.info(f"📊 검색된 이미지: {summary.get('total_images', 0)}개, 매칭률: {summary.get('match_rate', 0):.1f}%")
                             if copy_info.get("errors"):
                                 with st.expander("⚠️ 오류 목록"):
                                     for err in copy_info["errors"]:
@@ -4243,11 +4615,15 @@ with tab_auto:
             st.divider()
 
             # 이미지 파일 목록 (캐싱된 함수 사용 - 중복 로드 방지)
+            # ⭐ mtime 기반 캐시 키로 새 이미지 자동 감지
+            cache_key = get_image_dirs_mtime(project_path)
             image_files_tuple, image_map = load_image_files_cached(
-                str(scenes_images_dir), str(content_images_dir)
+                str(backgrounds_images_dir),
+                str(scenes_images_dir),
+                str(content_images_dir),
+                _cache_key=cache_key
             )
             image_files = [Path(p) for p in image_files_tuple]  # Path 객체로 변환
-            print(f"[스토리보드] 총 {len(image_files)}개 이미지 로드됨 (캐싱)")
 
             # 통계 표시
             col1, col2, col3, col4 = st.columns(4)
@@ -4267,11 +4643,12 @@ with tab_auto:
             st.divider()
 
             # ============================================================
-            # 실사 이미지 관리 섹션
+            # 실사 이미지 관리 섹션 (v1.0)
             # ============================================================
             with st.expander("🖼️ 실사 이미지 관리", expanded=False):
                 st.caption("AI 생성 이미지를 실사 이미지로 대체하고 관리할 수 있습니다.")
 
+                # 기존 버튼들
                 batch_col1, batch_col2, batch_col3, batch_col4 = st.columns(4)
 
                 # 전체 백업
@@ -4297,9 +4674,9 @@ with tab_auto:
                 # 전체 새로고침
                 with batch_col3:
                     if st.button("🔄 전체 새로고침", use_container_width=True, help="모든 이미지 캐시를 새로고침합니다"):
-                        for img in image_files:
-                            invalidate_image_cache(str(img))
-                        st.toast(f"{len(image_files)}개 이미지 새로고침됨")
+                        # ⭐ 전체 캐시 무효화 (명시적 새로고침)
+                        cleared = invalidate_all_image_caches(full_reset=True)
+                        st.toast(f"이미지 캐시 새로고침됨 ({cleared}개 항목)")
                         st.rerun()
 
                 # 이미지 폴더 열기
@@ -4307,10 +4684,928 @@ with tab_auto:
                     if st.button("📂 이미지 폴더", use_container_width=True, help="이미지 폴더를 탐색기에서 엽니다"):
                         open_folder(str(scenes_images_dir))
 
-                # 백업 상태 표시
-                backup_count = sum(1 for img in image_files if has_backup(img))
+                # 백업 상태 표시 (캐시된 결과 사용)
+                # ⭐ 성능 최적화: 백업 카운트 캐싱 (매 렌더링 시 300+개 파일 확인 방지)
+                backup_cache_key = f"backup_count_{str(project_path)}_{st.session_state.get('image_cache_version', 0)}"
+                if backup_cache_key not in st.session_state:
+                    backup_count = sum(1 for img in image_files if has_backup(img))
+                    st.session_state[backup_cache_key] = backup_count
+                else:
+                    backup_count = st.session_state[backup_cache_key]
                 if backup_count > 0:
                     st.info(f"💾 백업된 이미지: {backup_count}개 / {len(image_files)}개")
+
+                st.divider()
+
+                # 실사 이미지 업로드 기능 (REAL_IMAGE_MANAGER_AVAILABLE 확인)
+                if REAL_IMAGE_MANAGER_AVAILABLE:
+                    # 탭으로 구분 (AI 매핑 탭 추가)
+                    if AI_MAPPING_PARSER_AVAILABLE:
+                        real_tab1, real_tab2, real_tab3 = st.tabs(["📤 배치 업로드", "🎯 개별 씬 업로드", "🤖 AI 매핑 적용"])
+                    else:
+                        real_tab1, real_tab2 = st.tabs(["📤 배치 업로드", "🎯 개별 씬 업로드"])
+                        real_tab3 = None
+
+                    with real_tab1:
+                        st.markdown("**파일명에서 씬 번호를 자동 인식합니다.**")
+                        st.caption("예: `1.png`, `scene_05.jpg`, `씬10.webp`")
+
+                        # 파일 업로더
+                        uploaded_real_images = st.file_uploader(
+                            "실사 이미지 업로드",
+                            type=["png", "jpg", "jpeg", "webp"],
+                            accept_multiple_files=True,
+                            key="batch_real_image_upload",
+                            help="씬 번호가 포함된 이미지 파일들을 업로드하세요"
+                        )
+
+                        if uploaded_real_images:
+                            # 빠른 분석
+                            existing_ai = get_existing_ai_images(scenes_images_dir, scenes)
+                            real_results = quick_analyze_real_images(uploaded_real_images, len(scenes), existing_ai)
+                            real_stats = get_real_image_stats(real_results)
+
+                            # 업로드 완료 메시지
+                            st.success(f"📁 {len(uploaded_real_images)}개 이미지 파일 업로드 완료")
+
+                            # 통계 표시
+                            stat_cols = st.columns(4)
+                            with stat_cols[0]:
+                                st.metric("전체", real_stats["total"])
+                            with stat_cols[1]:
+                                st.metric("매칭 성공", real_stats["success"])
+                            with stat_cols[2]:
+                                failed_count = real_stats["out_of_range"] + real_stats["invalid_name"] + real_stats["invalid_format"] + real_stats["duplicate"]
+                                st.metric("실패", failed_count)
+                            with stat_cols[3]:
+                                replace_count = sum(1 for r in real_results if r.status == "success" and r.current_ai_image)
+                                st.metric("AI 대체", replace_count)
+
+                            # 미리보기
+                            if real_stats["success"] > 0:
+                                st.markdown("##### ✅ 매칭된 이미지")
+                                for item in real_stats["success_items"]:
+                                    icon = "🔄" if item.current_ai_image else "➕"
+                                    st.text(f"{icon} 씬 {item.scene_number}: {item.filename} ({item.message})")
+
+                            if real_stats["failed_items"]:
+                                st.markdown("##### ❌ 실패 항목")
+                                for item in real_stats["failed_items"]:
+                                    st.text(f"⚠️ {item.filename}: {item.message}")
+
+                            # 적용 버튼
+                            if real_stats["success"] > 0:
+                                st.divider()
+                                apply_cols = st.columns([2, 1])
+                                with apply_cols[0]:
+                                    backup_ai_images = st.checkbox("AI 이미지 백업", value=True, key="batch_real_backup_ai")
+                                with apply_cols[1]:
+                                    apply_real_btn = st.button("🖼️ 실사 이미지 적용", type="primary", use_container_width=True, key="apply_batch_real_images")
+
+                                if apply_real_btn:
+                                    # 진행률 표시
+                                    progress_bar = st.progress(0, text="이미지 저장 준비 중...")
+                                    status_text = st.empty()
+
+                                    # 진행률 콜백
+                                    def real_progress_callback(current: int, total: int, filename: str):
+                                        progress = current / total
+                                        progress_bar.progress(progress, text=f"저장 중... ({current}/{total})")
+                                        status_text.text(f"🖼️ {filename}")
+
+                                    # 실사 이미지 적용
+                                    apply_real_result = apply_real_images(
+                                        uploaded_files=uploaded_real_images,
+                                        results=real_results,
+                                        images_folder=scenes_images_dir,
+                                        backup_ai=backup_ai_images,
+                                        progress_callback=real_progress_callback
+                                    )
+
+                                    # 완료 표시
+                                    progress_bar.progress(1.0, text="완료!")
+                                    status_text.empty()
+
+                                    # 캐시 무효화
+                                    invalidate_all_image_caches()
+
+                                    st.success(f"✅ {apply_real_result['applied']}개 실사 이미지 적용 완료!")
+                                    if apply_real_result["backed_up"] > 0:
+                                        st.info(f"💾 {apply_real_result['backed_up']}개 AI 이미지 백업됨")
+                                    if apply_real_result["failed"] > 0:
+                                        st.warning(f"⚠️ {apply_real_result['failed']}개 저장 실패")
+                                    st.rerun()
+
+                    with real_tab2:
+                        st.markdown("**특정 씬의 이미지를 직접 대체합니다.**")
+
+                        # 씬 선택
+                        scene_options = [(i+1, f"씬 {i+1}") for i in range(len(scenes))]
+                        if scene_options:
+                            selected_scene_idx = st.selectbox(
+                                "대체할 씬 선택",
+                                options=range(len(scene_options)),
+                                format_func=lambda x: scene_options[x][1],
+                                key="single_real_scene_select"
+                            )
+                            target_scene_num = scene_options[selected_scene_idx][0]
+
+                            # 현재 이미지 미리보기
+                            existing_ai = get_existing_ai_images(scenes_images_dir, scenes)
+                            current_ai_path = existing_ai.get(target_scene_num)
+
+                            if current_ai_path and Path(current_ai_path).exists():
+                                st.image(current_ai_path, caption=f"현재 씬 {target_scene_num} AI 이미지", width=200)
+                            else:
+                                st.info(f"씬 {target_scene_num}의 이미지가 없습니다.")
+
+                            # 파일 업로더
+                            single_real_image = st.file_uploader(
+                                "실사 이미지 선택",
+                                type=["png", "jpg", "jpeg", "webp"],
+                                key=f"single_real_upload_{target_scene_num}"
+                            )
+
+                            if single_real_image:
+                                # 미리보기
+                                st.image(single_real_image, caption="업로드할 실사 이미지", width=200)
+
+                                single_backup_ai = st.checkbox("AI 이미지 백업", value=True, key=f"single_backup_ai_{target_scene_num}")
+
+                                if st.button(f"🔄 씬 {target_scene_num} 이미지 대체", type="primary", key=f"apply_single_real_{target_scene_num}"):
+                                    single_result = save_single_real_image(
+                                        uploaded_file=single_real_image,
+                                        images_folder=scenes_images_dir,
+                                        scene_num=target_scene_num,
+                                        current_ai_image=current_ai_path,
+                                        backup_ai=single_backup_ai
+                                    )
+
+                                    if single_result['success']:
+                                        invalidate_all_image_caches()
+                                        st.success(f"✅ 씬 {target_scene_num} 이미지가 실사로 대체되었습니다!")
+                                        if single_result['ai_backup_path']:
+                                            st.info(f"AI 이미지 백업: {Path(single_result['ai_backup_path']).name}")
+                                        st.rerun()
+                                    else:
+                                        st.error(f"❌ 대체 실패: {single_result['error']}")
+
+                    # ============================================================
+                    # 🤖 AI 매핑 적용 탭 (v1.0)
+                    # ============================================================
+                    if real_tab3 is not None:
+                        with real_tab3:
+                            st.markdown("### 🤖 AI 매핑 결과 일괄 적용")
+                            st.info("""
+                            AI(Gemini, GPT 등)가 생성한 씬-이미지 매핑 결과를 붙여넣으면 자동으로 파싱하여 일괄 적용합니다.
+
+                            **지원 형식**: JSON, CSV, 텍스트 (자동 감지)
+                            """)
+
+                            # 이미지 폴더 설정
+                            col_folder1, col_folder2 = st.columns([3, 1])
+                            with col_folder1:
+                                ai_image_folder = st.text_input(
+                                    "📁 이미지 폴더 경로",
+                                    value=st.session_state.get('ai_mapping_image_folder', ''),
+                                    placeholder="C:/Users/이름/images/프로젝트명",
+                                    help="AI가 매핑한 이미지 파일들이 저장된 폴더 경로",
+                                    key="ai_mapping_folder_input"
+                                )
+                            with col_folder2:
+                                st.markdown("<br>", unsafe_allow_html=True)
+                                if st.button("📂 폴더 선택", key="select_ai_folder_btn"):
+                                    # ⭐ 성능 최적화: tkinter 모듈 사전 캐싱 + 즉시 정리
+                                    try:
+                                        import tkinter as tk
+                                        from tkinter import filedialog
+                                        root = tk.Tk()
+                                        root.withdraw()
+                                        root.wm_attributes('-topmost', 1)
+                                        root.focus_force()  # 포커스 강제 설정
+                                        folder_selected = filedialog.askdirectory(parent=root)
+                                        root.destroy()  # ⭐ 즉시 정리 (메모리 누수 방지)
+                                        if folder_selected:
+                                            st.session_state['ai_mapping_image_folder'] = folder_selected
+                                            st.rerun()
+                                    except Exception:
+                                        st.warning("폴더 선택 다이얼로그를 열 수 없습니다. 경로를 직접 입력하세요.")
+
+                            # 폴더 상태 표시
+                            if ai_image_folder:
+                                st.session_state['ai_mapping_image_folder'] = ai_image_folder
+                                folder_path = Path(ai_image_folder)
+                                if folder_path.exists():
+                                    # ⭐ 성능 최적화: 폴더 파일 목록 캐싱
+                                    ai_folder_cache_key = f"ai_folder_files_{ai_image_folder}_{st.session_state.get('image_cache_version', 0)}"
+                                    if ai_folder_cache_key not in st.session_state:
+                                        image_exts = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
+                                        ai_image_files = [f for f in folder_path.iterdir()
+                                                         if f.is_file() and f.suffix.lower() in image_exts]
+                                        st.session_state[ai_folder_cache_key] = ai_image_files
+                                    else:
+                                        ai_image_files = st.session_state[ai_folder_cache_key]
+                                    st.success(f"✅ 폴더 확인됨: **{len(ai_image_files)}개** 이미지 파일")
+
+                                    with st.expander(f"📋 이미지 파일 목록 ({len(ai_image_files)}개)", expanded=False):
+                                        for f in sorted(ai_image_files)[:30]:
+                                            st.caption(f"• {f.name}")
+                                        if len(ai_image_files) > 30:
+                                            st.caption(f"... 외 {len(ai_image_files) - 30}개")
+
+                                        # AI 프롬프트용 목록 복사 버튼
+                                        if st.button("📋 AI 프롬프트용 목록 복사", key="copy_file_list"):
+                                            file_list = get_image_folder_listing(ai_image_folder)
+                                            st.code(file_list, language=None)
+                                            st.info("위 텍스트를 복사하여 AI에게 전달하세요.")
+                                else:
+                                    st.error("❌ 폴더가 존재하지 않습니다.")
+
+                            st.divider()
+
+                            # ============================================================
+                            # 🖼️ 실사 이미지 레이아웃 설정 (v1.1)
+                            # ============================================================
+                            if IMAGE_COMPOSER_AVAILABLE:
+                                st.markdown("#### 🖼️ 실사 이미지 레이아웃 설정")
+                                st.caption("실사 이미지가 정중앙에 배치되며, 배경 이미지와 합성됩니다.")
+
+                                # 크기 설정
+                                col_size1, col_size2 = st.columns([1, 1])
+
+                                with col_size1:
+                                    size_preset = st.selectbox(
+                                        "📐 실사 이미지 크기",
+                                        options=list(IMAGE_SIZE_PRESETS.keys()),
+                                        format_func=lambda x: IMAGE_SIZE_PRESETS[x]['name'],
+                                        index=1,  # 기본값: medium
+                                        help="실사 이미지가 배치될 크기를 선택합니다.",
+                                        key="compose_size_preset"
+                                    )
+
+                                    # 사용자 지정 크기
+                                    if size_preset == 'custom':
+                                        col_w, col_h = st.columns(2)
+                                        with col_w:
+                                            custom_width = st.number_input(
+                                                "너비 (px)",
+                                                min_value=100,
+                                                max_value=1280,
+                                                value=640,
+                                                step=10,
+                                                key="compose_custom_width"
+                                            )
+                                        with col_h:
+                                            custom_height = st.number_input(
+                                                "높이 (px)",
+                                                min_value=100,
+                                                max_value=720,
+                                                value=360,
+                                                step=10,
+                                                key="compose_custom_height"
+                                            )
+                                    else:
+                                        custom_width = None
+                                        custom_height = None
+
+                                with col_size2:
+                                    preset_data = IMAGE_SIZE_PRESETS[size_preset]
+                                    if size_preset != 'custom':
+                                        st.info(f"""
+                                        **선택된 크기**
+                                        - 최대 너비: {preset_data['max_width']}px
+                                        - 최대 높이: {preset_data['max_height']}px
+                                        - 비율: {int(preset_data['scale'] * 100)}%
+                                        """)
+                                    else:
+                                        st.info(f"""
+                                        **사용자 지정 크기**
+                                        - 너비: {custom_width}px
+                                        - 높이: {custom_height}px
+                                        """)
+
+                                # 배경 설정
+                                st.markdown("##### 🎨 배경 설정")
+                                col_bg1, col_bg2 = st.columns([2, 1])
+
+                                with col_bg1:
+                                    use_background = st.checkbox(
+                                        "배경 이미지 사용",
+                                        value=False,
+                                        help="실사 이미지 뒤에 배경 이미지를 배치합니다.",
+                                        key="compose_use_background"
+                                    )
+
+                                    if use_background:
+                                        background_source = st.radio(
+                                            "배경 소스",
+                                            options=["파일 업로드", "단색 배경"],
+                                            horizontal=True,
+                                            key="compose_bg_source"
+                                        )
+
+                                        if background_source == "파일 업로드":
+                                            bg_uploaded = st.file_uploader(
+                                                "배경 이미지 업로드",
+                                                type=['jpg', 'jpeg', 'png', 'webp'],
+                                                help="모든 실사 이미지 씬에 일괄 적용됩니다.",
+                                                key="compose_bg_uploader"
+                                            )
+
+                                            if bg_uploaded:
+                                                # 임시 저장
+                                                bg_temp_dir = Path("data/temp")
+                                                bg_temp_dir.mkdir(parents=True, exist_ok=True)
+                                                bg_temp_path = bg_temp_dir / "background_temp.jpg"
+                                                with open(bg_temp_path, 'wb') as f:
+                                                    f.write(bg_uploaded.read())
+                                                st.session_state['compose_bg_image_path'] = str(bg_temp_path)
+                                                st.image(bg_uploaded, caption="선택된 배경 이미지", width=200)
+
+                                            background_image_path = st.session_state.get('compose_bg_image_path')
+                                        else:
+                                            background_image_path = None
+                                    else:
+                                        background_source = "단색 배경"
+                                        background_image_path = None
+
+                                    # 배경 색상 (단색 배경 또는 배경 이미지 없을 때)
+                                    if not use_background or background_source == "단색 배경":
+                                        bg_color_hex = st.color_picker(
+                                            "배경 색상",
+                                            value="#1e1e1e",
+                                            help="실사 이미지 뒤에 표시될 배경 색상",
+                                            key="compose_bg_color"
+                                        )
+                                        bg_color_rgb = hex_to_rgb(bg_color_hex)
+                                    else:
+                                        bg_color_rgb = (30, 30, 30)
+
+                                with col_bg2:
+                                    if use_background and background_source == "파일 업로드":
+                                        bg_opacity = st.slider(
+                                            "배경 투명도",
+                                            min_value=0.0,
+                                            max_value=1.0,
+                                            value=0.3,
+                                            step=0.05,
+                                            help="0.0 = 완전 투명, 1.0 = 불투명",
+                                            key="compose_bg_opacity"
+                                        )
+                                        opacity_percent = int(bg_opacity * 100)
+                                        opacity_label = '매우 투명' if bg_opacity < 0.3 else '반투명' if bg_opacity < 0.7 else '불투명'
+                                        st.caption(f"투명도: {opacity_percent}% ({opacity_label})")
+                                    else:
+                                        bg_opacity = 1.0
+
+                                # 효과 설정
+                                st.markdown("##### ✨ 효과 설정")
+                                col_fx1, col_fx2, col_fx3 = st.columns(3)
+
+                                with col_fx1:
+                                    add_shadow = st.checkbox(
+                                        "그림자 효과",
+                                        value=True,
+                                        help="실사 이미지에 그림자를 추가합니다.",
+                                        key="compose_add_shadow"
+                                    )
+
+                                with col_fx2:
+                                    add_border = st.checkbox(
+                                        "테두리 추가",
+                                        value=True,
+                                        help="실사 이미지에 테두리를 추가합니다.",
+                                        key="compose_add_border"
+                                    )
+
+                                with col_fx3:
+                                    if add_border:
+                                        border_width = st.number_input(
+                                            "테두리 두께",
+                                            min_value=1,
+                                            max_value=10,
+                                            value=3,
+                                            key="compose_border_width"
+                                        )
+                                    else:
+                                        border_width = 0
+
+                                # 미리보기 버튼
+                                if st.button("👁️ 미리보기 생성", key="compose_preview_btn"):
+                                    mapping = st.session_state.get('ai_mapping_result', {})
+
+                                    if mapping and ai_image_folder:
+                                        first_scene = sorted(mapping.keys())[0]
+                                        first_data = mapping[first_scene]
+                                        first_image = first_data.get('image')
+
+                                        if first_image:
+                                            real_image_path = Path(ai_image_folder) / first_image
+
+                                            if real_image_path.exists():
+                                                try:
+                                                    composer = ImageComposer()
+
+                                                    preview = composer.compose_scene_image(
+                                                        real_image_path=str(real_image_path),
+                                                        background_image_path=background_image_path if use_background else None,
+                                                        size_preset=size_preset,
+                                                        custom_width=custom_width,
+                                                        custom_height=custom_height,
+                                                        bg_opacity=bg_opacity if use_background else 1.0,
+                                                        bg_color=bg_color_rgb,
+                                                        add_shadow=add_shadow,
+                                                        add_border=add_border,
+                                                        border_width=border_width if add_border else 0
+                                                    )
+
+                                                    st.image(preview, caption=f"미리보기 (씬 {first_scene}: {first_image})", use_container_width=True)
+                                                    st.success("✅ 미리보기 생성 완료! 위 설정이 모든 실사 이미지 씬에 적용됩니다.")
+
+                                                except Exception as e:
+                                                    st.error(f"미리보기 생성 실패: {e}")
+                                            else:
+                                                st.warning(f"이미지 파일을 찾을 수 없습니다: {first_image}")
+                                    else:
+                                        st.warning("먼저 AI 매핑 결과를 분석하고 이미지 폴더를 지정하세요.")
+
+                                st.divider()
+
+                            # AI 매핑 결과 입력
+                            st.markdown("#### 📝 AI 매핑 결과 붙여넣기")
+
+                            with st.expander("📖 입력 형식 안내", expanded=False):
+                                st.markdown("""
+**형식 1: JSON (권장)**
+```json
+{
+  "mapping": [
+    {"scene": 1, "image": "imgi_101_images.jpg", "reason": "선택 이유"},
+    {"scene": 2, "image": "imgi_167_hq720.jpg", "reason": "선택 이유"},
+    {"scene": 4, "image": null}
+  ]
+}
+```
+
+**형식 2: CSV**
+```
+scene,image,reason
+1,imgi_101_images.jpg,선택 이유
+2,imgi_167_hq720.jpg,선택 이유
+4,,
+```
+
+**형식 3: 텍스트 (AI 원본 출력)**
+```
+Scene 1 (00:00:00 --> 00:00:05)
+• 이미지: imgi_101_images.jpg
+• 이유: 선택 이유
+
+Scene 2 (00:00:06 --> 00:00:12)
+• 이미지: imgi_167_hq720.jpg
+
+Scene 4: (비워둠)
+```
+                                """)
+
+                            mapping_input = st.text_area(
+                                "AI 매핑 결과",
+                                height=250,
+                                placeholder='''여기에 AI 매핑 결과를 붙여넣으세요...
+
+예시:
+Scene 1: imgi_101_images.jpg
+Scene 2: imgi_167_hq720.jpg
+Scene 3: imgi_192_image.jpg
+Scene 4: (비워둠)
+...''',
+                                key="ai_mapping_input"
+                            )
+
+                            # 분석 및 적용 버튼
+                            col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 2])
+
+                            with col_btn1:
+                                analyze_btn = st.button("🔍 분석", type="secondary", use_container_width=True, key="analyze_ai_mapping")
+                            with col_btn2:
+                                apply_mapping_btn = st.button("✅ 일괄 적용", type="primary", use_container_width=True, key="apply_ai_mapping")
+
+                            # 분석 결과 저장
+                            if 'ai_mapping_result' not in st.session_state:
+                                st.session_state['ai_mapping_result'] = None
+                                st.session_state['ai_mapping_warnings'] = []
+
+                            # 분석 실행
+                            if analyze_btn and mapping_input and ai_image_folder:
+                                with st.spinner("매핑 결과 분석 중..."):
+                                    try:
+                                        parser = ImageMappingParser()
+
+                                        # 형식 감지
+                                        detected_format = parser.detect_format(mapping_input)
+                                        st.info(f"📊 감지된 형식: **{detected_format.upper()}**")
+
+                                        # 파싱 및 검증
+                                        total_scenes_count = len(scenes)
+                                        mapping_result, warnings = parse_ai_mapping(mapping_input, ai_image_folder, total_scenes_count)
+
+                                        st.session_state['ai_mapping_result'] = mapping_result
+                                        st.session_state['ai_mapping_warnings'] = warnings
+
+                                        # 결과 표시
+                                        st.success(f"✅ **{len(mapping_result)}개 씬**에 이미지 매핑됨")
+
+                                        # 경고 표시
+                                        if warnings:
+                                            with st.expander(f"⚠️ 경고 ({len(warnings)}개)", expanded=True):
+                                                for w in warnings:
+                                                    st.warning(w)
+
+                                        # 매핑 미리보기
+                                        if mapping_result:
+                                            with st.expander(f"📋 매핑 결과 미리보기 ({len(mapping_result)}개)", expanded=True):
+                                                preview_data = []
+                                                for scene_num in sorted(mapping_result.keys()):
+                                                    data = mapping_result[scene_num]
+                                                    reason_preview = data.get('reason', '')[:50]
+                                                    if len(data.get('reason', '')) > 50:
+                                                        reason_preview += '...'
+                                                    preview_data.append({
+                                                        '씬': scene_num,
+                                                        '이미지': data['image'],
+                                                        '이유': reason_preview
+                                                    })
+
+                                                st.dataframe(preview_data, use_container_width=True)
+
+                                    except Exception as e:
+                                        st.error(f"❌ 파싱 오류: {str(e)}")
+                                        import traceback
+                                        with st.expander("오류 상세"):
+                                            st.code(traceback.format_exc())
+
+                            elif analyze_btn:
+                                if not mapping_input:
+                                    st.warning("AI 매핑 결과를 입력하세요.")
+                                if not ai_image_folder:
+                                    st.warning("이미지 폴더 경로를 입력하세요.")
+
+                            # 일괄 적용 실행
+                            if apply_mapping_btn:
+                                mapping_result = st.session_state.get('ai_mapping_result')
+
+                                if not mapping_result:
+                                    st.error("❌ 먼저 '분석' 버튼을 눌러 매핑 결과를 확인하세요.")
+                                elif not ai_image_folder:
+                                    st.error("❌ 이미지 폴더 경로를 입력하세요.")
+                                else:
+                                    with st.spinner("🖼️ 실사 이미지 합성 및 적용 중..."):
+                                        try:
+                                            success_count = 0
+                                            fail_count = 0
+                                            error_messages = []
+
+                                            progress_bar = st.progress(0)
+                                            status_text = st.empty()
+
+                                            total = len(mapping_result)
+                                            existing_ai = get_existing_ai_images(scenes_images_dir, scenes)
+
+                                            # ImageComposer 사용 여부 결정
+                                            use_composer = IMAGE_COMPOSER_AVAILABLE and st.session_state.get('compose_size_preset', 'medium') != 'full'
+
+                                            # 합성 설정 가져오기
+                                            if use_composer:
+                                                compose_size_preset = st.session_state.get('compose_size_preset', 'medium')
+                                                compose_custom_width = st.session_state.get('compose_custom_width')
+                                                compose_custom_height = st.session_state.get('compose_custom_height')
+                                                compose_use_background = st.session_state.get('compose_use_background', False)
+                                                compose_bg_source = st.session_state.get('compose_bg_source', '단색 배경')
+                                                compose_bg_opacity = st.session_state.get('compose_bg_opacity', 0.3)
+                                                compose_add_shadow = st.session_state.get('compose_add_shadow', True)
+                                                compose_add_border = st.session_state.get('compose_add_border', True)
+                                                compose_border_width = st.session_state.get('compose_border_width', 3)
+                                                compose_bg_color_hex = st.session_state.get('compose_bg_color', '#1e1e1e')
+                                                compose_bg_color_rgb = hex_to_rgb(compose_bg_color_hex)
+                                                compose_bg_image_path = st.session_state.get('compose_bg_image_path') if compose_use_background and compose_bg_source == '파일 업로드' else None
+
+                                                composer = ImageComposer()
+
+                                            for idx, (scene_num, data) in enumerate(sorted(mapping_result.items()), 1):
+                                                status_text.text(f"씬 {scene_num} 처리 중... ({idx}/{total})")
+
+                                                image_path = data.get('path') or str(Path(ai_image_folder) / data['image'])
+
+                                                if Path(image_path).exists():
+                                                    # 기존 AI 이미지 경로 가져오기
+                                                    current_ai_path = existing_ai.get(scene_num)
+
+                                                    # 기존 이미지 백업
+                                                    if current_ai_path and Path(current_ai_path).exists():
+                                                        backup_path = Path(current_ai_path).with_suffix(f".ai_backup{Path(current_ai_path).suffix}")
+                                                        if not backup_path.exists():
+                                                            import shutil
+                                                            shutil.copy2(current_ai_path, backup_path)
+
+                                                    # 파일명 생성 (씬 번호 기반)
+                                                    target_filename = f"{scene_num:03d}_scene_composed.jpg"
+                                                    target_path = scenes_images_dir / target_filename
+
+                                                    if use_composer:
+                                                        # ImageComposer로 합성
+                                                        try:
+                                                            composed_image = composer.compose_scene_image(
+                                                                real_image_path=image_path,
+                                                                background_image_path=compose_bg_image_path,
+                                                                size_preset=compose_size_preset,
+                                                                custom_width=compose_custom_width,
+                                                                custom_height=compose_custom_height,
+                                                                bg_opacity=compose_bg_opacity if compose_use_background and compose_bg_source != '단색 배경' else 1.0,
+                                                                bg_color=compose_bg_color_rgb,
+                                                                add_shadow=compose_add_shadow,
+                                                                add_border=compose_add_border,
+                                                                border_width=compose_border_width if compose_add_border else 0
+                                                            )
+                                                            composed_image.save(target_path, quality=95)
+                                                            success_count += 1
+                                                        except Exception as compose_err:
+                                                            error_messages.append(f"씬 {scene_num}: 합성 실패 - {str(compose_err)}")
+                                                            fail_count += 1
+                                                    else:
+                                                        # 단순 복사 (full 크기 또는 ImageComposer 없음)
+                                                        ext = Path(image_path).suffix.lower()
+                                                        target_filename = f"{scene_num:03d}_scene{ext}"
+                                                        target_path = scenes_images_dir / target_filename
+
+                                                        with open(image_path, 'rb') as f:
+                                                            file_content = f.read()
+                                                        with open(target_path, 'wb') as f:
+                                                            f.write(file_content)
+                                                        success_count += 1
+                                                else:
+                                                    error_messages.append(f"씬 {scene_num}: 파일 없음 - {data['image']}")
+                                                    fail_count += 1
+
+                                                progress_bar.progress(idx / total)
+
+                                            status_text.empty()
+
+                                            # 캐시 무효화
+                                            invalidate_all_image_caches()
+
+                                            # 결과 표시
+                                            col_result1, col_result2 = st.columns(2)
+                                            with col_result1:
+                                                st.metric("✅ 합성 성공", f"{success_count}개")
+                                            with col_result2:
+                                                if fail_count > 0:
+                                                    st.metric("❌ 합성 실패", f"{fail_count}개", delta_color="inverse")
+                                                else:
+                                                    st.metric("❌ 합성 실패", "0개")
+
+                                            # 오류 상세 표시
+                                            if error_messages:
+                                                with st.expander(f"⚠️ 오류 상세 ({len(error_messages)}개)"):
+                                                    for err in error_messages:
+                                                        st.warning(err)
+
+                                            if success_count > 0:
+                                                st.success(f"✅ {success_count}개 씬에 실사 이미지가 합성/적용되었습니다!")
+                                                st.info("💡 위의 스토리보드에서 결과를 확인하세요.")
+
+                                                # 분석 결과 초기화
+                                                st.session_state['ai_mapping_result'] = None
+                                                st.session_state['ai_mapping_warnings'] = []
+
+                                                st.rerun()
+
+                                        except Exception as e:
+                                            st.error(f"❌ 적용 중 오류 발생: {str(e)}")
+                                            import traceback
+                                            with st.expander("오류 상세"):
+                                                st.code(traceback.format_exc())
+
+                            # 이전 분석 결과 표시 (있는 경우)
+                            if st.session_state.get('ai_mapping_result') and not analyze_btn:
+                                mapping_result = st.session_state['ai_mapping_result']
+                                warnings = st.session_state.get('ai_mapping_warnings', [])
+
+                                st.divider()
+                                st.markdown("#### 📊 이전 분석 결과")
+                                st.info(f"**{len(mapping_result)}개 씬**에 이미지 매핑됨")
+
+                                if warnings:
+                                    st.warning(f"⚠️ {len(warnings)}개 경고")
+
+                else:
+                    st.warning("⚠️ 실사 이미지 관리 모듈을 불러올 수 없습니다.")
+
+            # ============================================================
+            # 배치 비디오 업로드 섹션
+            # ============================================================
+            if BATCH_VIDEO_AVAILABLE:
+                with st.expander("🎬 배치 비디오 업로드", expanded=False):
+                    st.caption("비디오 파일을 일괄 업로드하여 씬의 배경을 비디오로 대체합니다.")
+                    st.markdown("""
+                    **지원 파일명 형식:**
+                    - `1.mp4`, `2.webm`, `100.mov` (순수 숫자)
+                    - `001.mp4`, `005.webm` (앞에 0 패딩)
+                    - `scene_1.mp4`, `scene_10.webm` (scene_ 접두사)
+                    - `씬1.mp4`, `씬_5.webm` (한글 접두사)
+                    """)
+
+                    # 비디오 파일 업로드
+                    uploaded_videos = st.file_uploader(
+                        "비디오 파일 업로드",
+                        type=["mp4", "webm", "mov", "avi", "mkv"],
+                        accept_multiple_files=True,
+                        key="batch_video_upload",
+                        help="씬 번호가 포함된 비디오 파일들을 업로드하세요"
+                    )
+
+                    if uploaded_videos:
+                        # 빠른 분석 실행 (v1.1 - 파일 데이터 읽지 않음)
+                        existing_videos = get_existing_videos(scenes)
+                        results = quick_analyze_batch_video_upload(uploaded_videos, len(scenes), existing_videos)
+                        stats = get_batch_video_stats(results)
+
+                        # 업로드 완료 메시지
+                        st.success(f"📁 {len(uploaded_videos)}개 비디오 파일 업로드 완료")
+
+                        # 통계 표시
+                        stat_cols = st.columns(4)
+                        with stat_cols[0]:
+                            st.metric("전체", stats["total"])
+                        with stat_cols[1]:
+                            st.metric("매칭 성공", stats["success"], delta_color="normal")
+                        with stat_cols[2]:
+                            failed_count = stats["out_of_range"] + stats["invalid_name"] + stats["invalid_format"] + stats["duplicate"]
+                            st.metric("실패", failed_count, delta_color="inverse" if failed_count > 0 else "off")
+                        with stat_cols[3]:
+                            replace_count = sum(1 for r in results if r.status == "success" and r.current_video_path)
+                            st.metric("기존 대체", replace_count)
+
+                        # 미리보기 테이블
+                        if stats["success"] > 0:
+                            st.markdown("##### ✅ 매칭된 비디오")
+                            for item in stats["success_items"]:
+                                icon = "🔄" if item.current_video_path else "➕"
+                                st.text(f"{icon} 씬 {item.scene_number}: {item.filename} ({item.message})")
+
+                        if stats["failed_items"]:
+                            st.markdown("##### ❌ 실패 항목")
+                            for item in stats["failed_items"]:
+                                st.text(f"⚠️ {item.filename}: {item.message}")
+
+                        # 적용 버튼
+                        if stats["success"] > 0:
+                            st.divider()
+                            apply_cols = st.columns([2, 1])
+                            with apply_cols[0]:
+                                backup_existing = st.checkbox("기존 비디오 백업", value=True, key="batch_video_backup")
+                            with apply_cols[1]:
+                                apply_btn = st.button("🎬 비디오 적용", type="primary", use_container_width=True, key="apply_batch_videos")
+
+                            if apply_btn:
+                                # 비디오 저장 폴더
+                                videos_folder = project_path / "videos" / "backgrounds"
+
+                                # 진행률 표시
+                                progress_bar = st.progress(0, text="비디오 저장 준비 중...")
+                                status_text = st.empty()
+
+                                # 씬 데이터 업데이트 콜백
+                                def update_scene_video(scene_num: int, video_path: str):
+                                    for s in scenes:
+                                        if s.get("scene_id") == scene_num or s.get("scene_num") == scene_num:
+                                            s["media_type"] = "video"
+                                            s["background_video"] = video_path
+                                            break
+
+                                # 진행률 콜백
+                                def progress_callback(current: int, total: int, filename: str):
+                                    progress = current / total
+                                    progress_bar.progress(progress, text=f"저장 중... ({current}/{total})")
+                                    status_text.text(f"📼 {filename}")
+
+                                # 비디오 적용 (v1.1 - 직접 저장)
+                                apply_result = apply_batch_videos_direct(
+                                    uploaded_files=uploaded_videos,
+                                    results=results,
+                                    videos_folder=videos_folder,
+                                    backup=backup_existing,
+                                    update_scene_callback=update_scene_video,
+                                    progress_callback=progress_callback
+                                )
+
+                                # 씬 데이터 저장
+                                scenes_path = project_path / "analysis" / "scenes.json"
+                                with open(scenes_path, 'w', encoding='utf-8') as f:
+                                    json.dump(scenes, f, ensure_ascii=False, indent=2)
+
+                                # 완료 표시
+                                progress_bar.progress(1.0, text="완료!")
+                                status_text.empty()
+
+                                st.success(f"✅ {apply_result['applied']}개 비디오 적용 완료!")
+                                if apply_result["backed_up"] > 0:
+                                    st.info(f"💾 {apply_result['backed_up']}개 기존 비디오 백업됨")
+                                if apply_result["failed"] > 0:
+                                    st.warning(f"⚠️ {apply_result['failed']}개 저장 실패")
+                                st.rerun()
+
+            # ============================================================
+            # 미디어 일괄 내보내기 섹션
+            # ============================================================
+            with st.expander("📦 미디어 일괄 내보내기", expanded=False):
+                st.caption("씬별 이미지/비디오를 씬 번호 기반 파일명으로 일괄 내보냅니다.")
+
+                # ⭐ 성능 최적화: 내보내기 목록 캐싱 (매 렌더링 시 전체 씬 스캔 방지)
+                export_cache_key = f"export_media_list_{str(project_path)}_{st.session_state.get('image_cache_version', 0)}"
+                if export_cache_key not in st.session_state:
+                    export_media_list = []
+                    for s in scenes:
+                        scene_id = s.get("scene_id") or s.get("scene_num")
+                        media_type = s.get("media_type", "image")
+
+                        if media_type == "video":
+                            video_path = s.get("background_video", "")
+                            if video_path and Path(video_path).exists():
+                                export_media_list.append({
+                                    "scene_id": scene_id,
+                                    "media_type": "video",
+                                    "path": video_path,
+                                    "ext": Path(video_path).suffix.lower()
+                                })
+                        else:
+                            # 이미지 매칭 로직 (간소화)
+                            img_path = None
+                            for img_name, path in image_map.items():
+                                if f"_{scene_id:03d}" in img_name or f"_seg_{scene_id:03d}" in img_name:
+                                    img_path = str(path)
+                                    break
+                            if img_path and Path(img_path).exists():
+                                export_media_list.append({
+                                    "scene_id": scene_id,
+                                    "media_type": "image",
+                                    "path": img_path,
+                                    "ext": Path(img_path).suffix.lower()
+                                })
+                    st.session_state[export_cache_key] = export_media_list
+                else:
+                    export_media_list = st.session_state[export_cache_key]
+
+                # 통계 표시
+                image_count = sum(1 for m in export_media_list if m["media_type"] == "image")
+                video_count = sum(1 for m in export_media_list if m["media_type"] == "video")
+
+                exp_stat_cols = st.columns(3)
+                with exp_stat_cols[0]:
+                    st.metric("전체 씬", len(scenes))
+                with exp_stat_cols[1]:
+                    st.metric("이미지", image_count)
+                with exp_stat_cols[2]:
+                    st.metric("비디오", video_count)
+
+                if export_media_list:
+                    st.divider()
+
+                    # 파일명 형식 선택
+                    filename_format = st.selectbox(
+                        "파일명 형식",
+                        ["scene_{num:03d}", "{num}", "{num:03d}"],
+                        format_func=lambda x: f"{x.format(num=1)} (예: {x.format(num=1)}.mp4)",
+                        key="media_export_filename_format"
+                    )
+
+                    # ZIP 생성 및 다운로드
+                    if st.button("📦 ZIP 다운로드 준비", key="prepare_media_zip", use_container_width=True):
+                        import zipfile
+                        from io import BytesIO
+
+                        zip_buffer = BytesIO()
+                        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+                            for item in export_media_list:
+                                src_path = Path(item["path"])
+                                new_name = f"{filename_format.format(num=item['scene_id'])}{item['ext']}"
+                                zf.write(src_path, new_name)
+
+                        zip_buffer.seek(0)
+                        st.session_state["media_export_zip"] = zip_buffer.getvalue()
+                        st.session_state["media_export_count"] = len(export_media_list)
+                        st.rerun()
+
+                    # 다운로드 버튼 표시
+                    if "media_export_zip" in st.session_state:
+                        st.download_button(
+                            label=f"⬇️ 다운로드 ({st.session_state.get('media_export_count', 0)}개 파일)",
+                            data=st.session_state["media_export_zip"],
+                            file_name=f"scene_media_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip",
+                            mime="application/zip",
+                            key="download_media_zip"
+                        )
+                else:
+                    st.info("내보낼 미디어가 없습니다. 먼저 이미지/비디오를 생성하세요.")
 
             # ============================================================
             # 씬 선택 및 다운로드 섹션
@@ -4406,9 +5701,9 @@ with tab_auto:
                         st.rerun()
 
                 with quick_nav_cols[1]:
-                    if st.button("🔄 이미지 캐시 새로고침", key="refresh_image_cache", help="이미지 목록 캐시 삭제"):
-                        load_image_files_cached.clear()
-                        st.toast("이미지 캐시 새로고침됨")
+                    if st.button("🔄 이미지 캐시 새로고침", key="refresh_image_cache_quicknav", help="모든 이미지 캐시 삭제 (최신 이미지 반영)"):
+                        cleared = invalidate_all_image_caches(full_reset=True)
+                        st.toast(f"이미지 캐시 새로고침됨 ({cleared}개 항목)")
                         st.rerun()
 
                 with quick_nav_cols[2]:
@@ -4424,6 +5719,7 @@ with tab_auto:
                     direction = scene.get("direction_guide", "")
                     characters = scene.get("characters", [])
                     image_prompt = scene.get("image_prompt_en", "")
+                    image_prompt_korean = scene.get("image_prompt_korean_text", "")  # v3.16 한글 프롬프트
                     duration = scene.get("duration_estimate", 10)
                     filename = scene.get("filename", "")
 
@@ -4448,48 +5744,115 @@ with tab_auto:
 
                             # 캐릭터
                             if show_characters and characters:
-                                st.markdown(f"**👤 등장 캐릭터:** {', '.join(characters)}")
+                                char_names = safe_join_characters(characters)
+                                if char_names:
+                                    st.markdown(f"**👤 등장 캐릭터:** {char_names}")
 
-                            # 프롬프트
-                            if show_prompt and image_prompt:
-                                st.markdown("**🎨 프롬프트**")
-                                st.code(image_prompt[:200] + "..." if len(image_prompt) > 200 else image_prompt)
+                            # 📝 프롬프트 섹션 (v3.16 개선 - 이미지/한글/비디오 탭)
+                            if show_prompt or show_video_prompt:
+                                # 비디오 프롬프트 가져오기
+                                video_prompt_char = get_video_prompt_for_scene(scene, "character") if show_video_prompt else ""
+                                video_prompt_full = get_video_prompt_for_scene(scene, "full") if show_video_prompt else ""
 
-                            # 🎬 비디오 프롬프트 (NEW!)
-                            if show_video_prompt:
-                                video_prompt_char = get_video_prompt_for_scene(scene, "character")
-                                video_prompt_full = get_video_prompt_for_scene(scene, "full")
+                                # 표시할 프롬프트가 있는지 확인
+                                has_image = image_prompt and image_prompt.upper() != "N/A"
+                                has_korean = image_prompt_korean and image_prompt_korean.upper() != "N/A"
+                                has_video = (video_prompt_char and video_prompt_char.upper() != "N/A") or \
+                                           (video_prompt_full and video_prompt_full.upper() != "N/A")
 
-                                if video_prompt_char or video_prompt_full:
-                                    st.markdown("**🎬 비디오 프롬프트**")
+                                if has_image or has_korean or has_video:
+                                    st.markdown("**📝 프롬프트**")
                                     with st.container(border=True):
-                                        vp_tab1, vp_tab2 = st.tabs(["👤 캐릭터", "🌍 전체"])
+                                        prompt_tabs = st.tabs(["🖼️ 이미지", "🇰🇷 한글이미지", "🎬 비디오"])
 
-                                        with vp_tab1:
-                                            if video_prompt_char and video_prompt_char.upper() != "N/A":
-                                                st.code(video_prompt_char[:200] + "..." if len(video_prompt_char) > 200 else video_prompt_char, language=None)
+                                        # 🖼️ 이미지 프롬프트 탭
+                                        with prompt_tabs[0]:
+                                            if has_image:
+                                                st.code(image_prompt[:300] + "..." if len(image_prompt) > 300 else image_prompt, language=None)
+                                                if st.button("📋", key=f"copy_img_prompt_{i}_{scene_id}", help="프롬프트 복사"):
+                                                    st.code(image_prompt, language=None)
                                             else:
-                                                st.caption("캐릭터 비디오 프롬프트 없음")
+                                                st.caption("이미지 프롬프트 없음")
 
-                                        with vp_tab2:
-                                            if video_prompt_full and video_prompt_full.upper() != "N/A":
-                                                st.code(video_prompt_full[:200] + "..." if len(video_prompt_full) > 200 else video_prompt_full, language=None)
+                                        # 🇰🇷 한글 이미지 프롬프트 탭
+                                        with prompt_tabs[1]:
+                                            if has_korean:
+                                                st.code(image_prompt_korean[:300] + "..." if len(image_prompt_korean) > 300 else image_prompt_korean, language=None)
+                                                if st.button("📋", key=f"copy_kr_prompt_{i}_{scene_id}", help="한글 프롬프트 복사"):
+                                                    st.code(image_prompt_korean, language=None)
                                             else:
-                                                st.caption("전체 비디오 프롬프트 없음")
+                                                st.caption("한글 프롬프트 없음 (씬 재분석 필요)")
+
+                                        # 🎬 비디오 프롬프트 탭
+                                        with prompt_tabs[2]:
+                                            if has_video:
+                                                vp_tab1, vp_tab2 = st.tabs(["👤 캐릭터", "🌍 전체"])
+
+                                                with vp_tab1:
+                                                    if video_prompt_char and video_prompt_char.upper() != "N/A":
+                                                        st.code(video_prompt_char[:200] + "..." if len(video_prompt_char) > 200 else video_prompt_char, language=None)
+                                                    else:
+                                                        st.caption("캐릭터 비디오 프롬프트 없음")
+
+                                                with vp_tab2:
+                                                    if video_prompt_full and video_prompt_full.upper() != "N/A":
+                                                        st.code(video_prompt_full[:200] + "..." if len(video_prompt_full) > 200 else video_prompt_full, language=None)
+                                                    else:
+                                                        st.caption("전체 비디오 프롬프트 없음")
+                                            else:
+                                                st.caption("비디오 프롬프트 없음")
 
                         with cols[2]:
-                            # 이미지 표시
-                            if show_images:
+                            # 미디어 타입 확인 (video 또는 image)
+                            scene_media_type = scene.get("media_type", "image")
+                            background_video = scene.get("background_video", "")
+
+                            # 🎬 비디오 표시 (media_type이 video인 경우)
+                            if scene_media_type == "video" and background_video:
+                                video_path = Path(background_video)
+                                if video_path.exists():
+                                    st.video(str(video_path))
+                                    st.caption(f"🎬 비디오: {video_path.name}")
+
+                                    # 비디오 관리 버튼
+                                    vid_btn_cols = st.columns(3)
+                                    with vid_btn_cols[0]:
+                                        if st.button("Copy", key=f"copy_video_{i}_{scene_id}", help="비디오 경로 복사"):
+                                            abs_path = str(video_path.resolve())
+                                            copy_path_to_clipboard(abs_path, f"copy_vid_{i}_{scene_id}")
+                                            st.toast("경로 복사됨!")
+                                            st.code(abs_path, language=None)
+                                    with vid_btn_cols[1]:
+                                        if st.button("Open", key=f"open_video_{i}_{scene_id}", help="비디오 폴더 열기"):
+                                            open_file_location(str(video_path))
+                                    with vid_btn_cols[2]:
+                                        if st.button("이미지로 전환", key=f"switch_to_img_{i}_{scene_id}", help="이미지 모드로 전환"):
+                                            scene["media_type"] = "image"
+                                            scenes_path = project_path / "analysis" / "scenes.json"
+                                            with open(scenes_path, 'w', encoding='utf-8') as f:
+                                                json.dump(scenes, f, ensure_ascii=False, indent=2)
+                                            st.toast(f"씬 {scene_id} 이미지 모드로 전환됨")
+                                            st.rerun()
+                                else:
+                                    st.warning(f"비디오 파일 없음: {background_video}")
+
+                            # 🖼️ 이미지 표시
+                            elif show_images:
                                 scene_image = None
 
                                 # 파일명으로 매칭
                                 if filename and filename.replace(".png", "") in image_map:
                                     scene_image = image_map[filename.replace(".png", "")]
 
-                                # 씬 번호로 매칭
+                                # 씬 번호로 매칭 (다양한 파일명 패턴 지원)
                                 if not scene_image:
+                                    scene_num_str = f"{scene_id:03d}"
                                     for img_name, img_path in image_map.items():
-                                        if f"_{scene_id:03d}" in img_name or f"_seg_{scene_id:03d}" in img_name:
+                                        # 패턴: _001, _seg_001, 001_, 001_scene 등
+                                        if (f"_{scene_num_str}" in img_name or
+                                            f"_seg_{scene_num_str}" in img_name or
+                                            img_name.startswith(f"{scene_num_str}_") or
+                                            img_name.startswith(f"{scene_num_str}.")):
                                             scene_image = img_path
                                             break
 

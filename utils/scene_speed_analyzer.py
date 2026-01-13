@@ -9,15 +9,41 @@
 - 병렬 처리: concurrent.futures를 사용한 동시 처리
 - 순차 처리: 안정적인 하나씩 처리
 - 통합 AI 클라이언트 사용
+- 분석 메타데이터 추적
 """
 
 import json
 import time
 import concurrent.futures
-from typing import List, Dict, Callable, Optional
+from datetime import datetime
+from typing import List, Dict, Callable, Optional, Any
 
 from .ai_client import UnifiedAIClient
 from .ai_providers import get_model, AIProvider
+
+
+# ============================================================
+# 분석 메타데이터 추적
+# ============================================================
+_analysis_metadata: Dict[str, Any] = {}
+
+
+def get_analysis_metadata() -> Dict[str, Any]:
+    """마지막 분석에 사용된 메타데이터 반환"""
+    global _analysis_metadata
+    return _analysis_metadata.copy()
+
+
+def clear_analysis_metadata():
+    """분석 메타데이터 초기화"""
+    global _analysis_metadata
+    _analysis_metadata = {}
+
+
+def _update_analysis_metadata(key: str, value: Any):
+    """분석 메타데이터 업데이트"""
+    global _analysis_metadata
+    _analysis_metadata[key] = value
 
 
 def analyze_scenes_sequential(
@@ -240,8 +266,41 @@ def _analyze_single_scene_standalone(scene: Dict, model: str) -> Dict:
 
 
 def _create_single_scene_prompt(scene_id: int, narration: str, start_time: str, end_time: str) -> str:
-    """단일 씬 분석 프롬프트 생성"""
+    """단일 씬 분석 프롬프트 생성 (템플릿 시스템 사용)"""
+    global _analysis_metadata
 
+    # 템플릿 매니저에서 프롬프트 로드
+    try:
+        from core.prompt.prompt_template_manager import get_template_manager
+        template_manager = get_template_manager()
+        template = template_manager.get_srt_single_template()
+        template_prompt = template.prompt if template else None
+
+        if template_prompt:
+            # 템플릿에 변수 치환
+            prompt = template_prompt.format(
+                scene_id=scene_id,
+                start_time=start_time,
+                end_time=end_time,
+                narration=narration
+            )
+
+            # ⭐ 메타데이터 저장 (첫 번째 호출에서만)
+            if 'prompt_template' not in _analysis_metadata:
+                _analysis_metadata['mode'] = 'single'
+                _analysis_metadata['template_name'] = template.id if template else 'srt_scene_single'
+                _analysis_metadata['template_version'] = template.name if template else 'v1.0'
+                _analysis_metadata['prompt_template'] = template_prompt
+                _analysis_metadata['prompt_char_count'] = len(template_prompt)
+                _analysis_metadata['prompt_example'] = prompt  # 첫 씬에 적용된 예시
+                _analysis_metadata['is_default_template'] = False
+
+            print(f"[SRT 분석] 템플릿 프롬프트 사용 (srt_scene_single)")
+            return prompt
+    except Exception as e:
+        print(f"[SRT 분석] 템플릿 로드 실패, 기본 프롬프트 사용: {e}")
+
+    # 폴백: 기본 하드코딩된 프롬프트
     return f"""다음 씬을 분석하고 JSON으로 응답해주세요.
 
 ## 씬 정보
@@ -252,7 +311,8 @@ def _create_single_scene_prompt(scene_id: int, narration: str, start_time: str, 
 ## 출력 형식 (반드시 JSON만 출력)
 {{
     "image_prompt": "한국어 이미지 프롬프트 (상세한 시각적 묘사)",
-    "image_prompt_en": "English image prompt for FLUX (detailed visual description, cinematic style)",
+    "image_prompt_en": "English image prompt for FLUX (detailed visual description, cinematic style). Must include: absolutely no text, no letters, no words, no characters, no writing",
+    "image_prompt_korean_text": "영문 이미지 프롬프트 + 한글 텍스트 삽입. image_prompt_en의 시각적 묘사를 사용하되, 나레이션에서 추출한 핵심 메시지를 한글 텍스트로 포함. 형식: [시각적 묘사], headline text in Korean reading \\\"[나레이션 핵심 5-10자]\\\" at the top in handwritten pen script style, subtitle text in Korean reading \\\"[부가 설명 10-20자]\\\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity",
     "character_prompt": "한국어 캐릭터 프롬프트 (인물이 있다면)",
     "character_prompt_en": "English character prompt (if characters present)",
     "direction_guide": "연출가이드 (카메라 앵글, 조명, 분위기 등)",
@@ -262,30 +322,75 @@ def _create_single_scene_prompt(scene_id: int, narration: str, start_time: str, 
         {{"name": "캐릭터명", "visual_prompt": "English visual description of character appearance..."}}
     ],
     "location": "배경 장소",
-    "video_prompt_character": "영상용 캐릭터 프롬프트 (Kling/Runway용)",
-    "video_prompt_full": "전체 영상 프롬프트 (Kling/Runway용)"
+    "video_prompt_character": "Character animation description in ENGLISH for Kling/Runway",
+    "video_prompt_full": "Full scene video description in ENGLISH for Kling/Runway"
 }}
 
 ⚠️ 중요: characters 배열의 각 캐릭터에는 반드시 visual_prompt를 영문으로 포함해주세요!
+⚠️ video_prompt_character와 video_prompt_full은 반드시 영어로 작성하세요!
+⚠️ image_prompt_korean_text는 나레이션의 핵심 메시지를 한글 텍스트로 포함해야 합니다!
 
 JSON으로만 응답해주세요. 추가 설명 없이 JSON만 출력하세요."""
 
 
 def _create_batch_analysis_prompt(scenes: List[Dict]) -> str:
-    """배치 분석용 프롬프트 생성"""
+    """배치 분석용 프롬프트 생성 (템플릿 시스템 사용)"""
+    global _analysis_metadata
 
+    # 씬 내용 문자열 생성
+    scenes_content = ""
+    for scene in scenes:
+        scene_id = scene.get('scene_id', 0)
+        narration = scene.get('narration', '')
+        start_time = scene.get('start_time', '')
+        end_time = scene.get('end_time', '')
+
+        scenes_content += f"""
+--- 씬 {scene_id} [{start_time} ~ {end_time}] ---
+{narration}
+
+"""
+
+    # 템플릿 매니저에서 프롬프트 로드
+    try:
+        from core.prompt.prompt_template_manager import get_template_manager
+        template_manager = get_template_manager()
+        template = template_manager.get_srt_batch_template()
+        template_prompt = template.prompt if template else None
+
+        if template_prompt:
+            # 템플릿에 씬 내용 삽입
+            prompt = template_prompt.format(scenes_content=scenes_content)
+
+            # ⭐ 메타데이터 저장 (첫 번째 호출에서만)
+            if 'prompt_template' not in _analysis_metadata:
+                _analysis_metadata['mode'] = 'batch'
+                _analysis_metadata['template_name'] = template.id if template else 'srt_scene_batch'
+                _analysis_metadata['template_version'] = template.name if template else 'v1.0'
+                _analysis_metadata['prompt_template'] = template_prompt
+                _analysis_metadata['prompt_char_count'] = len(template_prompt)
+                _analysis_metadata['prompt_example'] = prompt  # 첫 배치에 적용된 예시
+                _analysis_metadata['is_default_template'] = False
+
+            print(f"[SRT 분석] 템플릿 프롬프트 사용 (srt_scene_batch)")
+            return prompt
+    except Exception as e:
+        print(f"[SRT 분석] 템플릿 로드 실패, 기본 프롬프트 사용: {e}")
+
+    # 폴백: 기본 하드코딩된 프롬프트
     prompt = """다음 씬들을 분석하고 JSON 배열로 응답해주세요.
 
 각 씬에 대해 다음 필드를 포함해주세요:
 - scene_id: 씬 번호
 - image_prompt: 한국어 이미지 생성 프롬프트
-- image_prompt_en: 영문 이미지 프롬프트 (FLUX용, 상세하게)
+- image_prompt_en: 영문 이미지 프롬프트 (FLUX용, 상세하게, 텍스트 없이)
+- image_prompt_korean_text: 영문 이미지 프롬프트 + 한글 텍스트 (나레이션 핵심 메시지를 한글로 포함)
 - character_prompt: 한국어 캐릭터 프롬프트
 - character_prompt_en: 영문 캐릭터 프롬프트
 - visual_elements: 시각 요소 리스트
 - direction_guide: 연출 가이드
-- video_prompt_character: 캐릭터 애니메이션 설명
-- video_prompt_full: 전체 씬 영상 설명
+- video_prompt_character: Character animation description (ENGLISH)
+- video_prompt_full: Full scene video description (ENGLISH)
 - characters: 등장 캐릭터 리스트 (각 캐릭터에 name, visual_prompt 포함!)
 - location: 배경 장소
 - mood: 분위기
@@ -293,21 +398,17 @@ def _create_batch_analysis_prompt(scenes: List[Dict]) -> str:
 ⚠️ 중요: characters 배열의 각 캐릭터에는 반드시 visual_prompt를 영문으로 포함해주세요!
 예: {"name": "자말 카슈크지", "visual_prompt": "Middle-aged Middle Eastern man, journalist, salt-and-pepper beard, wearing glasses, serious expression..."}
 
+⚠️ video_prompt_character와 video_prompt_full은 반드시 영어로 작성하세요!
+
+⚠️ image_prompt_korean_text 작성법:
+- image_prompt_en의 시각적 묘사를 사용
+- 나레이션에서 핵심 메시지를 추출하여 한글 텍스트로 포함
+- 형식: [시각적 묘사], headline text in Korean reading "[핵심 메시지 5-10자]" at the top in handwritten pen script style, subtitle text in Korean reading "[부가 설명 10-20자]" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style
+
 === 분석할 씬들 ===
-
 """
 
-    for scene in scenes:
-        scene_id = scene.get('scene_id', 0)
-        narration = scene.get('narration', '')
-        start_time = scene.get('start_time', '')
-        end_time = scene.get('end_time', '')
-
-        prompt += f"""
---- 씬 {scene_id} [{start_time} ~ {end_time}] ---
-{narration}
-
-"""
+    prompt += scenes_content
 
     prompt += """
 === 응답 형식 ===
@@ -318,9 +419,12 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
     "scene_id": 1,
     "image_prompt": "...",
     "image_prompt_en": "...",
+    "image_prompt_korean_text": "... headline text in Korean reading \"한글 제목\" at the top in handwritten pen script style...",
     "characters": [
       {"name": "캐릭터명", "visual_prompt": "영문 외모 설명..."}
     ],
+    "video_prompt_character": "English character animation...",
+    "video_prompt_full": "English full scene description...",
     ...
   },
   ...
@@ -404,12 +508,25 @@ def analyze_scenes_with_mode(
     Returns:
         분석된 씬 리스트
     """
+    global _analysis_metadata
+
+    # ⭐ 메타데이터 초기화 (새 분석 시작)
+    clear_analysis_metadata()
+    _analysis_metadata['timestamp'] = datetime.now().isoformat()
+    _analysis_metadata['processing_mode'] = mode
+    _analysis_metadata['total_scenes'] = len(scenes)
 
     start_time = time.time()
 
     model_info = get_model(model)
     model_name = model_info.name if model_info else model
     provider = model_info.provider.value if model_info else "unknown"
+
+    # ⭐ 모델 정보 메타데이터에 저장
+    _analysis_metadata['model_id'] = model
+    _analysis_metadata['model_name'] = model_name
+    _analysis_metadata['provider'] = provider
+
     print(f"[분석 시작] 모델: {model_name} ({provider}), 모드: {mode}")
 
     if mode == "parallel":
@@ -432,6 +549,10 @@ def analyze_scenes_with_mode(
         )
 
     elapsed = time.time() - start_time
+
+    # ⭐ 처리 시간 메타데이터에 저장
+    _analysis_metadata['processing_time_seconds'] = round(elapsed, 2)
+
     print(f"[분석 완료] {len(scenes)}개 씬, {elapsed:.1f}초 소요 (모드: {mode}, 모델: {model_name})")
 
     return result

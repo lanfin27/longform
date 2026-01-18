@@ -398,11 +398,23 @@ def render_prompt_info_button(image_path: str, key_prefix: str = "prompt_info"):
 
 
 def render_prompt_info_modal(metadata: Dict[str, Any], key: str):
-    """프롬프트 정보 모달/확장 패널 렌더링"""
+    """프롬프트 정보 모달/확장 패널 렌더링 (v1.2: 시드 표시 개선)"""
     with st.expander("Prompt Details", expanded=True):
         prompts = metadata.get("prompts", {})
         style = metadata.get("style", {})
         gen = metadata.get("generation", {})
+        extra = metadata.get("extra", {})
+
+        # v1.2: 시드 정보 먼저 표시 (있는 경우)
+        seed = extra.get('seed')
+        if seed:
+            seed_col1, seed_col2 = st.columns([3, 1])
+            with seed_col1:
+                st.markdown(f"🎲 **Seed:** `{seed:,}`")
+            with seed_col2:
+                st.code(str(seed), language=None)
+            st.caption("💡 동일한 시드를 사용하면 유사한 이미지를 재생성할 수 있습니다.")
+            st.markdown("---")
 
         # 생성 정보
         col1, col2, col3 = st.columns(3)
@@ -457,6 +469,7 @@ def render_prompt_info_expander(image_path: str, key_prefix: str = "prompt_exp")
     프롬프트 정보를 expander로 직접 렌더링
 
     스토리보드 등에서 이미지 아래에 바로 표시할 때 사용합니다.
+    v1.2: 시드 정보 표시 추가
     """
     if not image_path:
         return
@@ -469,6 +482,7 @@ def render_prompt_info_expander(image_path: str, key_prefix: str = "prompt_exp")
     prompts = metadata.get("prompts", {})
     style = metadata.get("style", {})
     gen = metadata.get("generation", {})
+    extra = metadata.get("extra", {})  # v1.2: 추가 정보 (시드 포함)
 
     unique_key = f"{key_prefix}_{hash(image_path) % 100000}"
 
@@ -479,6 +493,17 @@ def render_prompt_info_expander(image_path: str, key_prefix: str = "prompt_exp")
         size = f"{gen.get('width', 0)}x{gen.get('height', 0)}"
 
         st.caption(f"{api} | {model} | {size}")
+
+        # v1.2: 시드 정보 표시
+        seed = extra.get('seed')
+        if seed:
+            seed_col1, seed_col2 = st.columns([3, 1])
+            with seed_col1:
+                st.markdown(f"🎲 **Seed:** `{seed:,}`")
+            with seed_col2:
+                st.code(str(seed), language=None)
+
+            st.markdown("---")
 
         # 원본 프롬프트
         original = prompts.get("original", "")

@@ -786,6 +786,85 @@ def render_project_sidebar():
         if st.session_state.get("show_create_video") and selected_channel:
             _render_create_video_form(selected_channel)
 
+        # ============================================================
+        # 🚀 외부 도구 섹션 (v3.20)
+        # ============================================================
+        _render_external_tools_sidebar()
+
+
+def _render_external_tools_sidebar():
+    """사이드바에 외부 도구 섹션 렌더링"""
+    import time
+    from utils.external_launcher import (
+        EXTERNAL_PROJECTS,
+        get_project_status,
+        launch_project,
+        open_folder,
+        open_in_browser
+    )
+
+    st.divider()
+    st.markdown("### 🚀 외부 도구")
+
+    for project_id, project in EXTERNAL_PROJECTS.items():
+        status = get_project_status(project_id)
+
+        # 상태 아이콘
+        if project["type"] == "streamlit":
+            status_icon = "🟢" if status.get("running") else "⚪"
+        else:
+            status_icon = "📦"
+
+        # 프로젝트 버튼
+        col1, col2 = st.columns([4, 1])
+
+        with col1:
+            btn_label = f"{project['icon']} {project['name']} {status_icon}"
+
+            if st.button(
+                btn_label,
+                key=f"ext_launch_{project_id}",
+                use_container_width=True,
+                help=project.get("description", "")
+            ):
+                if project["type"] == "streamlit":
+                    if status.get("running"):
+                        # 이미 실행 중 → 브라우저 열기
+                        open_in_browser(status["url"])
+                        st.toast(f"✅ {project['name']} 열림")
+                    else:
+                        # 실행 시작
+                        with st.spinner(f"{project['name']} 시작 중..."):
+                            result = launch_project(project_id)
+
+                        if result.get("success"):
+                            st.toast(f"✅ {result['message']}")
+                            time.sleep(2)
+                            if result.get("url"):
+                                open_in_browser(result["url"])
+                            st.rerun()
+                        elif result.get("already_running"):
+                            open_in_browser(result["url"])
+                            st.toast(f"✅ {project['name']} 열림")
+                        else:
+                            st.error(f"❌ {result['message']}")
+                else:
+                    # 브라우저 확장 프로그램 등
+                    result = launch_project(project_id)
+                    if result.get("success"):
+                        st.toast(f"✅ {result['message']}")
+                    else:
+                        st.error(f"❌ {result['message']}")
+
+        with col2:
+            if st.button(
+                "📂",
+                key=f"ext_folder_{project_id}",
+                help="폴더 열기"
+            ):
+                if open_folder(project["path"]):
+                    st.toast("📂 폴더 열림")
+
 
 def _render_video_progress(status: Dict):
     """영상 진행 상태 표시"""

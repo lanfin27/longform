@@ -73,10 +73,17 @@ async function main() {
             generateOptions.size = aspectRatio;
         }
 
-        // 시드 설정
+        // ⭐ v1.2: 시드 설정 - 항상 시드를 사용하여 재현성 보장
+        // 사용자가 시드를 제공하지 않으면 랜덤 시드 생성
+        let usedSeed;
         if (seed) {
-            generateOptions.seed = parseInt(seed, 10);
+            usedSeed = parseInt(seed, 10);
+        } else {
+            // 랜덤 시드 생성 (1 ~ 2147483647)
+            usedSeed = Math.floor(Math.random() * 2147483647) + 1;
+            console.log("[ImageFX-Node] 🎲 랜덤 시드 생성:", usedSeed);
         }
+        generateOptions.seed = usedSeed;
 
         // ⭐ 네거티브 프롬프트 설정 (라이브러리가 지원하는 경우)
         if (negativePrompt) {
@@ -142,11 +149,26 @@ async function main() {
             throw new Error("이미지 데이터를 저장할 수 없습니다");
         }
 
-        // 성공 결과 출력
+        // v1.2: 시드 값 추출 (이미지 객체 또는 사용된 시드)
+        let extractedSeed = usedSeed;  // 기본값: 우리가 사용한 시드
+        if (images[0]) {
+            // API 응답에서 시드가 있으면 그것을 사용
+            const apiSeed = images[0].seed || images[0].generationSeed ||
+                           images[0].metadata?.seed || images[0].info?.seed;
+            if (apiSeed) {
+                extractedSeed = apiSeed;
+            }
+        }
+        console.log("[ImageFX-Node] 🔑 최종 시드:", extractedSeed);
+
+        // 성공 결과 출력 (시드 항상 포함)
         outputResult({
             success: true,
             path: savedPath,
-            count: images.length
+            count: images.length,
+            seed: extractedSeed,  // v1.2: 시드 항상 반환
+            model: model || "default",
+            aspectRatio: aspectRatio || "default"
         });
 
         process.exit(0);

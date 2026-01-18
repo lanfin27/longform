@@ -77,8 +77,9 @@ class VideoModelConfig:
 
 FAL_MODELS: Dict[str, VideoModelConfig] = {
     # === 가장 저렴 & 빠름 ===
+    # ⭐ v2.3: 올바른 fal.ai 모델 경로로 수정 (404 에러 수정)
     "wan_i2v": VideoModelConfig(
-        model_id="fal-ai/wan/v2.1/image-to-video",
+        model_id="fal-ai/wan-i2v",  # ✅ 올바른 경로 (기존: fal-ai/wan/v2.1/image-to-video)
         display_name="Wan 2.1 I2V (가장 저렴)",
         platform="fal_ai",
         video_type=VideoType.IMAGE_TO_VIDEO,
@@ -92,7 +93,7 @@ FAL_MODELS: Dict[str, VideoModelConfig] = {
         supports_negative_prompt=True,
     ),
     "wan_t2v": VideoModelConfig(
-        model_id="fal-ai/wan/v2.1/text-to-video",
+        model_id="fal-ai/wan-t2v",  # ✅ 올바른 경로 (기존: fal-ai/wan/v2.1/text-to-video)
         display_name="Wan 2.1 T2V (가장 저렴)",
         platform="fal_ai",
         video_type=VideoType.TEXT_TO_VIDEO,
@@ -171,29 +172,30 @@ FAL_MODELS: Dict[str, VideoModelConfig] = {
 
 REPLICATE_MODELS: Dict[str, VideoModelConfig] = {
     # === 가장 저렴 & 빠름 ===
+    # ⭐ v2.3: 올바른 Replicate 모델 경로로 수정 (모델 not found 에러 수정)
     "wan_i2v": VideoModelConfig(
-        model_id="wan-lab/wan2.1-i2v-480p",
+        model_id="wavespeedai/wan-2.1-i2v-480p",  # ✅ 수정됨 (기존: wavymulder/wan-2.1-i2v)
         display_name="Wan 2.1 I2V (가장 저렴)",
         platform="replicate",
         video_type=VideoType.IMAGE_TO_VIDEO,
-        resolutions=["480p"],
+        resolutions=["480p", "720p"],
         default_resolution="480p",
         durations=[5],
         default_duration=5,
-        price_per_video=0.05,
+        price_per_video=0.07,  # 가격 업데이트
         speed=SpeedTier.FAST,
         quality=QualityTier.GREAT,
     ),
     "wan_t2v": VideoModelConfig(
-        model_id="wan-lab/wan2.1-t2v-480p",
+        model_id="wavespeedai/wan-2.1-t2v-480p",  # ✅ 수정됨 (기존: wavymulder/wan-2.1-t2v)
         display_name="Wan 2.1 T2V (가장 저렴)",
         platform="replicate",
         video_type=VideoType.TEXT_TO_VIDEO,
-        resolutions=["480p"],
+        resolutions=["480p", "720p"],
         default_resolution="480p",
         durations=[5],
         default_duration=5,
-        price_per_video=0.05,
+        price_per_video=0.07,  # 가격 업데이트
         speed=SpeedTier.FAST,
         quality=QualityTier.GREAT,
     ),
@@ -227,10 +229,10 @@ REPLICATE_MODELS: Dict[str, VideoModelConfig] = {
         quality=QualityTier.BEST,
     ),
     "haiper": VideoModelConfig(
-        model_id="haiper-ai/haiper-video-2",
+        model_id="haiper-ai/haiper-video-2-image-to-video",  # ✅ 수정됨 (기존: haiper-ai/haiper-video-2)
         display_name="Haiper Video 2",
         platform="replicate",
-        video_type=VideoType.BOTH,
+        video_type=VideoType.IMAGE_TO_VIDEO,  # I2V 전용으로 변경
         resolutions=["720p"],
         default_resolution="720p",
         durations=[4, 6],

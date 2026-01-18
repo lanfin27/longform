@@ -26,7 +26,19 @@ DEFAULT_SETTINGS = {
         "celebrity_replacement": True,
         "celebrity_ai_model": "gemini-2.0-flash-exp",
         "rembg_enabled": False,
-        "auto_save_storyboard": False
+        "auto_save_storyboard": False,
+        "style_mode": "🖼️ 배경만 생성 (배경 스타일 사용)",
+        "character_composite_mode": "none"
+    },
+    "storyboard": {
+        "filter_mode": "all",
+        "show_images": True,
+        "show_script": True,
+        "show_direction": True,
+        "show_characters": True,
+        "show_prompt": False,
+        "show_video_prompt": True,
+        "scenes_per_page": 10
     },
     "video_generation": {
         "platform": "minimax",
@@ -51,7 +63,10 @@ DEFAULT_SETTINGS = {
     "scene_analysis": {
         "ai_provider": "google",
         "ai_model": "gemini-2.0-flash-exp",
-        "language": "ko"
+        "language": "ko",
+        "srt_bundle_size": 2,
+        "hybrid_ai_model": "gemini-2.0-flash-exp",
+        "srt_generate_prompts": True
     }
 }
 

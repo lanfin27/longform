@@ -274,3 +274,187 @@ Google 쿠키는 보안상 일정 시간 후 만료됩니다. 아래 단계를 �
 - 자주 만료되면 ImageFX 페이지에서 **새로고침(F5)** 후 쿠키 재추출
 - 로그아웃 후 다시 로그인하면 새 쿠키 발급
 """
+
+
+# ============================================================
+# 자동 쿠키 갱신 기능 (v2.0)
+# ============================================================
+
+def auto_refresh_cookies(use_selenium_fallback: bool = True) -> tuple:
+    """
+    자동 쿠키 갱신 시도
+
+    1차: Chrome 프로필에서 직접 추출 (빠르고 자동)
+    2차: Selenium으로 추출 (브라우저 창 열림)
+
+    Args:
+        use_selenium_fallback: Chrome 추출 실패 시 Selenium 사용 여부
+
+    Returns:
+        (success: bool, message: str, method: str)
+        - success: 갱신 성공 여부
+        - message: 결과 메시지
+        - method: 사용된 방법 ("chrome", "selenium", "failed")
+    """
+    print("[CookieManager] 자동 쿠키 갱신 시작...")
+
+    # 방법 1: Chrome 프로필에서 직접 추출
+    try:
+        from utils.cookie_extractor import (
+            extract_imagefx_cookies_from_chrome,
+            cookies_to_header_string,
+            validate_imagefx_cookies,
+            CRYPTO_AVAILABLE
+        )
+
+        if CRYPTO_AVAILABLE:
+            print("[CookieManager] Chrome 프로필에서 쿠키 추출 시도...")
+            cookies = extract_imagefx_cookies_from_chrome()
+
+            if cookies and validate_imagefx_cookies(cookies):
+                # Header String 형식으로 변환
+                cookie_header = cookies_to_header_string(cookies)
+
+                # 쿠키 저장
+                if save_imagefx_cookie(cookie_header):
+                    reset_cookie_state()
+                    print(f"[CookieManager] Chrome에서 쿠키 추출 성공 ({len(cookies)}개)")
+                    return True, f"Chrome에서 쿠키 자동 추출 성공 ({len(cookies)}개 쿠키)", "chrome"
+                else:
+                    print("[CookieManager] 쿠키 저장 실패")
+            else:
+                print("[CookieManager] Chrome에서 유효한 쿠키를 찾지 못함")
+        else:
+            print("[CookieManager] Chrome 쿠키 추출 라이브러리 미설치")
+
+    except ImportError as e:
+        print(f"[CookieManager] Chrome 추출 모듈 import 실패: {e}")
+    except Exception as e:
+        print(f"[CookieManager] Chrome 추출 실패: {e}")
+
+    # 방법 2: Selenium으로 추출
+    if use_selenium_fallback:
+        try:
+            from utils.selenium_cookie_extractor import (
+                extract_imagefx_cookies_with_selenium,
+                cookies_to_header_string as selenium_to_header,
+                check_selenium_available,
+                SELENIUM_AVAILABLE
+            )
+
+            if SELENIUM_AVAILABLE:
+                available, msg = check_selenium_available()
+                if available:
+                    print("[CookieManager] Selenium으로 쿠키 추출 시도...")
+                    print("[CookieManager] 브라우저 창이 열립니다. 필요시 Google 로그인하세요.")
+
+                    cookies = extract_imagefx_cookies_with_selenium(
+                        use_existing_profile=True,
+                        headless=False,
+                        timeout=120,
+                        wait_for_login=True
+                    )
+
+                    if cookies:
+                        # Header String 형식으로 변환
+                        cookie_header = selenium_to_header(cookies)
+
+                        # 쿠키 저장
+                        if save_imagefx_cookie(cookie_header):
+                            reset_cookie_state()
+                            print(f"[CookieManager] Selenium에서 쿠키 추출 성공 ({len(cookies)}개)")
+                            return True, f"Selenium으로 쿠키 자동 추출 성공 ({len(cookies)}개 쿠키)", "selenium"
+                        else:
+                            print("[CookieManager] 쿠키 저장 실패")
+                    else:
+                        print("[CookieManager] Selenium에서 쿠키 추출 실패")
+                else:
+                    print(f"[CookieManager] Selenium 사용 불가: {msg}")
+            else:
+                print("[CookieManager] Selenium 미설치")
+
+        except ImportError as e:
+            print(f"[CookieManager] Selenium 모듈 import 실패: {e}")
+        except Exception as e:
+            print(f"[CookieManager] Selenium 추출 실패: {e}")
+
+    print("[CookieManager] 자동 쿠키 갱신 실패")
+    return False, "자동 쿠키 갱신 실패. 수동으로 갱신해주세요.", "failed"
+
+
+def check_auto_refresh_available() -> dict:
+    """
+    자동 갱신 기능 사용 가능 여부 확인
+
+    Returns:
+        {
+            "chrome_available": bool,
+            "chrome_message": str,
+            "selenium_available": bool,
+            "selenium_message": str,
+            "any_available": bool
+        }
+    """
+    result = {
+        "chrome_available": False,
+        "chrome_message": "",
+        "selenium_available": False,
+        "selenium_message": "",
+        "any_available": False
+    }
+
+    # Chrome 직접 추출 확인
+    try:
+        from utils.cookie_extractor import CRYPTO_AVAILABLE, check_chrome_installation
+
+        if not CRYPTO_AVAILABLE:
+            result["chrome_message"] = "필요 패키지 미설치 (pywin32, pycryptodome)"
+        elif not check_chrome_installation():
+            result["chrome_message"] = "Chrome 브라우저 미설치"
+        else:
+            result["chrome_available"] = True
+            result["chrome_message"] = "Chrome 프로필에서 쿠키 추출 가능"
+
+    except ImportError:
+        result["chrome_message"] = "cookie_extractor 모듈 없음"
+    except Exception as e:
+        result["chrome_message"] = f"확인 오류: {e}"
+
+    # Selenium 확인
+    try:
+        from utils.selenium_cookie_extractor import check_selenium_available, SELENIUM_AVAILABLE
+
+        if not SELENIUM_AVAILABLE:
+            result["selenium_message"] = "selenium 패키지 미설치"
+        else:
+            available, msg = check_selenium_available()
+            result["selenium_available"] = available
+            result["selenium_message"] = msg
+
+    except ImportError:
+        result["selenium_message"] = "selenium_cookie_extractor 모듈 없음"
+    except Exception as e:
+        result["selenium_message"] = f"확인 오류: {e}"
+
+    result["any_available"] = result["chrome_available"] or result["selenium_available"]
+
+    return result
+
+
+def get_auto_refresh_status_message() -> str:
+    """
+    자동 갱신 상태 메시지 반환 (UI용)
+    """
+    status = check_auto_refresh_available()
+
+    messages = []
+
+    if status["chrome_available"]:
+        messages.append("Chrome 직접 추출")
+    if status["selenium_available"]:
+        messages.append("Selenium 브라우저 자동화")
+
+    if messages:
+        return f"자동 갱신 가능 ({', '.join(messages)})"
+    else:
+        return "자동 갱신 불가 (수동 갱신만 가능)"

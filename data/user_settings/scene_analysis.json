@@ -1,0 +1,9 @@
+{
+  "last_updated": "2026-01-17T08:20:30.931322",
+  "page_name": "scene_analysis",
+  "version": "1.0",
+  "settings": {
+    "hybrid_ai_model": "gemini-2.0-flash-exp",
+    "srt_bundle_size": 2
+  }
+}

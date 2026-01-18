@@ -38,9 +38,44 @@ from components.prompt_viewer import (
     get_prompt,
     PROMPT_TYPES
 )
+from components.prompt_default_selector import (
+    render_default_prompt_settings,
+    get_auto_selected_prompt_id
+)
+from utils.prompt_defaults import get_default_prompt_id
 import os
 import re
 from datetime import datetime
+
+# 사용자 설정 영속성 (v1.0) - settings_manager 사용
+from utils.settings_manager import (
+    get_setting, set_setting,
+    persistent_selectbox, persistent_radio, persistent_checkbox
+)
+
+# 페이지 설정 키
+PAGE_SETTINGS_NAME = "scene_analysis"
+
+
+# ============================================================
+# ⭐ 성능 최적화: 캐싱 데코레이터 및 초기화 플래그
+# ============================================================
+
+@st.cache_data(ttl=60, show_spinner=False)
+def _cached_sync_load_script(project_path_str: str):
+    """스크립트 동기화 로드 (캐싱 적용)"""
+    return sync_load_script(project_path_str)
+
+
+@st.cache_data(ttl=60, show_spinner=False)
+def _cached_load_script(project_path, language: str, script_type: str):
+    """스크립트 파일 로드 (캐싱 적용)"""
+    return load_script(project_path, language, script_type)
+
+
+def _get_page_init_key():
+    """페이지 초기화 키 생성"""
+    return f"scene_analysis_initialized_{st.session_state.get('current_project', '')}"
 
 
 # ============================================================
@@ -248,6 +283,33 @@ st.set_page_config(
     layout="wide"
 )
 
+# ============================================================
+# ⭐ 사용자 설정 복원 (v1.0 - 영속성)
+# ============================================================
+def _init_persistent_settings():
+    """저장된 설정 복원 (settings_manager 사용)"""
+    # 묶음 크기 복원
+    saved_bundle_size = get_setting(PAGE_SETTINGS_NAME, "srt_bundle_size")
+    if saved_bundle_size is not None and "srt_bundle_size" not in st.session_state:
+        st.session_state["srt_bundle_size"] = saved_bundle_size
+
+    # AI 모델 복원 (하이브리드 변환)
+    saved_ai_model = get_setting(PAGE_SETTINGS_NAME, "hybrid_ai_model")
+    if saved_ai_model is not None and "hybrid_ai_model" not in st.session_state:
+        st.session_state["hybrid_ai_model"] = saved_ai_model
+
+    # SRT 분석 모델 복원
+    saved_srt_model = get_setting(PAGE_SETTINGS_NAME, "srt_model_model")
+    if saved_srt_model is not None and "srt_model_model" not in st.session_state:
+        st.session_state["srt_model_model"] = saved_srt_model
+
+    # 프롬프트 생성 옵션 복원
+    saved_generate_prompts = get_setting(PAGE_SETTINGS_NAME, "srt_generate_prompts")
+    if saved_generate_prompts is not None and "srt_generate_prompts" not in st.session_state:
+        st.session_state["srt_generate_prompts"] = saved_generate_prompts
+
+_init_persistent_settings()
+
 render_project_sidebar()
 show_api_status_sidebar()
 
@@ -328,8 +390,9 @@ st.divider()
 
 # ═══════════════════════════════════════════════════════════════
 # 동기화된 스크립트 확인 (스크립트 생성 페이지에서 저장한 최신 데이터)
+# ⭐ 성능 최적화: 캐싱된 함수 사용
 # ═══════════════════════════════════════════════════════════════
-synced_script, synced_language = sync_load_script(str(project_path))
+synced_script, synced_language = _cached_sync_load_script(str(project_path))
 synced_info = get_synced_script_info()
 
 # 동기화된 스크립트가 있으면 언어 기본값을 동기화
@@ -356,8 +419,8 @@ elif synced_script:
     if language != synced_language:
         st.warning(f"⚠️ 저장된 스크립트는 **{synced_info.get('language_name')}**입니다. 언어 설정을 확인하세요.")
 else:
-    # 동기화된 스크립트가 없으면 기존 파일에서 로드
-    auto_script = load_script(project_path, language, "final") or load_script(project_path, language, "draft")
+    # 동기화된 스크립트가 없으면 기존 파일에서 로드 (⭐ 캐싱 적용)
+    auto_script = _cached_load_script(project_path, language, "final") or _cached_load_script(project_path, language, "draft")
 
 # 탭 구성 (v2.5: TTS+AI 타임스탬프 탭 추가)
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
@@ -965,81 +1028,165 @@ with tab2:
                     if not srt_templates:
                         st.info("기본 SRT 분석 프롬프트를 사용합니다.")
                     else:
-                        st.caption("현재 적용된 SRT 분석 프롬프트를 확인하고 수정할 수 있습니다.")
+                        # ============================================================
+                        # 통합 프롬프트 편집기 (v2.6 업데이트)
+                        # ============================================================
+                        st.subheader("📝 프롬프트 편집")
+                        st.caption("모든 SRT 분석 프롬프트를 확인하고 수정할 수 있습니다.")
 
-                        # 단일 씬 프롬프트 표시/수정
-                        st.markdown("**📌 단일 씬 분석 프롬프트**")
-                        st.caption("순차/병렬 처리 시 각 씬에 적용되는 프롬프트")
+                        # 편집할 프롬프트 선택 드롭다운
+                        all_srt_prompts = template_manager.get_all_srt_prompts_for_editor()
 
-                        single_template = template_manager.get_srt_single_template()
-                        if single_template:
-                            single_prompt_key = "srt_single_prompt_edit"
-                            edited_single = st.text_area(
-                                "단일 씬 프롬프트",
-                                value=single_template.prompt,
-                                height=200,
-                                key=single_prompt_key,
-                                label_visibility="collapsed"
+                        # 드롭다운용 옵션 생성 (유형별 그룹화)
+                        prompt_options = []
+                        prompt_map = {}  # id -> template info
+
+                        type_labels = {
+                            "single": "🔴 단일 씬 분석용",
+                            "batch": "🟠 배치 분석용",
+                            "both": "🟢 범용"
+                        }
+
+                        for ptype in ["single", "batch", "both"]:
+                            templates_in_type = all_srt_prompts.get(ptype, [])
+                            if templates_in_type:
+                                for t in templates_in_type:
+                                    default_badge = " [기본]" if t["is_default"] else ""
+                                    display_name = f"{type_labels[ptype]} | {t['name']}{default_badge}"
+                                    prompt_options.append(display_name)
+                                    prompt_map[display_name] = t
+
+                        if prompt_options:
+                            # 세션 스테이트 초기화
+                            if 'editor_selected_prompt' not in st.session_state:
+                                st.session_state['editor_selected_prompt'] = prompt_options[0]
+
+                            selected_prompt_display = st.selectbox(
+                                "📋 편집할 프롬프트 선택",
+                                options=prompt_options,
+                                key="editor_prompt_selector",
+                                help="수정할 프롬프트를 선택하세요"
                             )
 
-                            # 수정 여부 확인
-                            single_modified = edited_single != single_template.prompt
+                            if selected_prompt_display in prompt_map:
+                                selected_info = prompt_map[selected_prompt_display]
+                                selected_template = template_manager.get_template(selected_info["id"])
 
-                            if single_modified:
-                                col_s1, col_s2 = st.columns(2)
-                                with col_s1:
-                                    if st.button("💾 단일 프롬프트 저장", key="save_single_prompt"):
-                                        if template_manager.update_template(
-                                            single_template.id,
-                                            edited_single,
-                                            name=single_template.name,
-                                            description=single_template.description
-                                        ):
-                                            st.success("✅ 저장됨!")
+                                if selected_template:
+                                    is_default = selected_template.is_default
+
+                                    # 기본 프롬프트 안내
+                                    if is_default:
+                                        st.info("ℹ️ 기본 프롬프트는 이름 변경 및 삭제가 불가능합니다. 복제하여 사용하세요.")
+
+                                    # 프롬프트 이름 편집
+                                    edited_name = st.text_input(
+                                        "프롬프트 이름",
+                                        value=selected_template.name,
+                                        key=f"edit_name_{selected_info['id']}",
+                                        disabled=is_default,
+                                        help="기본 프롬프트는 이름 변경 불가" if is_default else "프롬프트 이름을 수정할 수 있습니다"
+                                    )
+
+                                    # 프롬프트 설명 편집
+                                    edited_desc = st.text_input(
+                                        "설명",
+                                        value=selected_template.description,
+                                        key=f"edit_desc_{selected_info['id']}",
+                                        help="프롬프트에 대한 간단한 설명"
+                                    )
+
+                                    # 프롬프트 내용 편집
+                                    edited_prompt = st.text_area(
+                                        "프롬프트 내용",
+                                        value=selected_template.prompt,
+                                        height=300,
+                                        key=f"edit_content_{selected_info['id']}"
+                                    )
+
+                                    # 수정 여부 확인
+                                    is_modified = (
+                                        edited_name != selected_template.name or
+                                        edited_desc != selected_template.description or
+                                        edited_prompt != selected_template.prompt
+                                    )
+
+                                    # 버튼 영역
+                                    btn_col1, btn_col2, btn_col3, btn_col4 = st.columns(4)
+
+                                    with btn_col1:
+                                        save_disabled = not is_modified
+                                        if st.button("💾 저장", key="unified_save", disabled=save_disabled, type="primary" if is_modified else "secondary"):
+                                            # 기본 프롬프트는 이름 변경 불가
+                                            final_name = selected_template.name if is_default else edited_name
+                                            if template_manager.update_template(
+                                                selected_info["id"],
+                                                edited_prompt,
+                                                name=final_name,
+                                                description=edited_desc
+                                            ):
+                                                st.success("✅ 저장 완료!")
+                                                st.rerun()
+                                            else:
+                                                st.error("저장 실패")
+
+                                    with btn_col2:
+                                        if st.button("🔄 되돌리기", key="unified_revert", disabled=not is_modified):
                                             st.rerun()
-                                        else:
-                                            st.error("저장 실패")
-                                with col_s2:
-                                    if st.button("🔄 되돌리기", key="revert_single_prompt"):
-                                        st.rerun()
 
-                        st.markdown("---")
+                                    with btn_col3:
+                                        # 삭제 버튼 (기본 프롬프트는 비활성화)
+                                        if st.button("🗑️ 삭제", key="unified_delete", disabled=is_default, help="기본 프롬프트는 삭제 불가" if is_default else "이 프롬프트를 삭제합니다"):
+                                            st.session_state['confirm_delete_prompt'] = selected_info["id"]
 
-                        # 배치 프롬프트 표시/수정
-                        st.markdown("**📦 배치 분석 프롬프트**")
-                        st.caption("배치 처리 시 여러 씬을 한 번에 분석하는 프롬프트")
+                                    with btn_col4:
+                                        if st.button("📋 복제", key="unified_duplicate", help="이 프롬프트를 복사하여 새 프롬프트 생성"):
+                                            st.session_state['show_duplicate_dialog'] = selected_info["id"]
 
-                        batch_template = template_manager.get_srt_batch_template()
-                        if batch_template:
-                            batch_prompt_key = "srt_batch_prompt_edit"
-                            edited_batch = st.text_area(
-                                "배치 프롬프트",
-                                value=batch_template.prompt,
-                                height=200,
-                                key=batch_prompt_key,
-                                label_visibility="collapsed"
-                            )
+                                    # 삭제 확인 다이얼로그
+                                    if st.session_state.get('confirm_delete_prompt') == selected_info["id"]:
+                                        st.warning(f"⚠️ '{selected_template.name}' 프롬프트를 삭제하시겠습니까?")
+                                        del_col1, del_col2 = st.columns(2)
+                                        with del_col1:
+                                            if st.button("✅ 삭제 확인", key="confirm_del_yes", type="primary"):
+                                                if template_manager.delete_template(selected_info["id"]):
+                                                    st.success("✅ 삭제 완료!")
+                                                    del st.session_state['confirm_delete_prompt']
+                                                    st.rerun()
+                                                else:
+                                                    st.error("삭제 실패")
+                                        with del_col2:
+                                            if st.button("❌ 취소", key="confirm_del_no"):
+                                                del st.session_state['confirm_delete_prompt']
+                                                st.rerun()
 
-                            # 수정 여부 확인
-                            batch_modified = edited_batch != batch_template.prompt
-
-                            if batch_modified:
-                                col_b1, col_b2 = st.columns(2)
-                                with col_b1:
-                                    if st.button("💾 배치 프롬프트 저장", key="save_batch_prompt"):
-                                        if template_manager.update_template(
-                                            batch_template.id,
-                                            edited_batch,
-                                            name=batch_template.name,
-                                            description=batch_template.description
-                                        ):
-                                            st.success("✅ 저장됨!")
-                                            st.rerun()
-                                        else:
-                                            st.error("저장 실패")
-                                with col_b2:
-                                    if st.button("🔄 되돌리기", key="revert_batch_prompt"):
-                                        st.rerun()
+                                    # 복제 다이얼로그
+                                    if st.session_state.get('show_duplicate_dialog') == selected_info["id"]:
+                                        st.info("📋 프롬프트 복제")
+                                        dup_name = st.text_input(
+                                            "새 프롬프트 이름",
+                                            value=f"{selected_template.name} (복사본)",
+                                            key="duplicate_new_name"
+                                        )
+                                        dup_col1, dup_col2 = st.columns(2)
+                                        with dup_col1:
+                                            if st.button("✅ 복제 생성", key="confirm_dup_yes", type="primary"):
+                                                if dup_name.strip():
+                                                    new_id = template_manager.duplicate_template(selected_info["id"], dup_name.strip())
+                                                    if new_id:
+                                                        st.success(f"✅ '{dup_name}' 복제 완료!")
+                                                        del st.session_state['show_duplicate_dialog']
+                                                        st.rerun()
+                                                    else:
+                                                        st.error("복제 실패")
+                                                else:
+                                                    st.warning("이름을 입력하세요")
+                                        with dup_col2:
+                                            if st.button("❌ 취소", key="confirm_dup_no"):
+                                                del st.session_state['show_duplicate_dialog']
+                                                st.rerun()
+                        else:
+                            st.warning("편집 가능한 프롬프트가 없습니다.")
 
                         st.markdown("---")
 
@@ -1050,26 +1197,106 @@ with tab2:
                             placeholder="예: SRT 분석 프롬프트 (상세 버전)",
                             key="new_srt_template_name"
                         )
+
+                        # ========================================
+                        # 프롬프트 유형 선택 (v2.5 추가)
+                        # ========================================
+                        st.markdown("##### 📋 프롬프트 유형")
+                        new_prompt_type = st.radio(
+                            "이 프롬프트를 어디에 사용하시겠습니까?",
+                            options=["single", "batch", "both"],
+                            format_func=lambda x: {
+                                "single": "🔴 단일 씬 분석용 - 순차/병렬 처리 시 각 씬에 개별 적용",
+                                "batch": "🟠 배치 분석용 - 여러 씬을 한 번에 묶어서 분석",
+                                "both": "🟢 둘 다 사용 - 단일/배치 모두 사용 가능"
+                            }[x],
+                            key="new_srt_template_type",
+                            horizontal=False,
+                            help="단일: 씬 하나씩 분석 / 배치: 여러 씬을 한 번에 분석"
+                        )
+
+                        # 유형별 설명
+                        if new_prompt_type == "single":
+                            st.info("""
+                            **🔴 단일 씬 분석용**
+                            - 순차 처리 또는 병렬 처리 시 사용
+                            - 각 씬마다 개별적으로 프롬프트가 적용됨
+                            - 예: 씬 1 분석 → 씬 2 분석 → 씬 3 분석...
+                            """)
+                        elif new_prompt_type == "batch":
+                            st.info("""
+                            **🟠 배치 분석용**
+                            - 배치 처리 시 사용
+                            - 여러 씬을 한 번에 묶어서 분석
+                            - 예: 씬 1~10을 한 번에 분석
+                            """)
+                        else:
+                            st.info("""
+                            **🟢 둘 다 사용**
+                            - 단일 씬 분석과 배치 분석 모두에 사용 가능
+                            - 범용 프롬프트
+                            """)
+
                         new_prompt = st.text_area(
                             "프롬프트 내용",
                             placeholder="새 프롬프트 내용을 입력하세요...",
                             height=150,
                             key="new_srt_template_content"
                         )
-                        if st.button("➕ 새 버전 추가", key="add_new_srt_template"):
+                        if st.button("➕ 새 버전 추가", key="add_new_srt_template", type="primary"):
                             if new_name and new_prompt:
                                 new_template = template_manager.create_srt_template(
                                     name=new_name,
                                     description="사용자 정의 SRT 분석 프롬프트",
-                                    prompt=new_prompt
+                                    prompt=new_prompt,
+                                    prompt_type=new_prompt_type
                                 )
                                 if new_template:
-                                    st.success(f"✅ '{new_name}' 생성 완료!")
+                                    type_label = {"single": "단일", "batch": "배치", "both": "범용"}[new_prompt_type]
+                                    st.success(f"✅ '{new_name}' 생성 완료! (유형: {type_label})")
                                     st.rerun()
                                 else:
                                     st.error("생성 실패")
                             else:
                                 st.warning("이름과 내용을 모두 입력하세요.")
+
+                        # ========================================
+                        # 프롬프트 목록 요약 (유형별 분류)
+                        # ========================================
+                        st.markdown("---")
+                        st.markdown("**📊 프롬프트 현황**")
+                        st.caption("위 통합 편집기에서 프롬프트를 선택하여 편집/삭제/복제할 수 있습니다.")
+
+                        # 유형별로 그룹화
+                        grouped_templates = template_manager.get_srt_templates_grouped_by_type()
+
+                        # 유형별 개수 표시
+                        single_count = len(grouped_templates.get("single", []))
+                        batch_count = len(grouped_templates.get("batch", []))
+                        both_count = len(grouped_templates.get("both", []))
+
+                        # 사용자 정의 프롬프트 개수
+                        user_single = len([t for t in grouped_templates.get("single", []) if not t.is_default])
+                        user_batch = len([t for t in grouped_templates.get("batch", []) if not t.is_default])
+                        user_both = len([t for t in grouped_templates.get("both", []) if not t.is_default])
+
+                        col_stat1, col_stat2, col_stat3 = st.columns(3)
+                        with col_stat1:
+                            st.metric("🔴 단일 씬 분석용", f"{single_count}개", f"(사용자: {user_single}개)")
+                        with col_stat2:
+                            st.metric("🟠 배치 분석용", f"{batch_count}개", f"(사용자: {user_batch}개)")
+                        with col_stat3:
+                            st.metric("🟢 범용", f"{both_count}개", f"(사용자: {user_both}개)")
+
+                        # ============================================================
+                        # ⭐ 기본 프롬프트 설정 (v3.26 추가)
+                        # ============================================================
+                        st.markdown("---")
+                        all_srt_prompts_for_default = template_manager.get_all_srt_prompts_for_editor()
+                        render_default_prompt_settings(
+                            all_srt_prompts=all_srt_prompts_for_default,
+                            key_prefix="srt_default_prompt"
+                        )
 
             # ═══════════════════════════════════════════════════════════════════
             # 🔀 분석 모드 선택 (v3.18 추가)
@@ -1127,6 +1354,21 @@ with tab2:
                 except:
                     pass
 
+            # 선택된 씬 ID 저장용
+            selected_scene_ids = []
+            total_scenes = len(srt_scenes)
+
+            # ⭐ v3.16: session_state 초기화 (위젯 생성 전!)
+            if "srt_range_start" not in st.session_state:
+                st.session_state["srt_range_start"] = 1
+            if "srt_range_end" not in st.session_state:
+                st.session_state["srt_range_end"] = min(10, total_scenes)
+            # 범위 검증 (total_scenes가 변경된 경우)
+            if st.session_state["srt_range_start"] > total_scenes:
+                st.session_state["srt_range_start"] = 1
+            if st.session_state["srt_range_end"] > total_scenes:
+                st.session_state["srt_range_end"] = total_scenes
+
             # 분석 범위 선택 라디오
             range_mode = st.radio(
                 "범위 선택 모드",
@@ -1137,10 +1379,6 @@ with tab2:
                 label_visibility="collapsed"
             )
 
-            # 선택된 씬 ID 저장용
-            selected_scene_ids = []
-            total_scenes = len(srt_scenes)
-
             if range_mode == "all":
                 # 전체 선택
                 selected_scene_ids = [s.get("scene_id", i+1) for i, s in enumerate(srt_scenes)]
@@ -1148,6 +1386,45 @@ with tab2:
 
             elif range_mode == "range":
                 # 구간 지정
+                # ⭐ v3.16: 콜백 함수 정의 (위젯 전에 정의해야 함)
+                def set_range_first_10():
+                    st.session_state["srt_range_start"] = 1
+                    st.session_state["srt_range_end"] = min(10, st.session_state.get("_total_scenes", 10))
+
+                def set_range_first_50():
+                    st.session_state["srt_range_start"] = 1
+                    st.session_state["srt_range_end"] = min(50, st.session_state.get("_total_scenes", 50))
+
+                def set_range_last_50():
+                    total = st.session_state.get("_total_scenes", 100)
+                    st.session_state["srt_range_start"] = max(1, total - 49)
+                    st.session_state["srt_range_end"] = total
+
+                def set_range_all():
+                    total = st.session_state.get("_total_scenes", 100)
+                    st.session_state["srt_range_start"] = 1
+                    st.session_state["srt_range_end"] = total
+
+                # total_scenes를 session_state에 임시 저장 (콜백에서 사용)
+                st.session_state["_total_scenes"] = total_scenes
+
+                # 빠른 선택 버튼 (on_click 콜백 사용!)
+                st.markdown("**⚡ 빠른 선택**")
+                quick_col1, quick_col2, quick_col3, quick_col4 = st.columns(4)
+
+                with quick_col1:
+                    st.button("처음 10개", key="quick_first_10", use_container_width=True, on_click=set_range_first_10)
+
+                with quick_col2:
+                    st.button("처음 50개", key="quick_first_50", use_container_width=True, on_click=set_range_first_50)
+
+                with quick_col3:
+                    st.button("마지막 50개", key="quick_last_50", use_container_width=True, on_click=set_range_last_50)
+
+                with quick_col4:
+                    st.button("전체 선택", key="quick_all", use_container_width=True, on_click=set_range_all)
+
+                # 수동 범위 입력 (value= 제거, session_state에서 자동 로드)
                 range_col1, range_col2 = st.columns(2)
 
                 with range_col1:
@@ -1155,7 +1432,6 @@ with tab2:
                         "시작 씬 번호",
                         min_value=1,
                         max_value=total_scenes,
-                        value=1,
                         key="srt_range_start"
                     )
 
@@ -1164,37 +1440,8 @@ with tab2:
                         "종료 씬 번호",
                         min_value=1,
                         max_value=total_scenes,
-                        value=min(10, total_scenes),
                         key="srt_range_end"
                     )
-
-                # 빠른 선택 버튼
-                st.markdown("**⚡ 빠른 선택**")
-                quick_col1, quick_col2, quick_col3, quick_col4 = st.columns(4)
-
-                with quick_col1:
-                    if st.button("처음 10개", key="quick_first_10", use_container_width=True):
-                        st.session_state["srt_range_start"] = 1
-                        st.session_state["srt_range_end"] = min(10, total_scenes)
-                        st.rerun()
-
-                with quick_col2:
-                    if st.button("처음 50개", key="quick_first_50", use_container_width=True):
-                        st.session_state["srt_range_start"] = 1
-                        st.session_state["srt_range_end"] = min(50, total_scenes)
-                        st.rerun()
-
-                with quick_col3:
-                    if st.button("마지막 50개", key="quick_last_50", use_container_width=True):
-                        st.session_state["srt_range_start"] = max(1, total_scenes - 49)
-                        st.session_state["srt_range_end"] = total_scenes
-                        st.rerun()
-
-                with quick_col4:
-                    if st.button("전체 선택", key="quick_all", use_container_width=True):
-                        st.session_state["srt_range_start"] = 1
-                        st.session_state["srt_range_end"] = total_scenes
-                        st.rerun()
 
                 # 구간 유효성 검사
                 if start_scene <= end_scene:
@@ -1340,12 +1587,14 @@ with tab2:
             bundle_col1, bundle_col2 = st.columns([1, 2])
 
             with bundle_col1:
-                bundle_size = st.selectbox(
+                # v1.0: 설정 영속성 - persistent_selectbox 사용
+                bundle_size = persistent_selectbox(
                     "묶음 크기",
                     options=[1, 2, 3, 4, 5],
-                    index=1,  # 기본값 2
-                    help="N개의 씬을 묶어서 하나의 분석 단위로 처리합니다. 안정적인 이미지 전환(5-10초)에 효과적입니다.",
-                    key="srt_bundle_size"
+                    page=PAGE_SETTINGS_NAME,
+                    setting_key="srt_bundle_size",
+                    default_index=1,  # 기본값 2
+                    help="N개의 씬을 묶어서 하나의 분석 단위로 처리합니다. 안정적인 이미지 전환(5-10초)에 효과적입니다."
                 )
 
             with bundle_col2:
@@ -1407,6 +1656,128 @@ with tab2:
                         "parallel": f"🚀 예상 시간: ~{max(selected_count // 3, 5)}초 (병렬 처리)"
                     }
                     st.caption(speed_info.get(processing_mode, ""))
+
+                    # ========================================
+                    # 📋 분석 프롬프트 설정 (v2.7 통합)
+                    # ========================================
+                    st.markdown("##### 📋 분석 프롬프트 설정")
+
+                    # 현재 처리 모드 표시
+                    mode_info = {
+                        "sequential": ("🔴 순차 처리", "각 씬을 하나씩 순서대로 분석", "single"),
+                        "batch": ("🟠 배치 처리", "여러 씬을 한 번에 묶어서 분석", "batch"),
+                        "parallel": ("🔴 병렬 처리", "여러 씬을 동시에 개별 분석", "single")
+                    }
+                    mode_label, mode_desc, prompt_type = mode_info.get(processing_mode, ("🟠 배치 처리", "기본 모드", "batch"))
+
+                    st.info(f"**현재 처리 모드**: {mode_label}\n\n{mode_desc}")
+                    st.caption("※ 처리 모드에 따라 해당 유형의 프롬프트가 자동 필터링됩니다.")
+
+                    # 처리 모드에 따라 사용 가능한 프롬프트 필터링
+                    available_prompts = template_manager.get_templates_for_analysis_mode(processing_mode)
+
+                    if available_prompts:
+                        # 현재 활성 프롬프트 ID 가져오기
+                        active_prompt_id = template_manager.get_active_prompt(prompt_type)
+
+                        # 프롬프트 옵션 생성
+                        prompt_options = {}
+                        prompt_ids = []
+                        for t in available_prompts:
+                            # 유형 배지 추가
+                            type_badge = {
+                                "single": "🔴",
+                                "batch": "🟠",
+                                "both": "🟢"
+                            }.get(getattr(t, 'prompt_type', 'both'), "🟢")
+
+                            # 현재 활성 프롬프트 표시
+                            active_mark = " ✓" if t.id == active_prompt_id else ""
+                            prompt_options[t.id] = f"{type_badge} {t.name}{active_mark}"
+                            prompt_ids.append(t.id)
+
+                        # ⭐ v3.26.2: 기본 프롬프트 적용 버그 수정
+                        # 문제: st.selectbox의 key가 있으면 index 파라미터가 무시됨
+                        # 해결: selectbox 렌더링 전에 session_state를 미리 설정
+
+                        default_prompt_type = "single_scene_analysis" if prompt_type == "single" else "batch_scene_analysis"
+                        user_default_prompt_id = get_default_prompt_id(default_prompt_type)
+
+                        # 🔴 v3.26.2: session_state 기반 기본값 적용
+                        # selectbox의 key가 있으면 session_state[key] 값을 우선 사용함
+                        # 따라서 session_state가 없거나 처리 모드가 변경되면 기본값으로 초기화
+                        selectbox_key = "srt_analysis_prompt_selector"
+                        mode_key = "_last_prompt_type"  # 마지막 처리 모드 추적
+
+                        # 처리 모드 변경 감지 (single ↔ batch)
+                        last_prompt_type = st.session_state.get(mode_key)
+                        mode_changed = last_prompt_type != prompt_type
+
+                        # selectbox가 아직 초기화되지 않았거나, 처리 모드가 변경됨
+                        needs_default_init = (
+                            selectbox_key not in st.session_state or
+                            mode_changed
+                        )
+
+                        default_prompt_applied = False
+
+                        if needs_default_init:
+                            # 사용자 기본 프롬프트가 있으면 그것을 사용
+                            if user_default_prompt_id and user_default_prompt_id in prompt_ids:
+                                st.session_state[selectbox_key] = user_default_prompt_id
+                                default_prompt_applied = True
+                            elif active_prompt_id and active_prompt_id in prompt_ids:
+                                # 활성 프롬프트 (세션 중 수동 선택한 것)
+                                st.session_state[selectbox_key] = active_prompt_id
+                            else:
+                                # 시스템 기본 템플릿 ID
+                                fallback_id = "srt_scene_single" if prompt_type == "single" else "srt_scene_batch"
+                                if fallback_id in prompt_ids:
+                                    st.session_state[selectbox_key] = fallback_id
+                                elif prompt_ids:
+                                    st.session_state[selectbox_key] = prompt_ids[0]
+
+                            # 처리 모드 기록
+                            st.session_state[mode_key] = prompt_type
+
+                        # 현재 session_state 값이 사용자 기본값과 같은지 확인 (안내 메시지용)
+                        current_value = st.session_state.get(selectbox_key)
+                        if current_value == user_default_prompt_id and user_default_prompt_id:
+                            default_prompt_applied = True
+
+                        # 기본 프롬프트 적용 안내
+                        if default_prompt_applied:
+                            st.info(f"⭐ 설정된 기본 프롬프트가 적용되었습니다.")
+
+                        # selectbox 렌더링 (session_state[key]가 이미 설정되어 있으므로 그 값을 사용함)
+                        selected_prompt_id = st.selectbox(
+                            "사용할 프롬프트",
+                            options=prompt_ids,
+                            format_func=lambda x: prompt_options.get(x, x),
+                            key=selectbox_key,
+                            help="선택한 프롬프트가 분석에 바로 적용됩니다. ⭐ 기본 프롬프트 설정에서 기본값을 변경할 수 있습니다."
+                        )
+
+                        # 선택이 변경되면 자동으로 활성 프롬프트로 저장
+                        if selected_prompt_id and selected_prompt_id != active_prompt_id:
+                            template_manager.set_active_prompt(prompt_type, selected_prompt_id)
+                            st.success(f"✅ 프롬프트가 적용되었습니다.")
+
+                        # 선택된 프롬프트 정보 표시
+                        selected_prompt_template = template_manager.get_template(selected_prompt_id)
+                        if selected_prompt_template:
+                            with st.expander("📄 선택된 프롬프트 미리보기", expanded=False):
+                                st.markdown(f"**{selected_prompt_template.name}**")
+                                st.caption(selected_prompt_template.description)
+                                st.code(selected_prompt_template.prompt, language="markdown")
+
+                        # 세션에 선택된 프롬프트 ID 저장
+                        st.session_state['selected_srt_prompt_id'] = selected_prompt_id
+                    else:
+                        st.warning("사용 가능한 프롬프트가 없습니다. 프롬프트 설정을 확인하세요.")
+                        st.session_state['selected_srt_prompt_id'] = None
+
+                    st.markdown("---")
 
             # 적용 버튼
             selected_scene_ids_final = st.session_state.get("srt_selected_scene_ids", [])
@@ -2883,11 +3254,13 @@ with tab6:
             "gemini-1.5-pro": "Gemini 1.5 Pro (고품질)",
             "claude-agent": "Claude Agent (씬분할+교정)"
         }
-        hybrid_ai_model = st.selectbox(
+        # v1.0: 설정 영속성 - persistent_selectbox 사용
+        hybrid_ai_model = persistent_selectbox(
             "AI 모델",
-            list(ai_model_options.keys()),
-            format_func=lambda x: ai_model_options[x],
-            key="hybrid_ai_model"
+            options=list(ai_model_options.keys()),
+            page=PAGE_SETTINGS_NAME,
+            setting_key="hybrid_ai_model",
+            format_func=lambda x: ai_model_options[x]
         )
 
         # Claude Agent 선택 시 API 키 확인

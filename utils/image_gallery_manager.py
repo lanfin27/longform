@@ -55,29 +55,52 @@ class ImageGalleryManager:
         self.project_path = Path(project_path)
         self.images_dir = self.project_path / "images"
 
+        # ⭐ v2.0: 글로벌 이미지 폴더 (ImageFX 등)
+        root_dir = Path(__file__).parent.parent
+        self.global_images_dir = root_dir / "data" / "images"
+
     # ============================================================
     # 이미지 스캔
     # ============================================================
 
-    def scan_all_images(self) -> List[ImageInfo]:
-        """모든 이미지 스캔"""
+    def scan_all_images(self, include_global: bool = True) -> List[ImageInfo]:
+        """
+        모든 이미지 스캔
 
+        Args:
+            include_global: 글로벌 폴더(data/images/imagefx 등) 포함 여부
+
+        Returns:
+            이미지 정보 목록
+        """
         images = []
 
-        # 합성 이미지
+        # 프로젝트 폴더 이미지
         comp_dir = self.images_dir / "composited"
         if comp_dir.exists():
             images.extend(self._scan_folder(comp_dir, "composited"))
 
-        # 씬 이미지
         scene_dir = self.images_dir / "scenes"
         if scene_dir.exists():
             images.extend(self._scan_folder(scene_dir, "scene"))
 
-        # 배경 이미지
         bg_dir = self.images_dir / "backgrounds"
         if bg_dir.exists():
             images.extend(self._scan_folder(bg_dir, "background"))
+
+        # ⭐ v2.0: 글로벌 폴더 이미지 (ImageFX 등)
+        if include_global and self.global_images_dir.exists():
+            imagefx_dir = self.global_images_dir / "imagefx"
+            if imagefx_dir.exists():
+                images.extend(self._scan_folder(imagefx_dir, "imagefx"))
+
+            generated_dir = self.global_images_dir / "generated"
+            if generated_dir.exists():
+                images.extend(self._scan_folder(generated_dir, "generated"))
+
+            global_bg_dir = self.global_images_dir / "backgrounds"
+            if global_bg_dir.exists():
+                images.extend(self._scan_folder(global_bg_dir, "global_background"))
 
         # 시간순 정렬
         images.sort(key=lambda x: x.created, reverse=True)

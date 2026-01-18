@@ -1,0 +1,15 @@
+{
+  "default_prompts": {
+    "single_scene_analysis": {
+      "prompt_id": "srt_scene_analysis_42976284",
+      "prompt_name": "🔴 단일 씬 분석용 | SRT 단일 씬 분석 프롬프트 v1.0_숫자날짜 한글프롬프트추",
+      "set_at": "2026-01-16T23:25:45.158629"
+    },
+    "batch_scene_analysis": {
+      "prompt_id": "srt_scene_analysis_ec62d6cb",
+      "prompt_name": "🟠 배치 분석용 | SRT 배치 씬 분석 프롬프트 v1.0_숫자날짜 한글프롬프트 추가",
+      "set_at": "2026-01-16T23:25:48.224330"
+    }
+  },
+  "last_updated": "2026-01-16T23:25:48.224683"
+}

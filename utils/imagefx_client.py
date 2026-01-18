@@ -58,6 +58,42 @@ class ImagenModel(Enum):
     IMAGEN_3_1 = "IMAGEN_3_1"
     DEFAULT = "IMAGEN_4"  # v6.3: 기본값을 IMAGEN_4로 변경
 
+    def __str__(self):
+        """v6.4: 문자열 변환 시 value 반환"""
+        return self.value
+
+    def __repr__(self):
+        """v6.4: repr도 value 반환"""
+        return self.value
+
+
+def ensure_string_value(value) -> str:
+    """
+    v6.4: 값을 문자열로 안전하게 변환
+
+    Enum 객체가 전달되어도 자동으로 .value 추출
+    - Enum → .value
+    - hasattr(value, 'value') → .value
+    - 그 외 → str()
+    """
+    if value is None:
+        return "IMAGEN_4"
+
+    # Enum 클래스 체크 (어떤 Enum이든)
+    if isinstance(value, Enum):
+        return str(value.value)
+
+    # .value 속성이 있는 경우 (Enum-like 객체)
+    if hasattr(value, 'value'):
+        return str(value.value)
+
+    # 이미 문자열인 경우
+    if isinstance(value, str):
+        return value
+
+    # 그 외는 str() 변환
+    return str(value)
+
 
 class AspectRatio(Enum):
     """지원되는 이미지 비율"""
@@ -111,6 +147,7 @@ class GeneratedImage:
     file_path: str
     media_id: str = ""
     prompt: str = ""
+    seed: Optional[int] = None  # v1.1: 시드 값 추가
 
     def save(self, filepath: str) -> str:
         """이미지를 다른 경로로 복사"""
@@ -330,21 +367,21 @@ class ImageFXClient:
         output_dir.mkdir(parents=True, exist_ok=True)
         output_path = str(output_dir / f"{uuid.uuid4()}.png")
 
-        # 비율 값 추출
-        aspect_value = aspect_ratio.value if isinstance(aspect_ratio, AspectRatio) else aspect_ratio
+        # v6.4: 비율 값 추출 (Enum 안전 변환)
+        aspect_value = ensure_string_value(aspect_ratio)
 
-        # 모델 값 추출
-        model_value = model.value if isinstance(model, ImagenModel) else model
+        # v6.4: 모델 값 추출 (Enum 안전 변환)
+        model_value = ensure_string_value(model)
 
-        print(f"\n[ImageFX v6.3] ========== 이미지 생성 ==========")
-        print(f"[ImageFX v6.3] 원본 프롬프트: {prompt[:60]}...")
+        print(f"\n[ImageFX v6.4] ========== 이미지 생성 ==========")
+        print(f"[ImageFX v6.4] 원본 프롬프트: {prompt[:60]}...")
         if negative_prompt:
-            print(f"[ImageFX v6.3] ✅ 네거티브 프롬프트: {negative_prompt[:80]}...")
-        print(f"[ImageFX v6.3] 최종 프롬프트: {final_prompt[:80]}...")
-        print(f"[ImageFX v6.3] 모델: {model_value}")
-        print(f"[ImageFX v6.3] 비율: {aspect_value}")
-        print(f"[ImageFX v6.3] 출력 경로: {output_path}")
-        print(f"[ImageFX v6.3] ===================================")
+            print(f"[ImageFX v6.4] ✅ 네거티브 프롬프트: {negative_prompt[:80]}...")
+        print(f"[ImageFX v6.4] 최종 프롬프트: {final_prompt[:80]}...")
+        print(f"[ImageFX v6.4] 모델: {model_value} (타입: {type(model_value).__name__})")
+        print(f"[ImageFX v6.4] 비율: {aspect_value}")
+        print(f"[ImageFX v6.4] 출력 경로: {output_path}")
+        print(f"[ImageFX v6.4] ===================================")
 
         # Node.js 스크립트 호출 명령
         cmd = [
@@ -363,7 +400,16 @@ class ImageFXClient:
         # ⭐ 네거티브 프롬프트도 별도로 전달 (라이브러리 지원 시 사용)
         if negative_prompt:
             cmd.extend(["--negativePrompt", negative_prompt])
-            print(f"[ImageFX v6.3] ✅ 네거티브 프롬프트를 Node.js에 전달 ({len(negative_prompt)}자)")
+            print(f"[ImageFX v6.4] ✅ 네거티브 프롬프트를 Node.js에 전달 ({len(negative_prompt)}자)")
+
+        # ⭐ v6.4: 방어적 코드 - 모든 cmd 인자가 문자열인지 검증
+        for i, arg in enumerate(cmd):
+            if isinstance(arg, Enum):
+                print(f"[ImageFX v6.4] ⚠️ Enum 객체 감지! cmd[{i}] = {arg} (타입: {type(arg)})")
+                cmd[i] = str(arg.value)
+            elif not isinstance(arg, str):
+                print(f"[ImageFX v6.4] ⚠️ 비문자열 감지! cmd[{i}] = {arg} (타입: {type(arg)})")
+                cmd[i] = str(arg)
 
         last_error = None
 
@@ -400,12 +446,17 @@ class ImageFXClient:
                                 if output.get("success"):
                                     saved_path = output.get("path", output_path)
                                     if os.path.exists(saved_path):
+                                        # v1.1: 시드 값 추출
+                                        result_seed = output.get("seed")
+                                        if result_seed is not None:
+                                            print(f"[ImageFX v6.5] 🔑 시드: {result_seed}")
                                         print(f"[ImageFX v6.3] Success! Image saved: {saved_path}")
                                         # 성공 시 쿠키 유효 상태로 표시
                                         mark_cookie_valid()
                                         return [GeneratedImage(
                                             file_path=saved_path,
-                                            prompt=prompt
+                                            prompt=prompt,
+                                            seed=result_seed  # v1.1: 시드 저장
                                         )]
                                 else:
                                     error_msg = output.get("error", "Unknown error")
@@ -425,9 +476,13 @@ class ImageFXClient:
                 if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
                     print(f"[ImageFX v6.3] File directly verified: {output_path}")
                     mark_cookie_valid()
+                    # v1.2: 시드가 없으면 전달된 시드 사용 (Node.js에서 생성된 시드)
+                    fallback_seed = seed if seed else None
+                    print(f"[ImageFX v6.5] 📌 Fallback 시드: {fallback_seed}")
                     return [GeneratedImage(
                         file_path=output_path,
-                        prompt=prompt
+                        prompt=prompt,
+                        seed=fallback_seed
                     )]
 
                 # 실패 원인 분석

@@ -7,6 +7,7 @@ utils/scene_video_generator.py
 1. 씬 이미지를 Video API로 변환
 2. 비디오 프롬프트 조합
 3. 생성 결과 저장
+4. ⭐ v3.22: SRT/TTS 기반 비디오 길이 자동 추천
 """
 
 import os
@@ -30,6 +31,182 @@ try:
 except ImportError as e:
     VIDEO_API_AVAILABLE = False
     print(f"[SceneVideoGenerator] Video API 모듈 로드 실패: {e}")
+
+
+# ============================================================
+# ⭐ v3.22: SRT/TTS 기반 비디오 길이 자동 추천
+# ============================================================
+
+def get_scene_srt_duration(scene: Dict) -> Optional[float]:
+    """
+    씬의 SRT/TTS duration 가져오기
+
+    여러 필드를 확인하여 실제 오디오/SRT 기반 duration 반환.
+    추정치(duration_estimate)는 사용하지 않음.
+
+    Args:
+        scene: 씬 데이터 딕셔너리
+
+    Returns:
+        실제 duration (초) 또는 None (데이터 없음)
+    """
+    # 실제 TTS/오디오 duration 필드들 (추정치 제외)
+    duration = (
+        scene.get("tts_duration") or
+        scene.get("audio_duration") or
+        scene.get("final_duration") or
+        scene.get("srt_duration") or
+        scene.get("duration") or
+        scene.get("scene_duration") or
+        None
+    )
+
+    # duration_estimate는 텍스트 길이 기반 추정치이므로 제외
+    # 실제 TTS/SRT 데이터가 있는 경우에만 반환
+    if duration and duration > 0:
+        return float(duration)
+
+    return None
+
+
+def estimate_scene_duration(scene: Dict, chars_per_second: float = 4.0) -> float:
+    """
+    씬의 스크립트 길이 기반 duration 추정
+
+    실제 TTS duration이 없을 때 폴백으로 사용.
+
+    Args:
+        scene: 씬 데이터 딕셔너리
+        chars_per_second: 초당 글자 수 (기본: 4.0)
+
+    Returns:
+        추정 duration (초)
+    """
+    # 스크립트 텍스트 가져오기
+    script = (
+        scene.get("script_text") or
+        scene.get("스크립트") or
+        scene.get("text") or
+        ""
+    )
+
+    if not script:
+        return 5.0  # 기본값
+
+    # 공백 제거한 글자 수
+    char_count = len(script.replace(" ", "").replace("\n", ""))
+
+    # 최소 2초, 최대 30초
+    duration = max(2.0, min(30.0, char_count / chars_per_second))
+
+    return round(duration, 2)
+
+
+def get_recommended_video_duration(
+    scene: Dict,
+    threshold: float = 6.0,
+    short_duration: int = 5,
+    long_duration: int = 10
+) -> Tuple[int, Optional[float], str]:
+    """
+    씬의 SRT/TTS duration에 따른 비디오 길이 추천
+
+    규칙:
+    - 0~6초 씬 → 5초 비디오 (짧은 씬)
+    - 7초 이상 씬 → 10초 비디오 (긴 씬)
+
+    Args:
+        scene: 씬 데이터 딕셔너리
+        threshold: 기준점 (초) - 이하면 short, 초과면 long
+        short_duration: 짧은 씬용 비디오 길이
+        long_duration: 긴 씬용 비디오 길이
+
+    Returns:
+        (추천_비디오_길이, 씬_duration, 추천_이유)
+    """
+    # 실제 SRT/TTS duration 확인
+    scene_duration = get_scene_srt_duration(scene)
+
+    if scene_duration is not None:
+        # 실제 데이터 기반 추천
+        if scene_duration <= threshold:
+            return (
+                short_duration,
+                scene_duration,
+                f"SRT {scene_duration:.1f}초 → {short_duration}초 추천"
+            )
+        else:
+            return (
+                long_duration,
+                scene_duration,
+                f"SRT {scene_duration:.1f}초 → {long_duration}초 추천"
+            )
+    else:
+        # 실제 데이터 없음 - 추정치 사용
+        estimated = scene.get("duration_estimate") or estimate_scene_duration(scene)
+
+        if estimated <= threshold:
+            return (
+                short_duration,
+                None,
+                f"추정 {estimated:.1f}초 → {short_duration}초 (TTS 없음)"
+            )
+        else:
+            return (
+                long_duration,
+                None,
+                f"추정 {estimated:.1f}초 → {long_duration}초 (TTS 없음)"
+            )
+
+
+def get_batch_duration_info(
+    scenes: List[Dict],
+    threshold: float = 6.0
+) -> Dict[str, Any]:
+    """
+    배치 생성을 위한 씬별 duration 정보 요약
+
+    Args:
+        scenes: 씬 리스트
+        threshold: 기준점 (초)
+
+    Returns:
+        요약 정보 딕셔너리
+    """
+    short_scenes = []  # 5초 추천
+    long_scenes = []   # 10초 추천
+    no_data_scenes = []  # TTS 데이터 없음
+
+    for scene in scenes:
+        scene_id = scene.get("scene_id") or scene.get("scene_num") or 0
+        recommended, actual_duration, reason = get_recommended_video_duration(
+            scene, threshold=threshold
+        )
+
+        info = {
+            "scene_id": scene_id,
+            "recommended_duration": recommended,
+            "actual_duration": actual_duration,
+            "reason": reason
+        }
+
+        if actual_duration is None:
+            no_data_scenes.append(info)
+        elif actual_duration <= threshold:
+            short_scenes.append(info)
+        else:
+            long_scenes.append(info)
+
+    return {
+        "total": len(scenes),
+        "short_count": len(short_scenes),  # 5초 추천
+        "long_count": len(long_scenes),    # 10초 추천
+        "no_data_count": len(no_data_scenes),
+        "short_scenes": short_scenes,
+        "long_scenes": long_scenes,
+        "no_data_scenes": no_data_scenes,
+        "has_tts_data": len(no_data_scenes) < len(scenes),
+    }
 
 
 def get_available_video_platforms() -> List[str]:
@@ -159,6 +336,8 @@ def generate_scene_video(
         )
 
         if result.success:
+            # ⭐ v2.4: 최종 프롬프트 정보 추가
+            metadata = result.metadata or {}
             return {
                 "success": True,
                 "video_url": result.video_url,
@@ -169,6 +348,10 @@ def generate_scene_video(
                 "model": result.model_display_name,
                 "duration": result.duration,
                 "generation_time": result.generation_time,
+                # 프롬프트 정보 (v2.4)
+                "original_prompt": metadata.get("original_prompt", prompt),
+                "final_prompt": metadata.get("final_prompt", prompt),
+                "prompt_expanded": metadata.get("prompt_expanded", False),
             }
         else:
             return {
@@ -235,7 +418,17 @@ def get_video_prompt_for_scene(
 
 
 def get_scene_image_path(scene: Dict, project_path: str = None) -> Optional[str]:
-    """씬의 이미지 경로 추출 (최신 이미지 우선)"""
+    """씬의 이미지 경로 추출 (v2.3: 실사 이미지 우선)"""
+
+    # ⭐ v2.3: 실사 이미지 경로 필드 우선 확인
+    real_image_path = (
+        scene.get("real_image_path") or
+        scene.get("replaced_image_path") or
+        None
+    )
+    if real_image_path and Path(real_image_path).exists():
+        return str(real_image_path)
+
     # 다양한 이미지 경로 필드 확인
     image_path = (
         scene.get("composited_image_path") or
@@ -253,6 +446,14 @@ def get_scene_image_path(scene: Dict, project_path: str = None) -> Optional[str]
 
     if scene_id and project_path:
         project = Path(project_path)
+
+        # ⭐ v2.3: 실사 이미지 폴더 먼저 확인
+        real_folder = project / "images" / "real"
+        if real_folder.exists():
+            for ext in [".png", ".jpg", ".jpeg", ".webp"]:
+                real_path = real_folder / f"real_scene_{scene_id:03d}{ext}"
+                if real_path.exists():
+                    return str(real_path)
 
         # 1. 정확한 파일명 패턴 먼저 확인 (AI 매핑 패턴 포함)
         exact_patterns = [
@@ -272,6 +473,7 @@ def get_scene_image_path(scene: Dict, project_path: str = None) -> Optional[str]
 
         # 2. ⭐ 타임스탬프가 포함된 파일 검색 (최신 이미지 선택)
         search_dirs = [
+            project / "images" / "real",  # ⭐ v2.3: 실사 이미지 폴더 추가
             project / "images" / "composited",
             project / "images" / "backgrounds",
             project / "images" / "scenes",
@@ -282,8 +484,9 @@ def get_scene_image_path(scene: Dict, project_path: str = None) -> Optional[str]
             if not search_dir.exists():
                 continue
 
-            # bg_scene_017_*, scene_017_*, 017_scene* 패턴 검색
-            for pattern in [f"*scene_{scene_id:03d}_*.png", f"*_{scene_id:03d}_*.png", f"{scene_id:03d}_scene*"]:
+            # ⭐ v2.3: real_scene_* 패턴 추가
+            # bg_scene_017_*, scene_017_*, 017_scene*, real_scene_017* 패턴 검색
+            for pattern in [f"real_scene_{scene_id:03d}*", f"*scene_{scene_id:03d}_*.png", f"*_{scene_id:03d}_*.png", f"{scene_id:03d}_scene*"]:
                 for img in search_dir.glob(pattern):
                     try:
                         mtime = img.stat().st_mtime
@@ -308,6 +511,8 @@ def batch_generate_scene_videos(
     duration: int = 5,
     resolution: str = "720p",
     progress_callback=None,
+    auto_duration: bool = False,
+    duration_threshold: float = 6.0,
 ) -> List[Dict]:
     """
     여러 씬의 비디오 일괄 생성
@@ -318,9 +523,11 @@ def batch_generate_scene_videos(
         platform: API 플랫폼
         model_key: 모델 키
         prompt_type: 프롬프트 타입
-        duration: 영상 길이
+        duration: 영상 길이 (auto_duration=False일 때 사용)
         resolution: 해상도
         progress_callback: 진행률 콜백 (current, total, message)
+        auto_duration: ⭐ v3.22: True면 씬별 SRT duration에 따라 자동 결정
+        duration_threshold: ⭐ v3.22: 자동 모드 기준점 (기본 6초)
 
     Returns:
         생성 결과 리스트
@@ -332,11 +539,21 @@ def batch_generate_scene_videos(
     for idx, scene in enumerate(scenes):
         scene_id = scene.get("scene_id") or scene.get("scene_num") or (idx + 1)
 
-        if progress_callback:
-            progress_callback(idx, total, f"씬 {scene_id} 처리 중...")
+        # ⭐ v3.22: 자동 모드일 때 씬별 duration 결정
+        if auto_duration:
+            scene_duration, actual_dur, reason = get_recommended_video_duration(
+                scene, threshold=duration_threshold
+            )
+            duration_msg = f"({reason})"
+        else:
+            scene_duration = duration
+            duration_msg = f"({duration}초)"
 
-        # 이미지 경로 확인
-        image_path = get_scene_image_path(scene, project_path)
+        if progress_callback:
+            progress_callback(idx, total, f"씬 {scene_id} 처리 중... {duration_msg}")
+
+        # ⭐ v3.23: 이미지 경로 확인 (캐시된 경로 우선 사용)
+        image_path = scene.get("_batch_image_path") or get_scene_image_path(scene, project_path)
         if not image_path:
             results.append({
                 "scene_id": scene_id,
@@ -354,13 +571,17 @@ def batch_generate_scene_videos(
             prompt=prompt,
             platform=platform,
             model_key=model_key,
-            duration=duration,
+            duration=scene_duration,
             resolution=resolution,
             output_dir=output_dir,
             scene_id=scene_id,
         )
 
         result["scene_id"] = scene_id
+        # ⭐ v3.22: 사용된 duration 정보 추가
+        result["video_duration"] = scene_duration
+        if auto_duration:
+            result["auto_duration_reason"] = reason
         results.append(result)
 
     if progress_callback:

@@ -33,6 +33,32 @@ from utils.image_viewer import (
 from utils.scene_selector import SceneSelector
 from utils.storyboard_downloader import StoryboardDownloader
 
+# ⭐ v3.18: 스토리보드 필터 유틸리티 (복합 필터, 프리셋 지원)
+try:
+    from utils.storyboard_filter import (
+        get_bundle_map,
+        get_bundle_representative_ids,
+        has_korean_text,
+        get_korean_text_scene_ids,
+        get_no_image_scene_ids,
+        get_no_video_scene_ids,
+        get_not_generated_scene_ids,
+        apply_filters,
+        apply_complex_filters,
+        get_filter_summary,
+        get_extended_filter_summary,
+        get_scene_tags_only,
+        apply_preset_filter,
+        get_filter_presets,
+        get_filter_info,
+        get_active_filter_labels,
+        FILTER_PRESETS,
+        FILTER_INFO
+    )
+    STORYBOARD_FILTER_AVAILABLE = True
+except ImportError:
+    STORYBOARD_FILTER_AVAILABLE = False
+
 # 이미지 캐시 관리 (MediaFileStorageError 방지)
 try:
     from utils.image_cache import ImageCache, display_image_safe, refresh_session_images
@@ -148,7 +174,11 @@ try:
         get_video_prompt_for_scene,
         get_scene_image_path,
         batch_generate_scene_videos,
-        VIDEO_API_AVAILABLE
+        VIDEO_API_AVAILABLE,
+        # ⭐ v3.22: SRT 기반 비디오 길이 자동 추천
+        get_scene_srt_duration,
+        get_recommended_video_duration,
+        get_batch_duration_info,
     )
     from utils.video_api import ALL_MODELS, PLATFORM_CONFIGS
 except ImportError as e:
@@ -160,10 +190,52 @@ from utils.settings_manager import (
     get_setting,
     set_setting,
     persistent_selectbox,
+    persistent_radio,
+    persistent_checkbox,
     render_settings_management_ui
 )
 
 import subprocess
+
+
+# ============================================================
+# 성능 프로파일링 도구 (v3.18)
+# ============================================================
+
+class Profiler:
+    """간단한 전역 프로파일러"""
+    _start_time = None
+
+    @classmethod
+    def start(cls):
+        import time
+        cls._start_time = time.time()
+
+    @classmethod
+    def log(cls, message: str):
+        import time
+        if cls._start_time is None:
+            cls._start_time = time.time()
+        elapsed = time.time() - cls._start_time
+        print(f"[PROFILER] [{elapsed:.3f}s] {message}", flush=True)
+
+
+class Timer:
+    """컨텍스트 매니저 타이머"""
+    def __init__(self, name: str):
+        self.name = name
+        self.start = None
+
+    def __enter__(self):
+        import time
+        self.start = time.time()
+        return self
+
+    def __exit__(self, *args):
+        import time
+        elapsed = time.time() - self.start
+        if elapsed > 0.05:  # 0.05초 이상만 출력
+            print(f"[TIMER] {self.name}: {elapsed:.3f}s", flush=True)
 
 
 # ============================================================
@@ -323,6 +395,106 @@ def copy_path_to_clipboard(path: str, key: str):
     return True
 
 
+def render_instant_copy_button(text: str, key: str, label: str = "Copy", help_text: str = "클립보드에 복사"):
+    """
+    즉시 클립보드 복사 버튼 렌더링 (v1.3)
+
+    JavaScript로 즉시 복사하고 '✅ 복사됨!' 피드백 표시
+    v1.3: json.dumps()로 안전한 이스케이프 (전체 텍스트 복사 보장)
+
+    Args:
+        text: 복사할 텍스트
+        key: 고유 키
+        label: 버튼 라벨
+        help_text: 툴팁 텍스트
+    """
+    import json
+
+    if not text:
+        st.button(label, disabled=True, key=f"{key}_disabled", help="복사할 내용이 없습니다")
+        return
+
+    # v1.3: json.dumps()로 모든 특수문자 안전하게 이스케이프
+    # 이 방법은 따옴표, 줄바꿈, 유니코드 등 모든 문자를 올바르게 처리
+    safe_text_json = json.dumps(text, ensure_ascii=False)  # "텍스트" 형태 (따옴표 포함)
+
+    btn_id = f"copy_btn_{key}"
+    func_name = key.replace('-', '_').replace('.', '_')
+
+    # HTML + JavaScript 인라인 버튼
+    html_code = f"""
+    <style>
+        #{btn_id} {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 60px;
+        }}
+        #{btn_id}:hover {{
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }}
+        #{btn_id}.copied {{
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }}
+    </style>
+    <button id="{btn_id}" title="{help_text}" onclick="copyPrompt_{func_name}()">
+        {label}
+    </button>
+    <script>
+        function copyPrompt_{func_name}() {{
+            // v1.3: JSON.parse로 안전하게 텍스트 복원 (전체 텍스트 보장)
+            const text = {safe_text_json};
+            const btn = document.getElementById("{btn_id}");
+
+            navigator.clipboard.writeText(text).then(function() {{
+                // 복사 성공
+                btn.innerHTML = "✅ 복사됨!";
+                btn.classList.add("copied");
+                setTimeout(function() {{
+                    btn.innerHTML = "{label}";
+                    btn.classList.remove("copied");
+                }}, 1500);
+            }}).catch(function(err) {{
+                console.error("복사 실패:", err);
+                // 폴백: execCommand 사용
+                try {{
+                    const textarea = document.createElement("textarea");
+                    textarea.value = text;
+                    textarea.style.position = "fixed";
+                    textarea.style.opacity = "0";
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textarea);
+
+                    btn.innerHTML = "✅ 복사됨!";
+                    btn.classList.add("copied");
+                    setTimeout(function() {{
+                        btn.innerHTML = "{label}";
+                        btn.classList.remove("copied");
+                    }}, 1500);
+                }} catch(e) {{
+                    btn.innerHTML = "❌ 실패";
+                    setTimeout(function() {{
+                        btn.innerHTML = "{label}";
+                    }}, 1500);
+                }}
+            }});
+        }}
+    </script>
+    """
+
+    components_js.html(html_code, height=38)
+
+
 def get_backup_path(image_path: Path) -> Path:
     """AI 이미지 백업 경로 반환"""
     backup_dir = image_path.parent / "_ai_backup"
@@ -430,6 +602,15 @@ def invalidate_all_image_caches(full_reset: bool = False):
     st.session_state["image_cache_version"] = current_version + 1
     cleared_count += 1
 
+    # ⭐ v2.3: 이미지 파일 변경 시 항상 캐시 클리어 필요 (실사 이미지 반영 버그 수정)
+    # load_image_files_cached 캐시 항상 클리어
+    try:
+        load_image_files_cached.clear()
+        cleared_count += 1
+        print(f"[스토리보드] 이미지 파일 캐시 클리어됨", flush=True)
+    except Exception:
+        pass
+
     # full_reset이 아니면 여기서 종료 (가벼운 갱신)
     if not full_reset:
         print(f"[스토리보드] 이미지 캐시 갱신 (버전: {current_version + 1})", flush=True)
@@ -437,13 +618,6 @@ def invalidate_all_image_caches(full_reset: bool = False):
 
     # === 아래는 full_reset=True 일 때만 실행 ===
     print(f"[스토리보드] 전체 캐시 초기화 시작...", flush=True)
-
-    # 1. st.cache_data 함수 캐시 클리어
-    try:
-        load_image_files_cached.clear()
-        cleared_count += 1
-    except Exception:
-        pass
 
     # 1-2. 메타데이터 인덱스 캐시 클리어 (v3.17)
     try:
@@ -837,6 +1011,18 @@ def _render_video_conversion_modal(project_path):
             )
 
         st.markdown("---")
+
+        # ⭐ v3.22: SRT 기반 비디오 길이 추천
+        recommended_duration, actual_srt_duration, duration_reason = get_recommended_video_duration(scene)
+
+        if actual_srt_duration is not None:
+            # 실제 SRT/TTS 데이터가 있는 경우
+            st.info(f"📊 **SRT 기반 추천**: 이 씬은 **{actual_srt_duration:.1f}초** → 비디오 **{recommended_duration}초** 추천")
+        else:
+            # TTS 데이터 없음
+            estimated_dur = scene.get("duration_estimate", 5)
+            st.caption(f"💡 TTS 데이터 없음. 추정치 {estimated_dur:.1f}초 기반 → {recommended_duration}초 추천")
+
         st.markdown("**⚙️ 비디오 생성 설정**")
 
         # 페이지 ID (settings_manager용)
@@ -891,10 +1077,13 @@ def _render_video_conversion_modal(project_path):
                 model_config = models.get(selected_model)
                 if model_config and model_config.durations:
                     duration_options = sorted(model_config.durations)
-                    default_idx = (
-                        duration_options.index(model_config.default_duration)
-                        if model_config.default_duration in duration_options else 0
-                    )
+                    # ⭐ v3.22: SRT 추천값이 모델 옵션에 있으면 그것을 기본값으로
+                    if recommended_duration in duration_options:
+                        default_idx = duration_options.index(recommended_duration)
+                    elif model_config.default_duration in duration_options:
+                        default_idx = duration_options.index(model_config.default_duration)
+                    else:
+                        default_idx = 0
                 else:
                     duration_options = [5]
                     default_idx = 0
@@ -902,13 +1091,13 @@ def _render_video_conversion_modal(project_path):
                 duration_options = [5]
                 default_idx = 0
 
-            selected_duration = persistent_selectbox(
+            # ⭐ v3.22: 추천 표시 추가
+            selected_duration = st.selectbox(
                 "⏱️ 비디오 길이",
                 options=duration_options,
-                page=VIDEO_PAGE_ID,
-                setting_key="duration",
-                default_index=default_idx,
-                format_func=lambda x: f"{x}초"
+                index=default_idx,
+                format_func=lambda x: f"{x}초 {'✨추천' if x == recommended_duration else ''}",
+                key=f"video_modal_duration_{scene_id}"
             )
 
         # 비용 예측 및 플랫폼 정보
@@ -996,6 +1185,31 @@ def _render_video_conversion_modal(project_path):
                                 file_name=os.path.basename(video_path),
                                 mime="video/mp4"
                             )
+
+                    # ⭐ v2.4: 프롬프트 뷰어 (최종 프롬프트 확인)
+                    original_prompt = result.get("original_prompt", edited_prompt)
+                    final_prompt = result.get("final_prompt", edited_prompt)
+                    prompt_expanded = result.get("prompt_expanded", False)
+
+                    with st.expander("📝 사용된 프롬프트 보기", expanded=False):
+                        col_info1, col_info2 = st.columns([1, 2])
+
+                        with col_info1:
+                            st.markdown(f"**플랫폼:** {result.get('platform', 'N/A')}")
+                            st.markdown(f"**모델:** {result.get('model', 'N/A')}")
+                            st.markdown(f"**비용:** ${result.get('cost_usd', 0):.3f}")
+                            st.markdown(f"**생성 시간:** {result.get('generation_time', 0):.1f}초")
+
+                        with col_info2:
+                            if prompt_expanded:
+                                st.info("🔄 프롬프트가 AI에 의해 자동 확장되었습니다")
+
+                            st.markdown("**원본 프롬프트:**")
+                            st.code(original_prompt[:200] + "..." if len(original_prompt) > 200 else original_prompt, language=None)
+
+                            if final_prompt and final_prompt != original_prompt:
+                                st.markdown("**최종 프롬프트 (AI 확장):**")
+                                st.code(final_prompt[:300] + "..." if len(final_prompt) > 300 else final_prompt, language=None)
                 else:
                     st.error(f"❌ 비디오 생성 실패: {result.get('error', 'Unknown error')}")
 
@@ -1315,12 +1529,22 @@ def render_ai_video_generation_section(scenes: list, project_path, visual_manage
         disabled=len(selected_scenes) == 0 or not selected_model,
         key="ai_video_generate"
     ):
-        progress_bar = st.progress(0)
-        status_text = st.empty()
+        # ⭐ v2.4: 향상된 프로그레스 표시
+        progress_container = st.container()
+        with progress_container:
+            progress_bar = st.progress(0)
+            col_status, col_count = st.columns([3, 1])
+            status_text = col_status.empty()
+            count_text = col_count.empty()
+
+        # 예상 비용 (단가)
+        unit_cost = estimate.get("cost_usd", 0) if estimate else 0
 
         def progress_callback(current, total, message):
-            progress_bar.progress((current + 1) / total)
+            progress_pct = (current + 1) / total if total > 0 else 0
+            progress_bar.progress(progress_pct)
             status_text.text(message)
+            count_text.markdown(f"**{current + 1}/{total}** ({int(progress_pct * 100)}%)")
 
         # 선택된 씬의 scene 데이터 리스트 추출
         scenes_to_process = [s["scene"] for s in selected_scenes]
@@ -1338,15 +1562,17 @@ def render_ai_video_generation_section(scenes: list, project_path, visual_manage
             )
 
         progress_bar.progress(1.0)
-        status_text.text("완료!")
+        status_text.text("✅ 완료!")
+        count_text.markdown(f"**{len(selected_scenes)}/{len(selected_scenes)}** (100%)")
 
         # 결과 표시
         success_count = sum(1 for r in results if r.get("success"))
         fail_count = len(results) - success_count
         total_cost = sum(r.get("cost_usd", 0) for r in results if r.get("success"))
+        total_time = sum(r.get("generation_time", 0) for r in results if r.get("success"))
 
         if success_count > 0:
-            st.success(f"✅ {success_count}개 비디오 생성 성공! (총 비용: ${total_cost:.2f})")
+            st.success(f"✅ {success_count}개 비디오 생성 성공! (총 비용: ${total_cost:.2f}, 총 시간: {total_time:.1f}초)")
 
         if fail_count > 0:
             st.error(f"❌ {fail_count}개 비디오 생성 실패")
@@ -1355,6 +1581,44 @@ def render_ai_video_generation_section(scenes: list, project_path, visual_manage
                 for r in results:
                     if not r.get("success"):
                         st.markdown(f"- 씬 {r.get('scene_id')}: {r.get('error')}")
+
+        # ⭐ v2.4: 성공 결과 상세 정보 (프롬프트 뷰어 포함)
+        success_results = [r for r in results if r.get("success")]
+        if success_results:
+            with st.expander("📝 생성 상세 정보 및 사용된 프롬프트", expanded=False):
+                for r in success_results:
+                    scene_id = r.get("scene_id", "?")
+                    st.markdown(f"### 씬 {scene_id}")
+
+                    col1, col2 = st.columns([1, 2])
+
+                    with col1:
+                        st.markdown(f"**모델:** {r.get('model', 'N/A')}")
+                        st.markdown(f"**비용:** ${r.get('cost_usd', 0):.3f}")
+                        st.markdown(f"**생성 시간:** {r.get('generation_time', 0):.1f}초")
+
+                    with col2:
+                        # 프롬프트 정보
+                        original_prompt = r.get("original_prompt", "")
+                        final_prompt = r.get("final_prompt", "")
+                        prompt_expanded = r.get("prompt_expanded", False)
+
+                        if prompt_expanded:
+                            st.info("🔄 프롬프트가 AI에 의해 확장되었습니다")
+
+                        st.markdown("**원본 프롬프트:**")
+                        st.code(original_prompt[:200] + "..." if len(original_prompt) > 200 else original_prompt, language=None)
+
+                        if final_prompt and final_prompt != original_prompt:
+                            st.markdown("**최종 프롬프트 (AI 확장):**")
+                            st.code(final_prompt[:300] + "..." if len(final_prompt) > 300 else final_prompt, language=None)
+
+                    st.divider()
+
+        # 세션에 결과 저장 (나중에 확인용)
+        if "video_generation_history" not in st.session_state:
+            st.session_state.video_generation_history = []
+        st.session_state.video_generation_history.extend(results)
 
         st.rerun()
 
@@ -2190,7 +2454,7 @@ init_media_cache()
 # 이미지 로딩 캐시 (중복 로드 방지)
 # ============================================================
 @st.cache_data(ttl=300, show_spinner=False)  # ⭐ TTL 5분으로 증가
-def load_image_files_cached(backgrounds_dir: str, scenes_dir: str, content_dir: str, _cache_key: str = "") -> tuple:
+def load_image_files_cached(backgrounds_dir: str, scenes_dir: str, content_dir: str, cache_key: str = "") -> tuple:
     """
     이미지 파일 목록 캐싱 (중복 로드 방지)
 
@@ -2198,14 +2462,17 @@ def load_image_files_cached(backgrounds_dir: str, scenes_dir: str, content_dir: 
         backgrounds_dir: 배경 이미지 폴더
         scenes_dir: 씬 이미지 폴더
         content_dir: 콘텐츠 이미지 폴더
-        _cache_key: 캐시 무효화용 키 (폴더 mtime 등)
+        cache_key: 캐시 무효화용 키 (폴더 mtime 등) - v2.3: _cache_key → cache_key (해시 포함)
     """
     import re
 
     image_files = []
 
-    # 우선순위: backgrounds > scenes > content
+    # ⭐ v2.3: 실사 이미지 폴더 추가 (우선순위 최상위)
+    # 우선순위: real > backgrounds > scenes > content
+    real_dir = Path(backgrounds_dir).parent / "real"  # images/real
     dirs_to_search = [
+        (real_dir, "real"),  # ⭐ 실사 이미지 최우선
         (Path(backgrounds_dir), "backgrounds"),
         (Path(scenes_dir), "scenes"),
         (Path(content_dir), "content"),
@@ -2229,8 +2496,9 @@ def load_image_files_cached(backgrounds_dir: str, scenes_dir: str, content_dir: 
     seen_scene_ids = set()
     unique_images = []
 
+    # ⭐ v2.3: 실사 이미지 패턴 추가 (real_scene_002.jpg 등)
     # 씬 번호 추출 패턴 (AI 매핑 파일명 "001_scene.jpg" 포함)
-    patterns = [r'bg[_-]?scene[_-]?(\d+)', r'scene[_-]?(\d+)', r'^(\d+)[_-]', r'^(\d+)$', r'[_-](\d+)$']
+    patterns = [r'real[_-]?scene[_-]?(\d+)', r'bg[_-]?scene[_-]?(\d+)', r'scene[_-]?(\d+)', r'^(\d+)[_-]', r'^(\d+)$', r'[_-](\d+)$']
 
     for img, mtime in image_files:
         # 씬 번호 추출
@@ -2290,6 +2558,7 @@ if not ensure_project_selected():
 
 project_path = get_current_project()
 project_config = get_current_project_config()
+Profiler.log("🗂️ 프로젝트 로드 완료")
 
 st.title("📋 8단계: 스토리보드")
 st.caption("씬별 이미지, 스크립트, TTS를 한눈에 확인하고 편집")
@@ -2473,1465 +2742,669 @@ with tab_manual:
 # === 인포그래픽 탭 ===
 if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
     with tab_infographic:
-        st.subheader("📊 인포그래픽 동영상 통합")
+        Profiler.log("📊 인포그래픽 탭 시작")
 
-        st.info("""
-        💡 **인포그래픽 동영상 통합 모드 v2**
-        - **UI 표시**: 인포그래픽 첫 프레임 이미지 (썸네일)
-        - **내보내기**: CSS 애니메이션을 녹화한 MP4 동영상
-        - **캐릭터 합성**: 동영상 전체에 캐릭터 PNG 오버레이
-        """)
+        # ⭐ 성능 최적화: Lazy Loading (항상 비활성으로 시작)
+        _infographic_active_key = f"infographic_active_{project_path}"
 
-        # 선택 매니저 초기화
-        if "visual_manager" not in st.session_state:
-            st.session_state.visual_manager = VisualSelectionManager(str(project_path))
-        visual_manager = st.session_state.visual_manager
+        # 활성화 여부 체크 - 항상 비활성으로 시작하여 5초+ 지연 방지
+        if _infographic_active_key not in st.session_state:
+            st.session_state[_infographic_active_key] = False  # ⭐ 항상 비활성 시작
 
-        # 인포그래픽 데이터 상태
-        infographic_data = visual_manager.get_infographic_data()
+        # Lazy Loading UI (비활성 상태)
+        if not st.session_state.get(_infographic_active_key, False):
+            st.subheader("📊 인포그래픽 동영상 통합")
+            st.info("⚡ **성능 최적화**: 이 탭은 무거운 기능을 포함하고 있어 필요할 때만 로드합니다.")
+            st.markdown("**포함된 기능:** HTML 업로드, 썸네일/동영상 생성, 캐릭터 합성, 씬별 시각자료 선택")
 
-        # 렌더링 환경 상태 확인 (Selenium 기반)
-        env_status = check_environment()
-        ffmpeg_ok = env_status.get("ffmpeg", False)
-        selenium_ok = env_status.get("selenium", False)
+            if st.button("🚀 인포그래픽 탭 활성화", type="primary", use_container_width=True):
+                st.session_state[_infographic_active_key] = True
+                st.rerun()
 
-        # 환경 상태 표시 (접을 수 있는 형태)
-        with st.expander("🔧 렌더링 환경 상태 (Selenium 기반)", expanded=False):
-            env_col1, env_col2, env_col3 = st.columns(3)
-            with env_col1:
-                sel_icon = "✅" if selenium_ok else "❌"
-                st.metric("Selenium", sel_icon)
-            with env_col2:
-                pil_icon = "✅" if env_status.get("pillow") else "❌"
-                st.metric("Pillow", pil_icon)
-            with env_col3:
-                ff_icon = "✅" if ffmpeg_ok else "❌"
-                st.metric("FFmpeg", ff_icon)
+            Profiler.log("📊 인포그래픽 탭 종료 (비활성 - 빠름)")
 
-            if selenium_ok:
-                st.success("✅ Selenium WebDriver 사용 가능")
+        # === 활성화된 인포그래픽 탭 콘텐츠 ===
+        if st.session_state.get(_infographic_active_key, False):
+            # 헤더 + 비활성화 버튼
+            _header_col, _deactivate_col = st.columns([5, 1])
+            with _header_col:
+                st.subheader("📊 인포그래픽 동영상 통합")
+            with _deactivate_col:
+                if st.button("⏸️ 비활성화", key="btn_deactivate_infographic", help="인포그래픽 기능을 비활성화하여 페이지 로딩 속도를 높입니다"):
+                    st.session_state[_infographic_active_key] = False
+                    st.rerun()
+
+            st.info("""
+            💡 **인포그래픽 동영상 통합 모드 v2**
+            - **UI 표시**: 인포그래픽 첫 프레임 이미지 (썸네일)
+            - **내보내기**: CSS 애니메이션을 녹화한 MP4 동영상
+            - **캐릭터 합성**: 동영상 전체에 캐릭터 PNG 오버레이
+            """)
+
+            # 선택 매니저 초기화
+            with Timer("VisualSelectionManager 초기화"):
+                if "visual_manager" not in st.session_state:
+                    st.session_state.visual_manager = VisualSelectionManager(str(project_path))
+                visual_manager = st.session_state.visual_manager
+
+            # 인포그래픽 데이터 상태
+            infographic_data = visual_manager.get_infographic_data()
+
+            # 렌더링 환경 상태 확인 (Selenium 기반)
+            with Timer("check_environment"):
+                env_status = check_environment()
+            ffmpeg_ok = env_status.get("ffmpeg", False)
+            selenium_ok = env_status.get("selenium", False)
+
+            # 환경 상태 표시 (접을 수 있는 형태)
+            with st.expander("🔧 렌더링 환경 상태 (Selenium 기반)", expanded=False):
+                env_col1, env_col2, env_col3 = st.columns(3)
+                with env_col1:
+                    sel_icon = "✅" if selenium_ok else "❌"
+                    st.metric("Selenium", sel_icon)
+                with env_col2:
+                    pil_icon = "✅" if env_status.get("pillow") else "❌"
+                    st.metric("Pillow", pil_icon)
+                with env_col3:
+                    ff_icon = "✅" if ffmpeg_ok else "❌"
+                    st.metric("FFmpeg", ff_icon)
+
+                if selenium_ok:
+                    st.success("✅ Selenium WebDriver 사용 가능")
+                else:
+                    st.error("❌ Selenium이 설치되지 않았습니다.")
+                    st.code("pip install selenium webdriver-manager pillow", language="bash")
+
+            if not ffmpeg_ok:
+                st.warning("⚠️ FFmpeg이 설치되지 않았습니다. 동영상 녹화 및 합성을 위해 FFmpeg을 설치하세요.")
+
+            # === 1. 인포그래픽 HTML 업로드 섹션 ===
+            st.markdown("### 📁 1. 인포그래픽 HTML 업로드")
+
+            upload_method = st.radio(
+                "업로드 방식",
+                ["파일 업로드", "HTML 코드 붙여넣기"],
+                horizontal=True,
+                key="html_upload_method"
+            )
+
+            html_content = None
+            html_filename = "infographic.html"
+
+            if upload_method == "파일 업로드":
+                uploaded_html = st.file_uploader(
+                    "인포그래픽 HTML 파일",
+                    type=["html", "htm"],
+                    help="sceneData 배열이 포함된 HTML 파일을 업로드하세요",
+                    key="infographic_html_upload"
+                )
+                if uploaded_html:
+                    html_content = uploaded_html.read().decode("utf-8")
+                    html_filename = uploaded_html.name
             else:
-                st.error("❌ Selenium이 설치되지 않았습니다.")
-                st.code("pip install selenium webdriver-manager pillow", language="bash")
+                html_text = st.text_area(
+                    "HTML 코드",
+                    height=200,
+                    placeholder="<!DOCTYPE html>...",
+                    key="infographic_html_paste"
+                )
+                if html_text.strip():
+                    html_content = html_text
 
-        if not ffmpeg_ok:
-            st.warning("⚠️ FFmpeg이 설치되지 않았습니다. 동영상 녹화 및 합성을 위해 FFmpeg을 설치하세요.")
+            if html_content:
+                try:
+                    # 상세 파싱 정보 가져오기
+                    parse_info = get_parsing_info(html_content)
 
-        # === 1. 인포그래픽 HTML 업로드 섹션 ===
-        st.markdown("### 📁 1. 인포그래픽 HTML 업로드")
+                    if parse_info["success"]:
+                        parsed_data = parse_info["data"]
 
-        upload_method = st.radio(
-            "업로드 방식",
-            ["파일 업로드", "HTML 코드 붙여넣기"],
-            horizontal=True,
-            key="html_upload_method"
-        )
+                        st.success(f"✅ {parse_info['scene_count']}개 씬 파싱 완료!")
 
-        html_content = None
-        html_filename = "infographic.html"
+                        # 파싱 형식 표시
+                        format_col1, format_col2 = st.columns(2)
+                        with format_col1:
+                            st.caption(f"📄 감지된 형식: **{parse_info['format_name']}**")
+                        with format_col2:
+                            if parse_info["animated_count"] > 0:
+                                st.caption(f"🎬 애니메이션 포함: {parse_info['animated_count']}개 씬")
 
-        if upload_method == "파일 업로드":
-            uploaded_html = st.file_uploader(
-                "인포그래픽 HTML 파일",
-                type=["html", "htm"],
-                help="sceneData 배열이 포함된 HTML 파일을 업로드하세요",
-                key="infographic_html_upload"
-            )
-            if uploaded_html:
-                html_content = uploaded_html.read().decode("utf-8")
-                html_filename = uploaded_html.name
-        else:
-            html_text = st.text_area(
-                "HTML 코드",
-                height=200,
-                placeholder="<!DOCTYPE html>...",
-                key="infographic_html_paste"
-            )
-            if html_text.strip():
-                html_content = html_text
+                        # 미리보기
+                        with st.expander("📋 파싱된 씬 미리보기", expanded=True):
+                            for scene in parsed_data.scenes[:5]:
+                                col1, col2 = st.columns([1, 3])
+                                with col1:
+                                    st.markdown(f"**씬 {scene.scene_id}**")
+                                    if scene.chart_type:
+                                        st.caption(f"📊 {scene.chart_type}")
+                                    if scene.comment:
+                                        st.caption(f"📝 {scene.comment}")
+                                with col2:
+                                    st.markdown(f"**{scene.text[:50]}...**" if len(scene.text) > 50 else f"**{scene.text}**")
+                                    if scene.sub:
+                                        st.caption(scene.sub[:100] + "..." if len(scene.sub) > 100 else scene.sub)
+                                    if scene.icons:
+                                        st.caption(f"🎨 아이콘: {', '.join(scene.icons[:3])}")
 
-        if html_content:
-            try:
-                # 상세 파싱 정보 가져오기
-                parse_info = get_parsing_info(html_content)
+                            if len(parsed_data.scenes) > 5:
+                                st.caption(f"... 외 {len(parsed_data.scenes) - 5}개 씬")
 
-                if parse_info["success"]:
-                    parsed_data = parse_info["data"]
+                        # 저장 버튼
+                        if st.button("💾 인포그래픽 저장", type="primary", key="save_infographic"):
+                            # 인포그래픽 디렉토리 생성
+                            infographic_dir = project_path / "infographics"
+                            infographic_dir.mkdir(parents=True, exist_ok=True)
 
-                    st.success(f"✅ {parse_info['scene_count']}개 씬 파싱 완료!")
+                            # HTML 파일 저장
+                            html_path = infographic_dir / html_filename
+                            with open(html_path, "w", encoding="utf-8") as f:
+                                f.write(html_content)
 
-                    # 파싱 형식 표시
-                    format_col1, format_col2 = st.columns(2)
-                    with format_col1:
-                        st.caption(f"📄 감지된 형식: **{parse_info['format_name']}**")
-                    with format_col2:
-                        if parse_info["animated_count"] > 0:
-                            st.caption(f"🎬 애니메이션 포함: {parse_info['animated_count']}개 씬")
+                            # 데이터 저장
+                            parsed_data.source_path = str(html_path)
+                            visual_manager.set_infographic_data(parsed_data)
 
-                    # 미리보기
-                    with st.expander("📋 파싱된 씬 미리보기", expanded=True):
-                        for scene in parsed_data.scenes[:5]:
-                            col1, col2 = st.columns([1, 3])
-                            with col1:
-                                st.markdown(f"**씬 {scene.scene_id}**")
-                                if scene.chart_type:
-                                    st.caption(f"📊 {scene.chart_type}")
-                                if scene.comment:
-                                    st.caption(f"📝 {scene.comment}")
-                            with col2:
-                                st.markdown(f"**{scene.text[:50]}...**" if len(scene.text) > 50 else f"**{scene.text}**")
-                                if scene.sub:
-                                    st.caption(scene.sub[:100] + "..." if len(scene.sub) > 100 else scene.sub)
-                                if scene.icons:
-                                    st.caption(f"🎨 아이콘: {', '.join(scene.icons[:3])}")
+                            # ✅ 개별 씬 편집기 캐시 초기화 (새 HTML로 동기화 보장)
+                            if "scene_html_editor" in st.session_state:
+                                del st.session_state["scene_html_editor"]
+                            if "scene_editor_source" in st.session_state:
+                                del st.session_state["scene_editor_source"]
+                            if "scene_editor_html_hash" in st.session_state:
+                                del st.session_state["scene_editor_html_hash"]
 
-                        if len(parsed_data.scenes) > 5:
-                            st.caption(f"... 외 {len(parsed_data.scenes) - 5}개 씬")
+                            st.success("인포그래픽 데이터가 저장되었습니다!")
+                            st.rerun()
+                    else:
+                        st.error(f"❌ 파싱 실패: {parse_info['message']}")
 
-                    # 저장 버튼
-                    if st.button("💾 인포그래픽 저장", type="primary", key="save_infographic"):
-                        # 인포그래픽 디렉토리 생성
-                        infographic_dir = project_path / "infographics"
-                        infographic_dir.mkdir(parents=True, exist_ok=True)
+                        # 디버깅 힌트 표시
+                        with st.expander("🔧 문제 해결 힌트"):
+                            st.markdown("""
+                            **지원되는 HTML 형식:**
 
-                        # HTML 파일 저장
-                        html_path = infographic_dir / html_filename
-                        with open(html_path, "w", encoding="utf-8") as f:
-                            f.write(html_content)
+                            **1. JavaScript sceneData 배열**
+                            ```javascript
+                            const sceneData = [
+                                { id: 1, text: "메인 텍스트", sub: "서브 텍스트" },
+                                { id: 2, text: "두 번째 씬", sub: "설명" },
+                                ...
+                            ];
+                            ```
 
-                        # 데이터 저장
-                        parsed_data.source_path = str(html_path)
-                        visual_manager.set_infographic_data(parsed_data)
+                            **2. HTML scene 요소**
+                            ```html
+                            <!-- 씬 1: 설명 -->
+                            <div class="scene" id="scene1">
+                                <h1>메인 텍스트</h1>
+                                <p>서브 텍스트</p>
+                            </div>
+                            ```
 
-                        # ✅ 개별 씬 편집기 캐시 초기화 (새 HTML로 동기화 보장)
-                        if "scene_html_editor" in st.session_state:
-                            del st.session_state["scene_html_editor"]
-                        if "scene_editor_source" in st.session_state:
-                            del st.session_state["scene_editor_source"]
-                        if "scene_editor_html_hash" in st.session_state:
-                            del st.session_state["scene_editor_html_hash"]
+                            **확인 사항:**
+                            - HTML 코드가 완전히 복사되었는지 확인
+                            - `<div class="scene" id="sceneN">` 형식의 요소가 있는지 확인
+                            - 또는 `sceneData = [...]` JavaScript 배열이 있는지 확인
+                            - BeautifulSoup이 설치되어 있는지 확인: `pip install beautifulsoup4`
+                            """)
 
-                        st.success("인포그래픽 데이터가 저장되었습니다!")
+                except Exception as e:
+                    st.error(f"파일 처리 오류: {str(e)}")
+
+            st.divider()
+
+            # === 2. 저장된 인포그래픽 관리 ===
+            if infographic_data:
+                st.markdown("### 📊 2. 저장된 인포그래픽")
+
+                # 상태 메트릭
+                thumbnail_ready = len([s for s in infographic_data.scenes if s.is_thumbnail_ready])
+                video_ready = len([s for s in infographic_data.scenes if s.is_video_ready])
+                composite_ready = len([s for s in infographic_data.scenes if s.is_composite_ready])
+
+                info_col1, info_col2, info_col3, info_col4 = st.columns(4)
+                with info_col1:
+                    st.metric("총 씬 수", infographic_data.total_scenes)
+                with info_col2:
+                    st.metric("썸네일", f"{thumbnail_ready}/{infographic_data.total_scenes}")
+                with info_col3:
+                    st.metric("동영상", f"{video_ready}/{infographic_data.total_scenes}")
+                with info_col4:
+                    st.metric("합성", f"{composite_ready}/{infographic_data.total_scenes}")
+
+                st.caption(f"📁 소스: {Path(infographic_data.source_path).name if infographic_data.source_path else '없음'}")
+
+                st.divider()
+
+                # === 2.3. 개별 씬 HTML 편집 ===
+                with st.expander("✏️ 개별 씬 HTML 편집", expanded=False):
+                    render_scene_editor_section(infographic_data, project_path, visual_manager)
+
+                st.divider()
+
+                # === 2.5. 배경 이미지 대체 === (⭐ 성능 최적화: 버튼 클릭 시에만 로드)
+                _bg_section_key = f"show_bg_replacement_{project_path}"
+                st.markdown("### 🖼️ 2.5 배경 이미지 대체")
+                if not st.session_state.get(_bg_section_key, False):
+                    st.caption("인포그래픽 HTML의 배경 이미지를 대체합니다.")
+                    if st.button("🖼️ 배경 대체 기능 열기", key="btn_open_bg_replace"):
+                        st.session_state[_bg_section_key] = True
                         st.rerun()
                 else:
-                    st.error(f"❌ 파싱 실패: {parse_info['message']}")
+                    if st.button("🔼 접기", key="btn_close_bg_replace"):
+                        st.session_state[_bg_section_key] = False
+                        st.rerun()
+                    render_background_replacement_section(infographic_data, project_path, visual_manager)
 
-                    # 디버깅 힌트 표시
-                    with st.expander("🔧 문제 해결 힌트"):
-                        st.markdown("""
-                        **지원되는 HTML 형식:**
+                st.divider()
 
-                        **1. JavaScript sceneData 배열**
-                        ```javascript
-                        const sceneData = [
-                            { id: 1, text: "메인 텍스트", sub: "서브 텍스트" },
-                            { id: 2, text: "두 번째 씬", sub: "설명" },
-                            ...
-                        ];
-                        ```
+                # === 2.6. AI 비디오 생성 === (⭐ 성능 최적화: 버튼 클릭 시에만 로드)
+                _ai_video_section_key = f"show_ai_video_{project_path}"
+                st.markdown("### 🎬 2.6 AI 비디오 생성")
+                if not st.session_state.get(_ai_video_section_key, False):
+                    st.caption("씬 이미지를 AI Video API로 변환하여 동영상을 생성합니다.")
+                    if st.button("🎬 AI 비디오 기능 열기", key="btn_open_ai_video"):
+                        st.session_state[_ai_video_section_key] = True
+                        st.rerun()
+                else:
+                    if st.button("🔼 접기", key="btn_close_ai_video"):
+                        st.session_state[_ai_video_section_key] = False
+                        st.rerun()
+                    # InfographicScene 객체를 딕셔너리로 변환하여 전달
+                    scenes_for_video = [
+                        s.to_dict() if hasattr(s, 'to_dict') else s
+                        for s in infographic_data.scenes
+                    ]
+                    render_ai_video_generation_section(scenes_for_video, project_path, visual_manager)
 
-                        **2. HTML scene 요소**
-                        ```html
-                        <!-- 씬 1: 설명 -->
-                        <div class="scene" id="scene1">
-                            <h1>메인 텍스트</h1>
-                            <p>서브 텍스트</p>
-                        </div>
-                        ```
+                st.divider()
 
-                        **확인 사항:**
-                        - HTML 코드가 완전히 복사되었는지 확인
-                        - `<div class="scene" id="sceneN">` 형식의 요소가 있는지 확인
-                        - 또는 `sceneData = [...]` JavaScript 배열이 있는지 확인
-                        - BeautifulSoup이 설치되어 있는지 확인: `pip install beautifulsoup4`
-                        """)
+                # === 3. 썸네일 생성 ===
+                st.markdown("### 🖼️ 3. 썸네일 생성 (UI 표시용)")
+                st.caption("각 씬의 첫 프레임을 캡처하여 썸네일 이미지 생성")
+                scene_count = infographic_data.total_scenes
 
-            except Exception as e:
-                st.error(f"파일 처리 오류: {str(e)}")
+                # 씬 선택 옵션
+                thumb_mode_col, thumb_select_col = st.columns([1, 2])
 
-        st.divider()
+                with thumb_mode_col:
+                    thumb_gen_mode = st.radio(
+                        "생성 범위",
+                        ["전체 씬", "범위 선택", "개별 선택"],
+                        key="thumb_gen_mode",
+                        horizontal=False
+                    )
 
-        # === 2. 저장된 인포그래픽 관리 ===
-        if infographic_data:
-            st.markdown("### 📊 2. 저장된 인포그래픽")
+                with thumb_select_col:
+                    if thumb_gen_mode == "범위 선택":
+                        thumb_range = st.slider(
+                            "씬 범위",
+                            min_value=1,
+                            max_value=scene_count,
+                            value=(1, min(10, scene_count)),
+                            key="thumb_range_slider"
+                        )
+                        selected_thumb_indices = list(range(thumb_range[0] - 1, thumb_range[1]))
+                        st.info(f"씬 {thumb_range[0]} ~ {thumb_range[1]} 선택됨 ({len(selected_thumb_indices)}개)")
 
-            # 상태 메트릭
-            thumbnail_ready = len([s for s in infographic_data.scenes if s.is_thumbnail_ready])
-            video_ready = len([s for s in infographic_data.scenes if s.is_video_ready])
-            composite_ready = len([s for s in infographic_data.scenes if s.is_composite_ready])
+                    elif thumb_gen_mode == "개별 선택":
+                        # 멀티셀렉트
+                        scene_options = [f"씬 {i+1}" for i in range(scene_count)]
+                        default_selected = scene_options[:min(5, scene_count)]
+                        selected_labels = st.multiselect(
+                            "생성할 씬 선택",
+                            options=scene_options,
+                            default=default_selected,
+                            key="thumb_scene_multiselect"
+                        )
+                        selected_thumb_indices = [int(s.replace("씬 ", "")) - 1 for s in selected_labels]
+                        st.info(f"{len(selected_thumb_indices)}개 씬 선택됨")
+                    else:
+                        selected_thumb_indices = list(range(scene_count))
+                        st.info(f"전체 {scene_count}개 씬 선택됨")
 
-            info_col1, info_col2, info_col3, info_col4 = st.columns(4)
-            with info_col1:
-                st.metric("총 씬 수", infographic_data.total_scenes)
-            with info_col2:
-                st.metric("썸네일", f"{thumbnail_ready}/{infographic_data.total_scenes}")
-            with info_col3:
-                st.metric("동영상", f"{video_ready}/{infographic_data.total_scenes}")
-            with info_col4:
-                st.metric("합성", f"{composite_ready}/{infographic_data.total_scenes}")
+                thumb_col1, thumb_col2 = st.columns(2)
+                with thumb_col1:
+                    if st.button("🖼️ 썸네일 생성", type="primary", use_container_width=True, key="generate_thumbnails"):
+                        if not selected_thumb_indices:
+                            st.error("생성할 씬을 선택하세요.")
+                        else:
+                            try:
+                                output_dir = str(project_path / "infographics" / "thumbnails")
+                                os.makedirs(output_dir, exist_ok=True)
 
-            st.caption(f"📁 소스: {Path(infographic_data.source_path).name if infographic_data.source_path else '없음'}")
+                                progress_bar = st.progress(0)
+                                status_text = st.empty()
 
-            st.divider()
+                                if thumb_gen_mode == "전체 씬":
+                                    # 기존 전체 생성 로직
+                                    def thumb_progress(current, total, message):
+                                        progress_bar.progress(current / total)
+                                        status_text.text(message)
 
-            # === 2.3. 개별 씬 HTML 편집 ===
-            with st.expander("✏️ 개별 씬 HTML 편집", expanded=False):
-                render_scene_editor_section(infographic_data, project_path, visual_manager)
+                                    results = factory_generate_thumbnails(
+                                        infographic_data,
+                                        output_dir=output_dir,
+                                        progress_callback=thumb_progress
+                                    )
 
-            st.divider()
+                                    success = sum(1 for v in results.values() if v)
+                                    fail = len(results) - success
+                                else:
+                                    # 선택적 생성 로직
+                                    from utils.infographic_thumbnail import generate_selected_thumbnails_sync
 
-            # === 2.5. 배경 이미지 대체 ===
-            render_background_replacement_section(infographic_data, project_path, visual_manager)
+                                    def thumb_progress(current, total):
+                                        progress_bar.progress(current / total)
+                                        status_text.text(f"씬 {selected_thumb_indices[current-1]+1} 완료 ({current}/{total})")
 
-            st.divider()
+                                    results = generate_selected_thumbnails_sync(
+                                        html_content=infographic_data.html_code,
+                                        scene_indices=selected_thumb_indices,
+                                        output_dir=output_dir,
+                                        progress_callback=thumb_progress
+                                    )
 
-            # === 2.6. AI 비디오 생성 ===
-            # InfographicScene 객체를 딕셔너리로 변환하여 전달
-            scenes_for_video = [
-                s.to_dict() if hasattr(s, 'to_dict') else s
-                for s in infographic_data.scenes
-            ]
-            render_ai_video_generation_section(scenes_for_video, project_path, visual_manager)
+                                    success = len(results)
+                                    fail = len(selected_thumb_indices) - success
 
-            st.divider()
+                                progress_bar.progress(1.0)
+                                status_text.text(f"완료! 성공: {success}, 실패: {fail}")
 
-            # === 3. 썸네일 생성 ===
-            st.markdown("### 🖼️ 3. 썸네일 생성 (UI 표시용)")
-            st.caption("각 씬의 첫 프레임을 캡처하여 썸네일 이미지 생성")
+                                visual_manager.set_infographic_data(infographic_data)
+                                st.success(f"✅ {success}개 썸네일 생성 완료!")
 
-            scene_count = infographic_data.total_scenes
+                                if fail > 0:
+                                    st.warning(f"⚠️ {fail}개 씬 실패")
 
-            # 씬 선택 옵션
-            thumb_mode_col, thumb_select_col = st.columns([1, 2])
+                                st.rerun()
 
-            with thumb_mode_col:
-                thumb_gen_mode = st.radio(
-                    "생성 범위",
-                    ["전체 씬", "범위 선택", "개별 선택"],
-                    key="thumb_gen_mode",
-                    horizontal=False
-                )
+                            except RuntimeError as e:
+                                st.error(f"렌더러 오류: {str(e)}")
+                                with st.expander("🔧 설치 방법"):
+                                    st.markdown("""
+                                    **Selenium WebDriver 설치:**
 
-            with thumb_select_col:
-                if thumb_gen_mode == "범위 선택":
-                    thumb_range = st.slider(
+                                    ```bash
+                                    pip install selenium webdriver-manager pillow
+                                    ```
+
+                                    Chrome 브라우저가 설치되어 있어야 합니다.
+                                    ChromeDriver는 자동으로 다운로드됩니다.
+                                    """)
+                            except Exception as e:
+                                st.error(f"썸네일 생성 오류: {str(e)}")
+
+                with thumb_col2:
+                    if st.button("🗑️ 인포그래픽 삭제", use_container_width=True, key="clear_infographic"):
+                        visual_manager.state.infographic_data = None
+                        visual_manager.save_state()
+                        st.success("인포그래픽 데이터가 삭제되었습니다.")
+                        st.rerun()
+
+                # 썸네일 미리보기
+                thumbnail_scenes = [s for s in infographic_data.scenes if s.is_thumbnail_ready]
+                if thumbnail_scenes:
+                    with st.expander(f"🖼️ 썸네일 미리보기 ({len(thumbnail_scenes)}개)", expanded=False):
+                        cols_per_row = 4
+                        for row_start in range(0, len(thumbnail_scenes), cols_per_row):
+                            cols = st.columns(cols_per_row)
+                            for j, col in enumerate(cols):
+                                idx = row_start + j
+                                if idx >= len(thumbnail_scenes):
+                                    break
+                                scene = thumbnail_scenes[idx]
+                                with col:
+                                    thumb = scene.thumbnail_path or scene.first_frame_path
+                                    if thumb and os.path.exists(thumb):
+                                        st.image(thumb, caption=f"씬 {scene.scene_id}")
+                                    else:
+                                        st.info(f"씬 {scene.scene_id}")
+
+                st.divider()
+
+                # === 4. 동영상 녹화 ===
+                st.markdown("### 🎬 4. 동영상 녹화 (내보내기용)")
+                st.caption("Selenium + FFmpeg 기반 MP4 동영상 녹화 (중앙정렬 + 고화질)")
+
+                # 화질 프리셋 정보
+                QUALITY_OPTIONS = {
+                    "⚡ 미리보기 (480p)": {"key": "preview", "time_factor": 0.5, "size_mb": 0.5},
+                    "📺 표준 (720p)": {"key": "standard", "time_factor": 1.0, "size_mb": 1.0},
+                    "🎬 고화질 (1080p)": {"key": "high", "time_factor": 1.5, "size_mb": 2.0},
+                    "🌟 초고화질 (1080p+)": {"key": "ultra", "time_factor": 3.0, "size_mb": 4.0},
+                }
+
+                # 설정 행 1: 화질 + 시간
+                video_set_row1_col1, video_set_row1_col2 = st.columns([2, 1])
+
+                with video_set_row1_col1:
+                    video_quality_label = st.selectbox(
+                        "🎥 화질 선택",
+                        options=list(QUALITY_OPTIONS.keys()),
+                        index=2,  # 기본: 고화질
+                        key="video_quality_select",
+                        help="미리보기: 빠른 테스트용\n표준: 일반적인 용도\n고화질: 유튜브 권장\n초고화질: 최상의 품질 (느림)"
+                    )
+                    video_quality = QUALITY_OPTIONS[video_quality_label]["key"]
+
+                with video_set_row1_col2:
+                    video_duration = st.slider(
+                        "🕐 씬당 재생 시간 (초)",
+                        min_value=1,
+                        max_value=15,
+                        value=5,
+                        step=1,
+                        key="video_duration"
+                    )
+
+                # 설정 행 2: 생성 범위 + 방식
+                video_set_row2_col1, video_set_row2_col2 = st.columns(2)
+
+                with video_set_row2_col1:
+                    video_gen_mode = st.radio(
+                        "생성 범위",
+                        ["전체", "범위", "개별"],
+                        key="video_gen_mode",
+                        horizontal=True
+                    )
+
+                with video_set_row2_col2:
+                    video_speed_mode = st.radio(
+                        "생성 방식",
+                        ["⚡ 빠른 생성", "🎭 애니메이션"],
+                        key="video_speed_mode",
+                        horizontal=True,
+                        help="빠른 생성: 정적 이미지 기반 (권장, 10배 빠름)\n애니메이션: CSS 애니메이션 실시간 프레임 캡처 (느림)"
+                    )
+
+                is_fast_mode = "빠른" in video_speed_mode
+                is_animation_mode = "애니메이션" in video_speed_mode
+
+                # 애니메이션 모드 추가 설정
+                animation_fps = 15  # 기본값
+                if is_animation_mode:
+                    st.info("🎭 **애니메이션 모드**: CSS 애니메이션이 실시간으로 캡처됩니다. 처리 시간이 5~10배 증가합니다.")
+                    anim_col1, anim_col2 = st.columns([1, 2])
+                    with anim_col1:
+                        animation_fps = st.slider(
+                            "캡처 FPS",
+                            min_value=10,
+                            max_value=25,
+                            value=15,
+                            key="animation_fps_slider",
+                            help="높을수록 부드럽지만 캡처 시간 증가"
+                        )
+                    with anim_col2:
+                        total_frames = video_duration * animation_fps
+                        st.caption(f"📊 씬당 {video_duration}초 × {animation_fps}fps = **{total_frames}프레임** 캡처")
+
+                # 씬 선택 UI
+                if video_gen_mode == "범위":
+                    video_range = st.slider(
                         "씬 범위",
                         min_value=1,
                         max_value=scene_count,
-                        value=(1, min(10, scene_count)),
-                        key="thumb_range_slider"
+                        value=(1, min(5, scene_count)),
+                        key="video_range_slider"
                     )
-                    selected_thumb_indices = list(range(thumb_range[0] - 1, thumb_range[1]))
-                    st.info(f"씬 {thumb_range[0]} ~ {thumb_range[1]} 선택됨 ({len(selected_thumb_indices)}개)")
-
-                elif thumb_gen_mode == "개별 선택":
-                    # 멀티셀렉트
-                    scene_options = [f"씬 {i+1}" for i in range(scene_count)]
-                    default_selected = scene_options[:min(5, scene_count)]
-                    selected_labels = st.multiselect(
-                        "생성할 씬 선택",
-                        options=scene_options,
-                        default=default_selected,
-                        key="thumb_scene_multiselect"
+                    selected_video_indices = list(range(video_range[0] - 1, video_range[1]))
+                elif video_gen_mode == "개별":
+                    video_scene_options = [f"씬 {i+1}" for i in range(scene_count)]
+                    selected_video_labels = st.multiselect(
+                        "녹화할 씬 선택",
+                        options=video_scene_options,
+                        default=[video_scene_options[0]] if video_scene_options else [],
+                        key="video_scene_multiselect"
                     )
-                    selected_thumb_indices = [int(s.replace("씬 ", "")) - 1 for s in selected_labels]
-                    st.info(f"{len(selected_thumb_indices)}개 씬 선택됨")
+                    selected_video_indices = [int(s.replace("씬 ", "")) - 1 for s in selected_video_labels]
                 else:
-                    selected_thumb_indices = list(range(scene_count))
-                    st.info(f"전체 {scene_count}개 씬 선택됨")
+                    selected_video_indices = list(range(scene_count))
 
-            thumb_col1, thumb_col2 = st.columns(2)
-            with thumb_col1:
-                if st.button("🖼️ 썸네일 생성", type="primary", use_container_width=True, key="generate_thumbnails"):
-                    if not selected_thumb_indices:
-                        st.error("생성할 씬을 선택하세요.")
+                # 예상 시간/용량 계산
+                quality_info = QUALITY_OPTIONS[video_quality_label]
+                time_factor = quality_info["time_factor"]
+                size_per_scene = quality_info["size_mb"] * video_duration
+
+                if is_animation_mode:
+                    # 애니메이션 모드: 씬당 (duration + 인코딩 시간)
+                    base_time = len(selected_video_indices) * (video_duration + 3)  # 캡처 + 인코딩
+                elif is_fast_mode:
+                    base_time = len(selected_video_indices) * 2  # 씬당 약 2초
+                else:
+                    base_time = len(selected_video_indices) * video_duration * 5  # 씬당 약 5초/1초영상
+
+                est_seconds = int(base_time * time_factor)
+                est_minutes = est_seconds // 60
+                est_sec_remain = est_seconds % 60
+                est_size = len(selected_video_indices) * size_per_scene
+
+                mode_emoji = "🎭" if is_animation_mode else "⚡"
+                st.info(f"📊 선택: {len(selected_video_indices)}개 씬 | {mode_emoji} {video_quality_label.split()[0]} | ⏱️ 예상: ~{est_minutes}분 {est_sec_remain}초 | 📁 ~{est_size:.1f}MB")
+
+                if st.button("🎬 동영상 녹화 시작", type="primary", use_container_width=True, key="record_videos", disabled=not ffmpeg_ok):
+                    if not selected_video_indices:
+                        st.error("녹화할 씬을 선택하세요.")
                     else:
                         try:
-                            output_dir = str(project_path / "infographics" / "thumbnails")
+                            output_dir = str(project_path / "infographics" / "videos")
                             os.makedirs(output_dir, exist_ok=True)
 
                             progress_bar = st.progress(0)
                             status_text = st.empty()
 
-                            if thumb_gen_mode == "전체 씬":
-                                # 기존 전체 생성 로직
-                                def thumb_progress(current, total, message):
-                                    progress_bar.progress(current / total)
-                                    status_text.text(message)
+                            def video_progress(current, total, message):
+                                progress_bar.progress(current / total)
+                                status_text.text(message)
 
-                                results = factory_generate_thumbnails(
-                                    infographic_data,
+                            # 레코더로 녹화
+                            from utils.infographic_video_recorder import get_video_recorder
+
+                            with get_video_recorder(output_dir=output_dir, quality=video_quality) as recorder:
+                                # 전체/선택 모두 동일한 메서드 사용
+                                scene_list = selected_video_indices if video_gen_mode != "전체" else list(range(scene_count))
+
+                                # ============================================================
+                                # ✅ 핵심: 수정된 HTML 우선 사용 (배경 합성 포함)
+                                # ============================================================
+                                # 우선순위:
+                                # 1. modified_infographic_html (배경 합성됨)
+                                # 2. infographic_html_content (현재 작업 중인 HTML)
+                                # 3. infographic_data.html_code (파일에서 로드한 원본)
+                                recording_html = st.session_state.get("modified_infographic_html")
+                                if not recording_html:
+                                    recording_html = st.session_state.get("infographic_html_content")
+                                if not recording_html:
+                                    recording_html = infographic_data.html_code
+
+                                results = recorder.record_selected_scenes(
+                                    html_content=recording_html,
+                                    scene_indices=scene_list,
+                                    duration=video_duration,
                                     output_dir=output_dir,
-                                    progress_callback=thumb_progress
+                                    fast_mode=is_fast_mode,
+                                    animation_mode=is_animation_mode,
+                                    animation_fps=animation_fps,
+                                    preserve_layout=True,
+                                    fade_effect=not is_animation_mode,  # 애니메이션 모드에서는 페이드 off
+                                    progress_callback=video_progress
                                 )
-
-                                success = sum(1 for v in results.values() if v)
-                                fail = len(results) - success
-                            else:
-                                # 선택적 생성 로직
-                                from utils.infographic_thumbnail import generate_selected_thumbnails_sync
-
-                                def thumb_progress(current, total):
-                                    progress_bar.progress(current / total)
-                                    status_text.text(f"씬 {selected_thumb_indices[current-1]+1} 완료 ({current}/{total})")
-
-                                results = generate_selected_thumbnails_sync(
-                                    html_content=infographic_data.html_code,
-                                    scene_indices=selected_thumb_indices,
-                                    output_dir=output_dir,
-                                    progress_callback=thumb_progress
-                                )
-
-                                success = len(results)
-                                fail = len(selected_thumb_indices) - success
 
                             progress_bar.progress(1.0)
-                            status_text.text(f"완료! 성공: {success}, 실패: {fail}")
+                            status_text.text(f"완료! {len(results)}개 동영상 생성")
 
                             visual_manager.set_infographic_data(infographic_data)
-                            st.success(f"✅ {success}개 썸네일 생성 완료!")
+                            st.success(f"✅ {len(results)}개 동영상 녹화 완료!")
 
-                            if fail > 0:
-                                st.warning(f"⚠️ {fail}개 씬 실패")
+                            # 병합 옵션 표시
+                            if len(results) > 1:
+                                st.info("💡 여러 씬을 하나의 영상으로 병합하려면 아래 '영상 병합' 기능을 사용하세요.")
 
                             st.rerun()
 
                         except RuntimeError as e:
-                            st.error(f"렌더러 오류: {str(e)}")
-                            with st.expander("🔧 설치 방법"):
-                                st.markdown("""
-                                **Selenium WebDriver 설치:**
-
-                                ```bash
-                                pip install selenium webdriver-manager pillow
-                                ```
-
-                                Chrome 브라우저가 설치되어 있어야 합니다.
-                                ChromeDriver는 자동으로 다운로드됩니다.
-                                """)
+                            st.error(f"동영상 녹화기 초기화 실패: {str(e)}")
+                            st.info("동영상 녹화 필수 요소: `pip install selenium webdriver-manager pillow` + FFmpeg 설치")
                         except Exception as e:
-                            st.error(f"썸네일 생성 오류: {str(e)}")
-
-            with thumb_col2:
-                if st.button("🗑️ 인포그래픽 삭제", use_container_width=True, key="clear_infographic"):
-                    visual_manager.state.infographic_data = None
-                    visual_manager.save_state()
-                    st.success("인포그래픽 데이터가 삭제되었습니다.")
-                    st.rerun()
-
-            # 썸네일 미리보기
-            thumbnail_scenes = [s for s in infographic_data.scenes if s.is_thumbnail_ready]
-            if thumbnail_scenes:
-                with st.expander(f"🖼️ 썸네일 미리보기 ({len(thumbnail_scenes)}개)", expanded=False):
-                    cols_per_row = 4
-                    for row_start in range(0, len(thumbnail_scenes), cols_per_row):
-                        cols = st.columns(cols_per_row)
-                        for j, col in enumerate(cols):
-                            idx = row_start + j
-                            if idx >= len(thumbnail_scenes):
-                                break
-                            scene = thumbnail_scenes[idx]
-                            with col:
-                                thumb = scene.thumbnail_path or scene.first_frame_path
-                                if thumb and os.path.exists(thumb):
-                                    st.image(thumb, caption=f"씬 {scene.scene_id}")
-                                else:
-                                    st.info(f"씬 {scene.scene_id}")
-
-            st.divider()
-
-            # === 4. 동영상 녹화 ===
-            st.markdown("### 🎬 4. 동영상 녹화 (내보내기용)")
-            st.caption("Selenium + FFmpeg 기반 MP4 동영상 녹화 (중앙정렬 + 고화질)")
-
-            # 화질 프리셋 정보
-            QUALITY_OPTIONS = {
-                "⚡ 미리보기 (480p)": {"key": "preview", "time_factor": 0.5, "size_mb": 0.5},
-                "📺 표준 (720p)": {"key": "standard", "time_factor": 1.0, "size_mb": 1.0},
-                "🎬 고화질 (1080p)": {"key": "high", "time_factor": 1.5, "size_mb": 2.0},
-                "🌟 초고화질 (1080p+)": {"key": "ultra", "time_factor": 3.0, "size_mb": 4.0},
-            }
-
-            # 설정 행 1: 화질 + 시간
-            video_set_row1_col1, video_set_row1_col2 = st.columns([2, 1])
-
-            with video_set_row1_col1:
-                video_quality_label = st.selectbox(
-                    "🎥 화질 선택",
-                    options=list(QUALITY_OPTIONS.keys()),
-                    index=2,  # 기본: 고화질
-                    key="video_quality_select",
-                    help="미리보기: 빠른 테스트용\n표준: 일반적인 용도\n고화질: 유튜브 권장\n초고화질: 최상의 품질 (느림)"
-                )
-                video_quality = QUALITY_OPTIONS[video_quality_label]["key"]
-
-            with video_set_row1_col2:
-                video_duration = st.slider(
-                    "🕐 씬당 재생 시간 (초)",
-                    min_value=1,
-                    max_value=15,
-                    value=5,
-                    step=1,
-                    key="video_duration"
-                )
-
-            # 설정 행 2: 생성 범위 + 방식
-            video_set_row2_col1, video_set_row2_col2 = st.columns(2)
-
-            with video_set_row2_col1:
-                video_gen_mode = st.radio(
-                    "생성 범위",
-                    ["전체", "범위", "개별"],
-                    key="video_gen_mode",
-                    horizontal=True
-                )
-
-            with video_set_row2_col2:
-                video_speed_mode = st.radio(
-                    "생성 방식",
-                    ["⚡ 빠른 생성", "🎭 애니메이션"],
-                    key="video_speed_mode",
-                    horizontal=True,
-                    help="빠른 생성: 정적 이미지 기반 (권장, 10배 빠름)\n애니메이션: CSS 애니메이션 실시간 프레임 캡처 (느림)"
-                )
-
-            is_fast_mode = "빠른" in video_speed_mode
-            is_animation_mode = "애니메이션" in video_speed_mode
-
-            # 애니메이션 모드 추가 설정
-            animation_fps = 15  # 기본값
-            if is_animation_mode:
-                st.info("🎭 **애니메이션 모드**: CSS 애니메이션이 실시간으로 캡처됩니다. 처리 시간이 5~10배 증가합니다.")
-                anim_col1, anim_col2 = st.columns([1, 2])
-                with anim_col1:
-                    animation_fps = st.slider(
-                        "캡처 FPS",
-                        min_value=10,
-                        max_value=25,
-                        value=15,
-                        key="animation_fps_slider",
-                        help="높을수록 부드럽지만 캡처 시간 증가"
-                    )
-                with anim_col2:
-                    total_frames = video_duration * animation_fps
-                    st.caption(f"📊 씬당 {video_duration}초 × {animation_fps}fps = **{total_frames}프레임** 캡처")
-
-            # 씬 선택 UI
-            if video_gen_mode == "범위":
-                video_range = st.slider(
-                    "씬 범위",
-                    min_value=1,
-                    max_value=scene_count,
-                    value=(1, min(5, scene_count)),
-                    key="video_range_slider"
-                )
-                selected_video_indices = list(range(video_range[0] - 1, video_range[1]))
-            elif video_gen_mode == "개별":
-                video_scene_options = [f"씬 {i+1}" for i in range(scene_count)]
-                selected_video_labels = st.multiselect(
-                    "녹화할 씬 선택",
-                    options=video_scene_options,
-                    default=[video_scene_options[0]] if video_scene_options else [],
-                    key="video_scene_multiselect"
-                )
-                selected_video_indices = [int(s.replace("씬 ", "")) - 1 for s in selected_video_labels]
-            else:
-                selected_video_indices = list(range(scene_count))
-
-            # 예상 시간/용량 계산
-            quality_info = QUALITY_OPTIONS[video_quality_label]
-            time_factor = quality_info["time_factor"]
-            size_per_scene = quality_info["size_mb"] * video_duration
-
-            if is_animation_mode:
-                # 애니메이션 모드: 씬당 (duration + 인코딩 시간)
-                base_time = len(selected_video_indices) * (video_duration + 3)  # 캡처 + 인코딩
-            elif is_fast_mode:
-                base_time = len(selected_video_indices) * 2  # 씬당 약 2초
-            else:
-                base_time = len(selected_video_indices) * video_duration * 5  # 씬당 약 5초/1초영상
-
-            est_seconds = int(base_time * time_factor)
-            est_minutes = est_seconds // 60
-            est_sec_remain = est_seconds % 60
-            est_size = len(selected_video_indices) * size_per_scene
-
-            mode_emoji = "🎭" if is_animation_mode else "⚡"
-            st.info(f"📊 선택: {len(selected_video_indices)}개 씬 | {mode_emoji} {video_quality_label.split()[0]} | ⏱️ 예상: ~{est_minutes}분 {est_sec_remain}초 | 📁 ~{est_size:.1f}MB")
-
-            if st.button("🎬 동영상 녹화 시작", type="primary", use_container_width=True, key="record_videos", disabled=not ffmpeg_ok):
-                if not selected_video_indices:
-                    st.error("녹화할 씬을 선택하세요.")
-                else:
-                    try:
-                        output_dir = str(project_path / "infographics" / "videos")
-                        os.makedirs(output_dir, exist_ok=True)
-
-                        progress_bar = st.progress(0)
-                        status_text = st.empty()
-
-                        def video_progress(current, total, message):
-                            progress_bar.progress(current / total)
-                            status_text.text(message)
-
-                        # 레코더로 녹화
-                        from utils.infographic_video_recorder import get_video_recorder
-
-                        with get_video_recorder(output_dir=output_dir, quality=video_quality) as recorder:
-                            # 전체/선택 모두 동일한 메서드 사용
-                            scene_list = selected_video_indices if video_gen_mode != "전체" else list(range(scene_count))
-
-                            # ============================================================
-                            # ✅ 핵심: 수정된 HTML 우선 사용 (배경 합성 포함)
-                            # ============================================================
-                            # 우선순위:
-                            # 1. modified_infographic_html (배경 합성됨)
-                            # 2. infographic_html_content (현재 작업 중인 HTML)
-                            # 3. infographic_data.html_code (파일에서 로드한 원본)
-                            recording_html = st.session_state.get("modified_infographic_html")
-                            if not recording_html:
-                                recording_html = st.session_state.get("infographic_html_content")
-                            if not recording_html:
-                                recording_html = infographic_data.html_code
-
-                            results = recorder.record_selected_scenes(
-                                html_content=recording_html,
-                                scene_indices=scene_list,
-                                duration=video_duration,
-                                output_dir=output_dir,
-                                fast_mode=is_fast_mode,
-                                animation_mode=is_animation_mode,
-                                animation_fps=animation_fps,
-                                preserve_layout=True,
-                                fade_effect=not is_animation_mode,  # 애니메이션 모드에서는 페이드 off
-                                progress_callback=video_progress
-                            )
-
-                        progress_bar.progress(1.0)
-                        status_text.text(f"완료! {len(results)}개 동영상 생성")
-
-                        visual_manager.set_infographic_data(infographic_data)
-                        st.success(f"✅ {len(results)}개 동영상 녹화 완료!")
-
-                        # 병합 옵션 표시
-                        if len(results) > 1:
-                            st.info("💡 여러 씬을 하나의 영상으로 병합하려면 아래 '영상 병합' 기능을 사용하세요.")
-
-                        st.rerun()
-
-                    except RuntimeError as e:
-                        st.error(f"동영상 녹화기 초기화 실패: {str(e)}")
-                        st.info("동영상 녹화 필수 요소: `pip install selenium webdriver-manager pillow` + FFmpeg 설치")
-                    except Exception as e:
-                        st.error(f"녹화 오류: {str(e)}")
-                        import traceback
-                        with st.expander("오류 상세"):
-                            st.code(traceback.format_exc())
-
-            # ============================================================
-            # 동영상 미리보기 섹션
-            # ============================================================
-            videos_dir = str(project_path / "infographics" / "videos")
-            thumbnails_dir = str(project_path / "infographics" / "thumbnails")
-
-            # 동영상 파일 목록 가져오기
-            video_files = []
-            if os.path.exists(videos_dir):
-                video_files = sorted([
-                    f for f in os.listdir(videos_dir)
-                    if f.endswith('.mp4') and 'scene' in f.lower()
-                ])
-
-            with st.expander(f"🎬 생성된 동영상 미리보기 ({len(video_files)}/{scene_count}개)", expanded=len(video_files) > 0):
-
-                if not video_files:
-                    st.info("아직 생성된 동영상이 없습니다. 위에서 동영상 녹화를 시작하세요.")
-                else:
-                    # 그리드 레이아웃 (5열)
-                    cols_per_row = 5
-
-                    for row_start in range(0, len(video_files), cols_per_row):
-                        cols = st.columns(cols_per_row)
-
-                        for col_idx, col in enumerate(cols):
-                            video_idx = row_start + col_idx
-
-                            if video_idx >= len(video_files):
-                                break
-
-                            video_file = video_files[video_idx]
-                            video_path = os.path.join(videos_dir, video_file)
-
-                            with col:
-                                # 씬 번호 추출 (예: infographic_scene_001.mp4 → 1)
-                                try:
-                                    scene_num = int(video_file.split('_')[-1].replace('.mp4', ''))
-                                except:
-                                    scene_num = video_idx + 1
-
-                                # 썸네일 이미지 (있으면 사용)
-                                thumb_path = os.path.join(thumbnails_dir, f"scene_{scene_num:03d}.png")
-                                alt_thumb_path = os.path.join(thumbnails_dir, f"scene_{scene_num:03d}_thumb.png")
-
-                                if os.path.exists(thumb_path):
-                                    render_lightbox_image(thumb_path, key=f"vid_thumb_{scene_num}")
-                                elif os.path.exists(alt_thumb_path):
-                                    render_lightbox_image(alt_thumb_path, key=f"vid_thumb_alt_{scene_num}")
-                                else:
-                                    # 비디오 아이콘 placeholder
-                                    st.markdown(
-                                        f"""
-                                        <div style="
-                                            background: #f0f0f0;
-                                            border-radius: 8px;
-                                            padding: 15px;
-                                            text-align: center;
-                                            height: 60px;
-                                            display: flex;
-                                            align-items: center;
-                                            justify-content: center;
-                                        ">
-                                            <span style="font-size: 20px;">🎬</span>
-                                        </div>
-                                        """,
-                                        unsafe_allow_html=True
-                                    )
-
-                                # 씬 번호 및 파일 정보
-                                file_size = os.path.getsize(video_path) / (1024 * 1024)  # MB
-                                st.caption(f"씬 {scene_num} ({file_size:.1f}MB)")
-
-                                # 버튼 행
-                                btn_col1, btn_col2 = st.columns(2)
-
-                                with btn_col1:
-                                    # 재생 버튼
-                                    if st.button("▶️", key=f"play_video_{video_idx}", help="미리보기"):
-                                        st.session_state[f'show_video_{video_idx}'] = True
-
-                                with btn_col2:
-                                    # 폴더 열기 버튼
-                                    if st.button("📂", key=f"open_folder_{video_idx}", help="폴더 열기"):
-                                        open_file_location(video_path)
-
-                                # 비디오 플레이어 (토글)
-                                if st.session_state.get(f'show_video_{video_idx}', False):
-                                    st.video(video_path)
-                                    if st.button("닫기", key=f"close_video_{video_idx}"):
-                                        st.session_state[f'show_video_{video_idx}'] = False
-                                        st.rerun()
-
-                    # 전체 폴더 열기 버튼
-                    st.divider()
-                    folder_col1, folder_col2, folder_col3 = st.columns([1, 1, 1])
-
-                    with folder_col1:
-                        if st.button("📂 동영상 폴더 열기", use_container_width=True, key="open_videos_folder"):
-                            open_folder(videos_dir)
-
-                    with folder_col2:
-                        if st.button("🗑️ 전체 동영상 삭제", use_container_width=True, type="secondary", key="delete_all_videos"):
-                            if st.session_state.get('confirm_delete_videos', False):
-                                # 삭제 실행
-                                for vf in video_files:
-                                    try:
-                                        os.remove(os.path.join(videos_dir, vf))
-                                    except:
-                                        pass
-                                st.session_state['confirm_delete_videos'] = False
-                                st.success("삭제 완료!")
-                                st.rerun()
-                            else:
-                                st.session_state['confirm_delete_videos'] = True
-                                st.warning("정말 삭제하시겠습니까? 다시 클릭하면 삭제됩니다.")
-
-                    with folder_col3:
-                        # 병합된 파일 확인
-                        merged_path = os.path.join(videos_dir, "merged_all.mp4")
-                        if os.path.exists(merged_path):
-                            merged_size = os.path.getsize(merged_path) / (1024 * 1024)
-                            st.success(f"✅ 병합 ({merged_size:.1f}MB)")
-                            if st.button("▶️ 병합 영상", key="play_merged"):
-                                st.video(merged_path)
-                        else:
-                            st.caption("병합 파일 없음")
-
-            st.divider()
-
-            # === 5. 캐릭터 합성 ===
-            st.markdown("### 👤 5. 캐릭터 동영상 합성")
-            st.caption("인포그래픽 동영상 위에 캐릭터 PNG 오버레이 (FFmpeg)")
-
-            # ========================================
-            # 캐릭터 로드 (CharacterManager + 직접 PNG 스캔)
-            # ========================================
-            try:
-                from core.character.character_manager import CharacterManager
-                char_manager = CharacterManager(str(project_path))
-                registered_characters = char_manager.get_all_characters()
-            except Exception as e:
-                registered_characters = []
-                st.warning(f"캐릭터 매니저 로드 실패: {e}")
-
-            # 캐릭터 이미지 목록 구성 (등록된 캐릭터 + 폴더 스캔)
-            character_dir = project_path / "characters"
-            character_images_dir = project_path / "images" / "characters"
-            character_options = []
-
-            # 1. 등록된 캐릭터 (generated_images 포함)
-            for char in registered_characters:
-                # 생성된 이미지 사용
-                if char.generated_images:
-                    for img_path in char.generated_images:
-                        full_path = Path(img_path) if os.path.isabs(img_path) else project_path / img_path
-                        if full_path.exists():
-                            character_options.append({
-                                'name': f"👤 {char.name}",
-                                'path': full_path,
-                                'type': 'registered',
-                                'char_id': char.id
-                            })
-                            break  # 첫 번째 이미지만 사용
-
-            # 2. characters 폴더 직접 스캔 (등록 안 된 PNG)
-            registered_paths = {opt['path'] for opt in character_options}
-            for scan_dir in [character_dir, character_images_dir]:
-                if scan_dir.exists():
-                    for img_file in scan_dir.glob("*.png"):
-                        if img_file not in registered_paths:
-                            character_options.append({
-                                'name': f"📁 {img_file.stem}",
-                                'path': img_file,
-                                'type': 'folder',
-                                'char_id': None
-                            })
-                            registered_paths.add(img_file)
-
-            # 동영상이 있는 씬 확인 (파일 시스템 기반)
-            video_dir = project_path / "infographics" / "videos"
-            video_files = list(video_dir.glob("infographic_scene_*.mp4")) if video_dir.exists() else []
-
-            # InfographicData와 동기화
-            video_ready_scenes = []
-            for scene in infographic_data.scenes:
-                video_path = video_dir / f"infographic_scene_{scene.scene_id:03d}.mp4"
-                if video_path.exists():
-                    scene.is_video_ready = True
-                    scene.video_path = str(video_path)
-                    video_ready_scenes.append(scene)
-
-            if not character_options:
-                st.info("캐릭터 이미지가 없습니다.")
-
-                # 탭: 캐릭터 관리로 이동 / 직접 업로드
-                char_tab1, char_tab2 = st.tabs(["📦 캐릭터 관리 페이지", "📤 직접 업로드"])
-
-                with char_tab1:
-                    st.write("**캐릭터 관리** 페이지에서 캐릭터를 생성하면 여기에 표시됩니다.")
-                    if registered_characters:
-                        st.write(f"등록된 캐릭터: {len(registered_characters)}명 (이미지 없음)")
-                        for char in registered_characters[:5]:
-                            st.caption(f"- {char.name}: 이미지 생성 필요")
-                    else:
-                        st.caption("등록된 캐릭터가 없습니다.")
-
-                with char_tab2:
-                    uploaded_char = st.file_uploader(
-                        "캐릭터 PNG 업로드",
-                        type=["png"],
-                        key="upload_character"
-                    )
-                    if uploaded_char:
-                        character_dir.mkdir(parents=True, exist_ok=True)
-                        char_path = character_dir / uploaded_char.name
-                        with open(char_path, "wb") as f:
-                            f.write(uploaded_char.read())
-                        st.success(f"캐릭터 저장: {char_path.name}")
-                        st.rerun()
-            else:
-                # 합성 상태 메트릭
-                composites_dir = project_path / "infographics" / "composites"
-                composite_files = list(composites_dir.glob("composite_scene_*.mp4")) if composites_dir.exists() else []
-
-                # 씬-캐릭터 매처 초기화
-                try:
-                    matcher = get_scene_character_matcher(str(project_path))
-                    mapping_summary = matcher.get_mapping_summary()
-                    scene_analysis = matcher.load_scene_analysis()
-                except Exception as e:
-                    matcher = None
-                    mapping_summary = {'total': 0, 'matched': 0, 'default': 0, 'by_character': {}}
-                    scene_analysis = []
-
-                comp_metric_col1, comp_metric_col2, comp_metric_col3, comp_metric_col4, comp_metric_col5 = st.columns(5)
-                with comp_metric_col1:
-                    st.metric("캐릭터 이미지", len(character_options))
-                with comp_metric_col2:
-                    st.metric("씬 분석", len(scene_analysis))
-                with comp_metric_col3:
-                    st.metric("자동 매칭", mapping_summary['matched'])
-                with comp_metric_col4:
-                    st.metric("동영상", len(video_files))
-                with comp_metric_col5:
-                    st.metric("합성 완료", len(composite_files))
-
-                # 탭: 씬분석 자동 매칭 / 수동 선택 / 설정
-                comp_tab_auto, comp_tab_manual, comp_tab_settings = st.tabs([
-                    "🤖 씬분석 자동 매칭",
-                    "✋ 수동 선택",
-                    "⚙️ 설정"
-                ])
-
-                # 기본값: 자동 배경 제거 활성화
-                auto_remove_bg = True
-
-                # ========================================
-                # 탭 1: 씬분석 자동 매칭
-                # ========================================
-                with comp_tab_auto:
-                    st.markdown("#### 🤖 씬분석 → 캐릭터 자동 매칭")
-                    st.caption("씬 분석 페이지의 '등장 캐릭터' 정보를 캐릭터 관리의 캐릭터와 자동 매칭합니다.")
-
-                    if not scene_analysis:
-                        st.warning("씬 분석 데이터가 없습니다.")
-                        st.info("👉 **씬 분석** 페이지에서 먼저 씬을 분석하세요.")
-                    elif not matcher or not matcher.get_available_characters():
-                        st.warning("등록된 캐릭터가 없습니다.")
-                        st.info("👉 **캐릭터 관리** 페이지에서 캐릭터를 먼저 추가하세요.")
-                    else:
-                        # 🔴 v3.12: 로드된 캐릭터 디버그 정보 표시
-                        available_chars = matcher.get_available_characters()
-                        with st.expander(f"👤 매칭 가능 캐릭터 ({len(available_chars)}명)", expanded=False):
-                            if available_chars:
-                                for c in available_chars:
-                                    has_image = "✅" if c.get('image_path') else "❌"
-                                    st.caption(f"- {c['name']} ({c['id']}) {has_image}")
-                            else:
-                                st.warning("캐릭터가 로드되지 않았습니다.")
-                                st.info("캐릭터 관리 페이지에서 캐릭터 이미지를 생성하세요.")
-
-                        # 현재 매핑 미리보기
-                        existing_mappings = matcher.load_mappings()
-
-                        with st.expander("📋 현재 씬-캐릭터 매핑", expanded=len(existing_mappings) > 0):
-                            if existing_mappings:
-                                import pandas as pd
-                                mapping_data = []
-                                for m in existing_mappings[:15]:
-                                    mapping_data.append({
-                                        "씬": m.get('scene_num', '-'),
-                                        "분석된 캐릭터": m.get('original_name', '-'),
-                                        "매칭된 캐릭터": m.get('character_name', '-'),
-                                        "신뢰도": f"{m.get('confidence', 0):.0%}",
-                                        "소스": "✅ 자동" if m.get('match_type') != 'default' else "⚪ 기본"
-                                    })
-
-                                df = pd.DataFrame(mapping_data)
-                                st.dataframe(df, use_container_width=True, hide_index=True)
-
-                                if len(existing_mappings) > 15:
-                                    st.caption(f"... 외 {len(existing_mappings) - 15}개")
-
-                                # 캐릭터별 등장 횟수
-                                if mapping_summary['by_character']:
-                                    st.markdown("**캐릭터별 등장 횟수:**")
-                                    for char_name, count in mapping_summary['by_character'].items():
-                                        st.write(f"- {char_name}: **{count}회**")
-                            else:
-                                st.info("아직 생성된 매핑이 없습니다. 아래에서 자동 매핑을 생성하세요.")
-
-                        st.divider()
-
-                        # 자동 매핑 생성
-                        st.markdown("##### 🔄 자동 매핑 생성")
-
-                        auto_col1, auto_col2 = st.columns(2)
-
-                        with auto_col1:
-                            # 기본 캐릭터 선택 (available_chars는 위에서 이미 로드됨)
-                            default_options = ["없음 (매칭된 것만)"] + [c['name'] for c in available_chars]
-                            default_select = st.selectbox(
-                                "기본 캐릭터 (매칭 실패 시)",
-                                options=default_options,
-                                key="default_char_matcher"
-                            )
-
-                            default_char_id = None
-                            if default_select != "없음 (매칭된 것만)":
-                                default_char = next((c for c in available_chars if c['name'] == default_select), None)
-                                if default_char:
-                                    default_char_id = default_char['id']
-
-                        with auto_col2:
-                            # 미리 계산
-                            preview_mappings = matcher.generate_mappings(scene_analysis, default_char_id)
-                            auto_count = sum(1 for m in preview_mappings if m.get('match_type') != 'default')
-                            default_count = len(preview_mappings) - auto_count
-
-                            st.write("📊 **예상 결과:**")
-                            st.write(f"- 자동 매칭: **{auto_count}개** 씬")
-                            st.write(f"- 기본값 사용: **{default_count}개** 씬")
-
-                        # 매핑 생성 버튼
-                        if st.button("🔍 씬분석에서 캐릭터 자동 매칭", key="generate_auto_mapping", type="primary"):
-                            with st.spinner("씬 분석 데이터에서 캐릭터 매칭 중..."):
-                                new_mappings = matcher.generate_mappings(scene_analysis, default_char_id)
-
-                                if new_mappings:
-                                    matcher.save_mappings(new_mappings)
-                                    st.success(f"✅ {len(new_mappings)}개 씬에 캐릭터 매핑 완료!")
-                                    st.rerun()
-                                else:
-                                    st.warning("매핑할 수 있는 씬이 없습니다.")
-
-                        st.divider()
-
-                        # 일괄 합성 실행
-                        st.markdown("##### 🎬 자동 매핑 기반 일괄 합성")
-
-                        existing_mappings = matcher.load_mappings()
-
-                        # 합성 가능한 씬 필터링 (동영상이 있는 씬)
-                        video_scene_nums = set()
-                        for vf in video_files:
-                            try:
-                                scene_num = int(vf.stem.split('_')[-1])
-                                video_scene_nums.add(scene_num)
-                            except ValueError:
-                                pass
-
-                        mappings_with_video = [
-                            m for m in existing_mappings
-                            if m.get('scene_num') in video_scene_nums and m.get('image_path')
-                        ]
-
-                        if not mappings_with_video:
-                            st.warning("합성 가능한 씬이 없습니다.")
-                            if not existing_mappings:
-                                st.info("먼저 위에서 자동 매핑을 생성하세요.")
-                            elif not video_files:
-                                st.info("먼저 동영상을 생성하세요.")
-                        else:
-                            # 합성 옵션
-                            auto_c1, auto_c2, auto_c3 = st.columns(3)
-
-                            with auto_c1:
-                                # v2.0: 9개 위치 프리셋 (3x3 그리드)
-                                position_options_auto = {
-                                    "↘️ 우하단 (기본)": "bottom_right",
-                                    "↙️ 좌하단": "bottom_left",
-                                    "⬇️ 하단 중앙": "bottom_center",
-                                    "➡️ 우측 중앙": "middle_right",
-                                    "⬅️ 좌측 중앙": "middle_left",
-                                    "⏺️ 정중앙": "middle_center",
-                                    "↗️ 우상단": "top_right",
-                                    "↖️ 좌상단": "top_left",
-                                    "⬆️ 상단 중앙": "top_center",
-                                }
-                                auto_pos_label = st.selectbox(
-                                    "📍 위치 (3x3 그리드)",
-                                    list(position_options_auto.keys()),
-                                    key="auto_compose_pos"
-                                )
-                                auto_position = position_options_auto[auto_pos_label]
-
-                            with auto_c2:
-                                # v2.0: 10-60% 크기 범위
-                                auto_scale = st.slider(
-                                    "📏 크기 (%)",
-                                    min_value=10,
-                                    max_value=60,
-                                    value=35,
-                                    step=5,
-                                    key="auto_compose_scale",
-                                    help="배경 높이 대비 캐릭터 높이 비율 (10-60%)"
-                                ) / 100  # 백분율을 비율로 변환
-
-                            with auto_c3:
-                                bg_available, bg_msg = is_bg_removal_available()
-                                # v3.14: 배경 제거 기본값 True, 체크박스 항상 활성화
-                                auto_remove_bg_opt = st.checkbox(
-                                    "🎭 배경 제거",
-                                    value=True,  # 항상 기본값 True
-                                    key="auto_remove_bg_opt",
-                                    help="캐릭터 배경을 자동으로 제거합니다"
-                                )
-                                if not bg_available:
-                                    st.caption("⚠️ rembg 미설치 (합성 시 자동 설치 시도)")
-                                    with st.expander("🔧 수동 설치하기"):
-                                        install_rembg_ui(key_suffix="auto_match")
-
-                            st.info(f"📊 합성 대상: **{len(mappings_with_video)}개** 씬")
-
-                            if st.button(
-                                "🎬 자동 매핑 기반 일괄 합성",
-                                key="start_auto_compose",
-                                use_container_width=True,
-                                type="primary"
-                            ):
-                                try:
-                                    output_dir = str(project_path / "infographics" / "composites")
-                                    os.makedirs(output_dir, exist_ok=True)
-
-                                    progress_bar = st.progress(0)
-                                    status_text = st.empty()
-
-                                    results = []
-                                    total = len(mappings_with_video)
-
-                                    for i, mapping in enumerate(mappings_with_video):
-                                        scene_num = mapping['scene_num']
-                                        char_name = mapping.get('character_name', 'Unknown')
-                                        image_path = mapping.get('image_path')
-
-                                        progress_bar.progress((i + 1) / total)
-                                        status_text.text(f"[{i+1}/{total}] 씬 {scene_num}: {char_name}")
-
-                                        # 동영상 경로
-                                        video_path = video_dir / f"infographic_scene_{scene_num:03d}.mp4"
-                                        if not video_path.exists() or not image_path:
-                                            continue
-
-                                        # 합성 실행
-                                        from utils.infographic_compositor import composite_character_sync
-                                        output = composite_character_sync(
-                                            video_path=str(video_path),
-                                            character_image_path=image_path,
-                                            scene_id=scene_num,
-                                            position=auto_position,
-                                            scale=auto_scale,
-                                            output_dir=output_dir,
-                                            auto_remove_bg=auto_remove_bg_opt
-                                        )
-
-                                        if output:
-                                            results.append(output)
-
-                                    progress_bar.empty()
-                                    status_text.empty()
-
-                                    if results:
-                                        st.success(f"✅ {len(results)}개 씬 일괄 합성 완료!")
-                                        st.balloons()
-                                        st.rerun()
-                                    else:
-                                        st.error("합성 실패")
-
-                                except Exception as e:
-                                    st.error(f"오류: {e}")
-                                    import traceback
-                                    st.code(traceback.format_exc())
-
-                        st.divider()
-
-                        # ========================================
-                        # 합성 결과 미리보기 (자동 매핑)
-                        # ========================================
-                        st.markdown("##### 👁️ 합성 결과 미리보기")
-
-                        # 합성된 파일 확인
-                        composites_dir = project_path / "infographics" / "composites"
-                        composite_thumbs = list(composites_dir.glob("composite_scene_*_thumb.png")) if composites_dir.exists() else []
-
-                        if composite_thumbs:
-                            st.success(f"✅ {len(composite_thumbs)}개 합성 완료된 씬")
-
-                            # 그리드로 미리보기
-                            preview_cols_per_row = 4
-                            composite_thumbs_sorted = sorted(composite_thumbs, key=lambda x: x.stem)
-
-                            for i in range(0, len(composite_thumbs_sorted), preview_cols_per_row):
-                                cols = st.columns(preview_cols_per_row)
-                                for j, col in enumerate(cols):
-                                    idx = i + j
-                                    if idx < len(composite_thumbs_sorted):
-                                        thumb_path = composite_thumbs_sorted[idx]
-                                        # 씬 번호 추출
-                                        try:
-                                            scene_num = int(thumb_path.stem.split('_')[2])
-                                        except:
-                                            scene_num = idx + 1
-
-                                        with col:
-                                            st.image(str(thumb_path), caption=f"씬 {scene_num}", use_container_width=True)
-
-                            # 개별 씬 편집 버튼
-                            with st.expander("✏️ 개별 씬 위치/크기 조정"):
-                                st.caption("특정 씬의 캐릭터 위치나 크기를 수정하려면 '수동 선택' 탭에서 개별 편집을 사용하세요.")
-                                st.info("👉 '수동 선택' 탭 → 씬 선택 → 캐릭터 에디터에서 위치/크기 조정")
-                        else:
-                            st.info("합성된 결과가 없습니다. 위에서 '일괄 합성'을 실행하세요.")
-
-                # ========================================
-                # 탭 2: 수동 선택 (기존 코드)
-                # ========================================
-                with comp_tab_manual:
-                    st.markdown("#### ✋ 수동 캐릭터 선택")
-                    st.caption("개별 씬에 특정 캐릭터를 직접 지정합니다.")
-
-                    char_col1, char_col2 = st.columns([3, 2])
-
-                    with char_col1:
-                        # 캐릭터 선택 (이름과 유형 표시)
-                        selected_char_idx = st.selectbox(
-                            "캐릭터 선택",
-                            range(len(character_options)),
-                            format_func=lambda i: character_options[i]['name'],
-                            key="select_character_idx"
-                        )
-                        selected_char_info = character_options[selected_char_idx]
-                        selected_char = selected_char_info['path']
-
-                        # v2.0: 위치 설정 (9개 프리셋)
-                        position_options = {
-                            "↘️ 우하단 (기본)": "bottom_right",
-                            "↙️ 좌하단": "bottom_left",
-                            "⬇️ 하단 중앙": "bottom_center",
-                            "➡️ 우측 중앙": "middle_right",
-                            "⬅️ 좌측 중앙": "middle_left",
-                            "⏺️ 정중앙": "middle_center",
-                            "↗️ 우상단": "top_right",
-                            "↖️ 좌상단": "top_left",
-                            "⬆️ 상단 중앙": "top_center",
-                        }
-                        char_position_label = st.selectbox(
-                            "📍 위치 (3x3 그리드)",
-                            list(position_options.keys()),
-                            key="char_position_select"
-                        )
-                        char_position = position_options[char_position_label]
-
-                        # v2.0: 크기 설정 (10-60%)
-                        scale_options = {
-                            "아주 작게 (10%)": 0.10,
-                            "작게 (20%)": 0.20,
-                            "보통 (30%)": 0.30,
-                            "크게 (40%)": 0.40,
-                            "아주 크게 (50%)": 0.50,
-                            "최대 (60%)": 0.60
-                        }
-                        scale_label = st.selectbox(
-                            "📏 크기",
-                            list(scale_options.keys()),
-                            index=2,  # 기본: 보통 (30%)
-                            key="char_scale_select"
-                        )
-                        char_scale = scale_options[scale_label]
-
-                        # 고급 설정
-                        with st.expander("⚙️ 고급 설정"):
-                            char_scale_custom = st.slider(
-                                "세부 크기 조정 (%)",
-                                min_value=10,
-                                max_value=60,
-                                value=int(char_scale * 100),
-                                step=5,
-                                key="char_scale_custom",
-                                help="배경 높이 대비 캐릭터 높이 비율 (10-60%)"
-                            ) / 100  # 백분율을 비율로 변환
-                            if char_scale_custom != char_scale:
-                                char_scale = char_scale_custom
-
-                            st.divider()
-
-                            # 배경 제거 옵션
-                            st.markdown("##### 🎭 배경 제거")
-                            rembg_available, rembg_msg = is_bg_removal_available()
-
-                            # v3.14: 배경 제거 항상 활성화, 기본값 True
-                            auto_remove_bg = st.checkbox(
-                                "🎭 자동 배경 제거",
-                                value=True,  # 항상 기본값 True
-                                help="캐릭터 이미지에 배경이 있으면 자동으로 제거합니다",
-                                key="auto_remove_bg_checkbox"
-                            )
-
-                            if rembg_available:
-                                st.success(rembg_msg)
-                            else:
-                                st.warning(f"{rembg_msg} (합성 시 자동 설치 시도)")
-                                with st.expander("🔧 수동 설치하기"):
-                                    install_rembg_ui(key_suffix="manual_select")
-
-                    with char_col2:
-                        if selected_char and selected_char.exists():
-                            st.image(str(selected_char), caption=selected_char_info['name'], width=180)
-                            if selected_char_info['type'] == 'registered':
-                                st.caption(f"✅ 캐릭터 관리에서 등록됨")
-                            else:
-                                st.caption(f"📁 폴더에서 직접 로드")
-
-                    # 합성 대상 선택
-                    st.markdown("#### 합성 대상 선택")
-                    comp_target_mode = st.radio(
-                        "합성 범위",
-                        ["미합성 씬만", "전체 재합성", "개별 선택"],
-                        horizontal=True,
-                        key="comp_target_mode"
-                    )
-
-                    if comp_target_mode == "미합성 씬만":
-                        compositable_scenes = [s for s in infographic_data.scenes if s.is_video_ready and not s.is_composite_ready]
-                    elif comp_target_mode == "전체 재합성":
-                        compositable_scenes = video_ready_scenes
-                    else:  # 개별 선택
-                        scene_options = [f"씬 {s.scene_id}" for s in video_ready_scenes]
-                        selected_comp_labels = st.multiselect(
-                            "합성할 씬 선택",
-                            options=scene_options,
-                            default=[],
-                            key="comp_scene_multiselect"
-                        )
-                        selected_comp_ids = [int(s.replace("씬 ", "")) for s in selected_comp_labels]
-                        compositable_scenes = [s for s in video_ready_scenes if s.scene_id in selected_comp_ids]
-
-                    st.info(f"📊 합성 대상: {len(compositable_scenes)}개 씬")
-
-                    st.divider()
-
-                    # ========================================
-                    # 🔴 v3.12: 시각적 캐릭터 에디터 (위치/크기 조정)
-                    # ========================================
-                    st.markdown("#### 🎨 시각적 위치/크기 조정 (미리보기)")
-
-                    # 개별 씬 선택해서 시각적 편집
-                    if video_ready_scenes and selected_char and selected_char.exists():
-                        edit_scene_options = [f"씬 {s.scene_id}" for s in video_ready_scenes]
-
-                        use_visual_editor = st.checkbox(
-                            "🖼️ 시각적 에디터 사용 (개별 씬)",
-                            value=False,
-                            key="use_visual_editor",
-                            help="선택한 씬의 인포그래픽에 캐릭터를 미리 배치하고 위치/크기를 조정합니다."
-                        )
-
-                        if use_visual_editor:
-                            selected_edit_scene = st.selectbox(
-                                "편집할 씬 선택",
-                                edit_scene_options,
-                                key="visual_edit_scene_select"
-                            )
-                            edit_scene_id = int(selected_edit_scene.replace("씬 ", ""))
-
-                            # 해당 씬의 인포그래픽 찾기
-                            infographic_thumb_path = project_path / "infographics" / "thumbnails" / f"infographic_{edit_scene_id:03d}.png"
-                            video_frame_path = project_path / "infographics" / "composites" / f"composite_scene_{edit_scene_id:03d}_thumb.png"
-
-                            # 썸네일 없으면 동영상 첫 프레임 추출 시도
-                            if not infographic_thumb_path.exists():
-                                # 동영상에서 첫 프레임 추출
-                                video_path = project_path / "infographics" / "videos" / f"infographic_scene_{edit_scene_id:03d}.mp4"
-                                if video_path.exists():
-                                    temp_frame = project_path / "infographics" / "thumbnails" / f"temp_frame_{edit_scene_id:03d}.png"
-                                    temp_frame.parent.mkdir(parents=True, exist_ok=True)
-                                    try:
-                                        subprocess.run([
-                                            "ffmpeg", "-y", "-i", str(video_path),
-                                            "-vframes", "1", str(temp_frame)
-                                        ], capture_output=True)
-                                        if temp_frame.exists():
-                                            infographic_thumb_path = temp_frame
-                                    except:
-                                        pass
-
-                            if infographic_thumb_path.exists():
-                                st.caption(f"씬 {edit_scene_id}에 캐릭터 배치 미리보기")
-
-                                # 캐릭터 에디터 호출
-                                editor_result = render_character_editor(
-                                    background_path=str(infographic_thumb_path),
-                                    character_path=str(selected_char),
-                                    initial_size=int(char_scale * 100),
-                                    remove_background=auto_remove_bg if 'auto_remove_bg' in dir() else True,
-                                    key=f"char_editor_scene_{edit_scene_id}"
-                                )
-
-                                if editor_result:
-                                    st.success(f"✅ 캐릭터 위치: ({editor_result['position_x']}, {editor_result['position_y']}), 크기: {editor_result['size_percent']}%")
-
-                                    # 이 설정으로 합성 버튼
-                                    if st.button(
-                                        f"📸 씬 {edit_scene_id}에 이 설정으로 합성",
-                                        key=f"apply_editor_scene_{edit_scene_id}",
-                                        type="secondary"
-                                    ):
-                                        # 결과 이미지 저장
-                                        output_path = project_path / "infographics" / "composites" / f"composite_scene_{edit_scene_id:03d}_preview.png"
-                                        output_path.parent.mkdir(parents=True, exist_ok=True)
-                                        editor_result['composite_image'].save(str(output_path), 'PNG')
-                                        st.success(f"미리보기 저장: {output_path.name}")
-
-                                        # 동영상 합성은 별도로 실행해야 함
-                                        st.info("💡 동영상 합성은 아래 '캐릭터 합성 시작' 버튼을 사용하세요.")
-                            else:
-                                st.warning(f"씬 {edit_scene_id}의 인포그래픽 이미지를 찾을 수 없습니다.")
-                                st.caption("동영상을 먼저 생성하거나, 인포그래픽 썸네일이 필요합니다.")
-                    else:
-                        st.caption("캐릭터를 선택하고 동영상이 있는 씬이 있어야 시각적 에디터를 사용할 수 있습니다.")
-
-                    st.divider()
-
-                    # 합성 실행 버튼
-                    can_composite = ffmpeg_ok and len(compositable_scenes) > 0 and selected_char
-                    if st.button(
-                        "👤 캐릭터 합성 시작",
-                        type="primary",
-                        use_container_width=True,
-                        key="composite_videos",
-                        disabled=not can_composite
-                    ):
-                        try:
-                            output_dir = str(project_path / "infographics" / "composites")
-                            os.makedirs(output_dir, exist_ok=True)
-
-                            progress_bar = st.progress(0)
-                            status_text = st.empty()
-
-                            def comp_progress(current, total, message):
-                                progress_bar.progress(current / total)
-                                status_text.text(message)
-
-                            # 합성 대상 씬 ID 목록
-                            target_scene_ids = [s.scene_id for s in compositable_scenes]
-
-                            results = batch_composite_sync(
-                                infographic_data,
-                                character_image_path=str(selected_char),
-                                position=char_position,
-                                scale=char_scale,
-                                scene_ids=target_scene_ids,
-                                output_dir=output_dir,
-                                auto_remove_bg=auto_remove_bg,
-                                progress_callback=comp_progress
-                            )
-
-                            progress_bar.progress(1.0)
-                            status_text.text(f"완료! {len(results)}개 합성")
-
-                            visual_manager.set_infographic_data(infographic_data)
-                            st.success(f"✅ {len(results)}개 동영상 합성 완료!")
-                            st.rerun()
-
-                        except Exception as e:
-                            st.error(f"합성 오류: {str(e)}")
+                            st.error(f"녹화 오류: {str(e)}")
                             import traceback
                             with st.expander("오류 상세"):
                                 st.code(traceback.format_exc())
 
-                    if not can_composite:
-                        if not ffmpeg_ok:
-                            st.warning("⚠️ FFmpeg이 필요합니다.")
-                        elif len(compositable_scenes) == 0:
-                            st.warning("⚠️ 합성할 동영상이 없습니다. 먼저 동영상을 녹화하세요.")
-                        elif not selected_char:
-                            st.warning("⚠️ 캐릭터를 선택하세요.")
+                # ============================================================
+                # 동영상 미리보기 섹션
+                # ============================================================
+                videos_dir = str(project_path / "infographics" / "videos")
+                thumbnails_dir = str(project_path / "infographics" / "thumbnails")
 
-                # ========================================
-                # 탭 3: 설정
-                # ========================================
-                with comp_tab_settings:
-                    st.markdown("#### ⚙️ 캐릭터 합성 설정")
+                # 동영상 파일 목록 가져오기
+                video_files = []
+                if os.path.exists(videos_dir):
+                    video_files = sorted([
+                        f for f in os.listdir(videos_dir)
+                        if f.endswith('.mp4') and 'scene' in f.lower()
+                    ])
 
-                    # 🔴 v3.12: 배경 제거 상세 진단
-                    st.markdown("##### 🎭 배경 제거 상태")
+                with st.expander(f"🎬 생성된 동영상 미리보기 ({len(video_files)}/{scene_count}개)", expanded=len(video_files) > 0):
 
-                    try:
-                        diag = get_bg_removal_diagnostic()
-
-                        diag_col1, diag_col2 = st.columns([2, 1])
-
-                        with diag_col1:
-                            if diag['available']:
-                                st.success(diag['message'])
-                                st.info("✅ 캐릭터 이미지에 배경이 있으면 합성 시 자동으로 제거됩니다.")
-                            else:
-                                st.error(diag['message'])
-                                st.warning("⚠️ 배경 제거 없이 합성되면 캐릭터 배경이 보일 수 있습니다!")
-
-                                # 상세 상태
-                                with st.expander("🔍 상세 진단"):
-                                    st.write(f"- 모듈 로드: {'✅' if diag['module_loaded'] else '❌'}")
-                                    st.write(f"- rembg 설치: {'✅' if diag['rembg_installed'] else '❌'}")
-                                    st.code(diag['install_cmd'], language="bash")
-
-                                install_rembg_ui(key_suffix="settings")
-
-                        with diag_col2:
-                            if diag['available']:
-                                if st.button("🧪 테스트", key="test_bg_removal"):
-                                    success, msg = test_bg_removal()
-                                    if success:
-                                        st.success(msg)
-                                    else:
-                                        st.error(msg)
-                    except Exception as e:
-                        bg_available, bg_msg = is_bg_removal_available()
-                        if bg_available:
-                            st.success(bg_msg)
-                        else:
-                            st.error(bg_msg)
-                            install_rembg_ui(key_suffix="settings")
-
-                    st.divider()
-
-                    # 씬-캐릭터 매핑 정보
-                    st.markdown("##### 📊 씬-캐릭터 매핑 현황")
-                    if matcher:
-                        ms = matcher.get_mapping_summary()
-                        settings_col1, settings_col2, settings_col3 = st.columns(3)
-                        with settings_col1:
-                            st.metric("총 매핑", ms['total'])
-                        with settings_col2:
-                            st.metric("자동 매칭", ms['matched'])
-                        with settings_col3:
-                            st.metric("기본값", ms['default'])
-
-                        if ms['by_character']:
-                            st.write("**캐릭터별 등장:**")
-                            for name, count in ms['by_character'].items():
-                                st.write(f"- {name}: {count}회")
+                    if not video_files:
+                        st.info("아직 생성된 동영상이 없습니다. 위에서 동영상 녹화를 시작하세요.")
                     else:
-                        st.info("씬-캐릭터 매핑 정보가 없습니다.")
-
-                    st.divider()
-
-                    # 캐시 관리
-                    st.markdown("##### 🗑️ 캐시 관리")
-                    cache_dir = project_path / "infographics" / "composites" / ".bg_removed_cache"
-                    cache_count = len(list(cache_dir.glob("*_nobg.png"))) if cache_dir.exists() else 0
-
-                    st.write(f"배경 제거 캐시: **{cache_count}**개 파일")
-
-                    if st.button("🗑️ 배경 제거 캐시 삭제", key="clear_bg_cache"):
-                        if cache_dir.exists():
-                            import shutil
-                            shutil.rmtree(cache_dir)
-                            st.success("캐시가 삭제되었습니다.")
-                            st.rerun()
-
-                # 합성 결과 미리보기
-                composite_scenes = [s for s in infographic_data.scenes if s.is_composite_ready]
-                if composite_scenes:
-                    composites_dir = str(project_path / "infographics" / "composites")
-
-                    with st.expander(f"👤 합성 결과 미리보기 ({len(composite_scenes)}개)", expanded=True):
+                        # 그리드 레이아웃 (5열)
                         cols_per_row = 5
-                        for row_start in range(0, len(composite_scenes), cols_per_row):
+
+                        for row_start in range(0, len(video_files), cols_per_row):
                             cols = st.columns(cols_per_row)
-                            for j, col in enumerate(cols):
-                                idx = row_start + j
-                                if idx >= len(composite_scenes):
+
+                            for col_idx, col in enumerate(cols):
+                                video_idx = row_start + col_idx
+
+                                if video_idx >= len(video_files):
                                     break
-                                scene = composite_scenes[idx]
+
+                                video_file = video_files[video_idx]
+                                video_path = os.path.join(videos_dir, video_file)
+
                                 with col:
-                                    # 썸네일 이미지 (클릭 시 확대)
-                                    if scene.composite_thumbnail_path and os.path.exists(scene.composite_thumbnail_path):
-                                        render_lightbox_image(scene.composite_thumbnail_path, key=f"comp_scene_{idx}")
+                                    # 씬 번호 추출 (예: infographic_scene_001.mp4 → 1)
+                                    try:
+                                        scene_num = int(video_file.split('_')[-1].replace('.mp4', ''))
+                                    except:
+                                        scene_num = video_idx + 1
+
+                                    # 썸네일 이미지 (있으면 사용)
+                                    thumb_path = os.path.join(thumbnails_dir, f"scene_{scene_num:03d}.png")
+                                    alt_thumb_path = os.path.join(thumbnails_dir, f"scene_{scene_num:03d}_thumb.png")
+
+                                    if os.path.exists(thumb_path):
+                                        render_lightbox_image(thumb_path, key=f"vid_thumb_{scene_num}")
+                                    elif os.path.exists(alt_thumb_path):
+                                        render_lightbox_image(alt_thumb_path, key=f"vid_thumb_alt_{scene_num}")
                                     else:
+                                        # 비디오 아이콘 placeholder
                                         st.markdown(
                                             f"""
                                             <div style="
-                                                background: #e8f5e9;
+                                                background: #f0f0f0;
                                                 border-radius: 8px;
                                                 padding: 15px;
                                                 text-align: center;
@@ -3940,480 +3413,1400 @@ if INFOGRAPHIC_AVAILABLE and tab_infographic is not None:
                                                 align-items: center;
                                                 justify-content: center;
                                             ">
-                                                <span style="font-size: 20px;">👤</span>
+                                                <span style="font-size: 20px;">🎬</span>
                                             </div>
                                             """,
                                             unsafe_allow_html=True
                                         )
 
-                                    st.caption(f"씬 {scene.scene_id}")
+                                    # 씬 번호 및 파일 정보
+                                    file_size = os.path.getsize(video_path) / (1024 * 1024)  # MB
+                                    st.caption(f"씬 {scene_num} ({file_size:.1f}MB)")
 
-                                    # 재생 버튼
+                                    # 버튼 행
                                     btn_col1, btn_col2 = st.columns(2)
-                                    with btn_col1:
-                                        if st.button("▶️", key=f"play_comp_{scene.scene_id}", help="미리보기"):
-                                            st.session_state[f'show_comp_video_{scene.scene_id}'] = True
-                                    with btn_col2:
-                                        if scene.composite_video_path and os.path.exists(scene.composite_video_path):
-                                            if st.button("📂", key=f"open_comp_{scene.scene_id}", help="폴더"):
-                                                open_file_location(scene.composite_video_path)
 
-                                    # 비디오 플레이어
-                                    if st.session_state.get(f'show_comp_video_{scene.scene_id}', False):
-                                        if scene.composite_video_path and os.path.exists(scene.composite_video_path):
-                                            st.video(scene.composite_video_path)
-                                        if st.button("닫기", key=f"close_comp_{scene.scene_id}"):
-                                            st.session_state[f'show_comp_video_{scene.scene_id}'] = False
+                                    with btn_col1:
+                                        # 재생 버튼
+                                        if st.button("▶️", key=f"play_video_{video_idx}", help="미리보기"):
+                                            st.session_state[f'show_video_{video_idx}'] = True
+
+                                    with btn_col2:
+                                        # 폴더 열기 버튼
+                                        if st.button("📂", key=f"open_folder_{video_idx}", help="폴더 열기"):
+                                            open_file_location(video_path)
+
+                                    # 비디오 플레이어 (토글)
+                                    if st.session_state.get(f'show_video_{video_idx}', False):
+                                        st.video(video_path)
+                                        if st.button("닫기", key=f"close_video_{video_idx}"):
+                                            st.session_state[f'show_video_{video_idx}'] = False
                                             st.rerun()
 
-                        # 폴더 열기 버튼
+                        # 전체 폴더 열기 버튼
                         st.divider()
-                        comp_folder_col1, comp_folder_col2 = st.columns(2)
-                        with comp_folder_col1:
-                            if st.button("📂 합성 폴더 열기", use_container_width=True, key="open_composites_folder"):
-                                open_folder(composites_dir)
-                        with comp_folder_col2:
-                            if st.button("🗑️ 합성 결과 초기화", use_container_width=True, key="clear_composites"):
-                                for scene in composite_scenes:
-                                    scene.is_composite_ready = False
-                                    scene.composite_video_path = None
-                                    scene.composite_thumbnail_path = None
-                                visual_manager.set_infographic_data(infographic_data)
-                                st.success("합성 상태가 초기화되었습니다.")
-                                st.rerun()
+                        folder_col1, folder_col2, folder_col3 = st.columns([1, 1, 1])
 
-        st.divider()
+                        with folder_col1:
+                            if st.button("📂 동영상 폴더 열기", use_container_width=True, key="open_videos_folder"):
+                                open_folder(videos_dir)
 
-        # === 6. 씬별 시각 자료 선택 ===
-        st.markdown("### 🎯 6. 씬별 시각 자료 선택")
+                        with folder_col2:
+                            if st.button("🗑️ 전체 동영상 삭제", use_container_width=True, type="secondary", key="delete_all_videos"):
+                                if st.session_state.get('confirm_delete_videos', False):
+                                    # 삭제 실행
+                                    for vf in video_files:
+                                        try:
+                                            os.remove(os.path.join(videos_dir, vf))
+                                        except:
+                                            pass
+                                    st.session_state['confirm_delete_videos'] = False
+                                    st.success("삭제 완료!")
+                                    st.rerun()
+                                else:
+                                    st.session_state['confirm_delete_videos'] = True
+                                    st.warning("정말 삭제하시겠습니까? 다시 클릭하면 삭제됩니다.")
 
-        # 씬 데이터 로드
-        scenes_path = project_path / "analysis" / "scenes.json"
-        if scenes_path.exists():
-            with open(scenes_path, "r", encoding="utf-8") as f:
-                scenes_for_selection = json.load(f)
-
-            if scenes_for_selection:
-                # AI 이미지 디렉토리
-                ai_images_dir = project_path / "images" / "scenes"
-                ai_images = list(ai_images_dir.glob("*.png")) if ai_images_dir.exists() else []
-
-                # 인포그래픽 썸네일 디렉토리
-                infographic_thumbs_dir = project_path / "infographics" / "thumbnails"
-                infographic_thumbs = list(infographic_thumbs_dir.glob("*.png")) if infographic_thumbs_dir.exists() else []
-
-                # 인포그래픽 동영상 디렉토리
-                infographic_videos_dir = project_path / "infographics" / "videos"
-                infographic_videos = list(infographic_videos_dir.glob("infographic_scene_*.mp4")) if infographic_videos_dir.exists() else []
-
-                # 합성 동영상 디렉토리
-                composites_dir = project_path / "infographics" / "composites"
-                composite_videos = list(composites_dir.glob("composite_scene_*.mp4")) if composites_dir.exists() else []
-
-                # 선택 초기화
-                visual_manager.initialize_selections_from_scenes(
-                    [s.get("scene_id", i+1) for i, s in enumerate(scenes_for_selection)]
-                )
-
-                # 파일 시스템 기반 동영상 경로 동기화
-                for i, scene in enumerate(scenes_for_selection):
-                    scene_id = scene.get("scene_id", i + 1)
-                    selection = visual_manager.state.selections.get(scene_id)
-
-                    if selection:
-                        # 인포그래픽 동영상 경로 동기화
-                        video_path = infographic_videos_dir / f"infographic_scene_{scene_id:03d}.mp4"
-                        if video_path.exists():
-                            selection.infographic_video = str(video_path)
-
-                        # 합성 동영상 경로 동기화
-                        composite_path = composites_dir / f"composite_scene_{scene_id:03d}.mp4"
-                        if composite_path.exists():
-                            selection.composite_video = str(composite_path)
-
-                # 통계 표시
-                stats = visual_manager.get_statistics()
-                stat_col1, stat_col2, stat_col3, stat_col4, stat_col5, stat_col6 = st.columns(6)
-                with stat_col1:
-                    st.metric("AI 이미지", stats["type_counts"].get("ai_image", 0))
-                with stat_col2:
-                    st.metric("인포그래픽", stats["type_counts"].get("infographic", 0))
-                with stat_col3:
-                    st.metric("캐릭터 합성", stats["type_counts"].get("composite", 0))
-                with stat_col4:
-                    st.metric("🎬 동영상", f"{len(infographic_videos)}/{len(composite_videos)}", help="인포그래픽/합성")
-                with stat_col5:
-                    st.metric("⏳ 생성필요", stats.get("videos_needed", 0))
-                with stat_col6:
-                    st.metric("확정률", f"{stats['completion_rate']:.0f}%")
-
-                # 일괄 적용 버튼
-                bulk_col1, bulk_col2, bulk_col3, bulk_col4 = st.columns(4)
-                with bulk_col1:
-                    if st.button("🎨 전체 AI 이미지로", key="bulk_ai", use_container_width=True):
-                        scene_nums = [s.get("scene_id", i+1) for i, s in enumerate(scenes_for_selection)]
-                        visual_manager.apply_bulk_type(scene_nums, VisualType.AI_IMAGE)
-                        st.rerun()
-                with bulk_col2:
-                    if st.button("📊 전체 인포그래픽으로", key="bulk_infographic", use_container_width=True):
-                        scene_nums = [s.get("scene_id", i+1) for i, s in enumerate(scenes_for_selection)]
-                        visual_manager.apply_bulk_type(scene_nums, VisualType.INFOGRAPHIC)
-                        st.rerun()
-                with bulk_col3:
-                    if st.button("🤖 AI 추천 적용", key="apply_ai_recommendation", use_container_width=True):
-                        try:
-                            from utils.ai_visual_recommender import AIVisualRecommender
-                            recommender = AIVisualRecommender()
-
-                            has_infographic = infographic_data is not None
-                            for i, scene in enumerate(scenes_for_selection):
-                                scene_id = scene.get("scene_id", i + 1)
-                                script_text = scene.get("script_text", "")
-                                scene_title = scene.get("title", "")
-
-                                result = recommender.recommend(
-                                    script_text=script_text,
-                                    scene_title=scene_title,
-                                    has_infographic=has_infographic
-                                )
-
-                                visual_manager.set_ai_recommendation(
-                                    scene_id,
-                                    result.visual_type,
-                                    result.reason,
-                                    result.score
-                                )
-                                visual_manager.set_visual_type(scene_id, result.visual_type, auto_save=False)
-
-                            visual_manager.save_state()
-                            st.success("AI 추천이 적용되었습니다!")
-                            st.rerun()
-                        except Exception as e:
-                            st.error(f"AI 추천 오류: {str(e)}")
-                with bulk_col4:
-                    if st.button("💾 선택 저장", type="primary", key="save_selections", use_container_width=True):
-                        visual_manager.save_state()
-                        st.success("선택이 저장되었습니다!")
-
-                # 📥 일괄 다운로드 섹션
-                st.markdown("#### 📥 자료 일괄 다운로드")
-                dl_col1, dl_col2, dl_col3, dl_col4 = st.columns(4)
-
-                # 이미지 경로 수집
-                scene_images = []
-                scene_videos = []
-                for i, scene in enumerate(scenes_for_selection):
-                    scene_id = scene.get("scene_id", i + 1)
-                    selection = visual_manager.get_selection(scene_id)
-
-                    # AI 이미지
-                    for img in ai_images:
-                        if f"_{scene_id:03d}" in img.stem or f"scene_{scene_id}" in img.stem:
-                            scene_images.append({"scene_num": scene_id, "image_path": str(img), "type": "ai"})
-                            break
-                        elif i < len(ai_images) and img == ai_images[i]:
-                            scene_images.append({"scene_num": scene_id, "image_path": str(ai_images[i]), "type": "ai"})
-                            break
-
-                    # 인포그래픽 동영상
-                    if selection and selection.selected_type == VisualType.INFOGRAPHIC:
-                        for vid in infographic_videos:
-                            if f"_{scene_id:03d}" in vid.stem or f"scene{scene_id}" in vid.stem.lower():
-                                scene_videos.append({"scene_num": scene_id, "video_path": str(vid), "type": "video"})
-                                break
-
-                with dl_col1:
-                    if scene_images:
-                        from utils.download_manager import SceneDownloadManager
-                        manager = SceneDownloadManager(video_path=str(project_path))
-                        zip_buffer = manager.create_zip_buffer(images=scene_images)
-                        st.download_button(
-                            label=f"🖼️ 이미지 다운로드 ({len(scene_images)}개)",
-                            data=zip_buffer,
-                            file_name=manager.get_zip_filename("scene_images"),
-                            mime="application/zip",
-                            key="sb_dl_images",
-                            use_container_width=True
-                        )
-                    else:
-                        st.button("🖼️ 이미지 없음", disabled=True, use_container_width=True)
-
-                with dl_col2:
-                    if scene_videos:
-                        from utils.download_manager import SceneDownloadManager
-                        manager = SceneDownloadManager(video_path=str(project_path))
-                        zip_buffer = manager.create_zip_buffer(videos=scene_videos)
-                        st.download_button(
-                            label=f"🎬 동영상 다운로드 ({len(scene_videos)}개)",
-                            data=zip_buffer,
-                            file_name=manager.get_zip_filename("scene_videos"),
-                            mime="application/zip",
-                            key="sb_dl_videos",
-                            use_container_width=True
-                        )
-                    else:
-                        st.button("🎬 동영상 없음", disabled=True, use_container_width=True)
-
-                with dl_col3:
-                    if scene_images or scene_videos:
-                        from utils.download_manager import SceneDownloadManager
-                        manager = SceneDownloadManager(video_path=str(project_path))
-                        zip_buffer = manager.create_zip_buffer(
-                            images=scene_images if scene_images else None,
-                            videos=scene_videos if scene_videos else None
-                        )
-                        total_items = len(scene_images) + len(scene_videos)
-                        st.download_button(
-                            label=f"📦 전체 다운로드 ({total_items}개)",
-                            data=zip_buffer,
-                            file_name=manager.get_zip_filename("storyboard_assets"),
-                            mime="application/zip",
-                            key="sb_dl_all_zip",
-                            type="primary",
-                            use_container_width=True
-                        )
-                    else:
-                        st.button("📦 자료 없음", disabled=True, use_container_width=True)
-
-                with dl_col4:
-                    if st.button("📁 프로젝트 폴더 저장", key="storyboard_save_to_folder", use_container_width=True):
-                        try:
-                            from utils.download_manager import SceneDownloadManager
-                            manager = SceneDownloadManager(video_path=str(project_path))
-                            saved_count = 0
-
-                            if scene_images:
-                                success, save_dir, saved_files = manager.save_to_project_folder(
-                                    images=scene_images,
-                                    subfolder="storyboard_images"
-                                )
-                                if success:
-                                    saved_count += len(saved_files)
-
-                            if scene_videos:
-                                success, save_dir, saved_files = manager.save_videos_to_project_folder(
-                                    videos=scene_videos,
-                                    subfolder="storyboard_videos"
-                                )
-                                if success:
-                                    saved_count += len(saved_files)
-
-                            if saved_count > 0:
-                                st.success(f"✅ {saved_count}개 파일 저장 완료!")
+                        with folder_col3:
+                            # 병합된 파일 확인
+                            merged_path = os.path.join(videos_dir, "merged_all.mp4")
+                            if os.path.exists(merged_path):
+                                merged_size = os.path.getsize(merged_path) / (1024 * 1024)
+                                st.success(f"✅ 병합 ({merged_size:.1f}MB)")
+                                if st.button("▶️ 병합 영상", key="play_merged"):
+                                    st.video(merged_path)
                             else:
-                                st.warning("저장할 파일이 없습니다.")
-                        except Exception as e:
-                            st.error(f"저장 오류: {e}")
-
-                # 🔄 프로세스 간 동기화 섹션
-                from utils.sync_manager import ProcessType
-                from utils.sync_ui import render_sync_buttons
-                render_sync_buttons(ProcessType.STORYBOARD)
+                                st.caption("병합 파일 없음")
 
                 st.divider()
 
-                # 씬별 선택 UI
-                for i, scene in enumerate(scenes_for_selection):
-                    scene_id = scene.get("scene_id", i + 1)
-                    script_text = scene.get("script_text", "")
+                # === 5. 캐릭터 합성 ===
+                st.markdown("### 👤 5. 캐릭터 동영상 합성")
+                st.caption("인포그래픽 동영상 위에 캐릭터 PNG 오버레이 (FFmpeg)")
 
-                    selection = visual_manager.get_selection(scene_id)
-                    current_type = selection.selected_type if selection else VisualType.AI_IMAGE
+                # ========================================
+                # 캐릭터 로드 (CharacterManager + 직접 PNG 스캔)
+                # ========================================
+                try:
+                    from core.character.character_manager import CharacterManager
+                    char_manager = CharacterManager(str(project_path))
+                    registered_characters = char_manager.get_all_characters()
+                except Exception as e:
+                    registered_characters = []
+                    st.warning(f"캐릭터 매니저 로드 실패: {e}")
 
-                    with st.container():
-                        main_col1, main_col2 = st.columns([2, 3])
+                # 캐릭터 이미지 목록 구성 (등록된 캐릭터 + 폴더 스캔)
+                character_dir = project_path / "characters"
+                character_images_dir = project_path / "images" / "characters"
+                character_options = []
 
-                        with main_col1:
-                            # 씬 번호 + AI 추천 표시
-                            header_cols = st.columns([3, 2])
-                            with header_cols[0]:
-                                st.markdown(f"#### 씬 {scene_id}")
-                            with header_cols[1]:
-                                if selection and selection.ai_recommendation:
-                                    rec_icon = {"ai_image": "🎨", "infographic": "📊", "composite": "👤"}.get(
-                                        selection.ai_recommendation.value, "❓"
+                # 1. 등록된 캐릭터 (generated_images 포함)
+                for char in registered_characters:
+                    # 생성된 이미지 사용
+                    if char.generated_images:
+                        for img_path in char.generated_images:
+                            full_path = Path(img_path) if os.path.isabs(img_path) else project_path / img_path
+                            if full_path.exists():
+                                character_options.append({
+                                    'name': f"👤 {char.name}",
+                                    'path': full_path,
+                                    'type': 'registered',
+                                    'char_id': char.id
+                                })
+                                break  # 첫 번째 이미지만 사용
+
+                # 2. characters 폴더 직접 스캔 (등록 안 된 PNG)
+                registered_paths = {opt['path'] for opt in character_options}
+                for scan_dir in [character_dir, character_images_dir]:
+                    if scan_dir.exists():
+                        for img_file in scan_dir.glob("*.png"):
+                            if img_file not in registered_paths:
+                                character_options.append({
+                                    'name': f"📁 {img_file.stem}",
+                                    'path': img_file,
+                                    'type': 'folder',
+                                    'char_id': None
+                                })
+                                registered_paths.add(img_file)
+
+                # 동영상이 있는 씬 확인 (파일 시스템 기반)
+                video_dir = project_path / "infographics" / "videos"
+                video_files = list(video_dir.glob("infographic_scene_*.mp4")) if video_dir.exists() else []
+
+                # InfographicData와 동기화
+                video_ready_scenes = []
+                for scene in infographic_data.scenes:
+                    video_path = video_dir / f"infographic_scene_{scene.scene_id:03d}.mp4"
+                    if video_path.exists():
+                        scene.is_video_ready = True
+                        scene.video_path = str(video_path)
+                        video_ready_scenes.append(scene)
+
+                if not character_options:
+                    st.info("캐릭터 이미지가 없습니다.")
+
+                    # 탭: 캐릭터 관리로 이동 / 직접 업로드
+                    char_tab1, char_tab2 = st.tabs(["📦 캐릭터 관리 페이지", "📤 직접 업로드"])
+
+                    with char_tab1:
+                        st.write("**캐릭터 관리** 페이지에서 캐릭터를 생성하면 여기에 표시됩니다.")
+                        if registered_characters:
+                            st.write(f"등록된 캐릭터: {len(registered_characters)}명 (이미지 없음)")
+                            for char in registered_characters[:5]:
+                                st.caption(f"- {char.name}: 이미지 생성 필요")
+                        else:
+                            st.caption("등록된 캐릭터가 없습니다.")
+
+                    with char_tab2:
+                        uploaded_char = st.file_uploader(
+                            "캐릭터 PNG 업로드",
+                            type=["png"],
+                            key="upload_character"
+                        )
+                        if uploaded_char:
+                            character_dir.mkdir(parents=True, exist_ok=True)
+                            char_path = character_dir / uploaded_char.name
+                            with open(char_path, "wb") as f:
+                                f.write(uploaded_char.read())
+                            st.success(f"캐릭터 저장: {char_path.name}")
+                            st.rerun()
+                else:
+                    # 합성 상태 메트릭
+                    composites_dir = project_path / "infographics" / "composites"
+                    composite_files = list(composites_dir.glob("composite_scene_*.mp4")) if composites_dir.exists() else []
+
+                    # 씬-캐릭터 매처 초기화
+                    try:
+                        matcher = get_scene_character_matcher(str(project_path))
+                        mapping_summary = matcher.get_mapping_summary()
+                        scene_analysis = matcher.load_scene_analysis()
+                    except Exception as e:
+                        matcher = None
+                        mapping_summary = {'total': 0, 'matched': 0, 'default': 0, 'by_character': {}}
+                        scene_analysis = []
+
+                    comp_metric_col1, comp_metric_col2, comp_metric_col3, comp_metric_col4, comp_metric_col5 = st.columns(5)
+                    with comp_metric_col1:
+                        st.metric("캐릭터 이미지", len(character_options))
+                    with comp_metric_col2:
+                        st.metric("씬 분석", len(scene_analysis))
+                    with comp_metric_col3:
+                        st.metric("자동 매칭", mapping_summary['matched'])
+                    with comp_metric_col4:
+                        st.metric("동영상", len(video_files))
+                    with comp_metric_col5:
+                        st.metric("합성 완료", len(composite_files))
+
+                    # 탭: 씬분석 자동 매칭 / 수동 선택 / 설정
+                    comp_tab_auto, comp_tab_manual, comp_tab_settings = st.tabs([
+                        "🤖 씬분석 자동 매칭",
+                        "✋ 수동 선택",
+                        "⚙️ 설정"
+                    ])
+
+                    # 기본값: 자동 배경 제거 활성화
+                    auto_remove_bg = True
+
+                    # ========================================
+                    # 탭 1: 씬분석 자동 매칭
+                    # ========================================
+                    with comp_tab_auto:
+                        st.markdown("#### 🤖 씬분석 → 캐릭터 자동 매칭")
+                        st.caption("씬 분석 페이지의 '등장 캐릭터' 정보를 캐릭터 관리의 캐릭터와 자동 매칭합니다.")
+
+                        if not scene_analysis:
+                            st.warning("씬 분석 데이터가 없습니다.")
+                            st.info("👉 **씬 분석** 페이지에서 먼저 씬을 분석하세요.")
+                        elif not matcher or not matcher.get_available_characters():
+                            st.warning("등록된 캐릭터가 없습니다.")
+                            st.info("👉 **캐릭터 관리** 페이지에서 캐릭터를 먼저 추가하세요.")
+                        else:
+                            # 🔴 v3.12: 로드된 캐릭터 디버그 정보 표시
+                            available_chars = matcher.get_available_characters()
+                            with st.expander(f"👤 매칭 가능 캐릭터 ({len(available_chars)}명)", expanded=False):
+                                if available_chars:
+                                    for c in available_chars:
+                                        has_image = "✅" if c.get('image_path') else "❌"
+                                        st.caption(f"- {c['name']} ({c['id']}) {has_image}")
+                                else:
+                                    st.warning("캐릭터가 로드되지 않았습니다.")
+                                    st.info("캐릭터 관리 페이지에서 캐릭터 이미지를 생성하세요.")
+
+                            # 현재 매핑 미리보기
+                            existing_mappings = matcher.load_mappings()
+
+                            with st.expander("📋 현재 씬-캐릭터 매핑", expanded=len(existing_mappings) > 0):
+                                if existing_mappings:
+                                    import pandas as pd
+                                    mapping_data = []
+                                    for m in existing_mappings[:15]:
+                                        mapping_data.append({
+                                            "씬": m.get('scene_num', '-'),
+                                            "분석된 캐릭터": m.get('original_name', '-'),
+                                            "매칭된 캐릭터": m.get('character_name', '-'),
+                                            "신뢰도": f"{m.get('confidence', 0):.0%}",
+                                            "소스": "✅ 자동" if m.get('match_type') != 'default' else "⚪ 기본"
+                                        })
+
+                                    df = pd.DataFrame(mapping_data)
+                                    st.dataframe(df, use_container_width=True, hide_index=True)
+
+                                    if len(existing_mappings) > 15:
+                                        st.caption(f"... 외 {len(existing_mappings) - 15}개")
+
+                                    # 캐릭터별 등장 횟수
+                                    if mapping_summary['by_character']:
+                                        st.markdown("**캐릭터별 등장 횟수:**")
+                                        for char_name, count in mapping_summary['by_character'].items():
+                                            st.write(f"- {char_name}: **{count}회**")
+                                else:
+                                    st.info("아직 생성된 매핑이 없습니다. 아래에서 자동 매핑을 생성하세요.")
+
+                            st.divider()
+
+                            # 자동 매핑 생성
+                            st.markdown("##### 🔄 자동 매핑 생성")
+
+                            auto_col1, auto_col2 = st.columns(2)
+
+                            with auto_col1:
+                                # 기본 캐릭터 선택 (available_chars는 위에서 이미 로드됨)
+                                default_options = ["없음 (매칭된 것만)"] + [c['name'] for c in available_chars]
+                                default_select = st.selectbox(
+                                    "기본 캐릭터 (매칭 실패 시)",
+                                    options=default_options,
+                                    key="default_char_matcher"
+                                )
+
+                                default_char_id = None
+                                if default_select != "없음 (매칭된 것만)":
+                                    default_char = next((c for c in available_chars if c['name'] == default_select), None)
+                                    if default_char:
+                                        default_char_id = default_char['id']
+
+                            with auto_col2:
+                                # 미리 계산
+                                preview_mappings = matcher.generate_mappings(scene_analysis, default_char_id)
+                                auto_count = sum(1 for m in preview_mappings if m.get('match_type') != 'default')
+                                default_count = len(preview_mappings) - auto_count
+
+                                st.write("📊 **예상 결과:**")
+                                st.write(f"- 자동 매칭: **{auto_count}개** 씬")
+                                st.write(f"- 기본값 사용: **{default_count}개** 씬")
+
+                            # 매핑 생성 버튼
+                            if st.button("🔍 씬분석에서 캐릭터 자동 매칭", key="generate_auto_mapping", type="primary"):
+                                with st.spinner("씬 분석 데이터에서 캐릭터 매칭 중..."):
+                                    new_mappings = matcher.generate_mappings(scene_analysis, default_char_id)
+
+                                    if new_mappings:
+                                        matcher.save_mappings(new_mappings)
+                                        st.success(f"✅ {len(new_mappings)}개 씬에 캐릭터 매핑 완료!")
+                                        st.rerun()
+                                    else:
+                                        st.warning("매핑할 수 있는 씬이 없습니다.")
+
+                            st.divider()
+
+                            # 일괄 합성 실행
+                            st.markdown("##### 🎬 자동 매핑 기반 일괄 합성")
+
+                            existing_mappings = matcher.load_mappings()
+
+                            # 합성 가능한 씬 필터링 (동영상이 있는 씬)
+                            video_scene_nums = set()
+                            for vf in video_files:
+                                try:
+                                    scene_num = int(vf.stem.split('_')[-1])
+                                    video_scene_nums.add(scene_num)
+                                except ValueError:
+                                    pass
+
+                            mappings_with_video = [
+                                m for m in existing_mappings
+                                if m.get('scene_num') in video_scene_nums and m.get('image_path')
+                            ]
+
+                            if not mappings_with_video:
+                                st.warning("합성 가능한 씬이 없습니다.")
+                                if not existing_mappings:
+                                    st.info("먼저 위에서 자동 매핑을 생성하세요.")
+                                elif not video_files:
+                                    st.info("먼저 동영상을 생성하세요.")
+                            else:
+                                # 합성 옵션
+                                auto_c1, auto_c2, auto_c3 = st.columns(3)
+
+                                with auto_c1:
+                                    # v2.0: 9개 위치 프리셋 (3x3 그리드)
+                                    position_options_auto = {
+                                        "↘️ 우하단 (기본)": "bottom_right",
+                                        "↙️ 좌하단": "bottom_left",
+                                        "⬇️ 하단 중앙": "bottom_center",
+                                        "➡️ 우측 중앙": "middle_right",
+                                        "⬅️ 좌측 중앙": "middle_left",
+                                        "⏺️ 정중앙": "middle_center",
+                                        "↗️ 우상단": "top_right",
+                                        "↖️ 좌상단": "top_left",
+                                        "⬆️ 상단 중앙": "top_center",
+                                    }
+                                    auto_pos_label = st.selectbox(
+                                        "📍 위치 (3x3 그리드)",
+                                        list(position_options_auto.keys()),
+                                        key="auto_compose_pos"
                                     )
-                                    st.caption(f"🤖 추천: {rec_icon} ({selection.recommendation_score:.0%})")
+                                    auto_position = position_options_auto[auto_pos_label]
 
-                            st.caption(script_text[:80] + "..." if len(script_text) > 80 else script_text)
+                                with auto_c2:
+                                    # v2.0: 10-60% 크기 범위
+                                    auto_scale = st.slider(
+                                        "📏 크기 (%)",
+                                        min_value=10,
+                                        max_value=60,
+                                        value=35,
+                                        step=5,
+                                        key="auto_compose_scale",
+                                        help="배경 높이 대비 캐릭터 높이 비율 (10-60%)"
+                                    ) / 100  # 백분율을 비율로 변환
 
-                            # AI 추천 이유 표시
-                            if selection and selection.recommendation_reason:
-                                st.caption(f"💡 {selection.recommendation_reason}")
+                                with auto_c3:
+                                    bg_available, bg_msg = is_bg_removal_available()
+                                    # v3.14: 배경 제거 기본값 True, 체크박스 항상 활성화
+                                    auto_remove_bg_opt = st.checkbox(
+                                        "🎭 배경 제거",
+                                        value=True,  # 항상 기본값 True
+                                        key="auto_remove_bg_opt",
+                                        help="캐릭터 배경을 자동으로 제거합니다"
+                                    )
+                                    if not bg_available:
+                                        st.caption("⚠️ rembg 미설치 (합성 시 자동 설치 시도)")
+                                        with st.expander("🔧 수동 설치하기"):
+                                            install_rembg_ui(key_suffix="auto_match")
 
-                            # 시각 자료 타입 선택
-                            type_options = ["🎨 AI 이미지", "📊 인포그래픽", "👤 캐릭터 합성"]
-                            type_values = [VisualType.AI_IMAGE, VisualType.INFOGRAPHIC, VisualType.COMPOSITE]
+                                st.info(f"📊 합성 대상: **{len(mappings_with_video)}개** 씬")
 
-                            current_idx = type_values.index(current_type) if current_type in type_values else 0
+                                if st.button(
+                                    "🎬 자동 매핑 기반 일괄 합성",
+                                    key="start_auto_compose",
+                                    use_container_width=True,
+                                    type="primary"
+                                ):
+                                    try:
+                                        output_dir = str(project_path / "infographics" / "composites")
+                                        os.makedirs(output_dir, exist_ok=True)
 
-                            selected_type_name = st.radio(
-                                f"시각 자료 타입 (씬 {scene_id})",
-                                type_options,
-                                index=current_idx,
-                                key=f"visual_type_{scene_id}_{i}",
-                                horizontal=True,
-                                label_visibility="collapsed"
+                                        progress_bar = st.progress(0)
+                                        status_text = st.empty()
+
+                                        results = []
+                                        total = len(mappings_with_video)
+
+                                        for i, mapping in enumerate(mappings_with_video):
+                                            scene_num = mapping['scene_num']
+                                            char_name = mapping.get('character_name', 'Unknown')
+                                            image_path = mapping.get('image_path')
+
+                                            progress_bar.progress((i + 1) / total)
+                                            status_text.text(f"[{i+1}/{total}] 씬 {scene_num}: {char_name}")
+
+                                            # 동영상 경로
+                                            video_path = video_dir / f"infographic_scene_{scene_num:03d}.mp4"
+                                            if not video_path.exists() or not image_path:
+                                                continue
+
+                                            # 합성 실행
+                                            from utils.infographic_compositor import composite_character_sync
+                                            output = composite_character_sync(
+                                                video_path=str(video_path),
+                                                character_image_path=image_path,
+                                                scene_id=scene_num,
+                                                position=auto_position,
+                                                scale=auto_scale,
+                                                output_dir=output_dir,
+                                                auto_remove_bg=auto_remove_bg_opt
+                                            )
+
+                                            if output:
+                                                results.append(output)
+
+                                        progress_bar.empty()
+                                        status_text.empty()
+
+                                        if results:
+                                            st.success(f"✅ {len(results)}개 씬 일괄 합성 완료!")
+                                            st.balloons()
+                                            st.rerun()
+                                        else:
+                                            st.error("합성 실패")
+
+                                    except Exception as e:
+                                        st.error(f"오류: {e}")
+                                        import traceback
+                                        st.code(traceback.format_exc())
+
+                            st.divider()
+
+                            # ========================================
+                            # 합성 결과 미리보기 (자동 매핑)
+                            # ========================================
+                            st.markdown("##### 👁️ 합성 결과 미리보기")
+
+                            # 합성된 파일 확인
+                            composites_dir = project_path / "infographics" / "composites"
+                            composite_thumbs = list(composites_dir.glob("composite_scene_*_thumb.png")) if composites_dir.exists() else []
+
+                            if composite_thumbs:
+                                st.success(f"✅ {len(composite_thumbs)}개 합성 완료된 씬")
+
+                                # 그리드로 미리보기
+                                preview_cols_per_row = 4
+                                composite_thumbs_sorted = sorted(composite_thumbs, key=lambda x: x.stem)
+
+                                for i in range(0, len(composite_thumbs_sorted), preview_cols_per_row):
+                                    cols = st.columns(preview_cols_per_row)
+                                    for j, col in enumerate(cols):
+                                        idx = i + j
+                                        if idx < len(composite_thumbs_sorted):
+                                            thumb_path = composite_thumbs_sorted[idx]
+                                            # 씬 번호 추출
+                                            try:
+                                                scene_num = int(thumb_path.stem.split('_')[2])
+                                            except:
+                                                scene_num = idx + 1
+
+                                            with col:
+                                                st.image(str(thumb_path), caption=f"씬 {scene_num}", use_container_width=True)
+
+                                # 개별 씬 편집 버튼
+                                with st.expander("✏️ 개별 씬 위치/크기 조정"):
+                                    st.caption("특정 씬의 캐릭터 위치나 크기를 수정하려면 '수동 선택' 탭에서 개별 편집을 사용하세요.")
+                                    st.info("👉 '수동 선택' 탭 → 씬 선택 → 캐릭터 에디터에서 위치/크기 조정")
+                            else:
+                                st.info("합성된 결과가 없습니다. 위에서 '일괄 합성'을 실행하세요.")
+
+                    # ========================================
+                    # 탭 2: 수동 선택 (기존 코드)
+                    # ========================================
+                    with comp_tab_manual:
+                        st.markdown("#### ✋ 수동 캐릭터 선택")
+                        st.caption("개별 씬에 특정 캐릭터를 직접 지정합니다.")
+
+                        char_col1, char_col2 = st.columns([3, 2])
+
+                        with char_col1:
+                            # 캐릭터 선택 (이름과 유형 표시)
+                            selected_char_idx = st.selectbox(
+                                "캐릭터 선택",
+                                range(len(character_options)),
+                                format_func=lambda i: character_options[i]['name'],
+                                key="select_character_idx"
                             )
+                            selected_char_info = character_options[selected_char_idx]
+                            selected_char = selected_char_info['path']
 
-                            new_type = type_values[type_options.index(selected_type_name)]
-                            if new_type != current_type:
-                                visual_manager.set_visual_type(scene_id, new_type, auto_save=False)
+                            # v2.0: 위치 설정 (9개 프리셋)
+                            position_options = {
+                                "↘️ 우하단 (기본)": "bottom_right",
+                                "↙️ 좌하단": "bottom_left",
+                                "⬇️ 하단 중앙": "bottom_center",
+                                "➡️ 우측 중앙": "middle_right",
+                                "⬅️ 좌측 중앙": "middle_left",
+                                "⏺️ 정중앙": "middle_center",
+                                "↗️ 우상단": "top_right",
+                                "↖️ 좌상단": "top_left",
+                                "⬆️ 상단 중앙": "top_center",
+                            }
+                            char_position_label = st.selectbox(
+                                "📍 위치 (3x3 그리드)",
+                                list(position_options.keys()),
+                                key="char_position_select"
+                            )
+                            char_position = position_options[char_position_label]
 
-                            # 내보내기 미디어 타입 표시
-                            if selection:
-                                _, media_type = selection.get_export_media()
-                                media_icon = "🖼️" if media_type == MediaType.IMAGE else "🎬"
-                                st.caption(f"내보내기: {media_icon} {media_type.value}")
+                            # v2.0: 크기 설정 (10-60%)
+                            scale_options = {
+                                "아주 작게 (10%)": 0.10,
+                                "작게 (20%)": 0.20,
+                                "보통 (30%)": 0.30,
+                                "크게 (40%)": 0.40,
+                                "아주 크게 (50%)": 0.50,
+                                "최대 (60%)": 0.60
+                            }
+                            scale_label = st.selectbox(
+                                "📏 크기",
+                                list(scale_options.keys()),
+                                index=2,  # 기본: 보통 (30%)
+                                key="char_scale_select"
+                            )
+                            char_scale = scale_options[scale_label]
 
-                        with main_col2:
-                            img_cols = st.columns(3)
+                            # 고급 설정
+                            with st.expander("⚙️ 고급 설정"):
+                                char_scale_custom = st.slider(
+                                    "세부 크기 조정 (%)",
+                                    min_value=10,
+                                    max_value=60,
+                                    value=int(char_scale * 100),
+                                    step=5,
+                                    key="char_scale_custom",
+                                    help="배경 높이 대비 캐릭터 높이 비율 (10-60%)"
+                                ) / 100  # 백분율을 비율로 변환
+                                if char_scale_custom != char_scale:
+                                    char_scale = char_scale_custom
 
-                            # AI 이미지 미리보기
-                            with img_cols[0]:
-                                st.caption("🎨 AI 이미지")
-                                ai_img = None
-                                for img in ai_images:
-                                    if f"_{scene_id:03d}" in img.stem or f"scene_{scene_id}" in img.stem:
-                                        ai_img = img
-                                        break
-                                if not ai_img and i < len(ai_images):
-                                    ai_img = ai_images[i]
+                                st.divider()
 
-                                if ai_img and ai_img.exists():
-                                    st.image(str(ai_img), width=120)
-                                    if st.button("🔍", key=f"zoom_ai_{scene_id}_{i}", help="확대"):
-                                        st.session_state[f"zoom_ai_{scene_id}_{i}"] = True
-                                    if st.session_state.get(f"zoom_ai_{scene_id}_{i}", False):
-                                        from utils.image_viewer import show_image_modal
-                                        show_image_modal(str(ai_img), scene_id, None, f"씬 {scene_id} AI 이미지")
-                                        st.session_state[f"zoom_ai_{scene_id}_{i}"] = False
-                                    if selection:
-                                        visual_manager.state.selections[scene_id].ai_image_path = str(ai_img)
+                                # 배경 제거 옵션
+                                st.markdown("##### 🎭 배경 제거")
+                                rembg_available, rembg_msg = is_bg_removal_available()
+
+                                # v3.14: 배경 제거 항상 활성화, 기본값 True
+                                auto_remove_bg = st.checkbox(
+                                    "🎭 자동 배경 제거",
+                                    value=True,  # 항상 기본값 True
+                                    help="캐릭터 이미지에 배경이 있으면 자동으로 제거합니다",
+                                    key="auto_remove_bg_checkbox"
+                                )
+
+                                if rembg_available:
+                                    st.success(rembg_msg)
                                 else:
-                                    st.info("없음")
+                                    st.warning(f"{rembg_msg} (합성 시 자동 설치 시도)")
+                                    with st.expander("🔧 수동 설치하기"):
+                                        install_rembg_ui(key_suffix="manual_select")
 
-                            # 인포그래픽 썸네일 미리보기
-                            with img_cols[1]:
-                                # 동영상 상태 확인
-                                info_video_path = infographic_videos_dir / f"infographic_scene_{scene_id:03d}.mp4"
-                                info_video_exists = info_video_path.exists()
-                                video_icon = "🎬" if info_video_exists else "⏳"
-                                st.caption(f"📊 인포그래픽 {video_icon}")
-
-                                info_thumb = None
-
-                                # infographic_data에서 찾기
-                                if infographic_data:
-                                    for info_scene in infographic_data.scenes:
-                                        if info_scene.scene_id == scene_id:
-                                            info_thumb = info_scene.thumbnail_path or info_scene.first_frame_path
-                                            break
-
-                                # 디렉토리에서 찾기
-                                if not info_thumb:
-                                    for img in infographic_thumbs:
-                                        if f"_{scene_id:03d}" in img.stem or f"scene_{scene_id}" in img.stem:
-                                            info_thumb = str(img)
-                                            break
-
-                                if info_thumb and os.path.exists(info_thumb):
-                                    st.image(info_thumb, width=120)
-                                    if st.button("🔍", key=f"zoom_info_{scene_id}_{i}", help="확대"):
-                                        st.session_state[f"zoom_info_{scene_id}_{i}"] = True
-                                    if st.session_state.get(f"zoom_info_{scene_id}_{i}", False):
-                                        from utils.image_viewer import show_image_modal
-                                        show_image_modal(info_thumb, scene_id, None, f"씬 {scene_id} 인포그래픽")
-                                        st.session_state[f"zoom_info_{scene_id}_{i}"] = False
-                                    if selection:
-                                        visual_manager.state.selections[scene_id].infographic_thumbnail = info_thumb
-                                        if info_video_exists:
-                                            visual_manager.state.selections[scene_id].infographic_video = str(info_video_path)
+                        with char_col2:
+                            if selected_char and selected_char.exists():
+                                st.image(str(selected_char), caption=selected_char_info['name'], width=180)
+                                if selected_char_info['type'] == 'registered':
+                                    st.caption(f"✅ 캐릭터 관리에서 등록됨")
                                 else:
-                                    st.info("없음")
+                                    st.caption(f"📁 폴더에서 직접 로드")
 
-                            # 캐릭터 합성 미리보기
-                            with img_cols[2]:
-                                # 합성 동영상 상태 확인
-                                comp_video_path = composites_dir / f"composite_scene_{scene_id:03d}.mp4"
-                                comp_video_exists = comp_video_path.exists()
-                                comp_icon = "🎬" if comp_video_exists else "⏳"
-                                st.caption(f"👤 합성 {comp_icon}")
+                        # 합성 대상 선택
+                        st.markdown("#### 합성 대상 선택")
+                        comp_target_mode = st.radio(
+                            "합성 범위",
+                            ["미합성 씬만", "전체 재합성", "개별 선택"],
+                            horizontal=True,
+                            key="comp_target_mode"
+                        )
 
-                                comp_thumb = None
+                        if comp_target_mode == "미합성 씬만":
+                            compositable_scenes = [s for s in infographic_data.scenes if s.is_video_ready and not s.is_composite_ready]
+                        elif comp_target_mode == "전체 재합성":
+                            compositable_scenes = video_ready_scenes
+                        else:  # 개별 선택
+                            scene_options = [f"씬 {s.scene_id}" for s in video_ready_scenes]
+                            selected_comp_labels = st.multiselect(
+                                "합성할 씬 선택",
+                                options=scene_options,
+                                default=[],
+                                key="comp_scene_multiselect"
+                            )
+                            selected_comp_ids = [int(s.replace("씬 ", "")) for s in selected_comp_labels]
+                            compositable_scenes = [s for s in video_ready_scenes if s.scene_id in selected_comp_ids]
 
-                                if infographic_data:
-                                    for info_scene in infographic_data.scenes:
-                                        if info_scene.scene_id == scene_id and info_scene.is_composite_ready:
-                                            comp_thumb = info_scene.composite_thumbnail_path
-                                            break
-
-                                # 합성 썸네일 직접 확인
-                                if not comp_thumb:
-                                    comp_thumb_path = composites_dir / f"composite_scene_{scene_id:03d}_thumb.png"
-                                    if comp_thumb_path.exists():
-                                        comp_thumb = str(comp_thumb_path)
-
-                                if comp_thumb and os.path.exists(comp_thumb):
-                                    st.image(comp_thumb, width=120)
-                                    if st.button("🔍", key=f"zoom_comp_{scene_id}_{i}", help="확대"):
-                                        st.session_state[f"zoom_comp_{scene_id}_{i}"] = True
-                                    if st.session_state.get(f"zoom_comp_{scene_id}_{i}", False):
-                                        from utils.image_viewer import show_image_modal
-                                        show_image_modal(comp_thumb, scene_id, None, f"씬 {scene_id} 합성")
-                                        st.session_state[f"zoom_comp_{scene_id}_{i}"] = False
-                                    if selection:
-                                        visual_manager.state.selections[scene_id].composite_thumbnail = comp_thumb
-                                        if comp_video_exists:
-                                            visual_manager.state.selections[scene_id].composite_video = str(comp_video_path)
-                                elif comp_video_exists:
-                                    # 동영상은 있지만 썸네일이 없을 때
-                                    st.success("🎬 준비됨")
-                                    if selection:
-                                        visual_manager.state.selections[scene_id].composite_video = str(comp_video_path)
-                                else:
-                                    st.info("없음")
+                        st.info(f"📊 합성 대상: {len(compositable_scenes)}개 씬")
 
                         st.divider()
 
-                # === 7. 내보내기 요약 ===
-                st.markdown("### 📤 7. 내보내기 요약")
+                        # ========================================
+                        # 🔴 v3.12: 시각적 캐릭터 에디터 (위치/크기 조정)
+                        # ========================================
+                        st.markdown("#### 🎨 시각적 위치/크기 조정 (미리보기)")
 
-                export_data = visual_manager.export_for_video_pipeline()
+                        # 개별 씬 선택해서 시각적 편집
+                        if video_ready_scenes and selected_char and selected_char.exists():
+                            edit_scene_options = [f"씬 {s.scene_id}" for s in video_ready_scenes]
 
-                if export_data:
-                    # 미디어 타입별 카운트
-                    image_count = sum(1 for e in export_data if e["media_type"] == "image")
-                    video_count = sum(1 for e in export_data if e["media_type"] == "video")
+                            use_visual_editor = st.checkbox(
+                                "🖼️ 시각적 에디터 사용 (개별 씬)",
+                                value=False,
+                                key="use_visual_editor",
+                                help="선택한 씬의 인포그래픽에 캐릭터를 미리 배치하고 위치/크기를 조정합니다."
+                            )
 
-                    exp_col1, exp_col2, exp_col3 = st.columns(3)
-                    with exp_col1:
-                        st.metric("총 씬", len(export_data))
-                    with exp_col2:
-                        st.metric("🖼️ 이미지", image_count)
-                    with exp_col3:
-                        st.metric("🎬 동영상", video_count)
+                            if use_visual_editor:
+                                selected_edit_scene = st.selectbox(
+                                    "편집할 씬 선택",
+                                    edit_scene_options,
+                                    key="visual_edit_scene_select"
+                                )
+                                edit_scene_id = int(selected_edit_scene.replace("씬 ", ""))
 
-                    with st.expander("📋 내보내기 상세", expanded=False):
-                        for item in export_data:
-                            media_icon = "🖼️" if item["media_type"] == "image" else "🎬"
-                            visual_icon = {"ai_image": "🎨", "infographic": "📊", "composite": "👤"}.get(item["visual_type"], "❓")
-                            finalized = "✅" if item["is_finalized"] else "⏳"
-                            st.text(f"{finalized} 씬 {item['scene_number']}: {visual_icon} {item['visual_type']} → {media_icon} {item['media_type']}")
+                                # 해당 씬의 인포그래픽 찾기
+                                infographic_thumb_path = project_path / "infographics" / "thumbnails" / f"infographic_{edit_scene_id:03d}.png"
+                                video_frame_path = project_path / "infographics" / "composites" / f"composite_scene_{edit_scene_id:03d}_thumb.png"
 
-                    # 내보내기 JSON 다운로드
-                    st.download_button(
-                        "📥 내보내기 JSON 다운로드",
-                        data=json.dumps(export_data, ensure_ascii=False, indent=2),
-                        file_name="visual_export.json",
-                        mime="application/json",
-                        use_container_width=True
-                    )
-                else:
-                    st.info("내보내기할 씬이 없습니다. 씬별 시각 자료를 선택하세요.")
+                                # 썸네일 없으면 동영상 첫 프레임 추출 시도
+                                if not infographic_thumb_path.exists():
+                                    # 동영상에서 첫 프레임 추출
+                                    video_path = project_path / "infographics" / "videos" / f"infographic_scene_{edit_scene_id:03d}.mp4"
+                                    if video_path.exists():
+                                        temp_frame = project_path / "infographics" / "thumbnails" / f"temp_frame_{edit_scene_id:03d}.png"
+                                        temp_frame.parent.mkdir(parents=True, exist_ok=True)
+                                        try:
+                                            subprocess.run([
+                                                "ffmpeg", "-y", "-i", str(video_path),
+                                                "-vframes", "1", str(temp_frame)
+                                            ], capture_output=True)
+                                            if temp_frame.exists():
+                                                infographic_thumb_path = temp_frame
+                                        except:
+                                            pass
 
-        else:
-            st.warning("씬 분석 결과가 없습니다. '자동 조합' 또는 '수동 구성' 탭에서 씬을 먼저 생성하세요.")
+                                if infographic_thumb_path.exists():
+                                    st.caption(f"씬 {edit_scene_id}에 캐릭터 배치 미리보기")
+
+                                    # 캐릭터 에디터 호출
+                                    editor_result = render_character_editor(
+                                        background_path=str(infographic_thumb_path),
+                                        character_path=str(selected_char),
+                                        initial_size=int(char_scale * 100),
+                                        remove_background=auto_remove_bg if 'auto_remove_bg' in dir() else True,
+                                        key=f"char_editor_scene_{edit_scene_id}"
+                                    )
+
+                                    if editor_result:
+                                        st.success(f"✅ 캐릭터 위치: ({editor_result['position_x']}, {editor_result['position_y']}), 크기: {editor_result['size_percent']}%")
+
+                                        # 이 설정으로 합성 버튼
+                                        if st.button(
+                                            f"📸 씬 {edit_scene_id}에 이 설정으로 합성",
+                                            key=f"apply_editor_scene_{edit_scene_id}",
+                                            type="secondary"
+                                        ):
+                                            # 결과 이미지 저장
+                                            output_path = project_path / "infographics" / "composites" / f"composite_scene_{edit_scene_id:03d}_preview.png"
+                                            output_path.parent.mkdir(parents=True, exist_ok=True)
+                                            editor_result['composite_image'].save(str(output_path), 'PNG')
+                                            st.success(f"미리보기 저장: {output_path.name}")
+
+                                            # 동영상 합성은 별도로 실행해야 함
+                                            st.info("💡 동영상 합성은 아래 '캐릭터 합성 시작' 버튼을 사용하세요.")
+                                else:
+                                    st.warning(f"씬 {edit_scene_id}의 인포그래픽 이미지를 찾을 수 없습니다.")
+                                    st.caption("동영상을 먼저 생성하거나, 인포그래픽 썸네일이 필요합니다.")
+                        else:
+                            st.caption("캐릭터를 선택하고 동영상이 있는 씬이 있어야 시각적 에디터를 사용할 수 있습니다.")
+
+                        st.divider()
+
+                        # 합성 실행 버튼
+                        can_composite = ffmpeg_ok and len(compositable_scenes) > 0 and selected_char
+                        if st.button(
+                            "👤 캐릭터 합성 시작",
+                            type="primary",
+                            use_container_width=True,
+                            key="composite_videos",
+                            disabled=not can_composite
+                        ):
+                            try:
+                                output_dir = str(project_path / "infographics" / "composites")
+                                os.makedirs(output_dir, exist_ok=True)
+
+                                progress_bar = st.progress(0)
+                                status_text = st.empty()
+
+                                def comp_progress(current, total, message):
+                                    progress_bar.progress(current / total)
+                                    status_text.text(message)
+
+                                # 합성 대상 씬 ID 목록
+                                target_scene_ids = [s.scene_id for s in compositable_scenes]
+
+                                results = batch_composite_sync(
+                                    infographic_data,
+                                    character_image_path=str(selected_char),
+                                    position=char_position,
+                                    scale=char_scale,
+                                    scene_ids=target_scene_ids,
+                                    output_dir=output_dir,
+                                    auto_remove_bg=auto_remove_bg,
+                                    progress_callback=comp_progress
+                                )
+
+                                progress_bar.progress(1.0)
+                                status_text.text(f"완료! {len(results)}개 합성")
+
+                                visual_manager.set_infographic_data(infographic_data)
+                                st.success(f"✅ {len(results)}개 동영상 합성 완료!")
+                                st.rerun()
+
+                            except Exception as e:
+                                st.error(f"합성 오류: {str(e)}")
+                                import traceback
+                                with st.expander("오류 상세"):
+                                    st.code(traceback.format_exc())
+
+                        if not can_composite:
+                            if not ffmpeg_ok:
+                                st.warning("⚠️ FFmpeg이 필요합니다.")
+                            elif len(compositable_scenes) == 0:
+                                st.warning("⚠️ 합성할 동영상이 없습니다. 먼저 동영상을 녹화하세요.")
+                            elif not selected_char:
+                                st.warning("⚠️ 캐릭터를 선택하세요.")
+
+                    # ========================================
+                    # 탭 3: 설정
+                    # ========================================
+                    with comp_tab_settings:
+                        st.markdown("#### ⚙️ 캐릭터 합성 설정")
+
+                        # 🔴 v3.12: 배경 제거 상세 진단
+                        st.markdown("##### 🎭 배경 제거 상태")
+
+                        try:
+                            diag = get_bg_removal_diagnostic()
+
+                            diag_col1, diag_col2 = st.columns([2, 1])
+
+                            with diag_col1:
+                                if diag['available']:
+                                    st.success(diag['message'])
+                                    st.info("✅ 캐릭터 이미지에 배경이 있으면 합성 시 자동으로 제거됩니다.")
+                                else:
+                                    st.error(diag['message'])
+                                    st.warning("⚠️ 배경 제거 없이 합성되면 캐릭터 배경이 보일 수 있습니다!")
+
+                                    # 상세 상태
+                                    with st.expander("🔍 상세 진단"):
+                                        st.write(f"- 모듈 로드: {'✅' if diag['module_loaded'] else '❌'}")
+                                        st.write(f"- rembg 설치: {'✅' if diag['rembg_installed'] else '❌'}")
+                                        st.code(diag['install_cmd'], language="bash")
+
+                                    install_rembg_ui(key_suffix="settings")
+
+                            with diag_col2:
+                                if diag['available']:
+                                    if st.button("🧪 테스트", key="test_bg_removal"):
+                                        success, msg = test_bg_removal()
+                                        if success:
+                                            st.success(msg)
+                                        else:
+                                            st.error(msg)
+                        except Exception as e:
+                            bg_available, bg_msg = is_bg_removal_available()
+                            if bg_available:
+                                st.success(bg_msg)
+                            else:
+                                st.error(bg_msg)
+                                install_rembg_ui(key_suffix="settings")
+
+                        st.divider()
+
+                        # 씬-캐릭터 매핑 정보
+                        st.markdown("##### 📊 씬-캐릭터 매핑 현황")
+                        if matcher:
+                            ms = matcher.get_mapping_summary()
+                            settings_col1, settings_col2, settings_col3 = st.columns(3)
+                            with settings_col1:
+                                st.metric("총 매핑", ms['total'])
+                            with settings_col2:
+                                st.metric("자동 매칭", ms['matched'])
+                            with settings_col3:
+                                st.metric("기본값", ms['default'])
+
+                            if ms['by_character']:
+                                st.write("**캐릭터별 등장:**")
+                                for name, count in ms['by_character'].items():
+                                    st.write(f"- {name}: {count}회")
+                        else:
+                            st.info("씬-캐릭터 매핑 정보가 없습니다.")
+
+                        st.divider()
+
+                        # 캐시 관리
+                        st.markdown("##### 🗑️ 캐시 관리")
+                        cache_dir = project_path / "infographics" / "composites" / ".bg_removed_cache"
+                        cache_count = len(list(cache_dir.glob("*_nobg.png"))) if cache_dir.exists() else 0
+
+                        st.write(f"배경 제거 캐시: **{cache_count}**개 파일")
+
+                        if st.button("🗑️ 배경 제거 캐시 삭제", key="clear_bg_cache"):
+                            if cache_dir.exists():
+                                import shutil
+                                shutil.rmtree(cache_dir)
+                                st.success("캐시가 삭제되었습니다.")
+                                st.rerun()
+
+                    # 합성 결과 미리보기
+                    composite_scenes = [s for s in infographic_data.scenes if s.is_composite_ready]
+                    if composite_scenes:
+                        composites_dir = str(project_path / "infographics" / "composites")
+
+                        with st.expander(f"👤 합성 결과 미리보기 ({len(composite_scenes)}개)", expanded=True):
+                            cols_per_row = 5
+                            for row_start in range(0, len(composite_scenes), cols_per_row):
+                                cols = st.columns(cols_per_row)
+                                for j, col in enumerate(cols):
+                                    idx = row_start + j
+                                    if idx >= len(composite_scenes):
+                                        break
+                                    scene = composite_scenes[idx]
+                                    with col:
+                                        # 썸네일 이미지 (클릭 시 확대)
+                                        if scene.composite_thumbnail_path and os.path.exists(scene.composite_thumbnail_path):
+                                            render_lightbox_image(scene.composite_thumbnail_path, key=f"comp_scene_{idx}")
+                                        else:
+                                            st.markdown(
+                                                f"""
+                                                <div style="
+                                                    background: #e8f5e9;
+                                                    border-radius: 8px;
+                                                    padding: 15px;
+                                                    text-align: center;
+                                                    height: 60px;
+                                                    display: flex;
+                                                    align-items: center;
+                                                    justify-content: center;
+                                                ">
+                                                    <span style="font-size: 20px;">👤</span>
+                                                </div>
+                                                """,
+                                                unsafe_allow_html=True
+                                            )
+
+                                        st.caption(f"씬 {scene.scene_id}")
+
+                                        # 재생 버튼
+                                        btn_col1, btn_col2 = st.columns(2)
+                                        with btn_col1:
+                                            if st.button("▶️", key=f"play_comp_{scene.scene_id}", help="미리보기"):
+                                                st.session_state[f'show_comp_video_{scene.scene_id}'] = True
+                                        with btn_col2:
+                                            if scene.composite_video_path and os.path.exists(scene.composite_video_path):
+                                                if st.button("📂", key=f"open_comp_{scene.scene_id}", help="폴더"):
+                                                    open_file_location(scene.composite_video_path)
+
+                                        # 비디오 플레이어
+                                        if st.session_state.get(f'show_comp_video_{scene.scene_id}', False):
+                                            if scene.composite_video_path and os.path.exists(scene.composite_video_path):
+                                                st.video(scene.composite_video_path)
+                                            if st.button("닫기", key=f"close_comp_{scene.scene_id}"):
+                                                st.session_state[f'show_comp_video_{scene.scene_id}'] = False
+                                                st.rerun()
+
+                            # 폴더 열기 버튼
+                            st.divider()
+                            comp_folder_col1, comp_folder_col2 = st.columns(2)
+                            with comp_folder_col1:
+                                if st.button("📂 합성 폴더 열기", use_container_width=True, key="open_composites_folder"):
+                                    open_folder(composites_dir)
+                            with comp_folder_col2:
+                                if st.button("🗑️ 합성 결과 초기화", use_container_width=True, key="clear_composites"):
+                                    for scene in composite_scenes:
+                                        scene.is_composite_ready = False
+                                        scene.composite_video_path = None
+                                        scene.composite_thumbnail_path = None
+                                    visual_manager.set_infographic_data(infographic_data)
+                                    st.success("합성 상태가 초기화되었습니다.")
+                                    st.rerun()
+
+            st.divider()
+
+            # === 6. 씬별 시각 자료 선택 ===
+            st.markdown("### 🎯 6. 씬별 시각 자료 선택")
+
+            # 씬 데이터 로드
+            scenes_path = project_path / "analysis" / "scenes.json"
+            if scenes_path.exists():
+                with open(scenes_path, "r", encoding="utf-8") as f:
+                    scenes_for_selection = json.load(f)
+
+                if scenes_for_selection:
+                    # ⭐ 성능 최적화: 파일 시스템 스캔 캐싱
+                    _cache_key = f"scene_selection_files_{project_path}"
+                    if _cache_key not in st.session_state or st.session_state.get("_scene_files_dirty", False):
+                        ai_images_dir = project_path / "images" / "scenes"
+                        ai_images = list(ai_images_dir.glob("*.png")) if ai_images_dir.exists() else []
+
+                        infographic_thumbs_dir = project_path / "infographics" / "thumbnails"
+                        infographic_thumbs = list(infographic_thumbs_dir.glob("*.png")) if infographic_thumbs_dir.exists() else []
+
+                        infographic_videos_dir = project_path / "infographics" / "videos"
+                        infographic_videos = list(infographic_videos_dir.glob("infographic_scene_*.mp4")) if infographic_videos_dir.exists() else []
+
+                        composites_dir = project_path / "infographics" / "composites"
+                        composite_videos = list(composites_dir.glob("composite_scene_*.mp4")) if composites_dir.exists() else []
+
+                        st.session_state[_cache_key] = {
+                            "ai_images": ai_images,
+                            "infographic_thumbs": infographic_thumbs,
+                            "infographic_videos": infographic_videos,
+                            "composite_videos": composite_videos,
+                            "ai_images_dir": ai_images_dir,
+                            "infographic_thumbs_dir": infographic_thumbs_dir,
+                            "infographic_videos_dir": infographic_videos_dir,
+                            "composites_dir": composites_dir,
+                        }
+                        st.session_state["_scene_files_dirty"] = False
+                    else:
+                        _cached = st.session_state[_cache_key]
+                        ai_images = _cached["ai_images"]
+                        infographic_thumbs = _cached["infographic_thumbs"]
+                        infographic_videos = _cached["infographic_videos"]
+                        composite_videos = _cached["composite_videos"]
+                        ai_images_dir = _cached["ai_images_dir"]
+                        infographic_thumbs_dir = _cached["infographic_thumbs_dir"]
+                        infographic_videos_dir = _cached["infographic_videos_dir"]
+                        composites_dir = _cached["composites_dir"]
+
+                    # 선택 초기화 (최초 1회만)
+                    _init_key = f"scene_sel_initialized_{project_path}"
+                    if _init_key not in st.session_state:
+                        visual_manager.initialize_selections_from_scenes(
+                            [s.get("scene_id", i+1) for i, s in enumerate(scenes_for_selection)]
+                        )
+                        # 파일 시스템 기반 동영상 경로 동기화
+                        for i, scene in enumerate(scenes_for_selection):
+                            scene_id = scene.get("scene_id", i + 1)
+                            selection = visual_manager.state.selections.get(scene_id)
+                            if selection:
+                                video_path = infographic_videos_dir / f"infographic_scene_{scene_id:03d}.mp4"
+                                if video_path.exists():
+                                    selection.infographic_video = str(video_path)
+                                composite_path = composites_dir / f"composite_scene_{scene_id:03d}.mp4"
+                                if composite_path.exists():
+                                    selection.composite_video = str(composite_path)
+                        st.session_state[_init_key] = True
+
+                    # 통계 표시 + 새로고침 버튼
+                    stats = visual_manager.get_statistics()
+                    stat_col1, stat_col2, stat_col3, stat_col4, stat_col5, stat_col6, stat_col_refresh = st.columns([1, 1, 1, 1, 1, 1, 0.5])
+                    with stat_col1:
+                        st.metric("AI 이미지", stats["type_counts"].get("ai_image", 0))
+                    with stat_col2:
+                        st.metric("인포그래픽", stats["type_counts"].get("infographic", 0))
+                    with stat_col3:
+                        st.metric("캐릭터 합성", stats["type_counts"].get("composite", 0))
+                    with stat_col4:
+                        st.metric("🎬 동영상", f"{len(infographic_videos)}/{len(composite_videos)}", help="인포그래픽/합성")
+                    with stat_col5:
+                        st.metric("⏳ 생성필요", stats.get("videos_needed", 0))
+                    with stat_col6:
+                        st.metric("확정률", f"{stats['completion_rate']:.0f}%")
+                    with stat_col_refresh:
+                        if st.button("🔄", key="refresh_scene_files", help="파일 목록 새로고침"):
+                            st.session_state["_scene_files_dirty"] = True
+                            st.session_state.pop(f"scene_sel_initialized_{project_path}", None)
+                            st.rerun()
+
+                    # 일괄 적용 버튼
+                    bulk_col1, bulk_col2, bulk_col3, bulk_col4 = st.columns(4)
+                    with bulk_col1:
+                        if st.button("🎨 전체 AI 이미지로", key="bulk_ai", use_container_width=True):
+                            scene_nums = [s.get("scene_id", i+1) for i, s in enumerate(scenes_for_selection)]
+                            visual_manager.apply_bulk_type(scene_nums, VisualType.AI_IMAGE)
+                            st.rerun()
+                    with bulk_col2:
+                        if st.button("📊 전체 인포그래픽으로", key="bulk_infographic", use_container_width=True):
+                            scene_nums = [s.get("scene_id", i+1) for i, s in enumerate(scenes_for_selection)]
+                            visual_manager.apply_bulk_type(scene_nums, VisualType.INFOGRAPHIC)
+                            st.rerun()
+                    with bulk_col3:
+                        if st.button("🤖 AI 추천 적용", key="apply_ai_recommendation", use_container_width=True):
+                            try:
+                                from utils.ai_visual_recommender import AIVisualRecommender
+                                recommender = AIVisualRecommender()
+
+                                has_infographic = infographic_data is not None
+                                for i, scene in enumerate(scenes_for_selection):
+                                    scene_id = scene.get("scene_id", i + 1)
+                                    script_text = scene.get("script_text", "")
+                                    scene_title = scene.get("title", "")
+
+                                    result = recommender.recommend(
+                                        script_text=script_text,
+                                        scene_title=scene_title,
+                                        has_infographic=has_infographic
+                                    )
+
+                                    visual_manager.set_ai_recommendation(
+                                        scene_id,
+                                        result.visual_type,
+                                        result.reason,
+                                        result.score
+                                    )
+                                    visual_manager.set_visual_type(scene_id, result.visual_type, auto_save=False)
+
+                                visual_manager.save_state()
+                                st.success("AI 추천이 적용되었습니다!")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"AI 추천 오류: {str(e)}")
+                    with bulk_col4:
+                        if st.button("💾 선택 저장", type="primary", key="save_selections", use_container_width=True):
+                            visual_manager.save_state()
+                            st.success("선택이 저장되었습니다!")
+
+                    # 📥 일괄 다운로드 섹션
+                    st.markdown("#### 📥 자료 일괄 다운로드")
+                    dl_col1, dl_col2, dl_col3, dl_col4 = st.columns(4)
+
+                    # 이미지 경로 수집
+                    scene_images = []
+                    scene_videos = []
+                    for i, scene in enumerate(scenes_for_selection):
+                        scene_id = scene.get("scene_id", i + 1)
+                        selection = visual_manager.get_selection(scene_id)
+
+                        # AI 이미지
+                        for img in ai_images:
+                            if f"_{scene_id:03d}" in img.stem or f"scene_{scene_id}" in img.stem:
+                                scene_images.append({"scene_num": scene_id, "image_path": str(img), "type": "ai"})
+                                break
+                            elif i < len(ai_images) and img == ai_images[i]:
+                                scene_images.append({"scene_num": scene_id, "image_path": str(ai_images[i]), "type": "ai"})
+                                break
+
+                        # 인포그래픽 동영상
+                        if selection and selection.selected_type == VisualType.INFOGRAPHIC:
+                            for vid in infographic_videos:
+                                if f"_{scene_id:03d}" in vid.stem or f"scene{scene_id}" in vid.stem.lower():
+                                    scene_videos.append({"scene_num": scene_id, "video_path": str(vid), "type": "video"})
+                                    break
+
+                    # v1.1: ZIP 데이터 캐싱 (MediaFileHandler 에러 방지)
+                    # 기존: 매 렌더링마다 ZIP 생성 → rerun 시 파일 ID 변경 → 다운로드 실패
+                    # 수정: session_state에 캐싱 + 동적 키 사용
+
+                    # 캐시 키 생성 (내용 기반)
+                    img_cache_key = f"sb_zip_img_{len(scene_images)}_{hash(str([i.get('scene_num') for i in scene_images])) if scene_images else 0}"
+                    vid_cache_key = f"sb_zip_vid_{len(scene_videos)}_{hash(str([v.get('scene_num') for v in scene_videos])) if scene_videos else 0}"
+                    all_cache_key = f"sb_zip_all_{len(scene_images)}_{len(scene_videos)}"
+
+                    with dl_col1:
+                        if scene_images:
+                            # 캐시된 데이터 확인 또는 생성
+                            if img_cache_key not in st.session_state:
+                                from utils.download_manager import SceneDownloadManager
+                                manager = SceneDownloadManager(video_path=str(project_path))
+                                st.session_state[img_cache_key] = manager.create_zip_buffer(images=scene_images)
+                                st.session_state[f"{img_cache_key}_name"] = manager.get_zip_filename("scene_images")
+
+                            st.download_button(
+                                label=f"🖼️ 이미지 다운로드 ({len(scene_images)}개)",
+                                data=st.session_state[img_cache_key],
+                                file_name=st.session_state.get(f"{img_cache_key}_name", "scene_images.zip"),
+                                mime="application/zip",
+                                key=f"sb_dl_images_{len(scene_images)}",
+                                use_container_width=True
+                            )
+                        else:
+                            st.button("🖼️ 이미지 없음", disabled=True, use_container_width=True, key="sb_img_disabled")
+
+                    with dl_col2:
+                        if scene_videos:
+                            # 캐시된 데이터 확인 또는 생성
+                            if vid_cache_key not in st.session_state:
+                                from utils.download_manager import SceneDownloadManager
+                                manager = SceneDownloadManager(video_path=str(project_path))
+                                st.session_state[vid_cache_key] = manager.create_zip_buffer(videos=scene_videos)
+                                st.session_state[f"{vid_cache_key}_name"] = manager.get_zip_filename("scene_videos")
+
+                            st.download_button(
+                                label=f"🎬 동영상 다운로드 ({len(scene_videos)}개)",
+                                data=st.session_state[vid_cache_key],
+                                file_name=st.session_state.get(f"{vid_cache_key}_name", "scene_videos.zip"),
+                                mime="application/zip",
+                                key=f"sb_dl_videos_{len(scene_videos)}",
+                                use_container_width=True
+                            )
+                        else:
+                            st.button("🎬 동영상 없음", disabled=True, use_container_width=True, key="sb_vid_disabled")
+
+                    with dl_col3:
+                        if scene_images or scene_videos:
+                            # 캐시된 데이터 확인 또는 생성
+                            if all_cache_key not in st.session_state:
+                                from utils.download_manager import SceneDownloadManager
+                                manager = SceneDownloadManager(video_path=str(project_path))
+                                st.session_state[all_cache_key] = manager.create_zip_buffer(
+                                    images=scene_images if scene_images else None,
+                                    videos=scene_videos if scene_videos else None
+                                )
+                                st.session_state[f"{all_cache_key}_name"] = manager.get_zip_filename("storyboard_assets")
+
+                            total_items = len(scene_images) + len(scene_videos)
+                            st.download_button(
+                                label=f"📦 전체 다운로드 ({total_items}개)",
+                                data=st.session_state[all_cache_key],
+                                file_name=st.session_state.get(f"{all_cache_key}_name", "storyboard_assets.zip"),
+                                mime="application/zip",
+                                key=f"sb_dl_all_{total_items}",
+                                type="primary",
+                                use_container_width=True
+                            )
+                        else:
+                            st.button("📦 자료 없음", disabled=True, use_container_width=True, key="sb_all_disabled")
+
+                    with dl_col4:
+                        if st.button("📁 프로젝트 폴더 저장", key="storyboard_save_to_folder", use_container_width=True):
+                            try:
+                                from utils.download_manager import SceneDownloadManager
+                                manager = SceneDownloadManager(video_path=str(project_path))
+                                saved_count = 0
+
+                                if scene_images:
+                                    success, save_dir, saved_files = manager.save_to_project_folder(
+                                        images=scene_images,
+                                        subfolder="storyboard_images"
+                                    )
+                                    if success:
+                                        saved_count += len(saved_files)
+
+                                if scene_videos:
+                                    success, save_dir, saved_files = manager.save_videos_to_project_folder(
+                                        videos=scene_videos,
+                                        subfolder="storyboard_videos"
+                                    )
+                                    if success:
+                                        saved_count += len(saved_files)
+
+                                if saved_count > 0:
+                                    st.success(f"✅ {saved_count}개 파일 저장 완료!")
+                                else:
+                                    st.warning("저장할 파일이 없습니다.")
+                            except Exception as e:
+                                st.error(f"저장 오류: {e}")
+
+                    # 🔄 프로세스 간 동기화 섹션
+                    from utils.sync_manager import ProcessType
+                    from utils.sync_ui import render_sync_buttons
+                    render_sync_buttons(ProcessType.STORYBOARD)
+
+                    st.divider()
+
+                    # 씬별 선택 UI - ⭐ 페이지네이션 적용 (성능 최적화)
+                    _SCENES_PER_PAGE = 10
+                    _total_scenes = len(scenes_for_selection)
+                    _total_pages = (_total_scenes + _SCENES_PER_PAGE - 1) // _SCENES_PER_PAGE
+
+                    # 페이지 선택 UI
+                    _page_col1, _page_col2, _page_col3 = st.columns([1, 2, 1])
+                    with _page_col1:
+                        if st.button("◀ 이전", key="scene_sel_prev", disabled=st.session_state.get("scene_sel_page", 0) <= 0):
+                            st.session_state["scene_sel_page"] = max(0, st.session_state.get("scene_sel_page", 0) - 1)
+                            st.rerun()
+                    with _page_col2:
+                        _current_page = st.session_state.get("scene_sel_page", 0)
+                        st.markdown(f"**페이지 {_current_page + 1} / {_total_pages}** ({_total_scenes}개 씬)")
+                    with _page_col3:
+                        if st.button("다음 ▶", key="scene_sel_next", disabled=st.session_state.get("scene_sel_page", 0) >= _total_pages - 1):
+                            st.session_state["scene_sel_page"] = min(_total_pages - 1, st.session_state.get("scene_sel_page", 0) + 1)
+                            st.rerun()
+
+                    # 현재 페이지의 씬만 표시
+                    _start_idx = st.session_state.get("scene_sel_page", 0) * _SCENES_PER_PAGE
+                    _end_idx = min(_start_idx + _SCENES_PER_PAGE, _total_scenes)
+                    _paginated_scenes = scenes_for_selection[_start_idx:_end_idx]
+
+                    for i, scene in enumerate(_paginated_scenes):
+                        _actual_idx = _start_idx + i  # 실제 인덱스
+                        scene_id = scene.get("scene_id", _actual_idx + 1)
+                        script_text = scene.get("script_text", "")
+
+                        selection = visual_manager.get_selection(scene_id)
+                        current_type = selection.selected_type if selection else VisualType.AI_IMAGE
+
+                        with st.container():
+                            main_col1, main_col2 = st.columns([2, 3])
+
+                            with main_col1:
+                                # 씬 번호 + AI 추천 표시
+                                header_cols = st.columns([3, 2])
+                                with header_cols[0]:
+                                    st.markdown(f"#### 씬 {scene_id}")
+                                with header_cols[1]:
+                                    if selection and selection.ai_recommendation:
+                                        rec_icon = {"ai_image": "🎨", "infographic": "📊", "composite": "👤"}.get(
+                                            selection.ai_recommendation.value, "❓"
+                                        )
+                                        st.caption(f"🤖 추천: {rec_icon} ({selection.recommendation_score:.0%})")
+
+                                st.caption(script_text[:80] + "..." if len(script_text) > 80 else script_text)
+
+                                # AI 추천 이유 표시
+                                if selection and selection.recommendation_reason:
+                                    st.caption(f"💡 {selection.recommendation_reason}")
+
+                                # 시각 자료 타입 선택
+                                type_options = ["🎨 AI 이미지", "📊 인포그래픽", "👤 캐릭터 합성"]
+                                type_values = [VisualType.AI_IMAGE, VisualType.INFOGRAPHIC, VisualType.COMPOSITE]
+
+                                current_idx = type_values.index(current_type) if current_type in type_values else 0
+
+                                selected_type_name = st.radio(
+                                    f"시각 자료 타입 (씬 {scene_id})",
+                                    type_options,
+                                    index=current_idx,
+                                    key=f"visual_type_{scene_id}_{i}",
+                                    horizontal=True,
+                                    label_visibility="collapsed"
+                                )
+
+                                new_type = type_values[type_options.index(selected_type_name)]
+                                if new_type != current_type:
+                                    visual_manager.set_visual_type(scene_id, new_type, auto_save=False)
+
+                                # 내보내기 미디어 타입 표시
+                                if selection:
+                                    _, media_type = selection.get_export_media()
+                                    media_icon = "🖼️" if media_type == MediaType.IMAGE else "🎬"
+                                    st.caption(f"내보내기: {media_icon} {media_type.value}")
+
+                            with main_col2:
+                                img_cols = st.columns(3)
+
+                                # AI 이미지 미리보기
+                                with img_cols[0]:
+                                    st.caption("🎨 AI 이미지")
+                                    ai_img = None
+                                    for img in ai_images:
+                                        if f"_{scene_id:03d}" in img.stem or f"scene_{scene_id}" in img.stem:
+                                            ai_img = img
+                                            break
+                                    if not ai_img and _actual_idx < len(ai_images):
+                                        ai_img = ai_images[_actual_idx]
+
+                                    if ai_img and ai_img.exists():
+                                        st.image(str(ai_img), width=120)
+                                        if st.button("🔍", key=f"zoom_ai_{scene_id}_{i}", help="확대"):
+                                            st.session_state[f"zoom_ai_{scene_id}_{i}"] = True
+                                        if st.session_state.get(f"zoom_ai_{scene_id}_{i}", False):
+                                            from utils.image_viewer import show_image_modal
+                                            show_image_modal(str(ai_img), scene_id, None, f"씬 {scene_id} AI 이미지")
+                                            st.session_state[f"zoom_ai_{scene_id}_{i}"] = False
+                                        if selection:
+                                            visual_manager.state.selections[scene_id].ai_image_path = str(ai_img)
+                                    else:
+                                        st.info("없음")
+
+                                # 인포그래픽 썸네일 미리보기
+                                with img_cols[1]:
+                                    # 동영상 상태 확인
+                                    info_video_path = infographic_videos_dir / f"infographic_scene_{scene_id:03d}.mp4"
+                                    info_video_exists = info_video_path.exists()
+                                    video_icon = "🎬" if info_video_exists else "⏳"
+                                    st.caption(f"📊 인포그래픽 {video_icon}")
+
+                                    info_thumb = None
+
+                                    # infographic_data에서 찾기
+                                    if infographic_data:
+                                        for info_scene in infographic_data.scenes:
+                                            if info_scene.scene_id == scene_id:
+                                                info_thumb = info_scene.thumbnail_path or info_scene.first_frame_path
+                                                break
+
+                                    # 디렉토리에서 찾기
+                                    if not info_thumb:
+                                        for img in infographic_thumbs:
+                                            if f"_{scene_id:03d}" in img.stem or f"scene_{scene_id}" in img.stem:
+                                                info_thumb = str(img)
+                                                break
+
+                                    if info_thumb and os.path.exists(info_thumb):
+                                        st.image(info_thumb, width=120)
+                                        if st.button("🔍", key=f"zoom_info_{scene_id}_{i}", help="확대"):
+                                            st.session_state[f"zoom_info_{scene_id}_{i}"] = True
+                                        if st.session_state.get(f"zoom_info_{scene_id}_{i}", False):
+                                            from utils.image_viewer import show_image_modal
+                                            show_image_modal(info_thumb, scene_id, None, f"씬 {scene_id} 인포그래픽")
+                                            st.session_state[f"zoom_info_{scene_id}_{i}"] = False
+                                        if selection:
+                                            visual_manager.state.selections[scene_id].infographic_thumbnail = info_thumb
+                                            if info_video_exists:
+                                                visual_manager.state.selections[scene_id].infographic_video = str(info_video_path)
+                                    else:
+                                        st.info("없음")
+
+                                # 캐릭터 합성 미리보기
+                                with img_cols[2]:
+                                    # 합성 동영상 상태 확인
+                                    comp_video_path = composites_dir / f"composite_scene_{scene_id:03d}.mp4"
+                                    comp_video_exists = comp_video_path.exists()
+                                    comp_icon = "🎬" if comp_video_exists else "⏳"
+                                    st.caption(f"👤 합성 {comp_icon}")
+
+                                    comp_thumb = None
+
+                                    if infographic_data:
+                                        for info_scene in infographic_data.scenes:
+                                            if info_scene.scene_id == scene_id and info_scene.is_composite_ready:
+                                                comp_thumb = info_scene.composite_thumbnail_path
+                                                break
+
+                                    # 합성 썸네일 직접 확인
+                                    if not comp_thumb:
+                                        comp_thumb_path = composites_dir / f"composite_scene_{scene_id:03d}_thumb.png"
+                                        if comp_thumb_path.exists():
+                                            comp_thumb = str(comp_thumb_path)
+
+                                    if comp_thumb and os.path.exists(comp_thumb):
+                                        st.image(comp_thumb, width=120)
+                                        if st.button("🔍", key=f"zoom_comp_{scene_id}_{i}", help="확대"):
+                                            st.session_state[f"zoom_comp_{scene_id}_{i}"] = True
+                                        if st.session_state.get(f"zoom_comp_{scene_id}_{i}", False):
+                                            from utils.image_viewer import show_image_modal
+                                            show_image_modal(comp_thumb, scene_id, None, f"씬 {scene_id} 합성")
+                                            st.session_state[f"zoom_comp_{scene_id}_{i}"] = False
+                                        if selection:
+                                            visual_manager.state.selections[scene_id].composite_thumbnail = comp_thumb
+                                            if comp_video_exists:
+                                                visual_manager.state.selections[scene_id].composite_video = str(comp_video_path)
+                                    elif comp_video_exists:
+                                        # 동영상은 있지만 썸네일이 없을 때
+                                        st.success("🎬 준비됨")
+                                        if selection:
+                                            visual_manager.state.selections[scene_id].composite_video = str(comp_video_path)
+                                    else:
+                                        st.info("없음")
+
+                            st.divider()
+
+                    # === 7. 내보내기 요약 ===
+                    st.markdown("### 📤 7. 내보내기 요약")
+
+                    export_data = visual_manager.export_for_video_pipeline()
+
+                    if export_data:
+                        # 미디어 타입별 카운트
+                        image_count = sum(1 for e in export_data if e["media_type"] == "image")
+                        video_count = sum(1 for e in export_data if e["media_type"] == "video")
+
+                        exp_col1, exp_col2, exp_col3 = st.columns(3)
+                        with exp_col1:
+                            st.metric("총 씬", len(export_data))
+                        with exp_col2:
+                            st.metric("🖼️ 이미지", image_count)
+                        with exp_col3:
+                            st.metric("🎬 동영상", video_count)
+
+                        with st.expander("📋 내보내기 상세", expanded=False):
+                            for item in export_data:
+                                media_icon = "🖼️" if item["media_type"] == "image" else "🎬"
+                                visual_icon = {"ai_image": "🎨", "infographic": "📊", "composite": "👤"}.get(item["visual_type"], "❓")
+                                finalized = "✅" if item["is_finalized"] else "⏳"
+                                st.text(f"{finalized} 씬 {item['scene_number']}: {visual_icon} {item['visual_type']} → {media_icon} {item['media_type']}")
+
+                        # 내보내기 JSON 다운로드
+                        st.download_button(
+                            "📥 내보내기 JSON 다운로드",
+                            data=json.dumps(export_data, ensure_ascii=False, indent=2),
+                            file_name="visual_export.json",
+                            mime="application/json",
+                            use_container_width=True
+                        )
+                    else:
+                        st.info("내보내기할 씬이 없습니다. 씬별 시각 자료를 선택하세요.")
+
+            else:
+                st.warning("씬 분석 결과가 없습니다. '자동 조합' 또는 '수동 구성' 탭에서 씬을 먼저 생성하세요.")
+
+            Profiler.log("📊 인포그래픽 탭 종료 (활성)")
 
 # === 자동 조합 탭 ===
 with tab_auto:
@@ -4426,12 +4819,13 @@ with tab_auto:
             format_func=lambda x: "한국어" if x == "ko" else "일본어",
             index=0 if project_config.get("language") == "ko" else 1
         )
-        show_images = st.checkbox("이미지 표시", value=True)
-        show_script = st.checkbox("스크립트 표시", value=True)
-        show_direction = st.checkbox("연출가이드 표시", value=True)
-        show_characters = st.checkbox("캐릭터 표시", value=True)
-        show_prompt = st.checkbox("프롬프트 표시", value=False)
-        show_video_prompt = st.checkbox("🎬 비디오 프롬프트 표시", value=True)
+        # ⭐ v3.27: 표시 옵션 영구 저장 (persistent_checkbox)
+        show_images = persistent_checkbox("이미지 표시", page="storyboard", setting_key="show_images", default_value=True)
+        show_script = persistent_checkbox("스크립트 표시", page="storyboard", setting_key="show_script", default_value=True)
+        show_direction = persistent_checkbox("연출가이드 표시", page="storyboard", setting_key="show_direction", default_value=True)
+        show_characters = persistent_checkbox("캐릭터 표시", page="storyboard", setting_key="show_characters", default_value=True)
+        show_prompt = persistent_checkbox("프롬프트 표시", page="storyboard", setting_key="show_prompt", default_value=False)
+        show_video_prompt = persistent_checkbox("🎬 비디오 프롬프트 표시", page="storyboard", setting_key="show_video_prompt", default_value=True)
 
     # 씬 데이터 로드
     scenes_path = project_path / "analysis" / "scenes.json"
@@ -4615,13 +5009,13 @@ with tab_auto:
             st.divider()
 
             # 이미지 파일 목록 (캐싱된 함수 사용 - 중복 로드 방지)
-            # ⭐ mtime 기반 캐시 키로 새 이미지 자동 감지
+            # ⭐ v2.3: cache_key 사용 (해시에 포함되어 캐시 무효화 정상 동작)
             cache_key = get_image_dirs_mtime(project_path)
             image_files_tuple, image_map = load_image_files_cached(
                 str(backgrounds_images_dir),
                 str(scenes_images_dir),
                 str(content_images_dir),
-                _cache_key=cache_key
+                cache_key=cache_key
             )
             image_files = [Path(p) for p in image_files_tuple]  # Path 객체로 변환
 
@@ -5517,7 +5911,7 @@ Scene 4: (비워둠)
             # ============================================================
             # 미디어 일괄 내보내기 섹션
             # ============================================================
-            with st.expander("📦 미디어 일괄 내보내기", expanded=False):
+            with st.expander("📤 미디어 일괄 내보내기", expanded=False):
                 st.caption("씬별 이미지/비디오를 씬 번호 기반 파일명으로 일괄 내보냅니다.")
 
                 # ⭐ 성능 최적화: 내보내기 목록 캐싱 (매 렌더링 시 전체 씬 스캔 방지)
@@ -5595,31 +5989,752 @@ Scene 4: (비워둠)
                         st.session_state["media_export_count"] = len(export_media_list)
                         st.rerun()
 
-                    # 다운로드 버튼 표시
+                    # 다운로드 버튼 표시 (v1.1: 동적 키 사용)
                     if "media_export_zip" in st.session_state:
+                        export_count = st.session_state.get('media_export_count', 0)
                         st.download_button(
-                            label=f"⬇️ 다운로드 ({st.session_state.get('media_export_count', 0)}개 파일)",
+                            label=f"⬇️ 다운로드 ({export_count}개 파일)",
                             data=st.session_state["media_export_zip"],
                             file_name=f"scene_media_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip",
                             mime="application/zip",
-                            key="download_media_zip"
+                            key=f"download_media_zip_{export_count}"
                         )
                 else:
                     st.info("내보낼 미디어가 없습니다. 먼저 이미지/비디오를 생성하세요.")
 
             # ============================================================
-            # 씬 선택 및 다운로드 섹션
+            # 🎯 통합 씬 선택 및 다운로드 섹션 (v2.0 - 필터 통합)
             # ============================================================
-            with st.expander("🎯 씬 선택 및 다운로드", expanded=False):
-                selector = SceneSelector(len(scenes), key_prefix="storyboard_download")
-                selected_ids = selector.render(scenes)
+            korean_text_applied = st.session_state.get('korean_text_scenes_applied', False)
 
-                if selected_ids:
-                    st.divider()
-                    downloader = StoryboardDownloader(str(project_path), key_prefix="sb_main_dl")
-                    downloader.render_download_ui(scenes, selected_ids)
+            # ⭐ v3.25: AI 추천 적용 시 session_state 우선 사용 (동기화 문제 해결)
+            # 기존 v3.24: 항상 씬 데이터에서 계산 → AI 추천 6개가 무시되고 22개로 표시
+            # 수정: AI 추천 적용 시 session_state 사용, 미적용 시 씬 데이터에서 계산
+            if korean_text_applied:
+                # AI 추천이 적용된 경우: session_state에서 로드 (우선순위 높음)
+                applied_ids = st.session_state.get('korean_text_scene_ids', [])
+                korean_text_ids = set(applied_ids) if applied_ids else set()
+                print(f"[스토리보드] AI 추천 적용됨 - session_state에서 로드: {len(korean_text_ids)}개")
+            elif STORYBOARD_FILTER_AVAILABLE:
+                # AI 추천 미적용: 씬 데이터에서 계산
+                korean_text_ids = get_korean_text_scene_ids(scenes)
+                print(f"[스토리보드] AI 추천 미적용 - 씬 데이터에서 계산: {len(korean_text_ids)}개")
+            else:
+                # 폴백: 세션 스테이트 사용
+                korean_text_ids = set(st.session_state.get('korean_text_scene_ids', []))
+
+            # ⭐ v3.19: 진단 로그 추가
+            if korean_text_ids:
+                print(f"[스토리보드] 한글 텍스트 씬: {len(korean_text_ids)}개 - {sorted(korean_text_ids)[:10]}{'...' if len(korean_text_ids) > 10 else ''}")
+
+            # ⭐ v3.17: 묶음 대표 씬 ID 계산 (expander 밖에서 계산해야 씬 카드에서도 사용 가능)
+            bundle_rep_ids = set()
+            has_bundles = False
+            if STORYBOARD_FILTER_AVAILABLE:
+                bundle_size = scenes[0].get("bundle_size", 1) if scenes else 1
+                has_bundles = bundle_size > 1
+                if has_bundles:
+                    bundle_rep_ids = get_bundle_representative_ids(scenes, mode="first")
+
+            # ⭐ v3.20: expander 상태 유지 (체크박스 클릭 시 닫히지 않도록)
+            if "scene_selector_expander_open" not in st.session_state:
+                st.session_state.scene_selector_expander_open = False
+
+            with st.expander("🎯 씬 선택 및 다운로드", expanded=st.session_state.scene_selector_expander_open):
+                # ⭐ v3.19: 씬 태그 상태 요약 표시 (expander 내부로 이동)
+                tag_status_parts = []
+                if bundle_rep_ids:
+                    tag_status_parts.append(f"📦 묶음대표: {len(bundle_rep_ids)}개")
+                if korean_text_ids:
+                    tag_status_parts.append(f"🔤 한글텍스트: {len(korean_text_ids)}개")
+                if tag_status_parts:
+                    st.info(" | ".join(tag_status_parts))
+
+                # ─────────────────────────────────────────────────────────
+                # 📌 씬 필터 섹션 (v3.18 - 복합 필터 지원)
+                # ─────────────────────────────────────────────────────────
+                st.markdown("#### 🎯 씬 필터 (복합 선택 가능)")
+
+                # 필터 상태 초기화
+                if "complex_filters" not in st.session_state:
+                    st.session_state.complex_filters = {
+                        "bundle_representative": False,
+                        "korean_text": False,
+                        "no_image": False,
+                        "no_video": False,
+                        "not_generated": False
+                    }
+                if "filter_combine_mode" not in st.session_state:
+                    st.session_state.filter_combine_mode = "union"
+
+                # 필터 요약 정보 계산
+                if STORYBOARD_FILTER_AVAILABLE:
+                    filter_summary = get_extended_filter_summary(scenes, bundle_mode="first")
                 else:
-                    st.info("다운로드할 씬을 선택하세요.")
+                    # 폴백: 기본 계산
+                    all_scene_ids_list = [s.get('scene_id', i + 1) for i, s in enumerate(scenes)]
+                    no_image_ids_list = [s.get('scene_id', i + 1) for i, s in enumerate(scenes)
+                                   if not s.get("image_path") and not s.get("composite_path")]
+                    no_video_ids_list = [s.get('scene_id', i + 1) for i, s in enumerate(scenes)
+                                   if not s.get("video_path")]
+                    not_generated_ids_list = [s.get('scene_id', i + 1) for i, s in enumerate(scenes)
+                                        if not s.get("image_path") and not s.get("composite_path") and not s.get("video_path")]
+                    filter_summary = {
+                        "total": len(scenes),
+                        "bundle_representative": len(bundle_rep_ids) if has_bundles else 0,
+                        "korean_text": len(korean_text_ids),
+                        "no_image": len(no_image_ids_list),
+                        "no_video": len(no_video_ids_list),
+                        "not_generated": len(not_generated_ids_list),
+                        "bundle_korean_overlap": 0,
+                        "has_bundles": has_bundles
+                    }
+
+                # ═══════════════════════════════════════════════════════
+                # ⚡ 빠른 프리셋 버튼 (v3.19: 자동 선택 기능 추가)
+                # ═══════════════════════════════════════════════════════
+                st.markdown("**⚡ 빠른 필터 프리셋**")
+
+                # 🆕 자동 선택 헬퍼 함수
+                def auto_select_filtered_scenes(scene_ids: set):
+                    """필터된 씬을 SceneSelector에 자동 선택으로 설정"""
+                    selector_key_prefix = "storyboard_download"
+                    uuid_key = f"_selector_uuid_{selector_key_prefix}"
+
+                    # UUID가 없으면 생성
+                    if uuid_key not in st.session_state:
+                        import uuid
+                        st.session_state[uuid_key] = str(uuid.uuid4())[:8]
+
+                    unique_id = st.session_state[uuid_key]
+                    selected_key = f"{selector_key_prefix}_{unique_id}_selected"
+
+                    # 선택된 씬 저장
+                    st.session_state[selected_key] = scene_ids
+                    st.session_state['auto_selected_by_filter'] = True
+                    st.session_state['auto_selected_count'] = len(scene_ids)
+
+                    # ⭐ v3.20: expander 상태 유지 (Problem 2 해결)
+                    st.session_state.scene_selector_expander_open = True
+
+                    print(f"[빠른필터] 자동 선택: {len(scene_ids)}개 씬")
+
+                preset_cols = st.columns(6)
+
+                with preset_cols[0]:
+                    if st.button("📋 전체", key="preset_all", use_container_width=True, help="모든 필터 해제, 전체 선택"):
+                        st.session_state.complex_filters = {k: False for k in st.session_state.complex_filters}
+                        # 🆕 전체 씬 자동 선택
+                        all_ids = set(s.get('scene_id', i + 1) for i, s in enumerate(scenes))
+                        auto_select_filtered_scenes(all_ids)
+                        st.rerun()
+
+                with preset_cols[1]:
+                    if st.button("📦+🔤 OR", key="preset_bundle_korean_or", use_container_width=True,
+                                help="묶음대표 또는 한글텍스트 (합집합) - 자동 선택"):
+                        st.session_state.complex_filters = {
+                            "bundle_representative": True,
+                            "korean_text": True,
+                            "no_image": False,
+                            "no_video": False,
+                            "not_generated": False
+                        }
+                        st.session_state.filter_combine_mode = "union"
+                        # 🆕 합집합 자동 선택
+                        or_ids = bundle_rep_ids.union(korean_text_ids)
+                        auto_select_filtered_scenes(or_ids)
+                        st.rerun()
+
+                with preset_cols[2]:
+                    if st.button("📦∩🔤 AND", key="preset_bundle_korean_and", use_container_width=True,
+                                help="묶음대표이면서 한글텍스트 (교집합) - 자동 선택"):
+                        st.session_state.complex_filters = {
+                            "bundle_representative": True,
+                            "korean_text": True,
+                            "no_image": False,
+                            "no_video": False,
+                            "not_generated": False
+                        }
+                        st.session_state.filter_combine_mode = "intersection"
+                        # 🆕 교집합 자동 선택
+                        and_ids = bundle_rep_ids.intersection(korean_text_ids)
+                        auto_select_filtered_scenes(and_ids)
+                        st.rerun()
+
+                with preset_cols[3]:
+                    if st.button("🔤 한글만", key="preset_korean", use_container_width=True,
+                                help="한글 텍스트 씬만 - 자동 선택"):
+                        st.session_state.complex_filters = {
+                            "bundle_representative": False,
+                            "korean_text": True,
+                            "no_image": False,
+                            "no_video": False,
+                            "not_generated": False
+                        }
+                        st.session_state.filter_combine_mode = "union"
+                        # 🆕 한글 텍스트 씬 자동 선택
+                        auto_select_filtered_scenes(korean_text_ids.copy())
+                        st.rerun()
+
+                with preset_cols[4]:
+                    if st.button("📦 묶음만", key="preset_bundle", use_container_width=True,
+                                help="묶음 대표 씬만 - 자동 선택"):
+                        st.session_state.complex_filters = {
+                            "bundle_representative": True,
+                            "korean_text": False,
+                            "no_image": False,
+                            "no_video": False,
+                            "not_generated": False
+                        }
+                        st.session_state.filter_combine_mode = "union"
+                        # 🆕 묶음 대표 씬 자동 선택
+                        auto_select_filtered_scenes(bundle_rep_ids.copy())
+                        st.rerun()
+
+                with preset_cols[5]:
+                    if st.button("⬜ 미생성", key="preset_not_gen", use_container_width=True,
+                                help="이미지/비디오 미생성 씬 - 자동 선택"):
+                        st.session_state.complex_filters = {
+                            "bundle_representative": False,
+                            "korean_text": False,
+                            "no_image": False,
+                            "no_video": False,
+                            "not_generated": True
+                        }
+                        st.session_state.filter_combine_mode = "union"
+                        # 🆕 미생성 씬 자동 선택
+                        if STORYBOARD_FILTER_AVAILABLE:
+                            not_gen_ids = get_not_generated_scene_ids(scenes)
+                        else:
+                            # 폴백: 직접 계산
+                            not_gen_ids = set(
+                                s.get('scene_id', i + 1) for i, s in enumerate(scenes)
+                                if not s.get("image_path") and not s.get("composite_path") and not s.get("video_path")
+                            )
+                        auto_select_filtered_scenes(not_gen_ids)
+                        st.rerun()
+
+                # 🆕 자동 선택 상태 표시
+                if st.session_state.get('auto_selected_by_filter'):
+                    auto_count = st.session_state.get('auto_selected_count', 0)
+                    st.success(f"⚡ 필터 적용 완료: {auto_count}개 씬 자동 선택됨")
+                    # 한 번 표시 후 초기화 (다음 렌더링에서 안 보이게)
+                    st.session_state['auto_selected_by_filter'] = False
+
+                st.markdown("---")
+
+                # ═══════════════════════════════════════════════════════
+                # 📌 필터 체크박스 (복수 선택)
+                # ═══════════════════════════════════════════════════════
+                st.markdown("**📌 필터 선택** (복수 선택 가능)")
+
+                filter_cols = st.columns(5)
+                filters = st.session_state.complex_filters
+
+                with filter_cols[0]:
+                    bundle_disabled = not (has_bundles and bundle_rep_ids)
+                    filters["bundle_representative"] = st.checkbox(
+                        f"📦 묶음 대표 ({filter_summary['bundle_representative']}개)",
+                        value=filters.get("bundle_representative", False),
+                        key="filter_cb_bundle",
+                        disabled=bundle_disabled,
+                        help="묶음 없음" if bundle_disabled else "각 묶음의 대표 씬"
+                    )
+
+                with filter_cols[1]:
+                    korean_disabled = not korean_text_ids
+                    filters["korean_text"] = st.checkbox(
+                        f"🔤 한글 텍스트 ({filter_summary['korean_text']}개)",
+                        value=filters.get("korean_text", False),
+                        key="filter_cb_korean",
+                        disabled=korean_disabled,
+                        help="한글 텍스트 씬 없음" if korean_disabled else "한글 텍스트가 필요한 씬"
+                    )
+
+                with filter_cols[2]:
+                    filters["no_image"] = st.checkbox(
+                        f"🖼️ 이미지 없음 ({filter_summary['no_image']}개)",
+                        value=filters.get("no_image", False),
+                        key="filter_cb_no_image",
+                        help="이미지가 생성되지 않은 씬"
+                    )
+
+                with filter_cols[3]:
+                    filters["no_video"] = st.checkbox(
+                        f"🎬 비디오 없음 ({filter_summary['no_video']}개)",
+                        value=filters.get("no_video", False),
+                        key="filter_cb_no_video",
+                        help="비디오가 생성되지 않은 씬"
+                    )
+
+                with filter_cols[4]:
+                    filters["not_generated"] = st.checkbox(
+                        f"⬜ 미생성 ({filter_summary['not_generated']}개)",
+                        value=filters.get("not_generated", False),
+                        key="filter_cb_not_gen",
+                        help="이미지, 비디오 모두 없는 씬"
+                    )
+
+                st.session_state.complex_filters = filters
+
+                # ═══════════════════════════════════════════════════════
+                # 🔀 필터 조합 방식
+                # ═══════════════════════════════════════════════════════
+                active_count = sum(1 for v in filters.values() if v)
+
+                if active_count >= 2:
+                    st.markdown("**🔀 필터 조합 방식**")
+                    combine_mode = st.radio(
+                        "조합 방식",
+                        options=["union", "intersection"],
+                        format_func=lambda x: (
+                            "합집합 (OR) - 선택한 필터 중 하나라도 해당되면 표시" if x == "union"
+                            else "교집합 (AND) - 선택한 필터 모두 해당되어야 표시"
+                        ),
+                        horizontal=True,
+                        key="filter_combine_radio",
+                        index=0 if st.session_state.filter_combine_mode == "union" else 1,
+                        label_visibility="collapsed"
+                    )
+                    st.session_state.filter_combine_mode = combine_mode
+                else:
+                    combine_mode = st.session_state.filter_combine_mode
+
+                # ═══════════════════════════════════════════════════════
+                # 📊 필터 결과 미리보기
+                # ═══════════════════════════════════════════════════════
+                if active_count > 0:
+                    st.markdown("---")
+                    st.markdown("**📊 필터 결과**")
+
+                    # 복합 필터 적용
+                    if STORYBOARD_FILTER_AVAILABLE:
+                        final_ids, filter_results = apply_complex_filters(
+                            scenes, filters, combine_mode, "first"
+                        )
+                    else:
+                        # 폴백: 단순 필터링
+                        all_scene_ids_set = set(s.get('scene_id', i + 1) for i, s in enumerate(scenes))
+                        filter_results = {}
+                        if filters.get("bundle_representative") and bundle_rep_ids:
+                            filter_results["bundle_representative"] = bundle_rep_ids
+                        if filters.get("korean_text") and korean_text_ids:
+                            filter_results["korean_text"] = korean_text_ids
+
+                        if not filter_results:
+                            final_ids = all_scene_ids_set
+                        elif combine_mode == "union":
+                            final_ids = set()
+                            for ids in filter_results.values():
+                                final_ids = final_ids.union(ids)
+                        else:
+                            final_ids = all_scene_ids_set.copy()
+                            for ids in filter_results.values():
+                                final_ids = final_ids.intersection(ids)
+
+                    # 결과 메트릭 표시
+                    result_cols = st.columns(min(len(filter_results) + 1, 6))
+                    col_idx = 0
+
+                    filter_icons = {
+                        "bundle_representative": "📦",
+                        "korean_text": "🔤",
+                        "no_image": "🖼️",
+                        "no_video": "🎬",
+                        "not_generated": "⬜"
+                    }
+                    filter_names = {
+                        "bundle_representative": "묶음대표",
+                        "korean_text": "한글텍스트",
+                        "no_image": "이미지없음",
+                        "no_video": "비디오없음",
+                        "not_generated": "미생성"
+                    }
+
+                    for filter_key, ids in filter_results.items():
+                        if col_idx < len(result_cols) - 1:
+                            with result_cols[col_idx]:
+                                icon = filter_icons.get(filter_key, "")
+                                name = filter_names.get(filter_key, filter_key)
+                                st.metric(f"{icon} {name}", f"{len(ids)}개")
+                            col_idx += 1
+
+                    # 최종 결과
+                    with result_cols[-1]:
+                        mode_label = "합집합" if combine_mode == "union" else "교집합"
+                        st.metric(f"🎯 최종 ({mode_label})", f"{len(final_ids)}개")
+
+                    # 중복 정보 (묶음대표 + 한글텍스트)
+                    if filters.get("bundle_representative") and filters.get("korean_text"):
+                        overlap_count = filter_summary.get("bundle_korean_overlap", 0)
+                        if overlap_count > 0:
+                            st.caption(f"ℹ️ 묶음 대표 ∩ 한글 텍스트 중복: {overlap_count}개")
+
+                    valid_scene_ids = sorted(list(final_ids))
+                    filter_label = get_active_filter_labels(filters, combine_mode) if STORYBOARD_FILTER_AVAILABLE else "복합 필터"
+                else:
+                    # 필터 미선택: 전체 표시
+                    all_scene_ids = [s.get('scene_id', i + 1) for i, s in enumerate(scenes)]
+                    valid_scene_ids = all_scene_ids
+                    filter_label = None
+                    final_ids = set(all_scene_ids)
+
+                st.divider()
+
+                # ─────────────────────────────────────────────────────────
+                # 🎬 씬 선택 (필터 적용)
+                # ─────────────────────────────────────────────────────────
+                if valid_scene_ids:
+                    # 필터된 씬 데이터
+                    filtered_scene_data = [s for s in scenes if s.get('scene_id', 0) in valid_scene_ids or
+                                          scenes.index(s) + 1 in valid_scene_ids]
+
+                    # SceneSelector에 유효한 씬 ID 전달
+                    selector = SceneSelector(
+                        len(scenes),
+                        key_prefix="storyboard_download",
+                        valid_scene_ids=valid_scene_ids
+                    )
+                    selected_ids = selector.render(filtered_scene_data, filter_label=filter_label)
+
+                    # ⭐ v3.20: 선택된 씬 ID를 session_state에 저장 (카드뷰 필터용)
+                    st.session_state["storyboard_selected_scene_ids"] = selected_ids
+
+                    # 선택된 ID 중 현재 필터에 해당하는 것만
+                    selected_in_filter = selected_ids.intersection(set(valid_scene_ids))
+
+                    if selected_in_filter:
+                        st.divider()
+                        downloader = StoryboardDownloader(str(project_path), key_prefix="sb_main_dl")
+                        downloader.render_download_ui(scenes, selected_in_filter)
+                    else:
+                        st.info("📥 다운로드할 씬을 선택하세요.")
+                else:
+                    st.warning("⚠️ 현재 필터 조건에 맞는 씬이 없습니다.")
+
+                # ─────────────────────────────────────────────────────────
+                # 🔤 한글 텍스트 씬 정보 (접힌 상태)
+                # ─────────────────────────────────────────────────────────
+                if korean_text_applied and korean_text_ids:
+                    with st.expander("📋 한글 텍스트 씬 상세 정보", expanded=False):
+                        kt_col1, kt_col2, kt_col3 = st.columns(3)
+                        with kt_col1:
+                            st.metric("한글 텍스트 씬", f"{len(korean_text_ids)}개")
+                        with kt_col2:
+                            ratio = (len(korean_text_ids) / len(scenes) * 100) if scenes else 0
+                            st.metric("비율", f"{ratio:.1f}%")
+                        with kt_col3:
+                            applied_at = st.session_state.get('korean_text_applied_at', '')[:16].replace('T', ' ')
+                            st.metric("적용 시간", applied_at if applied_at else "-")
+
+                        # 씬 번호 목록
+                        sorted_ids = sorted(korean_text_ids)
+                        st.caption("씬 번호: " + ", ".join(map(str, sorted_ids[:20])) + ("..." if len(sorted_ids) > 20 else ""))
+
+                        # 적용 해제 버튼
+                        if st.button("🗑️ 한글 텍스트 씬 적용 해제", key="clear_korean_text"):
+                            st.session_state['korean_text_scenes_applied'] = False
+                            st.session_state['korean_text_scene_ids'] = []
+                            st.session_state['storyboard_scene_filter'] = 'all'
+                            st.session_state['korean_text_filter_mode'] = 'all'
+                            st.success("✅ 해제됨")
+                            st.rerun()
+
+            # ⭐ v3.18: 복합 필터 적용 (스토리보드 표시용)
+            complex_filters = st.session_state.get('complex_filters', {})
+            combine_mode = st.session_state.get('filter_combine_mode', 'union')
+            active_filter_count = sum(1 for v in complex_filters.values() if v)
+
+            if active_filter_count > 0 and STORYBOARD_FILTER_AVAILABLE:
+                # 복합 필터 적용
+                display_ids, filter_results = apply_complex_filters(
+                    scenes, complex_filters, combine_mode, "first"
+                )
+                filtered_scenes = [s for s in scenes if s.get('scene_id', 0) in display_ids]
+
+                # 필터 라벨 생성
+                filter_label = get_active_filter_labels(complex_filters, combine_mode)
+                mode_text = "합집합" if combine_mode == "union" else "교집합"
+
+                # 활성화된 필터 아이콘 수집
+                filter_icons = []
+                if complex_filters.get("bundle_representative"):
+                    filter_icons.append("📦")
+                if complex_filters.get("korean_text"):
+                    filter_icons.append("🔤")
+                if complex_filters.get("no_image"):
+                    filter_icons.append("🖼️")
+                if complex_filters.get("no_video"):
+                    filter_icons.append("🎬")
+                if complex_filters.get("not_generated"):
+                    filter_icons.append("⬜")
+
+                separator = " + " if combine_mode == "union" else " ∩ "
+                icon_str = separator.join(filter_icons)
+
+                st.info(f"🎯 **필터 적용 중**: {icon_str} ({mode_text}) → {len(filtered_scenes)}개 씬")
+            else:
+                # 레거시 호환: 기존 단일 필터 모드
+                filter_mode = st.session_state.get('storyboard_scene_filter', st.session_state.get('korean_text_filter_mode', 'all'))
+                if filter_mode == 'korean_only' and korean_text_ids:
+                    filtered_scenes = [s for s in scenes if s.get('scene_id', 0) in korean_text_ids]
+                    st.info(f"🔤 한글 텍스트 씬만 표시 중 ({len(filtered_scenes)}개)")
+                elif filter_mode == 'exclude_korean' and korean_text_ids:
+                    filtered_scenes = [s for s in scenes if s.get('scene_id', 0) not in korean_text_ids]
+                    st.info(f"🖼️ 한글 텍스트 씬 제외 표시 중 ({len(filtered_scenes)}개)")
+                elif filter_mode == 'no_image':
+                    filtered_scenes = [s for s in scenes if not s.get("image_path") and not s.get("composite_path")]
+                    st.info(f"⬜ 이미지 없는 씬만 표시 중 ({len(filtered_scenes)}개)")
+                elif filter_mode == 'no_video':
+                    filtered_scenes = [s for s in scenes if not s.get("video_path")]
+                    st.info(f"🎬 비디오 없는 씬만 표시 중 ({len(filtered_scenes)}개)")
+                elif filter_mode == 'not_generated':
+                    filtered_scenes = [s for s in scenes if not s.get("image_path") and not s.get("composite_path") and not s.get("video_path")]
+                    st.info(f"⚪ 미생성 씬만 표시 중 ({len(filtered_scenes)}개)")
+                elif filter_mode == 'bundle_rep' and bundle_rep_ids:
+                    filtered_scenes = [s for s in scenes if s.get('scene_id', 0) in bundle_rep_ids]
+                    st.info(f"📦 묶음 대표 씬만 표시 중 ({len(filtered_scenes)}개)")
+                else:
+                    filtered_scenes = scenes
+
+            # ============================================================
+            # ⭐ v3.20: 선택된 씬만 표시 옵션 (Problem 1 해결)
+            # ============================================================
+            storyboard_selected_ids = st.session_state.get("storyboard_selected_scene_ids", set())
+
+            filter_col1, filter_col2, filter_col3 = st.columns([2, 1, 2])
+
+            with filter_col1:
+                show_selected_only = st.checkbox(
+                    f"✅ 선택된 씬만 표시 ({len(storyboard_selected_ids)}개)",
+                    value=st.session_state.get("show_selected_scenes_only", False),
+                    key="show_selected_scenes_only_cb",
+                    disabled=len(storyboard_selected_ids) == 0
+                )
+                st.session_state["show_selected_scenes_only"] = show_selected_only
+
+            with filter_col2:
+                if storyboard_selected_ids:
+                    st.caption(f"선택: {', '.join(map(str, sorted(storyboard_selected_ids)[:10]))}{'...' if len(storyboard_selected_ids) > 10 else ''}")
+
+            # 선택된 씬 필터 적용
+            if show_selected_only and storyboard_selected_ids:
+                filtered_scenes = [s for s in filtered_scenes if s.get('scene_id', 0) in storyboard_selected_ids]
+                st.success(f"✅ **선택된 {len(filtered_scenes)}개 씬만 표시 중**")
+
+            # ============================================================
+            # ⭐ v3.20: 일괄 비디오 변환 섹션 (Problem 3 해결)
+            # ============================================================
+            if storyboard_selected_ids and len(storyboard_selected_ids) > 0:
+                with st.expander(f"🎬 선택된 {len(storyboard_selected_ids)}개 씬 일괄 비디오 변환", expanded=False):
+                    st.markdown("#### 🚀 배치 비디오 변환")
+
+                    # ⭐ v3.23: 선택된 씬 중 이미지가 있는 씬 확인 (get_scene_image_path 사용)
+                    # 기존: s.get("image_path") 직접 확인 → 씬 데이터에 경로가 없으면 누락
+                    # 수정: get_scene_image_path()로 파일시스템 스캔 (카드뷰와 동일)
+                    scenes_with_image = []
+                    for s in scenes:
+                        sid = s.get('scene_id', 0)
+                        if sid in storyboard_selected_ids:
+                            # ⭐ get_scene_image_path: 실사이미지, 합성이미지, 패턴매칭 모두 확인
+                            img_path = get_scene_image_path(s, str(project_path))
+                            if img_path:
+                                # 이미지 경로를 씬 데이터에 임시 저장 (비디오 생성용)
+                                s["_batch_image_path"] = img_path
+                                scenes_with_image.append(s)
+
+                    batch_col1, batch_col2, batch_col3 = st.columns(3)
+
+                    with batch_col1:
+                        st.metric("선택된 씬", f"{len(storyboard_selected_ids)}개")
+
+                    with batch_col2:
+                        st.metric("이미지 있는 씬", f"{len(scenes_with_image)}개")
+
+                    with batch_col3:
+                        # 비용 예측
+                        estimated_cost = len(scenes_with_image) * 0.10  # Wan I2V 기준
+                        st.metric("예상 비용 (Wan)", f"${estimated_cost:.2f}")
+
+                    if scenes_with_image:
+                        # 플랫폼/모델/길이 선택
+                        batch_settings_col1, batch_settings_col2, batch_settings_col3 = st.columns(3)
+
+                        with batch_settings_col1:
+                            batch_platform = st.selectbox(
+                                "플랫폼",
+                                options=get_available_video_platforms() if VIDEO_API_AVAILABLE else [],
+                                key="batch_storyboard_platform"
+                            )
+
+                        with batch_settings_col2:
+                            if batch_platform and VIDEO_API_AVAILABLE:
+                                i2v_models = get_i2v_models_for_platform(batch_platform)
+                                model_options = list(i2v_models.keys())
+                                batch_model = st.selectbox(
+                                    "모델",
+                                    options=model_options,
+                                    format_func=lambda x: i2v_models[x].display_name if x in i2v_models else x,
+                                    key="batch_storyboard_model"
+                                )
+                            else:
+                                batch_model = None
+
+                        with batch_settings_col3:
+                            # ⭐ v3.22: 비디오 길이 선택 (자동 모드 추가)
+                            if batch_platform and batch_model and VIDEO_API_AVAILABLE:
+                                try:
+                                    model_config = ALL_MODELS[batch_platform][batch_model]
+                                    available_durations = model_config.durations if model_config.durations else [5]
+                                except:
+                                    available_durations = [5]
+                            else:
+                                available_durations = [5]
+
+                            # ⭐ v3.22: 자동/수동 모드 선택
+                            duration_mode = st.radio(
+                                "📐 영상 길이 모드",
+                                options=["auto", "manual"],
+                                format_func=lambda x: "🤖 SRT 기반 자동" if x == "auto" else "📏 수동 선택",
+                                horizontal=True,
+                                key="batch_duration_mode",
+                                help="자동: SRT 길이에 따라 5초/10초 자동 결정 | 수동: 모든 씬에 동일한 길이 적용"
+                            )
+
+                            if duration_mode == "manual":
+                                batch_duration = st.selectbox(
+                                    "영상 길이",
+                                    options=available_durations,
+                                    format_func=lambda x: f"{x}초",
+                                    key="batch_storyboard_duration",
+                                    help="5초: 빠른 생성 | 10초: 더 자연스러운 움직임"
+                                )
+                            else:
+                                batch_duration = None  # 자동 모드에서는 사용하지 않음
+
+                        # ⭐ v3.22: 자동 모드일 때 씬별 duration 정보 표시
+                        if duration_mode == "auto" and scenes_with_image:
+                            duration_info = get_batch_duration_info(scenes_with_image)
+                            info_col1, info_col2, info_col3 = st.columns(3)
+                            with info_col1:
+                                st.metric("5초 추천", f"{duration_info['short_count']}개", help="SRT 6초 이하")
+                            with info_col2:
+                                st.metric("10초 추천", f"{duration_info['long_count']}개", help="SRT 7초 이상")
+                            with info_col3:
+                                if duration_info['no_data_count'] > 0:
+                                    st.metric("TTS 없음", f"{duration_info['no_data_count']}개", help="추정치 기반")
+                                else:
+                                    st.metric("TTS 데이터", "✅ 완전", help="모든 씬에 TTS 데이터 있음")
+
+                        # 길이에 따른 비용 재계산 표시
+                        if batch_platform and batch_model:
+                            try:
+                                if duration_mode == "auto":
+                                    # ⭐ v3.22: 자동 모드 비용 계산 (씬별 다른 duration)
+                                    duration_info = get_batch_duration_info(scenes_with_image)
+                                    cost_5s = estimate_video_cost(batch_platform, batch_model, 5, "720p")
+                                    cost_10s = estimate_video_cost(batch_platform, batch_model, 10, "720p") if 10 in available_durations else cost_5s
+
+                                    cost_5s_unit = cost_5s.get("cost_usd", 0.10) if cost_5s else 0.10
+                                    cost_10s_unit = cost_10s.get("cost_usd", 0.15) if cost_10s else 0.15
+
+                                    total_5s_cost = duration_info['short_count'] * cost_5s_unit
+                                    total_10s_cost = duration_info['long_count'] * cost_10s_unit
+                                    total_no_data_cost = duration_info['no_data_count'] * cost_5s_unit  # 기본 5초
+
+                                    total_estimated_cost = total_5s_cost + total_10s_cost + total_no_data_cost
+                                    st.info(f"💰 예상 총 비용 (자동): **${total_estimated_cost:.2f}** (5초 {duration_info['short_count']}개 + 10초 {duration_info['long_count']}개)")
+                                else:
+                                    updated_estimate = estimate_video_cost(
+                                        platform=batch_platform,
+                                        model_key=batch_model,
+                                        duration=batch_duration,
+                                        resolution="720p"
+                                    )
+                                    unit_cost = updated_estimate.get("cost_usd", 0.10) if updated_estimate else 0.10
+                                    total_estimated_cost = len(scenes_with_image) * unit_cost
+                                    st.info(f"💰 예상 총 비용: **${total_estimated_cost:.2f}** (씬당 ${unit_cost:.2f} × {len(scenes_with_image)}개, {batch_duration}초)")
+                            except:
+                                pass
+
+                        # 배치 변환 버튼
+                        btn_label = f"🚀 {len(scenes_with_image)}개 씬 일괄 비디오 생성"
+                        if duration_mode == "auto":
+                            btn_label += " (🤖 자동)"
+
+                        if st.button(
+                            btn_label,
+                            type="primary",
+                            use_container_width=True,
+                            key="batch_storyboard_video_btn",
+                            disabled=not batch_platform or not batch_model or len(scenes_with_image) == 0
+                        ):
+                            # 배치 처리 실행
+                            st.markdown("---")
+                            progress_bar = st.progress(0)
+                            status_text = st.empty()
+
+                            def batch_progress_callback(current, total, message):
+                                progress_bar.progress((current + 1) / total if total > 0 else 0)
+                                status_text.text(f"{message} ({current + 1}/{total})")
+
+                            # ⭐ v3.22: 자동 모드 처리
+                            is_auto_mode = (duration_mode == "auto")
+                            actual_duration = 5 if is_auto_mode else batch_duration
+                            spinner_msg = "배치 비디오 생성 중... (🤖 SRT 기반 자동)" if is_auto_mode else f"배치 비디오 생성 중... ({batch_duration}초)"
+
+                            with st.spinner(spinner_msg):
+                                batch_results = batch_generate_scene_videos(
+                                    scenes=scenes_with_image,
+                                    project_path=str(project_path),
+                                    platform=batch_platform,
+                                    model_key=batch_model,
+                                    prompt_type="full",
+                                    duration=actual_duration,
+                                    resolution="720p",
+                                    progress_callback=batch_progress_callback,
+                                    auto_duration=is_auto_mode,  # ⭐ v3.22: 자동 모드 전달
+                                )
+
+                            progress_bar.progress(1.0)
+                            status_text.text("✅ 완료!")
+
+                            # 결과 표시
+                            success_count = sum(1 for r in batch_results if r.get("success"))
+                            fail_count = len(batch_results) - success_count
+                            total_cost = sum(r.get("cost_usd", 0) for r in batch_results if r.get("success"))
+
+                            if success_count > 0:
+                                st.success(f"🎉 **{success_count}개 비디오 생성 완료!** | 실패: {fail_count}개 | 총 비용: ${total_cost:.2f}")
+
+                                # ⭐ v3.22: 자동 모드일 때 씬별 duration 결과 표시
+                                if is_auto_mode:
+                                    successful_results = [r for r in batch_results if r.get("success")]
+                                    dur_5s = sum(1 for r in successful_results if r.get("video_duration") == 5)
+                                    dur_10s = sum(1 for r in successful_results if r.get("video_duration") == 10)
+                                    st.caption(f"📊 생성된 비디오: 5초 {dur_5s}개, 10초 {dur_10s}개")
+                            else:
+                                st.error(f"❌ 모든 비디오 생성 실패 ({fail_count}개)")
+
+                            # 실패 상세
+                            failed_results = [r for r in batch_results if not r.get("success")]
+                            if failed_results:
+                                with st.expander("❌ 실패 상세"):
+                                    for r in failed_results:
+                                        st.markdown(f"- 씬 {r.get('scene_id')}: {r.get('error')}")
+
+                            # ⭐ v3.22: 자동 모드 상세 (어떤 duration이 사용되었는지)
+                            if is_auto_mode and success_count > 0:
+                                with st.expander("📋 씬별 비디오 길이 상세"):
+                                    for r in batch_results:
+                                        if r.get("success"):
+                                            dur = r.get("video_duration", "?")
+                                            reason = r.get("auto_duration_reason", "")
+                                            st.markdown(f"- 씬 {r.get('scene_id')}: **{dur}초** - {reason}")
+
+                            st.rerun()
+                    else:
+                        st.warning("⚠️ 선택된 씬 중 이미지가 있는 씬이 없습니다. 먼저 이미지를 생성하세요.")
 
             st.divider()
 
@@ -5649,7 +6764,7 @@ Scene 4: (비워둠)
 
                 current_page = st.session_state["storyboard_page"]
                 paginated_scenes, start_idx, end_idx, total_pages = get_paginated_scenes(
-                    scenes, current_page, SCENES_PER_PAGE
+                    filtered_scenes, current_page, SCENES_PER_PAGE
                 )
 
                 # 페이지 네비게이션 UI
@@ -5669,7 +6784,7 @@ Scene 4: (비워둠)
                     st.markdown(
                         f"<div style='text-align:center; padding:8px;'>"
                         f"<b>페이지 {current_page + 1} / {total_pages}</b><br>"
-                        f"<small>씬 {start_idx + 1} ~ {end_idx} (총 {len(scenes)}개)</small>"
+                        f"<small>씬 {start_idx + 1} ~ {end_idx} (총 {len(filtered_scenes)}개)</small>"
                         f"</div>",
                         unsafe_allow_html=True
                     )
@@ -5687,7 +6802,7 @@ Scene 4: (비워둠)
                 # 빠른 페이지 이동 & 캐시 관리
                 quick_nav_cols = st.columns([2, 1, 1])
                 with quick_nav_cols[0]:
-                    page_options = [f"페이지 {p+1} (씬 {p*SCENES_PER_PAGE+1}~{min((p+1)*SCENES_PER_PAGE, len(scenes))})" for p in range(total_pages)]
+                    page_options = [f"페이지 {p+1} (씬 {p*SCENES_PER_PAGE+1}~{min((p+1)*SCENES_PER_PAGE, len(filtered_scenes))})" for p in range(total_pages)]
                     selected_page = st.selectbox(
                         "빠른 이동",
                         options=range(total_pages),
@@ -5728,7 +6843,17 @@ Scene 4: (비워둠)
                         cols = st.columns([1, 3, 2])
 
                         with cols[0]:
-                            st.markdown(f"### 씬 {scene_id}")
+                            # ⭐ v3.17: 씬 태그 표시 (묶음 대표 + 한글 텍스트)
+                            tags = []
+                            if scene_id in bundle_rep_ids:
+                                tags.append("📦")
+                            if scene_id in korean_text_ids:
+                                tags.append("🔤")
+                            tag_str = " ".join(tags)
+                            if tag_str:
+                                st.markdown(f"### 씬 {scene_id} {tag_str}")
+                            else:
+                                st.markdown(f"### 씬 {scene_id}")
                             st.caption(f"~{duration}초")
 
                         with cols[1]:
@@ -5769,8 +6894,13 @@ Scene 4: (비워둠)
                                         with prompt_tabs[0]:
                                             if has_image:
                                                 st.code(image_prompt[:300] + "..." if len(image_prompt) > 300 else image_prompt, language=None)
-                                                if st.button("📋", key=f"copy_img_prompt_{i}_{scene_id}", help="프롬프트 복사"):
-                                                    st.code(image_prompt, language=None)
+                                                # v1.2: 즉시 복사 버튼
+                                                render_instant_copy_button(
+                                                    text=image_prompt,
+                                                    key=f"copy_img_prompt_{i}_{scene_id}",
+                                                    label="📋 복사",
+                                                    help_text="영문 이미지 프롬프트 복사"
+                                                )
                                             else:
                                                 st.caption("이미지 프롬프트 없음")
 
@@ -5778,8 +6908,13 @@ Scene 4: (비워둠)
                                         with prompt_tabs[1]:
                                             if has_korean:
                                                 st.code(image_prompt_korean[:300] + "..." if len(image_prompt_korean) > 300 else image_prompt_korean, language=None)
-                                                if st.button("📋", key=f"copy_kr_prompt_{i}_{scene_id}", help="한글 프롬프트 복사"):
-                                                    st.code(image_prompt_korean, language=None)
+                                                # v1.2: 즉시 복사 버튼
+                                                render_instant_copy_button(
+                                                    text=image_prompt_korean,
+                                                    key=f"copy_kr_prompt_{i}_{scene_id}",
+                                                    label="📋 복사",
+                                                    help_text="한글 이미지 프롬프트 복사"
+                                                )
                                             else:
                                                 st.caption("한글 프롬프트 없음 (씬 재분석 필요)")
 
@@ -5844,17 +6979,24 @@ Scene 4: (비워둠)
                                 if filename and filename.replace(".png", "") in image_map:
                                     scene_image = image_map[filename.replace(".png", "")]
 
+                                # ⭐ v2.3: 실사 이미지 우선 매칭
                                 # 씬 번호로 매칭 (다양한 파일명 패턴 지원)
                                 if not scene_image:
                                     scene_num_str = f"{scene_id:03d}"
-                                    for img_name, img_path in image_map.items():
-                                        # 패턴: _001, _seg_001, 001_, 001_scene 등
-                                        if (f"_{scene_num_str}" in img_name or
-                                            f"_seg_{scene_num_str}" in img_name or
-                                            img_name.startswith(f"{scene_num_str}_") or
-                                            img_name.startswith(f"{scene_num_str}.")):
-                                            scene_image = img_path
-                                            break
+                                    # 실사 이미지 우선 검색
+                                    real_scene_key = f"real_scene_{scene_num_str}"
+                                    if real_scene_key in image_map:
+                                        scene_image = image_map[real_scene_key]
+                                    else:
+                                        for img_name, img_path in image_map.items():
+                                            # 패턴: real_scene_001, _001, _seg_001, 001_, 001_scene 등
+                                            if (img_name.startswith(f"real_scene_{scene_num_str}") or
+                                                f"_{scene_num_str}" in img_name or
+                                                f"_seg_{scene_num_str}" in img_name or
+                                                img_name.startswith(f"{scene_num_str}_") or
+                                                img_name.startswith(f"{scene_num_str}.")):
+                                                scene_image = img_path
+                                                break
 
                                 # 순서대로 매칭
                                 if not scene_image and i < len(image_files):
@@ -5868,17 +7010,16 @@ Scene 4: (비워둠)
                                     render_lightbox_image(str(scene_image), width=300, key=f"storyboard_img_{i}_{scene_id}")
 
                                     # === 실사 이미지 대체 기능 ===
-                                    img_btn_cols = st.columns(5)
+                                    img_btn_cols = st.columns(6)  # v1.1: 6열로 변경 (다운로드 버튼 추가)
 
-                                    # 1. 경로 복사 버튼
+                                    # 1. 🆕 v1.2: 한글 프롬프트 즉시 복사 버튼 (원클릭 복사)
                                     with img_btn_cols[0]:
-                                        if st.button("Copy", key=f"copy_path_{i}_{scene_id}", help="이미지 경로 복사"):
-                                            # 절대 경로로 변환
-                                            abs_path = str(scene_image.resolve())
-                                            copy_path_to_clipboard(abs_path, f"copy_{i}_{scene_id}")
-                                            st.toast(f"경로 복사됨!")
-                                            # 전체 경로 표시 (사용자가 직접 복사 가능)
-                                            st.code(abs_path, language=None)
+                                        render_instant_copy_button(
+                                            text=image_prompt_korean,
+                                            key=f"copy_kr_{i}_{scene_id}",
+                                            label="Copy",
+                                            help_text="한글 이미지 프롬프트 복사"
+                                        )
 
                                     # 2. 폴더 열기 버튼
                                     with img_btn_cols[1]:
@@ -5913,6 +7054,27 @@ Scene 4: (비워둠)
                                             if st.button("Prompt", key=f"prompt_info_{i}_{scene_id}", help="프롬프트 정보 보기"):
                                                 st.session_state[f"show_prompt_{i}_{scene_id}"] = True
 
+                                    # 6. 🆕 v1.1: 이미지 다운로드 버튼
+                                    with img_btn_cols[5]:
+                                        try:
+                                            with open(scene_image, "rb") as img_file:
+                                                img_bytes = img_file.read()
+                                            # 파일명 생성: scene_001.png 형식
+                                            dl_filename = f"scene_{str(scene_id).zfill(3)}{scene_image.suffix}"
+                                            # MIME 타입 결정
+                                            mime_map = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif"}
+                                            dl_mime = mime_map.get(scene_image.suffix.lower(), "image/png")
+                                            st.download_button(
+                                                "📥",
+                                                data=img_bytes,
+                                                file_name=dl_filename,
+                                                mime=dl_mime,
+                                                key=f"dl_img_{i}_{scene_id}",
+                                                help="이미지 다운로드"
+                                            )
+                                        except Exception as e:
+                                            st.button("📥", disabled=True, key=f"dl_img_{i}_{scene_id}", help=f"다운로드 실패: {e}")
+
                                     # 프롬프트 정보 표시 (expander)
                                     if PROMPT_METADATA_AVAILABLE and st.session_state.get(f"show_prompt_{i}_{scene_id}", False):
                                         render_prompt_info_expander(str(scene_image), key_prefix=f"prompt_{i}_{scene_id}")
@@ -5942,12 +7104,12 @@ Scene 4: (비워둠)
                 import pandas as pd
 
                 table_data = []
-                for i, scene in enumerate(scenes):
+                for i, scene in enumerate(filtered_scenes):
                     row = {
                         "씬": scene.get("scene_id", i + 1),
                         "시간(초)": scene.get("duration_estimate", 10),
                         "스크립트": scene.get("script_text", "")[:100] + "...",
-                        "캐릭터": ", ".join(scene.get("characters", [])),
+                        "캐릭터": safe_join_characters(scene.get("characters", [])),
                         "분위기": scene.get("mood", ""),
                         "이미지": "O" if i < len(image_files) else "X"
                     }
@@ -5964,15 +7126,15 @@ Scene 4: (비워둠)
                 cols_per_row = 4
                 current_time = 0
 
-                for row_start in range(0, len(scenes), cols_per_row):
+                for row_start in range(0, len(filtered_scenes), cols_per_row):
                     cols = st.columns(cols_per_row)
 
                     for j, col in enumerate(cols):
                         idx = row_start + j
-                        if idx >= len(scenes):
+                        if idx >= len(filtered_scenes):
                             break
 
-                        scene = scenes[idx]
+                        scene = filtered_scenes[idx]
                         scene_id = scene.get("scene_id", idx + 1)
                         duration = scene.get("duration_estimate", 10)
 

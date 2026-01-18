@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-14T20:04:58.274210",
+  "image_file": "bg_scene_008_1768388698273.png",
+  "scene_id": 8,
+  "prompts": {
+    "original": "A calculator displaying the number '2,000,000,000,000' (Korean Won), with a piece of paper on top reading '2조 원', money bills scattered around, financial chart background. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A calculator displaying the number '2,000,000,000,000' (Korean Won), with a piece of paper on top reading '2조 원', money bills scattered around, financial chart background. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

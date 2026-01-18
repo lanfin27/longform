@@ -36,6 +36,17 @@ from config.constants import IMAGE_STYLE_PREFIXES
 from utils.api_helper import show_api_status_sidebar
 from core.prompt.preset_manager import PromptPresetManager
 
+
+# ============================================================
+# ⭐ 성능 최적화: 캐싱 데코레이터
+# ============================================================
+@st.cache_data(ttl=60, show_spinner=False)
+def _cached_load_scenes(project_path_str):
+    """씬 로드 (캐싱 적용)"""
+    from pathlib import Path
+    return load_scenes(Path(project_path_str))
+
+
 # 페이지 설정
 st.set_page_config(
     page_title="이미지 프롬프트",
@@ -80,8 +91,8 @@ with tab_scene:
     - 세모지 스타일 워크플로우에 최적화
     """)
 
-    # 씬 분석 결과 확인
-    scenes = load_scenes(project_path)
+    # 씬 분석 결과 확인 (⭐ 캐싱 적용)
+    scenes = _cached_load_scenes(str(project_path))
 
     if not scenes:
         st.warning("씬 분석 결과가 없습니다. 3.5단계에서 씬 분석을 먼저 실행하세요.")

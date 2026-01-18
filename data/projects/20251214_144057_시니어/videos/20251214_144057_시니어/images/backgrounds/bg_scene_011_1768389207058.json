@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-14T20:13:27.059459",
+  "image_file": "bg_scene_011_1768389207058.png",
+  "scene_id": 11,
+  "prompts": {
+    "original": "A collage of the Samsung logo and various car images (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features). absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "photorealistic environment, A collage of the Samsung logo and various car images (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features). absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot, natural lighting, detailed scenery, cinematic",
+    "negative": "cartoon, anime, people"
+  },
+  "style": {
+    "id": "bg_realistic",
+    "name": "실사",
+    "prefix": "photorealistic environment,",
+    "suffix": "natural lighting, detailed scenery, cinematic"
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-프로젝트 초기화 관리자 (v1.0)
+프로젝트 초기화 관리자 (v2.0)
 
 3단계 레벨의 프로젝트 초기화 기능:
 1. 영상(Video) 초기화 - 특정 영상의 모든 산출물 삭제
@@ -10,6 +10,11 @@
 삭제 모드:
 - Hard Delete: 실제 파일 삭제 (복구 불가)
 - Soft Delete: 숨김 처리 (복구 가능)
+
+v2.0 추가:
+- 선택적 삭제 기능 (항목별 체크박스)
+- 빠른 선택 프리셋 (전체, 미디어만, 이미지만 등)
+- 보존 프리셋 (프롬프트 보존, 분석 보존 등)
 """
 
 import os
@@ -25,6 +30,100 @@ class DeleteMode(Enum):
     """삭제 모드"""
     HARD = "hard"  # 실제 삭제
     SOFT = "soft"  # 숨김 처리
+
+
+class ItemCategory(Enum):
+    """항목 카테고리"""
+    MEDIA = "media"         # 미디어 (images, videos)
+    ANALYSIS = "analysis"   # 분석 결과 (analysis, data)
+    SETTINGS = "settings"   # 설정 (presets, prompts)
+    OUTPUT = "output"       # 출력물 (output, export)
+    AUDIO = "audio"         # 오디오 (audio)
+    OTHER = "other"         # 기타
+
+
+# 폴더별 카테고리 매핑
+FOLDER_CATEGORY_MAP = {
+    'images': ItemCategory.MEDIA,
+    'videos': ItemCategory.MEDIA,
+    'backgrounds': ItemCategory.MEDIA,
+    'characters': ItemCategory.MEDIA,
+    'infographics': ItemCategory.MEDIA,
+    'analysis': ItemCategory.ANALYSIS,
+    'data': ItemCategory.ANALYSIS,
+    'scenes': ItemCategory.ANALYSIS,
+    'presets': ItemCategory.SETTINGS,
+    'prompts': ItemCategory.SETTINGS,
+    'output': ItemCategory.OUTPUT,
+    'export': ItemCategory.OUTPUT,
+    'audio': ItemCategory.AUDIO,
+    'scripts': ItemCategory.OTHER,
+}
+
+
+# 빠른 선택 프리셋 정의
+QUICK_SELECT_PRESETS = {
+    'all': {
+        'name': '전체 선택',
+        'icon': '☑️',
+        'description': '모든 항목 선택',
+        'categories': [ItemCategory.MEDIA, ItemCategory.ANALYSIS, ItemCategory.SETTINGS,
+                       ItemCategory.OUTPUT, ItemCategory.AUDIO, ItemCategory.OTHER]
+    },
+    'media_only': {
+        'name': '미디어만',
+        'icon': '🖼️',
+        'description': '이미지, 비디오만 선택',
+        'categories': [ItemCategory.MEDIA]
+    },
+    'images_only': {
+        'name': '이미지만',
+        'icon': '📷',
+        'description': '이미지 폴더만 선택',
+        'folders': ['images', 'backgrounds', 'characters', 'infographics']
+    },
+    'videos_only': {
+        'name': '영상만',
+        'icon': '🎬',
+        'description': '비디오 폴더만 선택',
+        'folders': ['videos', 'output', 'export']
+    },
+    'output_only': {
+        'name': '출력물만',
+        'icon': '📤',
+        'description': '최종 출력물만 선택',
+        'categories': [ItemCategory.OUTPUT]
+    },
+    'none': {
+        'name': '전체 해제',
+        'icon': '☐',
+        'description': '모든 선택 해제',
+        'categories': []
+    }
+}
+
+
+# 보존 프리셋 정의
+PRESERVE_PRESETS = {
+    'keep_prompts': {
+        'name': '프롬프트 보존',
+        'icon': '📝',
+        'description': '프롬프트, 프리셋 보존',
+        'exclude_categories': [ItemCategory.SETTINGS]
+    },
+    'keep_analysis': {
+        'name': '분석결과 보존',
+        'icon': '📊',
+        'description': '씬 분석 데이터 보존',
+        'exclude_categories': [ItemCategory.ANALYSIS]
+    },
+    'keep_settings': {
+        'name': '설정 보존',
+        'icon': '⚙️',
+        'description': '프롬프트, 분석, 프리셋 모두 보존',
+        'exclude_categories': [ItemCategory.SETTINGS, ItemCategory.ANALYSIS]
+    }
+}
 
 
 class ProjectResetManager:
@@ -296,6 +395,320 @@ class ProjectResetManager:
         print(f"[영상 초기화] 완료: {len(result['deleted_items'])}개 처리, {result['total_size'] / 1024 / 1024:.2f} MB", flush=True)
 
         return result
+
+    # ========================================
+    # 선택적 삭제 기능 (v2.0)
+    # ========================================
+
+    def scan_video_items(
+        self,
+        project_id: str,
+        video_id: str
+    ) -> List[Dict[str, Any]]:
+        """
+        영상 폴더 내 모든 항목 스캔 (선택적 삭제용)
+
+        Returns:
+            [{
+                'id': str,          # 고유 ID (폴더/파일명)
+                'name': str,        # 표시 이름
+                'path': str,        # 전체 경로
+                'type': str,        # 'folder' | 'file'
+                'category': str,    # ItemCategory.value
+                'size': int,        # 바이트
+                'file_count': int,  # 폴더 내 파일 수
+                'icon': str,        # 표시 아이콘
+            }, ...]
+        """
+        video_path = self.projects_path / project_id / "videos" / video_id
+
+        if not video_path.exists():
+            return []
+
+        items = []
+
+        # 폴더 아이콘 매핑
+        folder_icons = {
+            'analysis': '📊',
+            'images': '🖼️',
+            'audio': '🔊',
+            'videos': '🎬',
+            'output': '📤',
+            'export': '📦',
+            'infographics': '📈',
+            'prompts': '📝',
+            'data': '💾',
+            'presets': '⚙️',
+            'scripts': '📄',
+            'scenes': '🎭',
+            'backgrounds': '🏞️',
+            'characters': '👤',
+        }
+
+        # 폴더 스캔
+        for item in video_path.iterdir():
+            if item.name.startswith('.'):
+                continue
+
+            if item.is_dir():
+                category = FOLDER_CATEGORY_MAP.get(item.name, ItemCategory.OTHER)
+                size = self._get_size(item)
+                file_count = self._count_files(item)
+
+                items.append({
+                    'id': item.name,
+                    'name': item.name,
+                    'path': str(item),
+                    'type': 'folder',
+                    'category': category.value,
+                    'size': size,
+                    'file_count': file_count,
+                    'icon': folder_icons.get(item.name, '📁'),
+                })
+
+            elif item.is_file():
+                # JSON 파일 등
+                ext = item.suffix.lower()
+                size = item.stat().st_size
+
+                if ext == '.json':
+                    category = ItemCategory.ANALYSIS
+                    icon = '📋'
+                else:
+                    category = ItemCategory.OTHER
+                    icon = '📄'
+
+                items.append({
+                    'id': item.name,
+                    'name': item.name,
+                    'path': str(item),
+                    'type': 'file',
+                    'category': category.value,
+                    'size': size,
+                    'file_count': 1,
+                    'icon': icon,
+                })
+
+        # 이름순 정렬
+        items.sort(key=lambda x: (x['type'] != 'folder', x['name']))
+
+        return items
+
+    def get_items_by_preset(
+        self,
+        items: List[Dict[str, Any]],
+        preset_id: str,
+        preset_type: str = 'select'
+    ) -> Set[str]:
+        """
+        프리셋 적용 후 선택할 항목 ID 목록 반환
+
+        Args:
+            items: scan_video_items() 결과
+            preset_id: 프리셋 ID
+            preset_type: 'select' (빠른 선택) | 'preserve' (보존)
+
+        Returns:
+            선택할 항목 ID set
+        """
+        if preset_type == 'select':
+            preset = QUICK_SELECT_PRESETS.get(preset_id, {})
+
+            if not preset:
+                return set()
+
+            # 'none' 프리셋은 빈 set 반환
+            if preset_id == 'none':
+                return set()
+
+            selected_ids = set()
+
+            # 카테고리 기반 선택
+            if 'categories' in preset:
+                categories = [c.value for c in preset['categories']]
+                for item in items:
+                    if item['category'] in categories:
+                        selected_ids.add(item['id'])
+
+            # 폴더명 기반 선택 (더 세분화된 제어)
+            if 'folders' in preset:
+                folders = preset['folders']
+                for item in items:
+                    if item['id'] in folders:
+                        selected_ids.add(item['id'])
+
+            return selected_ids
+
+        elif preset_type == 'preserve':
+            preset = PRESERVE_PRESETS.get(preset_id, {})
+
+            if not preset:
+                # 프리셋 없으면 전체 선택 상태 유지
+                return {item['id'] for item in items}
+
+            # 보존할 카테고리 제외
+            exclude_categories = [c.value for c in preset.get('exclude_categories', [])]
+
+            selected_ids = set()
+            for item in items:
+                if item['category'] not in exclude_categories:
+                    selected_ids.add(item['id'])
+
+            return selected_ids
+
+        return set()
+
+    def delete_selected_items(
+        self,
+        project_id: str,
+        video_id: str,
+        selected_ids: Set[str],
+        mode: DeleteMode = DeleteMode.HARD,
+        confirm: bool = False
+    ) -> Dict[str, Any]:
+        """
+        선택된 항목만 삭제
+
+        Args:
+            project_id: 프로젝트 ID
+            video_id: 영상 ID
+            selected_ids: 삭제할 항목 ID set
+            mode: 삭제 모드
+            confirm: 확인 여부
+
+        Returns:
+            {
+                'success': bool,
+                'deleted_items': list,
+                'preserved_items': list,
+                'total_deleted_size': int,
+                'total_preserved_size': int,
+                'errors': list
+            }
+        """
+        result = {
+            'success': False,
+            'mode': mode.value,
+            'project_id': project_id,
+            'video_id': video_id,
+            'deleted_items': [],
+            'preserved_items': [],
+            'total_deleted_size': 0,
+            'total_preserved_size': 0,
+            'errors': []
+        }
+
+        if not confirm:
+            result['errors'].append("확인되지 않음. confirm=True 필요")
+            return result
+
+        if not selected_ids:
+            result['errors'].append("선택된 항목 없음")
+            return result
+
+        video_path = self.projects_path / project_id / "videos" / video_id
+
+        if not video_path.exists():
+            result['errors'].append(f"영상 폴더를 찾을 수 없음: {video_path}")
+            return result
+
+        print(f"[선택적 삭제] 시작: {project_id}/{video_id} - {len(selected_ids)}개 항목 (모드: {mode.value})", flush=True)
+
+        # 전체 항목 스캔
+        all_items = self.scan_video_items(project_id, video_id)
+
+        for item in all_items:
+            item_path = Path(item['path'])
+
+            if item['id'] in selected_ids:
+                # 삭제 대상
+                try:
+                    if mode == DeleteMode.HARD:
+                        if item_path.is_dir():
+                            shutil.rmtree(str(item_path))
+                        else:
+                            item_path.unlink()
+                        print(f"[선택적 삭제] 삭제: {item['name']} ({item['size'] / 1024:.1f} KB)", flush=True)
+                    else:
+                        self._soft_delete(item_path)
+                        print(f"[선택적 삭제] 숨김: {item['name']}", flush=True)
+
+                    result['deleted_items'].append({
+                        'id': item['id'],
+                        'name': item['name'],
+                        'size': item['size'],
+                        'category': item['category']
+                    })
+                    result['total_deleted_size'] += item['size']
+
+                except Exception as e:
+                    result['errors'].append(f"{item['name']}: {str(e)}")
+                    print(f"[선택적 삭제] ❌ 오류: {item['name']}: {e}", flush=True)
+            else:
+                # 보존 대상
+                result['preserved_items'].append({
+                    'id': item['id'],
+                    'name': item['name'],
+                    'size': item['size'],
+                    'category': item['category']
+                })
+                result['total_preserved_size'] += item['size']
+                print(f"[선택적 삭제] 보존: {item['name']}", flush=True)
+
+        result['success'] = len(result['errors']) == 0
+        print(f"[선택적 삭제] 완료: 삭제 {len(result['deleted_items'])}개 ({result['total_deleted_size'] / 1024 / 1024:.2f} MB), 보존 {len(result['preserved_items'])}개", flush=True)
+
+        return result
+
+    def get_deletion_summary(
+        self,
+        items: List[Dict[str, Any]],
+        selected_ids: Set[str]
+    ) -> Dict[str, Any]:
+        """
+        삭제 요약 정보 생성
+
+        Returns:
+            {
+                'selected_count': int,
+                'preserved_count': int,
+                'delete_size': int,
+                'preserve_size': int,
+                'by_category': {category: {'delete': int, 'preserve': int, 'delete_size': int, 'preserve_size': int}, ...}
+            }
+        """
+        summary = {
+            'selected_count': 0,
+            'preserved_count': 0,
+            'delete_size': 0,
+            'preserve_size': 0,
+            'by_category': {}
+        }
+
+        # 카테고리별 초기화
+        for cat in ItemCategory:
+            summary['by_category'][cat.value] = {
+                'delete': 0,
+                'preserve': 0,
+                'delete_size': 0,
+                'preserve_size': 0
+            }
+
+        for item in items:
+            cat = item['category']
+
+            if item['id'] in selected_ids:
+                summary['selected_count'] += 1
+                summary['delete_size'] += item['size']
+                summary['by_category'][cat]['delete'] += 1
+                summary['by_category'][cat]['delete_size'] += item['size']
+            else:
+                summary['preserved_count'] += 1
+                summary['preserve_size'] += item['size']
+                summary['by_category'][cat]['preserve'] += 1
+                summary['by_category'][cat]['preserve_size'] += item['size']
+
+        return summary
 
     # ========================================
     # 채널 프로젝트 초기화
@@ -731,3 +1144,39 @@ def get_reset_manager() -> ProjectResetManager:
         _manager_instance = ProjectResetManager()
 
     return _manager_instance
+
+
+def get_quick_select_presets() -> Dict[str, dict]:
+    """빠른 선택 프리셋 반환"""
+    return QUICK_SELECT_PRESETS.copy()
+
+
+def get_preserve_presets() -> Dict[str, dict]:
+    """보존 프리셋 반환"""
+    return PRESERVE_PRESETS.copy()
+
+
+def get_category_name(category: str) -> str:
+    """카테고리 한글 이름 반환"""
+    names = {
+        'media': '미디어',
+        'analysis': '분석결과',
+        'settings': '설정',
+        'output': '출력물',
+        'audio': '오디오',
+        'other': '기타'
+    }
+    return names.get(category, category)
+
+
+def get_category_icon(category: str) -> str:
+    """카테고리 아이콘 반환"""
+    icons = {
+        'media': '🖼️',
+        'analysis': '📊',
+        'settings': '⚙️',
+        'output': '📤',
+        'audio': '🔊',
+        'other': '📁'
+    }
+    return icons.get(category, '📁')

@@ -35,6 +35,23 @@ from utils.api_helper import (
 from utils.progress_ui import render_api_selector, StreamlitProgressUI
 from core.api.api_manager import get_api_manager
 
+
+# ============================================================
+# ⭐ 성능 최적화: 캐싱 데코레이터
+# ============================================================
+@st.cache_data(ttl=60, show_spinner=False)
+def _cached_load_selected_videos(project_path_str):
+    """선택된 영상 로드 (캐싱 적용)"""
+    from pathlib import Path
+    return load_selected_videos(Path(project_path_str))
+
+
+@st.cache_data(ttl=60, show_spinner=False)
+def _cached_load_script(project_path, language: str, script_type: str):
+    """스크립트 로드 (캐싱 적용)"""
+    return load_script(project_path, language, script_type)
+
+
 # 페이지 설정
 st.set_page_config(
     page_title="스크립트 생성",
@@ -126,7 +143,7 @@ with tab_settings:
     # 벤치마킹 정보
     st.subheader("📚 벤치마킹 정보")
 
-    selected_videos = load_selected_videos(project_path)
+    selected_videos = _cached_load_selected_videos(str(project_path))
     if selected_videos:
         st.success(f"✅ {len(selected_videos)}개의 벤치마킹 영상이 로드되었습니다.")
 
@@ -375,8 +392,8 @@ with tab_preview:
         horizontal=True
     )
 
-    # 스크립트 로드
-    script = load_script(project_path, preview_lang, script_type)
+    # 스크립트 로드 (⭐ 캐싱 적용)
+    script = _cached_load_script(project_path, preview_lang, script_type)
 
     if script:
         st.text_area("스크립트 내용", script, height=500)
@@ -411,8 +428,8 @@ with tab_translate:
     - 문화적 요소 적응 (예시, 비유 등)
     """)
 
-    # 한국어 스크립트 로드
-    ko_script = load_script(project_path, "ko", "final") or load_script(project_path, "ko", "draft")
+    # 한국어 스크립트 로드 (⭐ 캐싱 적용)
+    ko_script = _cached_load_script(project_path, "ko", "final") or _cached_load_script(project_path, "ko", "draft")
 
     if ko_script:
         st.text_area("원본 (한국어)", ko_script, height=200)

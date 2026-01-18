@@ -749,18 +749,44 @@ with tab_results:
     col1, col2, col3 = st.columns([1, 1, 2])
 
     with col1:
-        if st.button("📥 엑셀 다운로드", type="secondary"):
-            from utils.excel_export import export_videos_to_excel
+        # v1.1: 생성/다운로드 분리 (rerun 버그 수정)
+        excel_cache_key = "_filtered_videos_excel_cache"
+        excel_meta_key = "_filtered_videos_excel_meta"
 
-            excel_data = [v.to_excel_row() for v in filtered_videos]
-            excel_file = export_videos_to_excel(excel_data)
+        # 현재 데이터 해시 계산 (데이터 변경 감지용)
+        current_data_hash = hash(tuple(v.video_id for v in filtered_videos))
+        cached_meta = st.session_state.get(excel_meta_key, {})
+        cached_excel = st.session_state.get(excel_cache_key)
+        data_changed = cached_meta.get("data_hash") != current_data_hash
 
-            st.download_button(
-                "💾 다운로드",
-                data=excel_file,
-                file_name=f"영상_리서치_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+        excel_col1, excel_col2 = st.columns(2)
+
+        with excel_col1:
+            gen_label = "📝 엑셀 생성" if not cached_excel or data_changed else "🔄 엑셀 재생성"
+            if st.button(gen_label, type="secondary", key="filtered_excel_generate"):
+                from utils.excel_export import export_videos_to_excel
+
+                excel_data = [v.to_excel_row() for v in filtered_videos]
+                excel_file = export_videos_to_excel(excel_data)
+
+                st.session_state[excel_cache_key] = excel_file
+                st.session_state[excel_meta_key] = {
+                    "data_hash": current_data_hash,
+                    "generated_at": datetime.now().strftime('%Y%m%d_%H%M%S')
+                }
+                st.rerun()
+
+        with excel_col2:
+            if cached_excel and not data_changed:
+                st.download_button(
+                    "📥 다운로드",
+                    data=cached_excel,
+                    file_name=f"영상_리서치_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key="filtered_excel_download"
+                )
+            else:
+                st.button("📥 다운로드", disabled=True, key="filtered_excel_download_disabled", help="먼저 엑셀을 생성하세요")
 
     with col2:
         if st.button("📊 요약 통계"):
@@ -1076,19 +1102,44 @@ with tab_selected:
 
     st.success(f"총 {len(selected)}개 선택됨")
 
-    # 엑셀 다운로드
-    if st.button("📥 선택된 영상 엑셀 다운로드"):
-        from utils.excel_export import export_videos_to_excel
+    # 엑셀 다운로드 - v1.1: 생성/다운로드 분리 (rerun 버그 수정)
+    selected_excel_cache_key = "_selected_videos_excel_cache"
+    selected_excel_meta_key = "_selected_videos_excel_meta"
 
-        excel_data = [v.to_excel_row() for v in selected]
-        excel_file = export_videos_to_excel(excel_data, "선택된_영상")
+    # 현재 데이터 해시 계산 (데이터 변경 감지용)
+    selected_data_hash = hash(tuple(v.video_id for v in selected))
+    selected_cached_meta = st.session_state.get(selected_excel_meta_key, {})
+    selected_cached_excel = st.session_state.get(selected_excel_cache_key)
+    selected_data_changed = selected_cached_meta.get("data_hash") != selected_data_hash
 
-        st.download_button(
-            "💾 다운로드",
-            data=excel_file,
-            file_name=f"선택된_영상_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+    selected_excel_col1, selected_excel_col2 = st.columns(2)
+
+    with selected_excel_col1:
+        gen_label = "📝 엑셀 생성" if not selected_cached_excel or selected_data_changed else "🔄 엑셀 재생성"
+        if st.button(gen_label, key="selected_excel_generate"):
+            from utils.excel_export import export_videos_to_excel
+
+            excel_data = [v.to_excel_row() for v in selected]
+            excel_file = export_videos_to_excel(excel_data, "선택된_영상")
+
+            st.session_state[selected_excel_cache_key] = excel_file
+            st.session_state[selected_excel_meta_key] = {
+                "data_hash": selected_data_hash,
+                "generated_at": datetime.now().strftime('%Y%m%d_%H%M%S')
+            }
+            st.rerun()
+
+    with selected_excel_col2:
+        if selected_cached_excel and not selected_data_changed:
+            st.download_button(
+                "📥 다운로드",
+                data=selected_cached_excel,
+                file_name=f"선택된_영상_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                key="selected_excel_download"
+            )
+        else:
+            st.button("📥 다운로드", disabled=True, key="selected_excel_download_disabled", help="먼저 엑셀을 생성하세요")
 
     st.markdown("---")
 

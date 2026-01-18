@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-14T20:10:08.473774",
+  "image_file": "bg_scene_004_1768389008472.png",
+  "scene_id": 4,
+  "prompts": {
+    "original": "Anthropomorphic representation of a car's eye (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features), car headlights resembling eyes, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "animation style background, Anthropomorphic representation of a car's eye (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features), car headlights resembling eyes, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot, vibrant colors, cinematic composition, no characters",
+    "negative": "people, characters, realistic"
+  },
+  "style": {
+    "id": "bg_animation",
+    "name": "애니메이션",
+    "prefix": "animation style background,",
+    "suffix": "vibrant colors, cinematic composition, no characters"
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

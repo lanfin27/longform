@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 from typing import Optional, Dict, Any
 import logging
+import httpx
 
 from .base_client import BaseVideoAPIClient
 from ..config import FAL_MODELS, VideoModelConfig, get_api_key, PLATFORM_CONFIGS
@@ -107,6 +108,10 @@ class FalAIClient(BaseVideoAPIClient):
                 enable_audio=request.enable_audio,
             )
 
+            # ⭐ v2.4: 확장된 프롬프트 추출 (최종 프롬프트 보기 기능)
+            original_prompt = request.prompt
+            final_prompt = self._extract_final_prompt(data, original_prompt)
+
             # 결과 생성
             result = VideoGenerationResult(
                 success=True,
@@ -122,7 +127,10 @@ class FalAIClient(BaseVideoAPIClient):
                 generation_time=generation_time,
                 metadata={
                     "raw_response": data,
-                    "model_id": model_config.model_id
+                    "model_id": model_config.model_id,
+                    "original_prompt": original_prompt,
+                    "final_prompt": final_prompt,
+                    "prompt_expanded": final_prompt != original_prompt
                 }
             )
 
@@ -139,6 +147,35 @@ class FalAIClient(BaseVideoAPIClient):
 
             logger.info(f"fal.ai 영상 생성 완료: {generation_time:.1f}초")
             return result
+
+        except httpx.HTTPStatusError as e:
+            generation_time = time.time() - start_time
+
+            # 403 Forbidden - 크레딧 부족
+            if e.response.status_code == 403:
+                logger.error(f"[fal.ai] 크레딧 부족 (403 Forbidden)")
+                return self._create_error_result(
+                    "fal.ai 크레딧이 부족합니다. https://fal.ai/dashboard 에서 크레딧을 충전하세요.",
+                    generation_time
+                )
+
+            # 401 Unauthorized - API 키 오류
+            if e.response.status_code == 401:
+                logger.error(f"[fal.ai] API 키 오류 (401 Unauthorized)")
+                return self._create_error_result(
+                    "fal.ai API 키가 유효하지 않습니다. FAL_KEY 환경 변수를 확인하세요.",
+                    generation_time
+                )
+
+            # 기타 HTTP 에러
+            logger.error(f"fal.ai HTTP 에러: {e}")
+            try:
+                error_detail = e.response.json()
+                error_msg = error_detail.get("detail", str(e))
+            except:
+                error_msg = str(e)
+
+            return self._create_error_result(error_msg, generation_time)
 
         except Exception as e:
             logger.error(f"fal.ai 영상 생성 실패: {e}")
@@ -174,9 +211,11 @@ class FalAIClient(BaseVideoAPIClient):
 
         if "wan" in model_id:
             # Wan 2.1 모델
-            # 해상도 매핑
-            res_map = {"480p": 480, "720p": 720}
-            payload["resolution"] = res_map.get(request.resolution, 480)
+            # ⭐ v2.3: resolution은 문자열이어야 함 ("480p", "720p") - 422 에러 수정
+            # 기존: res_map = {"480p": 480, "720p": 720} → 숫자 반환 (❌)
+            valid_resolutions = ["480p", "720p"]
+            resolution = request.resolution if request.resolution in valid_resolutions else "480p"
+            payload["resolution"] = resolution  # ✅ 문자열 그대로 전달
             payload["num_frames"] = 81  # ~5초 @ 16fps
             payload["num_inference_steps"] = 30
             payload["guidance_scale"] = 5.0
@@ -227,6 +266,38 @@ class FalAIClient(BaseVideoAPIClient):
                 return output[0]
 
         return None
+
+    def _extract_final_prompt(self, data: Dict[str, Any], original_prompt: str) -> str:
+        """
+        ⭐ v2.4: 응답에서 최종 프롬프트 추출
+
+        fal.ai는 prompt_expansion 기능을 제공하여 프롬프트를 자동 확장할 수 있음.
+        확장된 프롬프트가 있으면 반환, 없으면 원본 반환.
+        """
+        # 다양한 경로에서 확장된 프롬프트 찾기
+        possible_keys = [
+            "expanded_prompt",
+            "enhanced_prompt",
+            "final_prompt",
+            "processed_prompt",
+            "prompt"
+        ]
+
+        for key in possible_keys:
+            if key in data:
+                expanded = data[key]
+                if expanded and expanded != original_prompt:
+                    return expanded
+
+        # output 내부에서 찾기
+        if "output" in data and isinstance(data["output"], dict):
+            for key in possible_keys:
+                if key in data["output"]:
+                    expanded = data["output"][key]
+                    if expanded and expanded != original_prompt:
+                        return expanded
+
+        return original_prompt
 
     async def _prepare_image_url(
         self,

@@ -28,6 +28,23 @@ from utils.data_loader import (
 )
 from utils.api_helper import show_api_status_sidebar
 
+
+# ============================================================
+# ⭐ 성능 최적화: 캐싱 데코레이터
+# ============================================================
+@st.cache_data(ttl=30, show_spinner=False)
+def _cached_check_export_status(project_path_str, language):
+    """Export 체크리스트 상태 확인 (캐싱 적용)"""
+    from pathlib import Path
+    project_path = Path(project_path_str)
+    return {
+        "오디오 (MP3)": get_audio_path(project_path, language).exists(),
+        "자막 (SRT)": get_srt_path(project_path, language).exists(),
+        "본문 이미지": len(list_content_images(project_path)) > 0,
+        "세그먼트 그룹": load_segment_groups(project_path) is not None,
+    }
+
+
 # 페이지 설정
 st.set_page_config(
     page_title="Vrew Export",
@@ -54,12 +71,8 @@ st.subheader("✅ Export 전 체크리스트")
 
 language = project_config.get("language", "ko")
 
-checks = {
-    "오디오 (MP3)": get_audio_path(project_path, language).exists(),
-    "자막 (SRT)": get_srt_path(project_path, language).exists(),
-    "본문 이미지": len(list_content_images(project_path)) > 0,
-    "세그먼트 그룹": load_segment_groups(project_path) is not None,
-}
+# ⭐ 캐싱된 함수 사용
+checks = _cached_check_export_status(str(project_path), language)
 
 all_ready = True
 for name, exists in checks.items():

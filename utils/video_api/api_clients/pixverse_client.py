@@ -156,15 +156,17 @@ class PixVerseClient(BaseVideoAPIClient):
                 f"{valid_duration}초로 변경 (지원: {model.durations})"
             )
 
-        # 3. 영상 생성 요청
+        # 3. 영상 생성 요청 (타입 명시적 변환)
         payload = {
-            "img_id": img_id,
-            "prompt": request.prompt,
-            "negative_prompt": request.negative_prompt or "",
-            "duration": valid_duration,
-            "model": model.model_id,
+            "img_id": int(img_id),  # 반드시 정수
+            "prompt": str(request.prompt) if request.prompt else "",
+            "negative_prompt": str(request.negative_prompt) if request.negative_prompt else "",
+            "duration": int(valid_duration),  # 반드시 정수
+            "model": str(model.model_id),
             "motion_mode": "normal"
         }
+
+        logger.debug(f"[PixVerse I2V] Payload: {payload}")
 
         logger.info(f"PixVerse I2V 영상 생성 요청: {model.display_name}")
 
@@ -197,16 +199,25 @@ class PixVerseClient(BaseVideoAPIClient):
                 f"{valid_duration}초로 변경 (지원: {model.durations})"
             )
 
+        # 타입 명시적 변환
+        # PixVerse aspect_ratio 지원: "16:9", "9:16", "1:1", "4:3", "3:4"
+        aspect_ratio = str(request.aspect_ratio) if request.aspect_ratio else "16:9"
+        if aspect_ratio not in ["16:9", "9:16", "1:1", "4:3", "3:4"]:
+            logger.warning(f"[PixVerse] 지원하지 않는 aspect_ratio: {aspect_ratio}, 16:9로 변경")
+            aspect_ratio = "16:9"
+
         payload = {
-            "prompt": request.prompt,
-            "negative_prompt": request.negative_prompt or "",
-            "aspect_ratio": request.aspect_ratio,
-            "duration": valid_duration,
-            "model": model.model_id,
-            "quality": self._get_quality(request.resolution),
+            "prompt": str(request.prompt) if request.prompt else "",
+            "negative_prompt": str(request.negative_prompt) if request.negative_prompt else "",
+            "aspect_ratio": aspect_ratio,
+            "duration": int(valid_duration),  # 반드시 정수
+            "model": str(model.model_id),
+            "quality": str(self._get_quality(request.resolution)),
             "motion_mode": "normal",
-            "water_mark": False
+            "water_mark": False  # boolean
         }
+
+        logger.debug(f"[PixVerse T2V] Payload: {payload}")
 
         logger.info(f"PixVerse T2V 영상 생성 요청: {model.display_name}")
 

@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-14T20:12:03.677274",
+  "image_file": "bg_scene_002_1768389123676.png",
+  "scene_id": 2,
+  "prompts": {
+    "original": "Dynamic composition of smartphone, semiconductor chip, and TV images floating and swirling, representing association with Samsung, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "photorealistic environment, Dynamic composition of smartphone, semiconductor chip, and TV images floating and swirling, representing association with Samsung, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot, natural lighting, detailed scenery, cinematic",
+    "negative": "cartoon, anime, people"
+  },
+  "style": {
+    "id": "bg_realistic",
+    "name": "실사",
+    "prefix": "photorealistic environment,",
+    "suffix": "natural lighting, detailed scenery, cinematic"
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {}
+}

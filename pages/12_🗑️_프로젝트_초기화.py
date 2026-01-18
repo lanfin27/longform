@@ -20,7 +20,11 @@ ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
 from utils.project_manager import render_project_sidebar
-from utils.project_reset_manager import get_reset_manager, DeleteMode
+from utils.project_reset_manager import (
+    get_reset_manager, DeleteMode,
+    get_quick_select_presets, get_preserve_presets,
+    get_category_name, get_category_icon
+)
 
 # 페이지 설정
 st.set_page_config(
@@ -34,9 +38,9 @@ render_project_sidebar()
 
 
 def render_video_reset_tab():
-    """영상 프로젝트 초기화 탭"""
+    """영상 프로젝트 초기화 탭 (선택적 삭제 지원)"""
     st.markdown("### 🎬 영상 프로젝트 초기화")
-    st.caption("특정 영상의 모든 산출물(이미지, 오디오, 비디오 등)을 초기화합니다.")
+    st.caption("특정 영상의 산출물을 선택적으로 초기화합니다. 프롬프트는 유지하고 이미지만 삭제하는 등 세밀한 제어가 가능합니다.")
 
     manager = get_reset_manager()
 
@@ -76,79 +80,243 @@ def render_video_reset_tab():
         else:
             selected_video = None
 
-    # 삭제 모드 선택
-    st.markdown("---")
-    st.markdown("##### 삭제 모드")
-
-    delete_mode = st.radio(
-        "삭제 모드 선택",
-        options=["hard", "soft"],
-        format_func=lambda x: {
-            "hard": "🗑️ 하드 삭제 (실제 파일 삭제, 복구 불가)",
-            "soft": "👁️ 소프트 삭제 (숨김 처리, 복구 가능)"
-        }[x],
-        key="reset_video_mode",
-        horizontal=True,
-        label_visibility="collapsed"
-    )
-
-    # 미리보기
+    # 영상이 선택되면 항목 스캔 및 선택 UI 표시
     if selected_project and selected_video:
-        with st.expander("📋 삭제될 항목 미리보기", expanded=True):
-            preview = manager.preview_reset('video', selected_project, selected_video)
+        st.markdown("---")
 
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("총 폴더 수", f"{preview['total_folders']}개")
-            with col2:
-                st.metric("총 파일 수", f"{preview['total_files']}개")
-            with col3:
-                st.metric("총 크기", manager.format_size(preview['total_size']))
+        # 항목 스캔
+        items = manager.scan_video_items(selected_project, selected_video)
 
-            if preview['items']:
-                st.markdown("**삭제될 항목:**")
-                for item in preview['items']:
-                    icon = "📁" if item['type'] == 'directory' else "📄"
-                    size_str = manager.format_size(item['size'])
-                    st.text(f"  {icon} {item['name']} ({size_str})")
+        if not items:
+            st.info("삭제할 항목이 없습니다.")
+            return
 
-    # 확인 및 실행
-    st.markdown("---")
+        # 세션 상태 초기화
+        state_key = f"selected_items_{selected_project}_{selected_video}"
+        if state_key not in st.session_state:
+            # 기본값: 미디어 선택, 프롬프트/분석 보존
+            default_selected = set()
+            for item in items:
+                if item['category'] in ['media', 'output', 'audio']:
+                    default_selected.add(item['id'])
+            st.session_state[state_key] = default_selected
 
-    if delete_mode == "hard":
-        st.error("⚠️ **주의**: 하드 삭제는 복구할 수 없습니다!")
+        # 빠른 선택 프리셋
+        st.markdown("##### 빠른 선택")
+        quick_presets = get_quick_select_presets()
 
-    confirm = st.checkbox(
-        f"'{selected_video}' 영상 초기화에 동의합니다",
-        key="confirm_reset_video",
-        disabled=not (selected_project and selected_video)
-    )
+        preset_cols = st.columns(len(quick_presets))
+        for i, (preset_id, preset) in enumerate(quick_presets.items()):
+            with preset_cols[i]:
+                if st.button(
+                    f"{preset['icon']} {preset['name']}",
+                    key=f"quick_{preset_id}",
+                    help=preset['description'],
+                    use_container_width=True
+                ):
+                    new_selected = manager.get_items_by_preset(items, preset_id, 'select')
+                    st.session_state[state_key] = new_selected
+                    st.rerun()
 
-    btn_disabled = not (confirm and selected_project and selected_video)
+        # 보존 프리셋
+        st.markdown("##### 보존 프리셋")
+        st.caption("선택된 항목 중 특정 카테고리를 보존합니다")
 
-    if st.button(
-        "🗑️ 영상 초기화 실행",
-        disabled=btn_disabled,
-        type="primary" if not btn_disabled else "secondary",
-        key="btn_reset_video",
-        use_container_width=True
-    ):
-        with st.spinner("영상 초기화 중..."):
-            result = manager.reset_video(
-                project_id=selected_project,
-                video_id=selected_video,
-                mode=DeleteMode.HARD if delete_mode == "hard" else DeleteMode.SOFT,
-                confirm=True
+        preserve_presets = get_preserve_presets()
+        preserve_cols = st.columns(len(preserve_presets))
+
+        for i, (preset_id, preset) in enumerate(preserve_presets.items()):
+            with preserve_cols[i]:
+                if st.button(
+                    f"{preset['icon']} {preset['name']}",
+                    key=f"preserve_{preset_id}",
+                    help=preset['description'],
+                    use_container_width=True
+                ):
+                    # 현재 전체 선택 후 보존 프리셋 적용
+                    all_ids = {item['id'] for item in items}
+                    new_selected = manager.get_items_by_preset(items, preset_id, 'preserve')
+                    st.session_state[state_key] = new_selected
+                    st.rerun()
+
+        st.markdown("---")
+
+        # 항목 선택 UI (카테고리별 그룹화)
+        st.markdown("##### 삭제할 항목 선택")
+
+        # 카테고리별 그룹화
+        items_by_category = {}
+        for item in items:
+            cat = item['category']
+            if cat not in items_by_category:
+                items_by_category[cat] = []
+            items_by_category[cat].append(item)
+
+        # 카테고리 순서 정의
+        category_order = ['media', 'output', 'audio', 'analysis', 'settings', 'other']
+
+        selected_ids = st.session_state[state_key].copy()
+
+        for cat in category_order:
+            if cat not in items_by_category:
+                continue
+
+            cat_items = items_by_category[cat]
+            cat_name = get_category_name(cat)
+            cat_icon = get_category_icon(cat)
+
+            # 카테고리 헤더
+            cat_total_size = sum(item['size'] for item in cat_items)
+            cat_selected = sum(1 for item in cat_items if item['id'] in selected_ids)
+
+            with st.expander(
+                f"{cat_icon} {cat_name} ({cat_selected}/{len(cat_items)}개 선택, {manager.format_size(cat_total_size)})",
+                expanded=(cat in ['media', 'output'])
+            ):
+                # 카테고리 전체 선택/해제
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    select_all = st.checkbox(
+                        f"{cat_name} 전체 선택",
+                        value=(cat_selected == len(cat_items)),
+                        key=f"cat_all_{cat}"
+                    )
+                with col2:
+                    cat_selected_size = sum(item['size'] for item in cat_items if item['id'] in selected_ids)
+                    st.caption(f"선택: {manager.format_size(cat_selected_size)}")
+
+                # 전체 선택/해제 적용
+                if select_all and cat_selected != len(cat_items):
+                    for item in cat_items:
+                        selected_ids.add(item['id'])
+                    st.session_state[state_key] = selected_ids
+                    st.rerun()
+                elif not select_all and cat_selected > 0 and cat_selected == len(cat_items):
+                    for item in cat_items:
+                        selected_ids.discard(item['id'])
+                    st.session_state[state_key] = selected_ids
+                    st.rerun()
+
+                # 개별 항목 체크박스
+                for item in cat_items:
+                    col1, col2, col3 = st.columns([0.5, 3, 1])
+
+                    with col1:
+                        is_selected = st.checkbox(
+                            "",
+                            value=item['id'] in selected_ids,
+                            key=f"item_{item['id']}",
+                            label_visibility="collapsed"
+                        )
+
+                        if is_selected and item['id'] not in selected_ids:
+                            selected_ids.add(item['id'])
+                            st.session_state[state_key] = selected_ids
+                            st.rerun()
+                        elif not is_selected and item['id'] in selected_ids:
+                            selected_ids.discard(item['id'])
+                            st.session_state[state_key] = selected_ids
+                            st.rerun()
+
+                    with col2:
+                        file_info = f"{item['file_count']}개 파일" if item['type'] == 'folder' else ""
+                        st.markdown(f"{item['icon']} **{item['name']}** {file_info}")
+
+                    with col3:
+                        st.caption(manager.format_size(item['size']))
+
+        # 삭제 요약
+        st.markdown("---")
+        st.markdown("##### 삭제 요약")
+
+        summary = manager.get_deletion_summary(items, selected_ids)
+
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("삭제 항목", f"{summary['selected_count']}개", delta=None)
+        with col2:
+            st.metric("삭제 크기", manager.format_size(summary['delete_size']), delta=None)
+        with col3:
+            st.metric("보존 항목", f"{summary['preserved_count']}개", delta=None)
+        with col4:
+            st.metric("보존 크기", manager.format_size(summary['preserve_size']), delta=None)
+
+        # 카테고리별 상세
+        with st.expander("카테고리별 상세", expanded=False):
+            for cat in category_order:
+                cat_summary = summary['by_category'].get(cat, {})
+                if cat_summary.get('delete', 0) > 0 or cat_summary.get('preserve', 0) > 0:
+                    cat_name = get_category_name(cat)
+                    cat_icon = get_category_icon(cat)
+                    st.markdown(
+                        f"- {cat_icon} **{cat_name}**: "
+                        f"삭제 {cat_summary.get('delete', 0)}개 ({manager.format_size(cat_summary.get('delete_size', 0))}), "
+                        f"보존 {cat_summary.get('preserve', 0)}개"
+                    )
+
+        # 삭제 모드 선택
+        st.markdown("---")
+        st.markdown("##### 삭제 모드")
+
+        delete_mode = st.radio(
+            "삭제 모드 선택",
+            options=["hard", "soft"],
+            format_func=lambda x: {
+                "hard": "🗑️ 하드 삭제 (실제 파일 삭제, 복구 불가)",
+                "soft": "👁️ 소프트 삭제 (숨김 처리, 복구 가능)"
+            }[x],
+            key="reset_video_mode",
+            horizontal=True,
+            label_visibility="collapsed"
+        )
+
+        # 확인 및 실행
+        st.markdown("---")
+
+        if delete_mode == "hard":
+            st.error("⚠️ **주의**: 하드 삭제는 복구할 수 없습니다!")
+
+        if summary['selected_count'] == 0:
+            st.warning("삭제할 항목을 선택하세요.")
+            confirm = False
+        else:
+            confirm = st.checkbox(
+                f"선택한 {summary['selected_count']}개 항목 ({manager.format_size(summary['delete_size'])}) 삭제에 동의합니다",
+                key="confirm_reset_video"
             )
 
-            if result['success']:
-                st.success(f"✅ 영상 초기화 완료!")
-                st.info(f"처리된 항목: {len(result['deleted_items'])}개, 크기: {manager.format_size(result['total_size'])}")
-                st.balloons()
-            else:
-                st.error(f"❌ 오류 발생:")
-                for err in result['errors']:
-                    st.text(f"  • {err}")
+        btn_disabled = not confirm or summary['selected_count'] == 0
+
+        if st.button(
+            f"🗑️ 선택 항목 삭제 ({summary['selected_count']}개)",
+            disabled=btn_disabled,
+            type="primary" if not btn_disabled else "secondary",
+            key="btn_reset_video",
+            use_container_width=True
+        ):
+            with st.spinner("선택 항목 삭제 중..."):
+                result = manager.delete_selected_items(
+                    project_id=selected_project,
+                    video_id=selected_video,
+                    selected_ids=selected_ids,
+                    mode=DeleteMode.HARD if delete_mode == "hard" else DeleteMode.SOFT,
+                    confirm=True
+                )
+
+                if result['success']:
+                    st.success(f"✅ 삭제 완료!")
+                    st.info(
+                        f"삭제: {len(result['deleted_items'])}개 ({manager.format_size(result['total_deleted_size'])}), "
+                        f"보존: {len(result['preserved_items'])}개 ({manager.format_size(result['total_preserved_size'])})"
+                    )
+                    # 세션 상태 초기화
+                    del st.session_state[state_key]
+                    st.balloons()
+                    st.rerun()
+                else:
+                    st.error(f"❌ 오류 발생:")
+                    for err in result['errors']:
+                        st.text(f"  • {err}")
 
 
 def render_channel_reset_tab():

@@ -177,8 +177,17 @@ def record_videos(
 # 환경 확인 유틸리티
 # ============================================
 
+# ⭐ 성능 최적화: 환경 확인 결과 캐시
+_environment_cache = None
+
 def check_environment() -> Dict[str, any]:
-    """렌더링 환경 확인"""
+    """렌더링 환경 확인 (캐싱 적용)"""
+    global _environment_cache
+
+    # ⭐ 캐시된 결과 반환 (매번 subprocess 호출 방지)
+    if _environment_cache is not None:
+        return _environment_cache
+
     results = {
         "python_version": sys.version,
         "platform": sys.platform,
@@ -218,6 +227,8 @@ def check_environment() -> Dict[str, any]:
     if results["selenium"]:
         results["recommended"] = "selenium"
 
+    # ⭐ 결과 캐싱
+    _environment_cache = results
     return results
 
 

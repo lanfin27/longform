@@ -9,8 +9,10 @@ from pathlib import Path
 from typing import Optional, Dict, Any
 import logging
 
+import httpx
+
 from .base_client import BaseVideoAPIClient
-from ..config import REPLICATE_MODELS, VideoModelConfig, get_api_key
+from ..config import REPLICATE_MODELS, VideoModelConfig, get_api_key, REQUEST_TIMEOUT
 from ..models import VideoGenerationRequest, VideoGenerationResult
 from ..cost_calculator import CostCalculator
 
@@ -67,6 +69,11 @@ class ReplicateClient(BaseVideoAPIClient):
         if not model_config:
             return self._create_error_result(f"지원하지 않는 모델: {model_key}")
 
+        # ⭐ HTTP 클라이언트 초기화 확인
+        if not self.client:
+            self.client = httpx.AsyncClient(timeout=REQUEST_TIMEOUT)
+            logger.debug("[Replicate] HTTP 클라이언트 초기화")
+
         try:
             # 이미지 URL 준비 (I2V)
             image_input = None
@@ -75,6 +82,7 @@ class ReplicateClient(BaseVideoAPIClient):
                     request.image_path,
                     request.image_url
                 )
+                logger.info(f"[Replicate] 이미지 준비 완료")
 
             # 1. Prediction 생성
             prediction_id = await self._create_prediction(
@@ -143,37 +151,103 @@ class ReplicateClient(BaseVideoAPIClient):
                 time.time() - start_time
             )
 
+    async def _get_model_version(self, model_id: str) -> str:
+        """모델의 최신 버전 해시 가져오기
+
+        Args:
+            model_id: 모델 식별자 (owner/name 형식)
+
+        Returns:
+            버전 해시 문자열
+        """
+        url = f"{self.base_url}/models/{model_id}"
+
+        logger.info(f"[Replicate] 모델 정보 조회: {model_id}")
+
+        response = await self.client.get(url, headers=self._get_headers())
+
+        if response.status_code == 404:
+            raise Exception(f"모델을 찾을 수 없습니다: {model_id}")
+
+        response.raise_for_status()
+
+        data = response.json()
+        latest_version = data.get("latest_version", {}).get("id")
+
+        if not latest_version:
+            raise Exception(f"모델 버전을 찾을 수 없습니다: {model_id}")
+
+        logger.info(f"[Replicate] 버전 해시: {latest_version[:20]}...")
+        return latest_version
+
     async def _create_prediction(
         self,
         request: VideoGenerationRequest,
         model: VideoModelConfig,
         image_input: Optional[str] = None
     ) -> str:
-        """Prediction 생성"""
+        """Prediction 생성
+
+        Replicate API는 /v1/predictions 엔드포인트에 버전 해시를 사용해야 합니다.
+        커뮤니티 모델은 먼저 버전 해시를 조회한 후 호출합니다.
+        """
 
         # 입력 파라미터 구성
         input_data = self._build_input(request, model, image_input)
 
+        model_id = model.model_id
+
+        # ✅ 항상 /v1/predictions 엔드포인트 사용 (올바른 방식)
+        url = f"{self.base_url}/predictions"
+
+        # 버전 해시 결정
+        if model_id.startswith("sha256:") or len(model_id) == 64:
+            # 이미 버전 해시인 경우
+            version_hash = model_id
+            logger.info(f"[Replicate] 버전 해시 직접 사용")
+        elif "/" in model_id:
+            # owner/name 형식인 경우 버전 해시 조회
+            version_hash = await self._get_model_version(model_id)
+        else:
+            raise Exception(f"유효하지 않은 모델 ID: {model_id}")
+
         payload = {
-            "version": model.model_id,
+            "version": version_hash,
             "input": input_data
         }
 
-        logger.info(f"Replicate 영상 생성 요청: {model.display_name}")
+        logger.info(f"[Replicate] 영상 생성 요청: {model.display_name}")
 
-        response = await self._retry_request(
-            "POST",
-            f"{self.base_url}/predictions",
-            json=payload
-        )
+        logger.info(f"[Replicate] 영상 생성 요청: {model.display_name}")
+        logger.debug(f"[Replicate] 입력 파라미터: {list(input_data.keys())}")
 
-        data = response.json()
-        prediction_id = data.get("id")
+        try:
+            response = await self._retry_request(
+                "POST",
+                url,
+                json=payload
+            )
 
-        if not prediction_id:
-            raise Exception("예측 ID를 받지 못했습니다")
+            data = response.json()
+            prediction_id = data.get("id")
 
-        return prediction_id
+            if not prediction_id:
+                logger.error(f"[Replicate] 응답에 ID 없음: {data}")
+                raise Exception("예측 ID를 받지 못했습니다")
+
+            logger.info(f"[Replicate] Prediction 생성됨: {prediction_id}")
+            return prediction_id
+
+        except Exception as e:
+            # 상세 에러 로깅
+            logger.error(f"[Replicate] Prediction 생성 실패: {e}")
+            if hasattr(e, 'response'):
+                try:
+                    error_detail = e.response.json()
+                    logger.error(f"[Replicate] 에러 상세: {error_detail}")
+                except:
+                    logger.error(f"[Replicate] 응답 텍스트: {e.response.text[:500]}")
+            raise
 
     async def _poll_prediction(
         self,
@@ -284,28 +358,96 @@ class ReplicateClient(BaseVideoAPIClient):
         image_path: Optional[str],
         image_url: Optional[str]
     ) -> str:
-        """이미지 입력 준비"""
-        if image_url:
-            return image_url
+        """
+        이미지 입력 준비 - Replicate API용 최적화
 
+        Wan I2V 모델 권장사항:
+        - 형식: JPEG 또는 PNG (WebP 지원 불확실)
+        - 최대 해상도: 1280x720 권장
+        - RGB 모드 필수
+        """
+        from PIL import Image
+        import io
+
+        MAX_SIZE = 1280  # 최대 크기
+
+        def process_image(img: Image.Image) -> str:
+            """이미지 처리 및 Base64 인코딩"""
+            original_size = img.size
+            logger.info(f"[Replicate] 원본 이미지 크기: {original_size[0]}x{original_size[1]}")
+
+            # 크기 조정 필요 여부 확인
+            if max(img.size) > MAX_SIZE:
+                ratio = MAX_SIZE / max(img.size)
+                new_width = int(img.size[0] * ratio)
+                new_height = int(img.size[1] * ratio)
+                # 짝수로 맞추기 (비디오 인코딩 호환성)
+                new_width = new_width - (new_width % 2)
+                new_height = new_height - (new_height % 2)
+                img = img.resize((new_width, new_height), Image.LANCZOS)
+                logger.info(f"[Replicate] 리사이즈: {new_width}x{new_height}")
+
+            # RGBA -> RGB 변환 (투명도 제거)
+            if img.mode in ('RGBA', 'LA', 'P'):
+                # 흰색 배경에 합성
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                if img.mode == 'P':
+                    img = img.convert('RGBA')
+                background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                img = background
+                logger.info(f"[Replicate] RGB 변환 완료")
+            elif img.mode != 'RGB':
+                img = img.convert('RGB')
+
+            # JPEG로 인코딩 (더 작은 용량, 호환성 좋음)
+            buffer = io.BytesIO()
+            img.save(buffer, format='JPEG', quality=95, optimize=True)
+            buffer.seek(0)
+
+            file_data = base64.b64encode(buffer.read()).decode()
+            data_uri = f"data:image/jpeg;base64,{file_data}"
+
+            logger.info(f"[Replicate] Base64 인코딩 완료: {len(data_uri)} 문자")
+            return data_uri
+
+        # HTTP URL인 경우 - 다운로드 후 처리
+        if image_url and image_url.startswith('http'):
+            try:
+                import httpx
+                logger.info(f"[Replicate] 이미지 URL 다운로드: {image_url[:80]}...")
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(image_url, timeout=30)
+                    response.raise_for_status()
+                    img = Image.open(io.BytesIO(response.content))
+                    return process_image(img)
+            except Exception as e:
+                logger.warning(f"[Replicate] 이미지 다운로드 실패, URL 직접 사용: {e}")
+                return image_url
+
+        # 로컬 파일인 경우
         if image_path:
             path = Path(image_path)
             if path.exists():
-                # Replicate는 base64 data URI 지원
-                with open(path, "rb") as f:
-                    file_data = base64.b64encode(f.read()).decode()
-
-                suffix = path.suffix.lower()
-                mime_type = {
-                    '.png': 'image/png',
-                    '.jpg': 'image/jpeg',
-                    '.jpeg': 'image/jpeg',
-                    '.webp': 'image/webp'
-                }.get(suffix, 'image/png')
-
-                return f"data:{mime_type};base64,{file_data}"
+                try:
+                    img = Image.open(path)
+                    return process_image(img)
+                except Exception as e:
+                    logger.error(f"[Replicate] 이미지 로드 실패: {e}")
+                    # 폴백: 단순 Base64 인코딩
+                    with open(path, "rb") as f:
+                        file_data = base64.b64encode(f.read()).decode()
+                    suffix = path.suffix.lower()
+                    mime_type = {
+                        '.png': 'image/png',
+                        '.jpg': 'image/jpeg',
+                        '.jpeg': 'image/jpeg',
+                        '.webp': 'image/webp'
+                    }.get(suffix, 'image/png')
+                    return f"data:{mime_type};base64,{file_data}"
             else:
-                # URL일 수도 있음
-                return image_path
+                # 경로가 URL일 수도 있음
+                if image_path.startswith('http'):
+                    return image_path
+                raise ValueError(f"이미지 파일을 찾을 수 없습니다: {image_path}")
 
-        raise ValueError("이미지가 필요합니다")
+        raise ValueError("이미지가 필요합니다 (image_path 또는 image_url)")

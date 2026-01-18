@@ -17,6 +17,39 @@ from PIL import Image
 import io
 
 
+@st.cache_data(ttl=300, show_spinner=False, max_entries=100)
+def _get_image_info_cached(image_path: str, _mtime: float) -> Dict:
+    """
+    이미지 파일의 메타데이터 추출 (캐싱됨)
+
+    Args:
+        image_path: 이미지 파일 경로
+        _mtime: 파일 수정 시간 (캐시 무효화 키)
+    """
+    info = {
+        "filename": os.path.basename(image_path) if image_path else "",
+        "size_kb": 0,
+        "width": 0,
+        "height": 0,
+        "format": "",
+        "exists": True
+    }
+
+    try:
+        info["size_kb"] = round(os.path.getsize(image_path) / 1024, 1)
+
+        with Image.open(image_path) as img:
+            info["width"] = img.width
+            info["height"] = img.height
+            info["format"] = img.format or "Unknown"
+
+    except Exception:
+        # 성능 최적화: 에러 로그 제거
+        pass
+
+    return info
+
+
 def get_image_info(image_path: str) -> Dict:
     """
     이미지 파일의 메타데이터 추출
@@ -34,38 +67,39 @@ def get_image_info(image_path: str) -> Dict:
             "exists": True
         }
     """
-    info = {
-        "filename": os.path.basename(image_path) if image_path else "",
-        "size_kb": 0,
-        "width": 0,
-        "height": 0,
-        "format": "",
-        "exists": False
-    }
-
     if not image_path or not os.path.exists(image_path):
-        return info
+        return {
+            "filename": os.path.basename(image_path) if image_path else "",
+            "size_kb": 0,
+            "width": 0,
+            "height": 0,
+            "format": "",
+            "exists": False
+        }
 
     try:
-        info["exists"] = True
-        info["size_kb"] = round(os.path.getsize(image_path) / 1024, 1)
+        mtime = os.path.getmtime(image_path)
+        return _get_image_info_cached(image_path, mtime)
+    except (OSError, IOError):
+        return {
+            "filename": os.path.basename(image_path) if image_path else "",
+            "size_kb": 0,
+            "width": 0,
+            "height": 0,
+            "format": "",
+            "exists": False
+        }
 
-        with Image.open(image_path) as img:
-            info["width"] = img.width
-            info["height"] = img.height
-            info["format"] = img.format or "Unknown"
 
-    except Exception as e:
-        print(f"[ImageViewer] 이미지 정보 추출 실패: {e}")
+@st.cache_data(ttl=300, show_spinner=False, max_entries=100)
+def _encode_image_base64_cached(image_path: str, _mtime: float) -> Optional[str]:
+    """
+    이미지를 Base64로 인코딩 (캐싱됨)
 
-    return info
-
-
-def _encode_image_base64(image_path: str) -> Optional[str]:
-    """이미지를 Base64로 인코딩"""
-    if not image_path or not os.path.exists(image_path):
-        return None
-
+    Args:
+        image_path: 이미지 경로
+        _mtime: 파일 수정 시간 (캐시 무효화 키)
+    """
     try:
         with open(image_path, "rb") as f:
             data = f.read()
@@ -86,7 +120,19 @@ def _encode_image_base64(image_path: str) -> Optional[str]:
         return f"data:{mime};base64,{encoded}"
 
     except Exception as e:
-        print(f"[ImageViewer] Base64 인코딩 실패: {e}")
+        # 성능 최적화: 에러 로그 제거
+        return None
+
+
+def _encode_image_base64(image_path: str) -> Optional[str]:
+    """이미지를 Base64로 인코딩 (캐싱 래퍼)"""
+    if not image_path or not os.path.exists(image_path):
+        return None
+
+    try:
+        mtime = os.path.getmtime(image_path)
+        return _encode_image_base64_cached(image_path, mtime)
+    except (OSError, IOError):
         return None
 
 

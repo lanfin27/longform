@@ -116,10 +116,14 @@ class PromptTemplate:
     category: str = "general"
     is_default: bool = True
     updated_at: str = ""
+    prompt_type: str = "both"  # "single", "batch", "both" (v2.5 추가)
 
     def __post_init__(self):
         if not self.updated_at:
             self.updated_at = datetime.now().isoformat()
+        # prompt_type 유효성 검사
+        if self.prompt_type not in ("single", "batch", "both"):
+            self.prompt_type = "both"
 
 
 class PromptTemplateManager:
@@ -584,6 +588,7 @@ JSON 배열로만 응답해주세요.'''
             name="SRT 단일 씬 분석 프롬프트 v1.0",
             category="srt_scene_analysis",
             description="SRT 직접 적용 시 단일 씬에 대한 이미지/캐릭터/비디오 프롬프트를 생성합니다.",
+            prompt_type="single",  # v2.5 추가
             prompt='''# SRT 씬 분석 프롬프트 (v1.0)
 
 다음 씬을 분석하고 JSON으로 응답해주세요.
@@ -623,6 +628,7 @@ JSON으로만 응답해주세요. 추가 설명 없이 JSON만 출력하세요.'
             name="SRT 배치 씬 분석 프롬프트 v1.0",
             category="srt_scene_analysis",
             description="SRT 직접 적용 시 여러 씬을 배치로 분석하여 프롬프트를 생성합니다.",
+            prompt_type="batch",  # v2.5 추가
             prompt='''# SRT 배치 씬 분석 프롬프트 (v1.0)
 
 다음 씬들을 분석하고 JSON 배열로 응답해주세요.
@@ -696,7 +702,8 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
                 description=template.description,
                 prompt=template.prompt,
                 is_default=template.is_default,
-                updated_at=template.updated_at
+                updated_at=template.updated_at,
+                prompt_type=getattr(template, 'prompt_type', 'both')  # v2.5 추가
             )
 
         _debug_log(f"  기본 템플릿 {len(self.templates)}개 로드됨")
@@ -724,7 +731,8 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
                             description=data.get("description", existing.description),
                             prompt=data.get("prompt", existing.prompt),
                             is_default=is_default,
-                            updated_at=data.get("updated_at", "")
+                            updated_at=data.get("updated_at", ""),
+                            prompt_type=data.get("prompt_type", getattr(existing, 'prompt_type', 'both'))  # v2.5 추가
                         )
                         if not is_default:
                             custom_count += 1
@@ -738,7 +746,8 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
                             description=data.get("description", ""),
                             prompt=data.get("prompt", ""),
                             is_default=is_default,
-                            updated_at=data.get("updated_at", "")
+                            updated_at=data.get("updated_at", ""),
+                            prompt_type=data.get("prompt_type", "both")  # v2.5 추가
                         )
                         if not is_default:
                             custom_count += 1
@@ -828,6 +837,45 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
                 _debug_log(f"    - {log['template_name']}: {log['from_version']} → {log['to_version']}")
         else:
             _debug_log(f"✅ 모든 템플릿이 최신 버전입니다 ({current_version})")
+
+        # 🔄 v2.5: prompt_type 마이그레이션
+        self._migrate_prompt_types()
+
+    def _migrate_prompt_types(self):
+        """
+        🔄 v2.5: 기본 SRT 템플릿의 prompt_type 마이그레이션
+
+        srt_scene_single → "single"
+        srt_scene_batch → "batch"
+        """
+        migrations = {
+            "srt_scene_single": "single",
+            "srt_scene_batch": "batch"
+        }
+
+        updated = False
+        for template_id, expected_type in migrations.items():
+            if template_id in self.templates:
+                template = self.templates[template_id]
+                current_type = getattr(template, 'prompt_type', 'both')
+                if current_type != expected_type:
+                    # 업데이트
+                    self.templates[template_id] = PromptTemplate(
+                        id=template.id,
+                        name=template.name,
+                        category=template.category,
+                        description=template.description,
+                        prompt=template.prompt,
+                        is_default=template.is_default,
+                        updated_at=template.updated_at,
+                        prompt_type=expected_type
+                    )
+                    _debug_log(f"🔄 prompt_type 마이그레이션: {template_id} ({current_type} → {expected_type})")
+                    updated = True
+
+        if updated:
+            self._save_templates()
+            _debug_log("✅ prompt_type 마이그레이션 완료")
 
     def _upgrade_prompt_content(self, prompt: str, from_version: str, to_version: str) -> str:
         """
@@ -1051,32 +1099,300 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
         return self.get_templates_by_category("srt_scene_analysis")
 
     def get_srt_single_template(self) -> Optional[PromptTemplate]:
-        """SRT 단일 씬 분석 프롬프트 반환 (기본값)"""
+        """
+        SRT 단일 씬 분석 프롬프트 반환
+
+        활성화된 프롬프트가 있으면 해당 프롬프트 반환,
+        없으면 기본 프롬프트(srt_scene_single) 반환
+        """
+        active_id = self.get_active_prompt("single")
+        _debug_log(f"[single] 활성 프롬프트 조회: active_id={active_id}")
+
+        if active_id:
+            if active_id in self.templates:
+                _debug_log(f"[single] 활성 프롬프트 사용: {active_id}")
+                return self.templates[active_id]
+            else:
+                _debug_log(f"[single] ⚠️ 활성 프롬프트 '{active_id}'가 templates에 없음! 기본값 사용")
+                _debug_log(f"[single] 현재 템플릿 목록: {list(self.templates.keys())[:10]}...")
+
+        _debug_log(f"[single] 기본 프롬프트 사용: srt_scene_single")
         return self.get_template("srt_scene_single")
 
     def get_srt_batch_template(self) -> Optional[PromptTemplate]:
-        """SRT 배치 씬 분석 프롬프트 반환 (기본값)"""
+        """
+        SRT 배치 씬 분석 프롬프트 반환
+
+        활성화된 프롬프트가 있으면 해당 프롬프트 반환,
+        없으면 기본 프롬프트(srt_scene_batch) 반환
+        """
+        active_id = self.get_active_prompt("batch")
+        _debug_log(f"[batch] 활성 프롬프트 조회: active_id={active_id}")
+
+        if active_id:
+            if active_id in self.templates:
+                _debug_log(f"[batch] 활성 프롬프트 사용: {active_id}")
+                return self.templates[active_id]
+            else:
+                _debug_log(f"[batch] ⚠️ 활성 프롬프트 '{active_id}'가 templates에 없음! 기본값 사용")
+                _debug_log(f"[batch] 현재 템플릿 목록: {list(self.templates.keys())[:10]}...")
+
+        _debug_log(f"[batch] 기본 프롬프트 사용: srt_scene_batch")
         return self.get_template("srt_scene_batch")
 
     def get_srt_single_prompt(self) -> str:
         """SRT 단일 씬 분석 프롬프트 텍스트 반환"""
-        return self.get_prompt("srt_scene_single")
+        template = self.get_srt_single_template()
+        return template.prompt if template else ""
 
     def get_srt_batch_prompt(self) -> str:
         """SRT 배치 씬 분석 프롬프트 텍스트 반환"""
-        return self.get_prompt("srt_scene_batch")
+        template = self.get_srt_batch_template()
+        return template.prompt if template else ""
 
-    def create_srt_template(self, name: str, description: str, prompt: str) -> Optional[PromptTemplate]:
-        """새 SRT 분석 프롬프트 템플릿 생성"""
-        return self.create_template("srt_scene_analysis", name, description, prompt)
+    # ═══════════════════════════════════════════════════════════════════
+    # 활성 프롬프트 관리 (v2.5 추가)
+    # ═══════════════════════════════════════════════════════════════════
+
+    _ACTIVE_PROMPTS_PAGE = "prompt_templates"
+    _ACTIVE_PROMPTS_KEY = "active_srt_prompts"
+
+    def get_active_prompt(self, prompt_type: str) -> Optional[str]:
+        """
+        활성화된 프롬프트 ID 가져오기
+
+        Args:
+            prompt_type: "single" 또는 "batch"
+
+        Returns:
+            활성 프롬프트 ID 또는 None (기본값 사용)
+        """
+        try:
+            from utils.settings_manager import get_setting
+            active_prompts = get_setting(self._ACTIVE_PROMPTS_PAGE, self._ACTIVE_PROMPTS_KEY, {})
+            result = active_prompts.get(prompt_type)
+            _debug_log(f"get_active_prompt({prompt_type}): settings={active_prompts}, result={result}")
+            return result
+        except Exception as e:
+            _debug_log(f"활성 프롬프트 로드 실패: {e}")
+            return None
+
+    def set_active_prompt(self, prompt_type: str, prompt_id: str) -> bool:
+        """
+        프롬프트 활성화 설정
+
+        Args:
+            prompt_type: "single" 또는 "batch"
+            prompt_id: 활성화할 프롬프트 ID (None이면 기본값 사용)
+
+        Returns:
+            성공 여부
+        """
+        try:
+            from utils.settings_manager import get_setting, set_setting
+
+            _debug_log(f"set_active_prompt 호출: {prompt_type} -> {prompt_id}")
+
+            # 프롬프트 ID 검증
+            if prompt_id and prompt_id not in self.templates:
+                _debug_log(f"⚠️ 잘못된 프롬프트 ID: {prompt_id} (templates에 없음)")
+                _debug_log(f"현재 templates 키 목록: {list(self.templates.keys())[:10]}...")
+                return False
+
+            # 현재 설정 로드
+            active_prompts = get_setting(self._ACTIVE_PROMPTS_PAGE, self._ACTIVE_PROMPTS_KEY, {})
+            _debug_log(f"저장 전 active_prompts: {active_prompts}")
+
+            # 업데이트
+            if prompt_id:
+                active_prompts[prompt_type] = prompt_id
+            elif prompt_type in active_prompts:
+                del active_prompts[prompt_type]
+
+            # 저장
+            set_setting(self._ACTIVE_PROMPTS_PAGE, self._ACTIVE_PROMPTS_KEY, active_prompts)
+            _debug_log(f"✅ 활성 프롬프트 설정 완료: {prompt_type} -> {prompt_id}")
+            _debug_log(f"저장 후 active_prompts: {active_prompts}")
+
+            # 저장 확인
+            verify = get_setting(self._ACTIVE_PROMPTS_PAGE, self._ACTIVE_PROMPTS_KEY, {})
+            _debug_log(f"저장 검증: {verify}")
+
+            return True
+        except Exception as e:
+            _debug_log(f"❌ 활성 프롬프트 설정 실패: {e}")
+            import traceback
+            _debug_log(f"상세 오류: {traceback.format_exc()}")
+            return False
+
+    def get_active_prompts_info(self) -> dict:
+        """
+        활성 프롬프트 정보 가져오기 (UI 표시용)
+
+        Returns:
+            {
+                "single": {"id": "...", "name": "...", "is_default": bool},
+                "batch": {"id": "...", "name": "...", "is_default": bool}
+            }
+        """
+        result = {}
+
+        for ptype in ["single", "batch"]:
+            active_id = self.get_active_prompt(ptype)
+            default_id = "srt_scene_single" if ptype == "single" else "srt_scene_batch"
+
+            if active_id and active_id in self.templates:
+                template = self.templates[active_id]
+                result[ptype] = {
+                    "id": active_id,
+                    "name": template.name,
+                    "is_default": active_id == default_id
+                }
+            else:
+                template = self.templates.get(default_id)
+                result[ptype] = {
+                    "id": default_id,
+                    "name": template.name if template else default_id,
+                    "is_default": True
+                }
+
+        return result
+
+    def clear_active_prompts(self) -> bool:
+        """
+        모든 활성 프롬프트 설정 초기화 (기본값으로 복원)
+        """
+        try:
+            from utils.settings_manager import set_setting
+            set_setting(self._ACTIVE_PROMPTS_PAGE, self._ACTIVE_PROMPTS_KEY, {})
+            _debug_log("활성 프롬프트 초기화됨")
+            return True
+        except Exception as e:
+            _debug_log(f"활성 프롬프트 초기화 실패: {e}")
+            return False
+
+    # ═══════════════════════════════════════════════════════════════════
+    # 프롬프트 유형별 필터링 메서드 (v2.5 추가)
+    # ═══════════════════════════════════════════════════════════════════
+
+    def get_srt_templates_by_type(self, prompt_type: str) -> List[PromptTemplate]:
+        """
+        SRT 템플릿을 유형별로 필터링
+
+        Args:
+            prompt_type: "single", "batch", "both"
+                - "single": 단일 씬 분석용 (single + both)
+                - "batch": 배치 분석용 (batch + both)
+                - "both": 범용 (both만)
+
+        Returns:
+            해당 유형의 템플릿 목록
+        """
+        all_templates = self.get_srt_templates()
+
+        if prompt_type == "single":
+            # 단일 처리용: single 또는 both
+            return [t for t in all_templates if getattr(t, 'prompt_type', 'both') in ('single', 'both')]
+        elif prompt_type == "batch":
+            # 배치 처리용: batch 또는 both
+            return [t for t in all_templates if getattr(t, 'prompt_type', 'both') in ('batch', 'both')]
+        else:
+            # 범용만
+            return [t for t in all_templates if getattr(t, 'prompt_type', 'both') == 'both']
+
+    def get_srt_templates_grouped_by_type(self) -> Dict[str, List[PromptTemplate]]:
+        """
+        SRT 템플릿을 유형별로 그룹화
+
+        Returns:
+            {
+                "single": [단일 씬 분석용 템플릿들],
+                "batch": [배치 분석용 템플릿들],
+                "both": [범용 템플릿들]
+            }
+        """
+        all_templates = self.get_srt_templates()
+
+        grouped = {
+            "single": [],
+            "batch": [],
+            "both": []
+        }
+
+        for t in all_templates:
+            ptype = getattr(t, 'prompt_type', 'both')
+            if ptype in grouped:
+                grouped[ptype].append(t)
+            else:
+                grouped["both"].append(t)
+
+        return grouped
+
+    def get_templates_for_analysis_mode(self, analysis_mode: str) -> List[PromptTemplate]:
+        """
+        분석 모드에 맞는 프롬프트 필터링
+
+        Args:
+            analysis_mode: "sequential", "parallel", "batch"
+                - sequential/parallel: 단일 씬 분석 → single + both 프롬프트
+                - batch: 배치 분석 → batch + both 프롬프트
+
+        Returns:
+            해당 분석 모드에 사용 가능한 템플릿 목록
+        """
+        if analysis_mode in ("sequential", "parallel"):
+            return self.get_srt_templates_by_type("single")
+        elif analysis_mode == "batch":
+            return self.get_srt_templates_by_type("batch")
+        else:
+            # 기본: 모든 템플릿
+            return self.get_srt_templates()
+
+    def create_srt_template(
+        self,
+        name: str,
+        description: str,
+        prompt: str,
+        prompt_type: str = "both"
+    ) -> Optional[PromptTemplate]:
+        """
+        새 SRT 분석 프롬프트 템플릿 생성
+
+        Args:
+            name: 프롬프트 이름
+            description: 프롬프트 설명
+            prompt: 프롬프트 내용
+            prompt_type: 프롬프트 유형 ("single", "batch", "both")
+        """
+        return self.create_template("srt_scene_analysis", name, description, prompt, prompt_type)
 
     # ═══════════════════════════════════════════════════════════════════
 
-    def create_template(self, category: str, name: str, description: str, prompt: str) -> Optional[PromptTemplate]:
-        """새 템플릿 생성"""
+    def create_template(
+        self,
+        category: str,
+        name: str,
+        description: str,
+        prompt: str,
+        prompt_type: str = "both"
+    ) -> Optional[PromptTemplate]:
+        """
+        새 템플릿 생성
+
+        Args:
+            category: 카테고리
+            name: 프롬프트 이름
+            description: 프롬프트 설명
+            prompt: 프롬프트 내용
+            prompt_type: 프롬프트 유형 ("single", "batch", "both")
+        """
         import uuid
         new_id = f"{category}_{uuid.uuid4().hex[:8]}"
-        
+
+        # prompt_type 유효성 검사
+        if prompt_type not in ("single", "batch", "both"):
+            prompt_type = "both"
+
         template = PromptTemplate(
             id=new_id,
             name=name,
@@ -1084,27 +1400,107 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
             description=description,
             prompt=prompt,
             is_default=False,
-            updated_at=datetime.now().isoformat()
+            updated_at=datetime.now().isoformat(),
+            prompt_type=prompt_type
         )
-        
+
         self.templates[new_id] = template
         self._save_templates()
-        _debug_log(f"✅ 새 템플릿 생성됨: {name} ({new_id})")
+        _debug_log(f"✅ 새 템플릿 생성됨: {name} ({new_id}) [유형: {prompt_type}]")
         return template
 
     def delete_template(self, template_id: str) -> bool:
         """템플릿 삭제"""
         if template_id not in self.templates:
             return False
-            
+
         if self.templates[template_id].is_default:
             _debug_log(f"❌ 삭제 불가: 기본 템플릿 ({template_id})")
             return False
-            
+
         del self.templates[template_id]
         self._save_templates()
         _debug_log(f"🗑️ 템플릿 삭제됨: {template_id}")
         return True
+
+    def duplicate_template(self, template_id: str, new_name: str) -> Optional[str]:
+        """
+        템플릿 복제
+
+        Args:
+            template_id: 복제할 템플릿 ID
+            new_name: 새 템플릿 이름
+
+        Returns:
+            새로 생성된 템플릿 ID 또는 None
+        """
+        if template_id not in self.templates:
+            _debug_log(f"❌ 복제 실패: 템플릿 없음 ({template_id})")
+            return None
+
+        original = self.templates[template_id]
+
+        # 새 ID 생성
+        import uuid
+        new_id = f"{original.category}_{uuid.uuid4().hex[:8]}"
+
+        # 복제
+        new_template = PromptTemplate(
+            id=new_id,
+            name=new_name,
+            category=original.category,
+            description=f"{original.description} (복제됨)",
+            prompt=original.prompt,
+            is_default=False,
+            updated_at=datetime.now().isoformat(),
+            prompt_type=getattr(original, 'prompt_type', 'both')
+        )
+
+        self.templates[new_id] = new_template
+        self._save_templates()
+        _debug_log(f"📋 템플릿 복제됨: {template_id} -> {new_id} ({new_name})")
+        return new_id
+
+    def get_all_srt_prompts_for_editor(self) -> dict:
+        """
+        편집기용 모든 SRT 프롬프트 목록 (유형별 그룹화)
+
+        Returns:
+            {
+                "single": [{"id": "...", "name": "...", "is_default": bool, "prompt_type": "..."}, ...],
+                "batch": [...],
+                "both": [...]
+            }
+        """
+        all_templates = self.get_srt_templates()
+
+        grouped = {
+            "single": [],
+            "batch": [],
+            "both": []
+        }
+
+        for t in all_templates:
+            ptype = getattr(t, 'prompt_type', 'both')
+            entry = {
+                "id": t.id,
+                "name": t.name,
+                "is_default": t.is_default,
+                "prompt_type": ptype,
+                "category": t.category,
+                "description": t.description
+            }
+
+            if ptype in grouped:
+                grouped[ptype].append(entry)
+            else:
+                grouped["both"].append(entry)
+
+        # 기본 프롬프트가 먼저 오도록 정렬
+        for ptype in grouped:
+            grouped[ptype].sort(key=lambda x: (not x["is_default"], x["name"]))
+
+        return grouped
 
 
 # 싱글톤

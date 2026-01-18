@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-17T17:29:29.779094",
+  "image_file": "bg_scene_003_1768638569778.png",
+  "scene_id": 3,
+  "prompts": {
+    "original": "The new logo 'wego' emerging with a futuristic feel. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "animation style background, The new logo 'wego' emerging with a futuristic feel. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot, vibrant colors, cinematic composition, no characters",
+    "negative": "people, characters, realistic"
+  },
+  "style": {
+    "id": "bg_animation",
+    "name": "애니메이션",
+    "prefix": "animation style background,",
+    "suffix": "vibrant colors, cinematic composition, no characters"
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 869342789
+  }
+}

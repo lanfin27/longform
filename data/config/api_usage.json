@@ -4348,5 +4348,20 @@
     "error_message": "",
     "project_name": "20251214_144057_시니어",
     "step_name": "character_compositing"
+  },
+  {
+    "provider": "google",
+    "model_id": "gemini-2.0-flash-exp",
+    "function": "text_generation",
+    "timestamp": "2026-01-14T12:02:56.165159",
+    "tokens_input": 0,
+    "tokens_output": 0,
+    "units_used": 0,
+    "cost_estimate": 0.0,
+    "duration_seconds": 19.50796341896057,
+    "success": false,
+    "error_message": "name 're' is not defined",
+    "project_name": "20251214_144057_시니어",
+    "step_name": "scene_analysis"
   }
 ]

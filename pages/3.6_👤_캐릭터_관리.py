@@ -86,6 +86,10 @@ st.divider()
 # 캐릭터 매니저 초기화
 manager = CharacterManager(str(project_path))
 
+# ⭐ 성능 최적화: 초기화 키
+_CHAR_INIT_KEY = f"char_mgmt_initialized_{project_path}"
+
+
 # === 자동 동기화: 세션/분석 파일에서 캐릭터 자동 가져오기 ===
 def auto_sync_characters():
     """세션 또는 분석 파일에서 캐릭터 자동 동기화"""
@@ -125,54 +129,49 @@ def auto_sync_characters():
         if synced > 0:
             print(f"[캐릭터 관리] {synced}명 등장 씬 동기화 완료")
 
-auto_sync_characters()
 
-# === 씬-캐릭터 등장 정보 자동 동기화 (Problem 56 수정) ===
-# 씬 데이터에서 캐릭터 등장 정보를 추출하여 appearance_scenes 업데이트
-try:
-    synced_count = sync_character_appearance_scenes(str(project_path))
-    if synced_count > 0:
-        print(f"[캐릭터 관리] ✅ {synced_count}명 캐릭터 appearance_scenes 동기화 완료")
-        # CharacterManager도 다시 로드하여 반영
-        manager = CharacterManager(str(project_path))
-except Exception as e:
-    print(f"[캐릭터 관리] ⚠️ 씬-캐릭터 동기화 오류: {e}")
+# ⭐ 성능 최적화: 이미 초기화되었으면 스킵
+if not st.session_state.get(_CHAR_INIT_KEY, False):
+    auto_sync_characters()
+
+    # === 씬-캐릭터 등장 정보 자동 동기화 (Problem 56 수정) ===
+    # 씬 데이터에서 캐릭터 등장 정보를 추출하여 appearance_scenes 업데이트
+    try:
+        synced_count = sync_character_appearance_scenes(str(project_path))
+        if synced_count > 0:
+            print(f"[캐릭터 관리] ✅ {synced_count}명 캐릭터 appearance_scenes 동기화 완료")
+            # CharacterManager도 다시 로드하여 반영
+            manager = CharacterManager(str(project_path))
+    except Exception as e:
+        print(f"[캐릭터 관리] ⚠️ 씬-캐릭터 동기화 오류: {e}")
+
+    # ⭐ 초기화 완료 플래그 설정
+    st.session_state[_CHAR_INIT_KEY] = True
 
 # === 씬 분석 데이터 로드 함수 (v2.0 - 최신 파일 자동 감지) ===
 from datetime import datetime
 
 
-def load_scene_analysis_data(force_refresh: bool = False) -> tuple:
-    """
-    최신 씬 분석 결과 로드 (v2.0)
+# ⭐ 성능 최적화: 씬 데이터 캐싱 (내부 함수)
+@st.cache_data(ttl=60, show_spinner=False)
+def _cached_load_scene_data(project_path_str: str) -> tuple:
+    """씬 데이터 로드 (캐싱 적용 - 내부 구현)"""
+    from pathlib import Path
+    project_path_obj = Path(project_path_str)
 
-    ⭐ 개선사항:
-    1. 여러 분석 파일 중 최신(수정 시간 기준) 파일 선택
-    2. 파일 수정 시간 반환
-    3. 캐시 무시 옵션
-
-    Returns:
-        Tuple[List[Dict], str]: (씬 데이터 리스트, 파일 수정 시간 문자열)
-    """
-    # 가능한 분석 파일 경로들
     analysis_paths = [
-        # 1순위: analysis 폴더 (현재 구조)
-        project_path / "analysis" / "scenes.json",
-        project_path / "analysis" / "scene_analysis.json",
-        project_path / "analysis" / "hybrid_v5_scenes.json",
-
-        # 2순위: 프로젝트 루트
-        project_path / "scenes.json",
-        project_path / "data" / "scenes.json",
+        project_path_obj / "analysis" / "scenes.json",
+        project_path_obj / "analysis" / "scene_analysis.json",
+        project_path_obj / "analysis" / "hybrid_v5_scenes.json",
+        project_path_obj / "scenes.json",
+        project_path_obj / "data" / "scenes.json",
     ]
 
-    # 새 구조 (videos 하위)인 경우
     video_name = st.session_state.get("current_video")
     if video_name:
-        analysis_paths.insert(0, project_path / "videos" / video_name / "analysis" / "scenes.json")
-        analysis_paths.insert(1, project_path / "videos" / video_name / "analysis" / "scene_analysis.json")
+        analysis_paths.insert(0, project_path_obj / "videos" / video_name / "analysis" / "scenes.json")
+        analysis_paths.insert(1, project_path_obj / "videos" / video_name / "analysis" / "scene_analysis.json")
 
-    # ⭐ 존재하는 파일 중 가장 최근 수정된 파일 찾기
     latest_file = None
     latest_mtime = 0
 
@@ -184,15 +183,12 @@ def load_scene_analysis_data(force_refresh: bool = False) -> tuple:
                 latest_file = path
 
     if not latest_file:
-        print(f"[씬 로드] ⚠️ 씬 분석 파일을 찾을 수 없습니다.")
-        return [], None
+        return [], None, None
 
-    # 파일 로드
     try:
         with open(latest_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
-        # 데이터 형식에 따라 처리
         if isinstance(data, list):
             raw_scenes = data
         elif isinstance(data, dict):
@@ -200,37 +196,51 @@ def load_scene_analysis_data(force_refresh: bool = False) -> tuple:
         else:
             raw_scenes = []
 
-        # 수정 시간 문자열
         mtime_str = datetime.fromtimestamp(latest_mtime).strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[씬 로드] ✅ 파일: {latest_file.name}")
-        print(f"[씬 로드]    씬 개수: {len(raw_scenes)}개")
-        print(f"[씬 로드]    수정 시간: {mtime_str}")
+
+        scenes = []
+        for i, scene in enumerate(raw_scenes):
+            scene_id = scene.get("scene_id", scene.get("scene_number", scene.get("id", i + 1)))
+            if isinstance(scene_id, str) and scene_id.isdigit():
+                scene_id = int(scene_id)
+
+            scene_data = {
+                "scene_number": scene_id,
+                "scene_id": scene_id,
+                "title": scene.get("title", scene.get("name", f"씬 {scene_id}")),
+                "mood": scene.get("mood", scene.get("분위기", "default")),
+                "description": scene.get("description", scene.get("내용", "")),
+                "script_text": scene.get("script_text", scene.get("narration", "")),
+                "characters": scene.get("characters", [])
+            }
+            scenes.append(scene_data)
+
+        return scenes, mtime_str, latest_file.name
 
     except Exception as e:
         print(f"[씬 로드] ❌ 씬 분석 로드 실패: {e}")
-        return [], None
+        return [], None, None
 
-    # 씬 데이터 정규화
-    scenes = []
-    for i, scene in enumerate(raw_scenes):
-        scene_id = scene.get("scene_id", scene.get("scene_number", scene.get("id", i + 1)))
-        if isinstance(scene_id, str) and scene_id.isdigit():
-            scene_id = int(scene_id)
 
-        scene_data = {
-            "scene_number": scene_id,
-            "scene_id": scene_id,
-            "title": scene.get("title", scene.get("name", f"씬 {scene_id}")),
-            "mood": scene.get("mood", scene.get("분위기", "default")),
-            "description": scene.get("description", scene.get("내용", "")),
-            "script_text": scene.get("script_text", scene.get("narration", "")),
-            "characters": scene.get("characters", [])
-        }
-        scenes.append(scene_data)
+def load_scene_analysis_data(force_refresh: bool = False) -> tuple:
+    """
+    최신 씬 분석 결과 로드 (v2.0)
+    ⭐ 성능 최적화: 캐싱된 함수 사용
+
+    Returns:
+        Tuple[List[Dict], str]: (씬 데이터 리스트, 파일 수정 시간 문자열)
+    """
+    # ⭐ 캐싱된 함수 사용
+    if force_refresh:
+        _cached_load_scene_data.clear()
+
+    scenes, mtime_str, file_name = _cached_load_scene_data(str(project_path))
 
     # 세션에 파일 정보 저장 (UI 표시용)
-    st.session_state['scene_file_mtime'] = mtime_str
-    st.session_state['scene_file_name'] = latest_file.name
+    if mtime_str:
+        st.session_state['scene_file_mtime'] = mtime_str
+    if file_name:
+        st.session_state['scene_file_name'] = file_name
 
     return scenes, mtime_str
 

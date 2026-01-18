@@ -90,6 +90,7 @@ from utils.settings_manager import (
     get_setting,
     set_setting,
     persistent_selectbox,
+    persistent_radio,
     persistent_checkbox,
     persistent_number_input,
     render_settings_management_ui
@@ -141,7 +142,7 @@ try:
 except ImportError:
     PROMPT_DOWNLOAD_AVAILABLE = False
 
-# 한글 프롬프트 씬 선택기 (v1.0)
+# 한글 프롬프트 씬 선택기 (v1.1 - 분석 기준 선택 지원)
 try:
     from utils.korean_scene_selector import (
         select_korean_scenes_by_ratio,
@@ -154,6 +155,48 @@ try:
     KOREAN_SCENE_SELECTOR_AVAILABLE = True
 except ImportError:
     KOREAN_SCENE_SELECTOR_AVAILABLE = False
+
+# v1.2: 한글 씬 상태 관리 (수동 추가/제거 지원)
+from utils.korean_scene_state import (
+    init_korean_scene_state,
+    get_all_selected_korean_scenes,
+    get_auto_selected_scenes,
+    get_manual_added_scenes,
+    set_auto_selected_scenes,
+    add_manual_scene,
+    remove_manual_scene,
+    is_korean_scene_selected,
+    get_selection_source,
+    get_selection_stats as get_korean_scene_stats,
+    sync_with_legacy_state,
+    update_legacy_state,
+    clear_korean_scene_selection
+)
+
+# ⭐ v1.5: AIPromptManager 통합
+try:
+    from utils.ai_prompt_manager import AIPromptManager, get_prompt_manager
+    PROMPT_MANAGER_AVAILABLE = True
+except ImportError:
+    PROMPT_MANAGER_AVAILABLE = False
+
+
+def _count_scenes_with_korean_prompt(scenes: list) -> int:
+    """한글프롬프트가 있는 씬 개수 계산"""
+    count = 0
+    for scene in scenes:
+        korean_prompt = (
+            scene.get('한글프롬프트') or
+            scene.get('korean_prompt') or
+            scene.get('image_prompt_ko') or
+            scene.get('prompt_ko') or
+            scene.get('image_prompt_korean_text') or
+            scene.get('prompts', {}).get('image_prompt_korean_text') or
+            ''
+        )
+        if korean_prompt and str(korean_prompt).strip():
+            count += 1
+    return count
 
 
 # 프롬프트 미리보기 및 결과 추적 (v2.0)
@@ -342,8 +385,20 @@ if check_and_clear_stale_style_cache("image_generation", clear_keys=True):
 # 유틸리티 함수
 # ===================================================================
 
+# ⭐ 성능 최적화: 초기화 키 생성
+def _get_image_gen_init_key():
+    """이미지 생성 페이지 초기화 키"""
+    return f"image_gen_initialized_{project_path}"
+
+
 def sync_all_data():
-    """페이지 로드 시 모든 데이터 동기화"""
+    """페이지 로드 시 모든 데이터 동기화 (⭐ 초기화 최적화 적용)"""
+
+    # ⭐ 성능 최적화: 이미 초기화된 경우 스킵
+    init_key = _get_image_gen_init_key()
+    if st.session_state.get(init_key, False):
+        return
+
     # 씬 데이터 로드 (통합 로더 사용 - Problem 56 수정)
     scenes = load_scenes_data(str(project_path))
     if scenes:
@@ -406,6 +461,16 @@ def sync_all_data():
         except Exception as e:
             print(f"[SceneImageManager] 초기화 중 오류: {e}")
 
+    # ⭐ 성능 최적화: 초기화 완료 플래그 설정
+    st.session_state[init_key] = True
+
+
+# ⭐ 성능 최적화: 씬 데이터 캐싱
+@st.cache_data(ttl=60, show_spinner=False)
+def _cached_load_scenes(project_path_str: str) -> List[Dict]:
+    """씬 데이터 로드 (캐싱 적용)"""
+    return load_scenes_data(project_path_str)
+
 
 def get_scenes() -> List[Dict]:
     """
@@ -413,8 +478,9 @@ def get_scenes() -> List[Dict]:
 
     통합 로더를 사용하여 프로젝트 파일에서 로드
     (Problem 56 수정: 프로젝트 간 데이터 혼동 방지)
+    ⭐ 성능 최적화: 캐싱 적용
     """
-    return load_scenes_data(str(project_path))
+    return _cached_load_scenes(str(project_path))
 
 
 def get_scene_by_id(scene_id: int) -> Optional[Dict]:
@@ -458,49 +524,70 @@ def force_refresh_styles():
     print(f"[스타일 새로고침] 클리어된 키: {len(keys_to_clear)}개")
 
 
-def get_all_gallery_images() -> List[Dict]:
-    """모든 생성된 이미지 목록"""
+# ⭐ 성능 최적화: 갤러리 이미지 목록 캐싱 (TTL 30초)
+@st.cache_data(ttl=30, show_spinner=False)
+def _cached_get_gallery_images(project_path_str: str) -> List[Dict]:
+    """
+    모든 생성된 이미지 목록 (캐싱 적용)
+
+    v2.1: 글로벌 폴더(data/images/imagefx 등) 포함
+    """
     images = []
+    project_path_obj = Path(project_path_str)
 
-    # 합성 이미지
-    comp_dir = project_path / "images" / "composited"
-    if comp_dir.exists():
-        for f in comp_dir.glob("*.png"):
-            images.append({
-                "path": str(f),
-                "filename": f.name,
-                "type": "composited",
-                "scene_id": extract_scene_id(f.name),
-                "created": f.stat().st_mtime
-            })
+    def scan_folder(folder: Path, img_type: str):
+        """폴더 내 이미지 스캔"""
+        if not folder or not folder.exists():
+            return
+        for ext in ["*.png", "*.jpg", "*.jpeg", "*.webp"]:
+            for f in folder.glob(ext):
+                try:
+                    images.append({
+                        "path": str(f),
+                        "filename": f.name,
+                        "type": img_type,
+                        "scene_id": extract_scene_id(f.name),
+                        "created": f.stat().st_mtime
+                    })
+                except:
+                    pass
 
-    # 씬 이미지
-    scene_dir = project_path / "images" / "scenes"
-    if scene_dir.exists():
-        for f in scene_dir.glob("*.png"):
-            images.append({
-                "path": str(f),
-                "filename": f.name,
-                "type": "scene",
-                "scene_id": extract_scene_id(f.name),
-                "created": f.stat().st_mtime
-            })
+    # 프로젝트 폴더 이미지
+    scan_folder(project_path_obj / "images" / "composited", "composited")
+    scan_folder(project_path_obj / "images" / "scenes", "scene")
+    scan_folder(project_path_obj / "images" / "backgrounds", "background")
 
-    # 배경 이미지
-    bg_dir = project_path / "images" / "backgrounds"
-    if bg_dir.exists():
-        for f in bg_dir.glob("*.png"):
-            images.append({
-                "path": str(f),
-                "filename": f.name,
-                "type": "background",
-                "scene_id": extract_scene_id(f.name),
-                "created": f.stat().st_mtime
-            })
+    # ⭐ v2.1: 글로벌 폴더 이미지 (ImageFX 등)
+    global_images_dir = Path(__file__).parent.parent / "data" / "images"
+    if global_images_dir.exists():
+        scan_folder(global_images_dir / "imagefx", "imagefx")
+        scan_folder(global_images_dir / "generated", "generated")
+        scan_folder(global_images_dir / "backgrounds", "global_background")
 
-    # 최신순 정렬
-    images.sort(key=lambda x: x["created"], reverse=True)
+    # ⭐ 씬 번호순 정렬 (1, 2, 3, 4... 순서)
+    def _sort_key(x):
+        scene_id = x.get("scene_id", "?")
+        if scene_id.isdigit():
+            return (0, int(scene_id))  # 숫자인 경우: 숫자순 정렬
+        return (1, scene_id)  # 숫자가 아닌 경우: 뒤로 배치
+
+    images.sort(key=_sort_key)
     return images
+
+
+def get_all_gallery_images() -> List[Dict]:
+    """모든 생성된 이미지 목록 (⭐ 캐싱된 함수 사용)"""
+    return _cached_get_gallery_images(str(project_path))
+
+
+def clear_gallery_cache():
+    """
+    갤러리 이미지 캐시 강제 무효화 (v2.2)
+
+    이미지 삭제/추가 후 개수가 갱신되지 않을 때 호출
+    """
+    _cached_get_gallery_images.clear()
+    print("[갤러리 캐시] 캐시 무효화됨")
 
 
 def extract_scene_id(filename: str) -> str:
@@ -720,15 +807,17 @@ def render_character_composite_options() -> str:
     st.markdown("##### 🎭 캐릭터 합성 옵션")
 
     with st.container(border=True):
-        composite_mode = st.radio(
+        # v1.0: 설정 영속성 - persistent_radio 사용
+        composite_mode = persistent_radio(
             "캐릭터 합성 모드",
             options=["none", "scene_character", "representative_character"],
+            page="image_generation",
+            setting_key="character_composite_mode",
             format_func=lambda x: {
                 "none": "❌ 합성 안 함 (배경만)",
                 "scene_character": "👥 씬별 캐릭터 합성",
                 "representative_character": "⭐ 대표 캐릭터 합성"
             }[x],
-            key="character_composite_mode",
             horizontal=False,
             label_visibility="collapsed"
         )
@@ -1805,7 +1894,8 @@ def render_save_step(scene_id: int, scene: Dict):
                 data=f.read(),
                 file_name=f"scene_{scene_id:03d}.png",
                 mime="image/png",
-                use_container_width=True
+                use_container_width=True,
+                key=f"dl_composite_result_{scene_id}"
             )
 
     with col2:
@@ -2291,13 +2381,15 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
     with st.container(border=True):
         st.markdown("#### 🎨 스타일 모드 선택")
 
-        style_mode = st.radio(
+        # v1.0: 설정 영속성 - persistent_radio 사용
+        style_mode = persistent_radio(
             "이미지 생성 모드",
             options=[
                 "🖼️ 배경만 생성 (배경 스타일 사용)",
                 "🎬 씬 합성 생성 (배경 + 캐릭터 통합 스타일)"
             ],
-            key="batch_style_mode",
+            page="image_generation",
+            setting_key="style_mode",
             horizontal=False
         )
 
@@ -3534,6 +3626,12 @@ def render_gallery_tab():
                 scenes_with_images = set()
                 if backgrounds_folder and backgrounds_folder.exists():
                     latest_images = get_latest_image_per_scene(backgrounds_folder)
+
+                # ⭐ v4.1: 모든 이미지 폴더 스캔 (backgrounds, scenes, composited)
+                if project_path:
+                    from utils.prompt_download import get_all_scenes_with_images
+                    scenes_with_images = get_all_scenes_with_images(Path(project_path))
+                else:
                     scenes_with_images = set(latest_images.keys())
 
                 # ========== 다운로드 범위 선택 ==========
@@ -3677,74 +3775,127 @@ def render_gallery_tab():
                     with stat_col4:
                         st.metric("메타데이터 출처", f"{stats['from_metadata']}개")
 
-                    # ========== 다운로드 버튼 ==========
+                    # ========== 다운로드 버튼 (v1.1 - session_state 캐싱) ==========
                     st.markdown("---")
 
-                    # ⭐ 고유 키 생성 (선택 범위 기반 - 캐싱 문제 해결)
-                    if selected_scenes:
-                        key_suffix = f"{min(selected_scenes)}_{max(selected_scenes)}_{len(selected_scenes)}"
+                    # ⭐ 캐시 키 생성 (선택 범위 + 옵션 기반)
+                    download_cache_key = f"prompt_dl_{min(selected_scenes)}_{max(selected_scenes)}_{len(selected_scenes)}_{use_latest_metadata}"
+
+                    # 캐시된 데이터 확인
+                    cached_download = st.session_state.get('_prompt_download_cache', {})
+                    cached_key = cached_download.get('cache_key')
+                    options_changed = cached_key != download_cache_key
+
+                    # 버튼 레이아웃
+                    gen_col, info_col = st.columns([1, 2])
+
+                    with gen_col:
+                        # 생성 버튼
+                        generate_clicked = st.button(
+                            "📦 다운로드 파일 생성" if options_changed or not cached_download.get('excel') else "🔄 다시 생성",
+                            key=f"gen_prompt_dl_{download_cache_key}",
+                            use_container_width=True,
+                            type="primary" if options_changed or not cached_download.get('excel') else "secondary"
+                        )
+
+                    with info_col:
+                        if cached_download.get('excel') and not options_changed:
+                            st.success(f"✅ 준비됨: 엑셀 {cached_download.get('excel_size', 0):,} bytes")
+                        elif options_changed and cached_key:
+                            st.warning("⚠️ 옵션 변경됨 - 다시 생성 필요")
+                        else:
+                            st.info("ℹ️ '다운로드 파일 생성' 버튼을 클릭하세요")
+
+                    # 생성 버튼 클릭 시 데이터 생성
+                    if generate_clicked:
+                        with st.spinner("다운로드 파일 생성 중..."):
+                            try:
+                                excel_bytes = generate_prompts_excel(prompts, include_source=True)
+                                korean_zip = generate_prompts_zip(prompts, "korean")
+                                final_zip = generate_prompts_zip(prompts, "final")
+
+                                # 디버깅: 데이터 크기 확인
+                                print(f"[프롬프트 다운로드] 엑셀: {len(excel_bytes) if excel_bytes else 0} bytes, 한글ZIP: {len(korean_zip) if korean_zip else 0} bytes, 최종ZIP: {len(final_zip) if final_zip else 0} bytes", flush=True)
+
+                                # 세션 스테이트에 캐싱
+                                st.session_state['_prompt_download_cache'] = {
+                                    'cache_key': download_cache_key,
+                                    'excel': excel_bytes,
+                                    'excel_size': len(excel_bytes) if excel_bytes else 0,
+                                    'korean_zip': korean_zip,
+                                    'korean_zip_size': len(korean_zip) if korean_zip else 0,
+                                    'final_zip': final_zip,
+                                    'final_zip_size': len(final_zip) if final_zip else 0,
+                                    'stats': stats,
+                                    'min_scene': min(selected_scenes),
+                                    'max_scene': max(selected_scenes)
+                                }
+                                print(f"[프롬프트 다운로드] ✅ 캐싱 완료", flush=True)
+                                st.rerun()  # 다운로드 버튼 활성화
+
+                            except Exception as e:
+                                st.error(f"다운로드 데이터 생성 실패: {e}")
+                                print(f"[프롬프트 다운로드] ❌ 오류: {e}", flush=True)
+                                st.session_state['_prompt_download_cache'] = {'cache_key': download_cache_key}
+
+                    # 다운로드 버튼 (캐시된 데이터 사용)
+                    btn_col1, btn_col2, btn_col3 = st.columns(3)
+
+                    # 캐시된 데이터 가져오기
+                    dl_cache = st.session_state.get('_prompt_download_cache', {})
+                    if dl_cache.get('cache_key') == download_cache_key:
+                        excel_bytes = dl_cache.get('excel')
+                        korean_zip = dl_cache.get('korean_zip')
+                        final_zip = dl_cache.get('final_zip')
+                        cached_stats = dl_cache.get('stats', stats)
+                        min_scene = dl_cache.get('min_scene', min(selected_scenes))
+                        max_scene = dl_cache.get('max_scene', max(selected_scenes))
                     else:
-                        key_suffix = "empty"
-
-                    # 데이터 생성 및 검증
-                    try:
-                        excel_bytes = generate_prompts_excel(prompts, include_source=True)
-                        korean_zip = generate_prompts_zip(prompts, "korean")
-                        final_zip = generate_prompts_zip(prompts, "final")
-
-                        # 디버깅: 데이터 크기 확인
-                        print(f"[프롬프트 다운로드] 엑셀: {len(excel_bytes)} bytes, 한글ZIP: {len(korean_zip)} bytes, 최종ZIP: {len(final_zip)} bytes", flush=True)
-
-                        if len(excel_bytes) < 100:
-                            print(f"[프롬프트 다운로드] ⚠️ 엑셀 파일이 너무 작음! prompts: {len(prompts)}개", flush=True)
-
-                    except Exception as e:
-                        st.error(f"다운로드 데이터 생성 실패: {e}")
-                        print(f"[프롬프트 다운로드] ❌ 오류: {e}", flush=True)
                         excel_bytes = None
                         korean_zip = None
                         final_zip = None
-
-                    btn_col1, btn_col2, btn_col3 = st.columns(3)
+                        cached_stats = stats
+                        min_scene = min(selected_scenes)
+                        max_scene = max(selected_scenes)
 
                     with btn_col1:
                         if excel_bytes and len(excel_bytes) > 100:
                             st.download_button(
-                                label=f"📊 엑셀 ({stats['total']}개)",
+                                label=f"📊 엑셀 ({cached_stats['total']}개)",
                                 data=excel_bytes,
-                                file_name=f"prompts_scene{min(selected_scenes)}-{max(selected_scenes)}.xlsx",
+                                file_name=f"prompts_scene{min_scene}-{max_scene}.xlsx",
                                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                key=f"dl_excel_{key_suffix}",
+                                key=f"dl_excel_{download_cache_key}",
                                 use_container_width=True
                             )
                         else:
-                            st.button("📊 엑셀 (데이터 없음)", disabled=True, use_container_width=True)
+                            st.button("📊 엑셀 (생성 필요)", disabled=True, use_container_width=True, key="dl_excel_disabled")
 
                     with btn_col2:
-                        if stats['with_korean'] > 0 and korean_zip and len(korean_zip) > 22:  # ZIP 헤더 최소 22 bytes
+                        if cached_stats.get('with_korean', 0) > 0 and korean_zip and len(korean_zip) > 22:
                             st.download_button(
-                                label=f"📁 한글 ZIP ({stats['with_korean']}개)",
+                                label=f"📁 한글 ZIP ({cached_stats['with_korean']}개)",
                                 data=korean_zip,
-                                file_name=f"korean_prompts_scene{min(selected_scenes)}-{max(selected_scenes)}.zip",
+                                file_name=f"korean_prompts_scene{min_scene}-{max_scene}.zip",
                                 mime="application/zip",
-                                key=f"dl_korean_{key_suffix}",
+                                key=f"dl_korean_{download_cache_key}",
                                 use_container_width=True
                             )
                         else:
-                            st.button("📁 한글 ZIP (0개)", disabled=True, use_container_width=True)
+                            st.button("📁 한글 ZIP (생성 필요)", disabled=True, use_container_width=True, key="dl_korean_disabled")
 
                     with btn_col3:
-                        if stats['with_final'] > 0 and final_zip and len(final_zip) > 22:
+                        if cached_stats.get('with_final', 0) > 0 and final_zip and len(final_zip) > 22:
                             st.download_button(
-                                label=f"📁 최종 ZIP ({stats['with_final']}개)",
+                                label=f"📁 최종 ZIP ({cached_stats['with_final']}개)",
                                 data=final_zip,
-                                file_name=f"final_prompts_scene{min(selected_scenes)}-{max(selected_scenes)}.zip",
+                                file_name=f"final_prompts_scene{min_scene}-{max_scene}.zip",
                                 mime="application/zip",
-                                key=f"dl_final_{key_suffix}",
+                                key=f"dl_final_{download_cache_key}",
                                 use_container_width=True
                             )
                         else:
-                            st.button("📁 최종 ZIP (0개)", disabled=True, use_container_width=True)
+                            st.button("📁 최종 ZIP (생성 필요)", disabled=True, use_container_width=True, key="dl_final_disabled")
 
                 else:
                     st.info("다운로드할 씬을 선택해주세요.")
@@ -3814,7 +3965,9 @@ def render_gallery_tab():
                             ratio_percent=ratio,
                             seed=seed if seed > 0 else None
                         )
-                        st.session_state['korean_selected_scenes'] = korean_selected_scenes
+                        # v1.2: 새 상태 관리 시스템에 저장
+                        set_auto_selected_scenes(korean_selected_scenes, 'random')
+                        st.session_state['korean_selected_scenes'] = update_legacy_state()
                         st.success(f"✅ {len(korean_selected_scenes)}개 씬 선택됨 ({ratio}%)")
 
                 elif random_type == "구간 텀":
@@ -3839,7 +3992,9 @@ def render_gallery_tab():
                             interval=interval,
                             randomize_offset=randomize
                         )
-                        st.session_state['korean_selected_scenes'] = korean_selected_scenes
+                        # v1.2: 새 상태 관리 시스템에 저장
+                        set_auto_selected_scenes(korean_selected_scenes, 'random')
+                        st.session_state['korean_selected_scenes'] = update_legacy_state()
                         st.success(f"✅ {len(korean_selected_scenes)}개 씬 선택됨 ({interval}씬당 1개)")
 
                 elif random_type == "혼합 모드":
@@ -3866,7 +4021,9 @@ def render_gallery_tab():
                             base_interval=base_interval,
                             variation=variation
                         )
-                        st.session_state['korean_selected_scenes'] = korean_selected_scenes
+                        # v1.2: 새 상태 관리 시스템에 저장
+                        set_auto_selected_scenes(korean_selected_scenes, 'random')
+                        st.session_state['korean_selected_scenes'] = update_legacy_state()
                         st.success(f"✅ {len(korean_selected_scenes)}개 씬 선택됨 (간격 {base_interval} ±{variation})")
 
             else:  # AI 추천
@@ -3874,35 +4031,295 @@ def render_gallery_tab():
 
                 ai_model = st.selectbox(
                     "AI 모델",
-                    options=["gemini-2.0-flash", "gemini-1.5-pro", "claude-3-5-sonnet-20241022"],
+                    options=["gemini-2.0-flash-exp", "gemini-2.0-flash", "gemini-1.5-pro", "claude-3-5-sonnet-20241022"],
                     key="korean_ai_model",
                     help="추천에 사용할 AI 모델"
                 )
 
-                target_ratio = st.slider(
-                    "목표 선택 비율 (%)",
-                    min_value=5,
-                    max_value=30,
-                    value=10,
-                    step=5,
-                    key="korean_ai_ratio",
-                    help="AI가 목표로 할 선택 비율"
+                # ⭐ v1.1: 분석 기준 선택 추가
+                st.markdown("###### 📊 분석 기준")
+
+                # 한글프롬프트 있는 씬 개수 계산
+                korean_prompt_count = _count_scenes_with_korean_prompt(scenes)
+
+                analysis_basis = st.radio(
+                    "프롬프트 기준",
+                    options=["original", "korean"],
+                    format_func=lambda x: {
+                        "original": f"🌐 원본프롬프트 (영어) - 전체 {total_scenes}개 씬",
+                        "korean": f"🇰🇷 한글프롬프트 - {korean_prompt_count}개 씬 (한글 있는 씬만)"
+                    }[x],
+                    key="korean_analysis_basis",
+                    help="원본프롬프트: 모든 씬 대상 / 한글프롬프트: 한글 있는 씬만 대상",
+                    horizontal=True
                 )
 
-                st.info("💡 AI 추천은 나레이션을 분석하여 한글 텍스트가 효과적인 씬을 선택합니다.")
+                # 분석 기준별 안내 메시지
+                if analysis_basis == "original":
+                    st.info(f"💡 **원본프롬프트 기준**: 전체 {total_scenes}개 씬을 영어 프롬프트로 분석합니다.")
+                    analysis_target_count = total_scenes
+                else:
+                    if korean_prompt_count == 0:
+                        st.warning("⚠️ 한글프롬프트가 있는 씬이 없습니다. 원본프롬프트 기준을 선택하세요.")
+                    else:
+                        st.info(f"💡 **한글프롬프트 기준**: {korean_prompt_count}개 씬만 한글 프롬프트로 분석합니다.")
+                    analysis_target_count = korean_prompt_count
 
-                if st.button("🤖 AI 추천 실행", key="run_ai_recommend", use_container_width=True):
+                # ⭐ v1.6: 선택 모드 추가
+                st.markdown("###### 🎯 선택 모드")
+
+                selection_mode = st.radio(
+                    "선택 모드",
+                    options=["비율 제한", "전체 선택"],
+                    index=0,
+                    horizontal=True,
+                    key="korean_selection_mode",
+                    help="'비율 제한': 목표 비율만큼만 선택 / '전체 선택': 프롬프트 조건에 맞는 모든 씬 선택"
+                )
+
+                # 모드별 설명 및 슬라이더 조건부 표시
+                if selection_mode == "비율 제한":
+                    st.info("📊 **비율 제한 모드**: AI가 목표 비율에 맞춰 가장 적합한 씬들을 선택합니다.")
+
+                    target_ratio = st.slider(
+                        "목표 선택 비율 (%)",
+                        min_value=5,
+                        max_value=30,
+                        value=10,
+                        step=5,
+                        key="korean_ai_ratio",
+                        help="AI가 목표로 할 선택 비율"
+                    )
+
+                    # 예상 선택 개수 표시
+                    expected_count = max(1, int(analysis_target_count * target_ratio / 100))
+                    st.caption(f"📌 예상 선택: {expected_count}개 / {analysis_target_count}개")
+                else:
+                    # 전체 선택 모드
+                    st.info("🎯 **전체 선택 모드**: AI가 프롬프트 조건에 해당하는 **모든 씬**을 선택합니다. 비율 제한 없음.")
+                    target_ratio = None  # 비율 없음
+                    expected_count = "?"  # 알 수 없음
+                    st.caption(f"📌 선택 대상: {analysis_target_count}개 씬 (조건에 맞는 모든 씬 선택)")
+
+                # ============================================================
+                # ⭐ v1.5: AI 프롬프트 다중 관리 섹션
+                # ============================================================
+                with st.expander("🤖 AI 프롬프트 설정", expanded=False):
+                    st.caption("AI 추천에 사용되는 프롬프트를 선택하고 관리할 수 있습니다.")
+
+                    if PROMPT_MANAGER_AVAILABLE:
+                        # 프롬프트 매니저 초기화
+                        pm = get_prompt_manager()
+                        all_prompts = pm.get_all_prompts()
+                        selected_id = pm.get_selected_prompt_id()
+                        prompt_list = pm.get_prompt_list()
+
+                        # ─────────────────────────────────────────────────────────
+                        # 섹션 1: 프롬프트 선택
+                        # ─────────────────────────────────────────────────────────
+                        st.markdown("##### 📚 저장된 프롬프트")
+
+                        # 프롬프트 옵션 생성
+                        prompt_options = [p["id"] for p in prompt_list]
+                        prompt_display = {p["id"]: f"{'🔒 ' if p.get('is_builtin') else '✏️ '}{p['name']}" for p in prompt_list}
+
+                        # 현재 선택 인덱스
+                        current_idx = prompt_options.index(selected_id) if selected_id in prompt_options else 0
+
+                        # 프롬프트 선택 라디오
+                        new_selected = st.radio(
+                            "프롬프트 선택",
+                            options=prompt_options,
+                            format_func=lambda x: prompt_display.get(x, x),
+                            index=current_idx,
+                            key="korean_prompt_selector",
+                            label_visibility="collapsed"
+                        )
+
+                        # 선택 변경 시 저장
+                        if new_selected != selected_id:
+                            pm.select_prompt(new_selected)
+                            st.success(f"✅ '{all_prompts[new_selected]['name']}' 프롬프트 선택됨")
+                            st.rerun()
+
+                        # 선택된 프롬프트 정보 표시
+                        selected_prompt = pm.get_prompt(new_selected)
+                        if selected_prompt:
+                            st.caption(f"📌 {selected_prompt.get('description', '')}")
+
+                        st.markdown("---")
+
+                        # ─────────────────────────────────────────────────────────
+                        # 섹션 2: 프롬프트 관리 버튼
+                        # ─────────────────────────────────────────────────────────
+                        btn_col1, btn_col2, btn_col3 = st.columns(3)
+
+                        with btn_col1:
+                            if st.button("➕ 새로 만들기", key="add_prompt_btn", use_container_width=True):
+                                st.session_state["show_add_prompt_modal"] = True
+
+                        with btn_col2:
+                            if st.button("📋 복제하기", key="duplicate_prompt_btn", use_container_width=True):
+                                new_id = pm.duplicate_prompt(new_selected)
+                                if new_id:
+                                    pm.select_prompt(new_id)
+                                    st.success("✅ 프롬프트 복제됨")
+                                    st.rerun()
+
+                        with btn_col3:
+                            can_delete = selected_prompt and not selected_prompt.get("is_builtin", False)
+                            if st.button("🗑️ 삭제", key="delete_prompt_btn", use_container_width=True, disabled=not can_delete):
+                                if pm.delete_prompt(new_selected):
+                                    st.success("✅ 프롬프트 삭제됨")
+                                    st.rerun()
+                                else:
+                                    st.error("내장 프롬프트는 삭제할 수 없습니다.")
+
+                        # ─────────────────────────────────────────────────────────
+                        # 모달: 새 프롬프트 추가
+                        # ─────────────────────────────────────────────────────────
+                        if st.session_state.get("show_add_prompt_modal"):
+                            st.markdown("---")
+                            st.markdown("##### ➕ 새 프롬프트 만들기")
+
+                            new_name = st.text_input("프롬프트 이름", placeholder="예: 내 커스텀 프롬프트", key="new_prompt_name")
+                            new_desc = st.text_input("설명", placeholder="예: 특정 용도에 맞는 프롬프트", key="new_prompt_desc")
+                            new_content = st.text_area("프롬프트 내용", height=150, key="new_prompt_content",
+                                                       placeholder="AI에게 전달할 프롬프트를 입력하세요...")
+
+                            modal_col1, modal_col2 = st.columns(2)
+                            with modal_col1:
+                                if st.button("✅ 추가", type="primary", use_container_width=True, key="confirm_add_prompt"):
+                                    if new_name and new_content:
+                                        new_id = pm.add_prompt(new_name, new_desc, new_content)
+                                        pm.select_prompt(new_id)
+                                        st.session_state["show_add_prompt_modal"] = False
+                                        st.success(f"✅ '{new_name}' 프롬프트 추가됨")
+                                        st.rerun()
+                                    else:
+                                        st.error("이름과 내용을 입력해주세요.")
+                            with modal_col2:
+                                if st.button("❌ 취소", use_container_width=True, key="cancel_add_prompt"):
+                                    st.session_state["show_add_prompt_modal"] = False
+                                    st.rerun()
+
+                        st.markdown("---")
+
+                        # ─────────────────────────────────────────────────────────
+                        # 섹션 3: 프롬프트 편집
+                        # ─────────────────────────────────────────────────────────
+                        st.markdown("##### 📝 프롬프트 내용")
+
+                        if selected_prompt:
+                            # 내장 프롬프트가 아니면 이름/설명 편집 가능
+                            if not selected_prompt.get("is_builtin"):
+                                edit_col1, edit_col2 = st.columns(2)
+                                with edit_col1:
+                                    edit_name = st.text_input("이름", value=selected_prompt.get("name", ""), key="edit_prompt_name")
+                                with edit_col2:
+                                    edit_desc = st.text_input("설명", value=selected_prompt.get("description", ""), key="edit_prompt_desc")
+                            else:
+                                edit_name = selected_prompt.get("name", "")
+                                edit_desc = selected_prompt.get("description", "")
+                                st.info(f"📌 **{edit_name}** (내장 프롬프트)")
+
+                            # 프롬프트 내용 편집
+                            edit_content = st.text_area(
+                                "프롬프트 내용",
+                                value=selected_prompt.get("content", ""),
+                                height=300,
+                                key="edit_prompt_content",
+                                label_visibility="collapsed"
+                            )
+
+                            # 변경 감지
+                            content_changed = edit_content != selected_prompt.get("content", "")
+                            name_changed = (not selected_prompt.get("is_builtin") and
+                                          (edit_name != selected_prompt.get("name", "") or
+                                           edit_desc != selected_prompt.get("description", "")))
+
+                            if content_changed or name_changed:
+                                st.warning("⚠️ 변경사항이 있습니다.")
+
+                            # 저장 버튼
+                            save_col1, save_col2, save_col3 = st.columns(3)
+
+                            with save_col1:
+                                if st.button("💾 변경사항 저장", type="primary", use_container_width=True,
+                                           disabled=not (content_changed or name_changed), key="save_prompt_changes"):
+                                    if selected_prompt.get("is_builtin"):
+                                        pm.update_prompt(new_selected, content=edit_content)
+                                    else:
+                                        pm.update_prompt(new_selected, name=edit_name, description=edit_desc, content=edit_content)
+                                    st.success("✅ 저장됨")
+                                    st.rerun()
+
+                            with save_col2:
+                                if selected_prompt.get("is_builtin"):
+                                    if st.button("🔄 원본 복원", use_container_width=True, key="reset_builtin_prompt"):
+                                        pm.reset_to_default(new_selected)
+                                        st.success("✅ 원본으로 복원됨")
+                                        st.rerun()
+
+                            with save_col3:
+                                if st.button("📋 복사", use_container_width=True, key="copy_prompt_content"):
+                                    st.code(selected_prompt.get("content", ""), language=None)
+
+                        # 미리보기
+                        with st.expander("👁️ 실제 전달될 프롬프트 미리보기", expanded=False):
+                            preview = pm.get_selected_prompt_content()[:500]
+                            st.markdown("**시스템 프롬프트 (처음 500자):**")
+                            st.code(preview + "...", language=None)
+
+                            st.markdown("**+ 자동 추가되는 씬 정보:**")
+                            # ⭐ v1.6: 선택 모드에 따른 미리보기
+                            if selection_mode == "전체 선택":
+                                st.code(f"""
+## 입력 데이터
+전체 씬 수: {analysis_target_count}개
+
+## 선택 방식
+⚠️ 비율 제한 없음: 기준에 해당하는 모든 씬을 선택
+
+### 씬 목록
+씬 1: [프롬프트 내용...]
+씬 2: [프롬프트 내용...]
+...
+                                """, language=None)
+                            else:
+                                st.code(f"""
+## 입력 데이터
+전체 씬 수: {analysis_target_count}개
+목표 선택 수: {expected_count}개 ({target_ratio}%)
+
+### 씬 목록
+씬 1: [프롬프트 내용...]
+씬 2: [프롬프트 내용...]
+...
+                                """, language=None)
+                    else:
+                        st.warning("⚠️ 프롬프트 관리 기능을 사용할 수 없습니다.")
+
+                # AI 추천 실행 버튼
+                if st.button("🤖 AI 추천 실행", key="run_ai_recommend", use_container_width=True, disabled=(analysis_basis == "korean" and korean_prompt_count == 0)):
                     import asyncio
 
                     with st.spinner("AI가 씬을 분석 중..."):
                         try:
+                            # ⭐ v1.6: 선택 모드 변환
+                            backend_selection_mode = "select_all" if selection_mode == "전체 선택" else "ratio_limit"
+                            effective_ratio = target_ratio if target_ratio is not None else 10.0  # 전체 선택 시 기본값 (실제 사용 안 함)
+
                             loop = asyncio.new_event_loop()
                             asyncio.set_event_loop(loop)
                             result = loop.run_until_complete(
                                 recommend_korean_scenes_with_ai(
                                     scenes=scenes,
                                     model_name=ai_model,
-                                    target_ratio=target_ratio
+                                    target_ratio=effective_ratio,
+                                    analysis_basis=analysis_basis,
+                                    selection_mode=backend_selection_mode  # ⭐ v1.6
+                                    # custom_prompt는 프롬프트 매니저에서 자동으로 가져옴
                                 )
                             )
                             loop.close()
@@ -3911,42 +4328,86 @@ def render_gallery_tab():
                                 st.error(f"AI 추천 오류: {result['error']}")
                             else:
                                 korean_selected_scenes = extract_selected_scene_numbers(result)
-                                st.session_state['korean_selected_scenes'] = korean_selected_scenes
+                                # v1.2: 새 상태 관리 시스템에 저장
+                                set_auto_selected_scenes(korean_selected_scenes, 'ai')
+                                st.session_state['korean_selected_scenes'] = update_legacy_state()
                                 st.session_state['korean_recommendation_data'] = result
-                                st.success(f"✅ {len(korean_selected_scenes)}개 씬 AI 추천됨")
+                                prompt_name = result.get("prompt_name", "기본")
+
+                                # ⭐ v1.6: 모드별 성공 메시지
+                                if backend_selection_mode == "select_all":
+                                    st.success(f"✅ 조건에 맞는 {len(korean_selected_scenes)}개 씬 모두 선택됨 (프롬프트: {prompt_name})")
+                                else:
+                                    st.success(f"✅ {len(korean_selected_scenes)}개 씬 AI 추천됨 (목표 {target_ratio}%, 프롬프트: {prompt_name})")
+
                                 if result.get("selection_summary"):
                                     st.info(f"📝 {result['selection_summary']}")
                         except Exception as e:
                             st.error(f"AI 추천 실패: {e}")
 
-            # 세션에서 선택된 씬 복원
+            # v1.2: 세션에서 선택된 씬 복원 + 새 상태 관리 동기화
+            init_korean_scene_state()
+            sync_with_legacy_state()
+
             if 'korean_selected_scenes' in st.session_state:
                 korean_selected_scenes = st.session_state['korean_selected_scenes']
             if 'korean_recommendation_data' in st.session_state:
                 korean_recommendation_data = st.session_state['korean_recommendation_data']
 
+            # v1.2: 새 상태 관리 시스템에서 전체 선택 (자동 + 수동) 가져오기
+            all_selected_korean = get_all_selected_korean_scenes()
+            korean_stats = get_korean_scene_stats()
+
             # 결과 표시 및 다운로드
-            if korean_selected_scenes:
+            if all_selected_korean:
                 st.markdown("---")
                 st.markdown("##### 📊 선택 결과")
 
-                stats = get_korean_selection_stats(korean_selected_scenes, total_scenes)
-
-                col1, col2, col3 = st.columns(3)
+                # v1.2: 새로운 통계 표시 (자동 + 수동 구분)
+                col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    st.metric("선택된 씬", f"{stats['selected_count']}개")
+                    st.metric(
+                        "선택된 씬",
+                        f"{korean_stats['total_selected']}개",
+                        help=f"자동: {korean_stats['auto_count']}개 + 수동: {korean_stats['manual_count']}개"
+                    )
                 with col2:
-                    st.metric("전체 씬", f"{stats['total_count']}개")
+                    st.metric("전체 씬", f"{total_scenes}개")
                 with col3:
-                    st.metric("선택 비율", f"{stats['ratio_percent']}%")
+                    ratio = (korean_stats['total_selected'] / total_scenes * 100) if total_scenes > 0 else 0
+                    st.metric("선택 비율", f"{ratio:.1f}%")
+                with col4:
+                    # 자동/수동 구분 표시
+                    st.markdown(f"""
+                        <div style="font-size: 12px; color: #666; padding: 8px 0;">
+                            🎲 자동: {korean_stats['auto_count']}개<br>
+                            ✋ 수동: {korean_stats['manual_count']}개
+                        </div>
+                    """, unsafe_allow_html=True)
 
-                # 선택된 씬 번호 미리보기
+                # v1.2: 기존 stats 호환을 위한 보완
+                stats = {
+                    'selected_count': korean_stats['total_selected'],
+                    'total_count': total_scenes,
+                    'ratio_percent': ratio,
+                    'scene_numbers': sorted(list(all_selected_korean))
+                }
+                # 기존 korean_selected_scenes를 all_selected_korean으로 업데이트
+                korean_selected_scenes = all_selected_korean
+
+                # v1.2: 선택된 씬 번호 미리보기 (자동/수동 구분)
                 with st.expander("📋 선택된 씬 번호 보기"):
-                    scene_nums = stats['scene_numbers']
-                    # 10개씩 줄바꿈
-                    chunks = [scene_nums[i:i+10] for i in range(0, len(scene_nums), 10)]
-                    for chunk in chunks:
-                        st.text(", ".join(str(n) for n in chunk))
+                    auto_scenes = get_auto_selected_scenes()
+                    manual_scenes = get_manual_added_scenes()
+
+                    if auto_scenes:
+                        method_label = "AI 추천" if korean_stats['method'] == 'ai' else "랜덤 선택"
+                        st.markdown(f"**🎲 {method_label}:** {sorted(auto_scenes)}")
+
+                    if manual_scenes:
+                        st.markdown(f"**✋ 수동 추가:** {sorted(manual_scenes)}")
+
+                    st.markdown(f"**📌 전체 선택:** {stats['scene_numbers']}")
 
                 # 다운로드 버튼
                 st.markdown("---")
@@ -3982,44 +4443,167 @@ def render_gallery_tab():
                         disabled=not korean_recommendation_data
                     )
 
-                    # 프롬프트 수집
-                    if korean_recommendation_data and include_recommend_info:
-                        prompts = collect_prompts_with_korean_recommendation(
-                            selected_scene_nums=target_scenes,
-                            scenes=scenes,
-                            latest_images=latest_images,
-                            korean_recommended=korean_recommendation_data,
-                            use_latest_metadata=True
-                        )
-                    else:
-                        prompts = collect_prompts_for_selected_scenes(
-                            selected_scene_nums=target_scenes,
-                            scenes=scenes,
-                            latest_images=latest_images,
-                            use_latest_metadata=True
-                        )
+                    # ⭐ v3.25.1: 엑셀 생성/다운로드 분리 - 다운로드 실패 버그 수정
+                    # 원인: 다운로드 클릭 시 Streamlit rerun으로 엑셀이 재생성되어 해시 변경
+                    # 해결: 명시적 "생성" 버튼 사용, 다운로드 시 재생성 방지
 
-                    # 엑셀 생성
-                    excel_bytes = generate_prompts_excel_with_highlight(
-                        prompts=prompts,
-                        korean_recommended_scenes=korean_selected_scenes,
-                        highlight_color="FFFF99",  # 연한 노란색
-                        include_recommendation_info=include_recommend_info
-                    )
+                    excel_cache_key = f"{len(target_scenes)}_{len(korean_selected_scenes)}_{include_recommend_info}"
+                    cached_excel = st.session_state.get('_korean_excel_bytes')
+                    cached_meta = st.session_state.get('_korean_excel_meta')
+                    cached_key = st.session_state.get('_korean_excel_cache_key')
 
-                    st.download_button(
-                        label=f"📊 한글 추천 씬 엑셀 다운로드 ({len(target_scenes)}개 씬, {len(korean_selected_scenes)}개 음영)",
-                        data=excel_bytes,
-                        file_name=f"korean_scenes_{len(korean_selected_scenes)}selected.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        key="korean_excel_download",
-                        use_container_width=True
-                    )
+                    # 옵션 변경 감지 (캐시 무효화)
+                    options_changed = cached_key != excel_cache_key
+
+                    if options_changed and cached_excel:
+                        st.info("ℹ️ 옵션이 변경되었습니다. '엑셀 생성' 버튼을 눌러 새로 생성하세요.")
+
+                    # 엑셀 생성 버튼 (다운로드와 분리)
+                    gen_col1, gen_col2 = st.columns([1, 1])
+
+                    with gen_col1:
+                        if st.button(
+                            "📝 엑셀 생성" if not cached_excel or options_changed else "🔄 엑셀 재생성",
+                            key="korean_excel_generate_btn",
+                            type="secondary" if cached_excel and not options_changed else "primary",
+                            use_container_width=True,
+                            help="엑셀 파일을 생성합니다. 생성 후 다운로드 버튼이 활성화됩니다."
+                        ):
+                            # 프롬프트 수집
+                            with st.spinner("엑셀 생성 중..."):
+                                if korean_recommendation_data and include_recommend_info:
+                                    prompts = collect_prompts_with_korean_recommendation(
+                                        selected_scene_nums=target_scenes,
+                                        scenes=scenes,
+                                        latest_images=latest_images,
+                                        korean_recommended=korean_recommendation_data,
+                                        use_latest_metadata=True
+                                    )
+                                else:
+                                    prompts = collect_prompts_for_selected_scenes(
+                                        selected_scene_nums=target_scenes,
+                                        scenes=scenes,
+                                        latest_images=latest_images,
+                                        use_latest_metadata=True
+                                    )
+
+                                # 프롬프트 데이터 검증
+                                if not prompts:
+                                    st.session_state['_korean_excel_bytes'] = None
+                                    st.session_state['_korean_excel_cache_key'] = excel_cache_key
+                                    st.session_state['_korean_excel_meta'] = None
+                                    st.error("❌ 프롬프트 데이터가 없습니다. 이미지 생성을 먼저 진행해주세요.")
+                                else:
+                                    # 엑셀 생성 및 캐싱
+                                    excel_bytes = generate_prompts_excel_with_highlight(
+                                        prompts=prompts,
+                                        korean_recommended_scenes=korean_selected_scenes,
+                                        highlight_color="FFFF99",  # 연한 노란색
+                                        include_recommendation_info=include_recommend_info
+                                    )
+
+                                    if excel_bytes and len(excel_bytes) > 0:
+                                        st.session_state['_korean_excel_bytes'] = excel_bytes
+                                        st.session_state['_korean_excel_cache_key'] = excel_cache_key
+                                        st.session_state['_korean_excel_meta'] = {
+                                            'prompts_count': len(prompts),
+                                            'target_scenes': len(target_scenes),
+                                            'selected_count': len(korean_selected_scenes)
+                                        }
+                                        print(f"[한글씬선택] 엑셀 생성 및 캐싱 완료: {len(excel_bytes)} bytes")
+                                        st.success(f"✅ 엑셀 생성 완료! ({len(excel_bytes):,} bytes)")
+                                        st.rerun()  # 다운로드 버튼 활성화를 위해 rerun
+                                    else:
+                                        st.session_state['_korean_excel_bytes'] = None
+                                        st.session_state['_korean_excel_cache_key'] = excel_cache_key
+                                        st.session_state['_korean_excel_meta'] = None
+                                        st.error("❌ 엑셀 생성 실패 (빈 데이터)")
+
+                    with gen_col2:
+                        # 다운로드 버튼 - 캐시된 데이터만 사용 (재생성 없음!)
+                        # v1.1: 동적 키 사용으로 rerun 시 temp file 무효화 방지
+                        if cached_excel and cached_meta and not options_changed:
+                            # 동적 키 생성 (캐시 키 기반)
+                            dl_key = f"korean_excel_dl_{excel_cache_key}"
+                            st.download_button(
+                                label=f"📥 다운로드 ({cached_meta['selected_count']}개 음영)",
+                                data=cached_excel,
+                                file_name=f"korean_scenes_{cached_meta['selected_count']}selected.xlsx",
+                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                key=dl_key,
+                                use_container_width=True,
+                                type="primary"
+                            )
+                        else:
+                            st.button(
+                                "📥 다운로드 (생성 필요)",
+                                disabled=True,
+                                use_container_width=True,
+                                key="korean_excel_download_disabled"
+                            )
+
+                    # 현재 상태 표시
+                    if cached_excel and cached_meta and not options_changed:
+                        st.success(f"✅ 엑셀 준비됨: {cached_meta['target_scenes']}개 씬, {cached_meta['selected_count']}개 음영 ({len(cached_excel):,} bytes)")
+
+                        # 디버그 정보 (expander로 숨김)
+                        with st.expander("🔍 디버그 정보", expanded=False):
+                            st.caption(f"- 프롬프트 수: {cached_meta['prompts_count']}개")
+                            st.caption(f"- 엑셀 크기: {len(cached_excel):,} bytes")
+                            st.caption(f"- 대상 씬: {cached_meta['target_scenes']}개")
+                            st.caption(f"- 음영 표시 씬: {sorted(korean_selected_scenes)[:10]}{'...' if len(korean_selected_scenes) > 10 else ''}")
+                            st.caption(f"- 캐시 키: {cached_key}")
+                    elif not cached_excel:
+                        st.info("ℹ️ '엑셀 생성' 버튼을 눌러 다운로드 파일을 준비하세요.")
 
                 except Exception as e:
                     st.error(f"엑셀 생성 오류: {e}")
                     import traceback
-                    print(f"[한글씬선택] 오류 상세: {traceback.format_exc()}")
+                    error_detail = traceback.format_exc()
+                    print(f"[한글씬선택] 오류 상세: {error_detail}")
+                    with st.expander("오류 상세", expanded=False):
+                        st.code(error_detail)
+
+                # ============================================================
+                # 📋 스토리보드 연동 (v1.0)
+                # ============================================================
+                st.markdown("---")
+                st.markdown("##### 📋 스토리보드 연동")
+
+                storyboard_col1, storyboard_col2 = st.columns(2)
+
+                with storyboard_col1:
+                    if st.button(
+                        "📋 스토리보드에 적용",
+                        key="apply_korean_text_to_storyboard",
+                        type="primary",
+                        use_container_width=True,
+                        help="스토리보드 페이지에서 한글 텍스트 씬 필터링 가능"
+                    ):
+                        # 세션에 저장 (스토리보드에서 사용)
+                        st.session_state['korean_text_scenes_applied'] = True
+                        st.session_state['korean_text_scene_ids'] = sorted(list(korean_selected_scenes))
+
+                        # 적용 시간 기록 (datetime은 파일 상단에서 import됨)
+                        st.session_state['korean_text_applied_at'] = datetime.now().isoformat()
+
+                        st.success(f"✅ {len(korean_selected_scenes)}개 한글 텍스트 씬이 스토리보드에 적용되었습니다!")
+                        st.info("💡 스토리보드 페이지에서 '🔤 한글 텍스트 씬 관리' 섹션을 확인하세요.")
+
+                        print(f"[한글 텍스트 씬] 스토리보드 적용: {len(korean_selected_scenes)}개", flush=True)
+
+                with storyboard_col2:
+                    # 현재 적용 상태 표시
+                    if st.session_state.get('korean_text_scenes_applied'):
+                        applied_count = len(st.session_state.get('korean_text_scene_ids', []))
+                        applied_at = st.session_state.get('korean_text_applied_at', '')
+                        st.success(f"📋 적용됨 ({applied_count}개)")
+                        if applied_at:
+                            st.caption(f"적용 시간: {applied_at[:16].replace('T', ' ')}")
+                    else:
+                        st.caption("📋 미적용 상태")
+
+                st.markdown("---")
 
                 # 선택 초기화 버튼
                 if st.button("🔄 선택 초기화", key="korean_reset", use_container_width=True):
@@ -4172,14 +4756,19 @@ def render_gallery_tab():
 
     st.markdown(f"**총 {len(images)}개 이미지**")
 
-    # 옵션 체크박스
-    opt_col1, opt_col2, opt_col3 = st.columns(3)
+    # 옵션 체크박스 + 새로고침 버튼 (v2.2)
+    opt_col1, opt_col2, opt_col3, opt_col4 = st.columns([1, 1, 1, 0.5])
     with opt_col1:
         multi_select = st.checkbox("다중 선택 모드", key="gallery_multi")
     with opt_col2:
         show_latest_only = st.checkbox("🕐 최신만 보기", key="gallery_show_latest", help="각 씬별 가장 최신 이미지만 표시")
     with opt_col3:
         st.caption(f"최신 이미지: {len(latest_images)}개")
+    with opt_col4:
+        # 🆕 v2.2: 새로고침 버튼
+        if st.button("🔄", key="gallery_refresh", help="이미지 개수 새로고침"):
+            clear_gallery_cache()
+            st.rerun()
 
     # ============================================================
     # 🆕 최신만 다운로드 및 정리 섹션
@@ -4189,21 +4778,30 @@ def render_gallery_tab():
 
     latest_dl_col1, latest_dl_col2, latest_dl_col3 = st.columns(3)
 
+    # v1.1: ZIP 캐싱 (MediaFileHandler 에러 방지)
+    latest_zip_key = f"gallery_latest_zip_{len(latest_images) if latest_images else 0}"
+    all_zip_key = f"gallery_all_zip_{len(all_scanned) if all_scanned else 0}"
+
     with latest_dl_col1:
         # 최신만 다운로드
         if latest_images:
-            zip_buffer = gallery_manager.create_zip_buffer(latest_images)
+            # 캐시된 ZIP 사용 또는 생성 (v1.2: BytesIO → bytes 변환으로 다운로드 안정성 개선)
+            if latest_zip_key not in st.session_state:
+                zip_buffer = gallery_manager.create_zip_buffer(latest_images)
+                st.session_state[latest_zip_key] = zip_buffer.getvalue()  # bytes로 변환
+                st.session_state[f"{latest_zip_key}_name"] = gallery_manager.get_zip_filename("latest_images")
+
             st.download_button(
                 label=f"⏰ 최신만 다운로드 ({len(latest_images)}개)",
-                data=zip_buffer,
-                file_name=gallery_manager.get_zip_filename("latest_images"),
+                data=st.session_state[latest_zip_key],
+                file_name=st.session_state.get(f"{latest_zip_key}_name", "latest_images.zip"),
                 mime="application/zip",
                 type="primary",
-                key="download_latest_only_zip",
+                key=f"dl_latest_{len(latest_images)}",
                 use_container_width=True
             )
         else:
-            st.button("⏰ 최신만 다운로드 (0개)", disabled=True, use_container_width=True)
+            st.button("⏰ 최신만 다운로드 (0개)", disabled=True, use_container_width=True, key="dl_latest_disabled")
 
     with latest_dl_col2:
         # 프로젝트 폴더에 최신만 저장
@@ -4218,13 +4816,18 @@ def render_gallery_tab():
     with latest_dl_col3:
         # 전체 다운로드 (중복 포함)
         if all_scanned:
-            zip_buffer_all = gallery_manager.create_zip_with_timestamp(all_scanned)
+            # 캐시된 ZIP 사용 또는 생성 (v1.2: BytesIO → bytes 변환)
+            if all_zip_key not in st.session_state:
+                zip_buffer = gallery_manager.create_zip_with_timestamp(all_scanned)
+                st.session_state[all_zip_key] = zip_buffer.getvalue()  # bytes로 변환
+                st.session_state[f"{all_zip_key}_name"] = gallery_manager.get_zip_filename("all_images")
+
             st.download_button(
                 label=f"📦 전체 다운로드 ({len(all_scanned)}개)",
-                data=zip_buffer_all,
-                file_name=gallery_manager.get_zip_filename("all_images"),
+                data=st.session_state[all_zip_key],
+                file_name=st.session_state.get(f"{all_zip_key}_name", "all_images.zip"),
                 mime="application/zip",
-                key="download_all_with_timestamp_zip",
+                key=f"dl_all_{len(all_scanned)}",
                 use_container_width=True
             )
 
@@ -4285,6 +4888,7 @@ def render_gallery_tab():
                     if result["errors"]:
                         st.error(f"⚠️ {len(result['errors'])}개 파일 삭제 실패")
                     st.success(f"✅ {result['deleted_count']}개 파일 삭제 완료! ({result['deleted_size_mb']:.1f}MB 절약)")
+                    clear_gallery_cache()  # ⭐ v2.2: 캐시 무효화
                     st.rerun()
             else:
                 if st.button(
@@ -4301,6 +4905,7 @@ def render_gallery_tab():
                         st.error(f"⚠️ {len(result['errors'])}개 파일 이동 실패")
                     st.success(f"✅ {result['moved_count']}개 파일 아카이브로 이동! ({result['moved_size_mb']:.1f}MB)")
                     st.caption(f"📁 아카이브: {result['archive_folder']}")
+                    clear_gallery_cache()  # ⭐ v2.2: 캐시 무효화
                     st.rerun()
 
     st.markdown("---")
@@ -4329,6 +4934,7 @@ def render_gallery_tab():
                     delete_image(path)
                 st.session_state["selected_gallery_images"] = []
                 st.success(f"{len(selected_images)}개 이미지 삭제됨")
+                clear_gallery_cache()  # ⭐ v2.2: 캐시 무효화
                 st.rerun()
 
         # 📥 일괄 다운로드 섹션
@@ -4336,13 +4942,13 @@ def render_gallery_tab():
         dl_col1, dl_col2, dl_col3 = st.columns(3)
 
         with dl_col1:
-            # 선택된 이미지 ZIP 다운로드
+            # 선택된 이미지 ZIP 다운로드 (v1.2: BytesIO → bytes 변환)
             if selected_images and len(selected_images) > 0:
                 from utils.download_manager import create_images_zip
                 zip_buffer, zip_filename = create_images_zip(selected_images)
                 st.download_button(
                     label=f"📦 선택 다운로드 ({len(selected_images)}개)",
-                    data=zip_buffer,
+                    data=zip_buffer.getvalue(),  # bytes로 변환
                     file_name=zip_filename,
                     mime="application/zip",
                     key="download_selected_zip",
@@ -4352,14 +4958,14 @@ def render_gallery_tab():
                 st.button("📦 선택 다운로드 (0개)", disabled=True, use_container_width=True)
 
         with dl_col2:
-            # 전체 이미지 ZIP 다운로드
+            # 전체 이미지 ZIP 다운로드 (v1.2: BytesIO → bytes 변환)
             all_image_paths = [img["path"] for img in images if os.path.exists(img["path"])]
             if all_image_paths:
                 from utils.download_manager import create_images_zip
                 zip_buffer_all, zip_filename_all = create_images_zip(all_image_paths, f"all_images_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip")
                 st.download_button(
                     label=f"📦 전체 다운로드 ({len(all_image_paths)}개)",
-                    data=zip_buffer_all,
+                    data=zip_buffer_all.getvalue(),  # bytes로 변환
                     file_name=zip_filename_all,
                     mime="application/zip",
                     key="download_all_zip",
@@ -4398,11 +5004,12 @@ def render_gallery_tab():
         with dl_col1:
             all_image_paths = [img["path"] for img in images if os.path.exists(img["path"])]
             if all_image_paths:
+                # v1.2: BytesIO → bytes 변환으로 다운로드 안정성 개선
                 from utils.download_manager import create_images_zip
                 zip_buffer_all, zip_filename_all = create_images_zip(all_image_paths, f"all_images_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip")
                 st.download_button(
                     label=f"📦 전체 ZIP 다운로드 ({len(all_image_paths)}개)",
-                    data=zip_buffer_all,
+                    data=zip_buffer_all.getvalue(),  # bytes로 변환
                     file_name=zip_filename_all,
                     mime="application/zip",
                     key="download_all_zip_simple",
@@ -4531,15 +5138,54 @@ def render_gallery_tab():
             else:
                 is_selected = False
 
+            # v1.2: 한글 씬 상태 확인
+            scene_id_for_korean = img.get("scene_id")
+            try:
+                scene_id_int = int(scene_id_for_korean) if scene_id_for_korean else 0
+            except (ValueError, TypeError):
+                scene_id_int = 0
+
+            is_korean_selected = is_korean_scene_selected(scene_id_int) if scene_id_int > 0 else False
+            korean_source = get_selection_source(scene_id_int) if scene_id_int > 0 else None
+
             # 이미지 (선택 시 테두리 표시, 클릭 시 확대)
             if os.path.exists(img["path"]):
-                if is_selected:
+                # v1.2: 한글 씬 선택 시 초록색 테두리
+                if is_korean_selected:
+                    border_color = "#10B981"
+                    bg_color = "rgba(16, 185, 129, 0.1)"
+                elif is_selected:
+                    border_color = "#667eea"
+                    bg_color = "rgba(102,126,234,0.1)"
+                else:
+                    border_color = None
+                    bg_color = None
+
+                if border_color:
                     st.markdown(
-                        '<div style="border: 3px solid #667eea; border-radius: 8px; padding: 2px; background: rgba(102,126,234,0.1);">',
+                        f'<div style="border: 3px solid {border_color}; border-radius: 8px; padding: 2px; background: {bg_color};">',
                         unsafe_allow_html=True
                     )
+
+                # v1.2: 한글 씬 배지 표시
+                if is_korean_selected:
+                    badge_color = "#10B981" if korean_source == 'auto' else "#3B82F6"
+                    badge_text = "🎲" if korean_source == 'auto' else "✋"
+                    st.markdown(f"""
+                        <div style="
+                            background: {badge_color};
+                            color: white;
+                            padding: 2px 8px;
+                            border-radius: 4px;
+                            font-size: 11px;
+                            display: inline-block;
+                            margin-bottom: 4px;
+                        ">{badge_text} 한글</div>
+                    """, unsafe_allow_html=True)
+
                 render_lightbox_image(img["path"], key=f"gallery_{img_key}")
-                if is_selected:
+
+                if border_color:
                     st.markdown('</div>', unsafe_allow_html=True)
 
             # 정보 (다중 선택 모드가 아닐 때만 표시)
@@ -4549,7 +5195,8 @@ def render_gallery_tab():
 
             # 버튼들 (다중 선택 모드가 아닐 때만)
             if not multi_select:
-                btn_cols = st.columns(4)
+                # v1.2: 5열로 변경 - 한글 씬 토글 버튼 추가
+                btn_cols = st.columns(5)
 
                 with btn_cols[0]:
                     # 스토리보드 적용
@@ -4579,7 +5226,26 @@ def render_gallery_tab():
                     # 삭제
                     if st.button("🗑️", key=f"del_gallery_{img_key}"):
                         delete_image(img["path"])
+                        clear_gallery_cache()  # ⭐ v2.2: 캐시 무효화
                         st.rerun()
+
+                with btn_cols[4]:
+                    # v1.2: 한글 씬 토글 버튼
+                    if scene_id_int > 0:
+                        if is_korean_selected:
+                            # 선택됨 → 제거 버튼
+                            if st.button("➖", key=f"korean_rm_{img_key}", help="한글 씬에서 제거"):
+                                if remove_manual_scene(scene_id_int):
+                                    update_legacy_state()
+                                    st.toast(f"씬 {scene_id_int}이(가) 한글 씬에서 제거되었습니다.")
+                                    st.rerun()
+                        else:
+                            # 미선택 → 추가 버튼
+                            if st.button("➕", key=f"korean_add_{img_key}", help="한글 씬에 추가"):
+                                if add_manual_scene(scene_id_int):
+                                    update_legacy_state()
+                                    st.toast(f"씬 {scene_id_int}이(가) 한글 씬에 추가되었습니다!")
+                                    st.rerun()
 
                 # 🔍 프롬프트 정보 표시 (v2.0)
                 if st.session_state.get(f"show_prompt_{img_key}", False):
@@ -5184,6 +5850,28 @@ def generate_background_image(
         update_scene_background(scene_id, str(filepath), str(project_path))
 
         st.success(f"배경 생성 완료: {filename}")
+
+        # v1.1: 시드 정보 표시
+        if used_seed:
+            seed_col1, seed_col2 = st.columns([3, 1])
+            with seed_col1:
+                st.info(f"🔑 **시드:** `{used_seed:,}`")
+            with seed_col2:
+                # JavaScript 즉시 복사 버튼
+                import streamlit.components.v1 as components
+                seed_copy_html = f"""
+                <button onclick="navigator.clipboard.writeText('{used_seed}').then(function(){{
+                    this.innerHTML='✅ 복사됨!';
+                    setTimeout(function(){{document.getElementById('seed_copy_btn').innerHTML='📋 시드 복사';}}, 1500);
+                }}.bind(this))" id="seed_copy_btn" style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white; border: none; border-radius: 6px;
+                    padding: 8px 16px; cursor: pointer; font-size: 13px;
+                ">📋 시드 복사</button>
+                """
+                components.html(seed_copy_html, height=45)
+            st.caption("💡 동일한 시드를 사용하면 유사한 이미지를 재생성할 수 있습니다.")
+
         render_lightbox_image(str(filepath), key=f"bg_result_{scene_id}")
 
         return str(filepath)
@@ -5686,6 +6374,27 @@ def generate_scene_composite_image(
         update_scene_composite(scene_id, str(filepath), str(project_path))
 
         st.success(f"씬 합성 이미지 생성 완료: {filename}")
+
+        # v1.1: 시드 정보 표시
+        if used_seed:
+            seed_col1, seed_col2 = st.columns([3, 1])
+            with seed_col1:
+                st.info(f"🔑 **시드:** `{used_seed:,}`")
+            with seed_col2:
+                import streamlit.components.v1 as components
+                seed_copy_html = f"""
+                <button onclick="navigator.clipboard.writeText('{used_seed}').then(function(){{
+                    this.innerHTML='✅ 복사됨!';
+                    setTimeout(function(){{document.getElementById('comp_seed_copy_btn').innerHTML='📋 시드 복사';}}, 1500);
+                }}.bind(this))" id="comp_seed_copy_btn" style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white; border: none; border-radius: 6px;
+                    padding: 8px 16px; cursor: pointer; font-size: 13px;
+                ">📋 시드 복사</button>
+                """
+                components.html(seed_copy_html, height=45)
+            st.caption("💡 동일한 시드를 사용하면 유사한 이미지를 재생성할 수 있습니다.")
+
         render_lightbox_image(str(filepath), key=f"comp_result_{scene_id}")
 
         return str(filepath)
@@ -6087,6 +6796,8 @@ def cleanup_unused_images():
                     delete_image(img["path"])
                     deleted_count += 1
 
+    if deleted_count > 0:
+        clear_gallery_cache()  # ⭐ v2.2: 캐시 무효화
     st.success(f"✅ {deleted_count}개 미사용 이미지 삭제됨")
 
 
@@ -6466,6 +7177,7 @@ def _render_infographic_gallery():
                 if st.button("🗑️", key=f"del_infographic_{idx}", help="삭제"):
                     try:
                         os.remove(img_path)
+                        clear_gallery_cache()  # ⭐ v2.2: 캐시 무효화
                         st.rerun()
                     except Exception as e:
                         st.error(f"삭제 실패: {e}")

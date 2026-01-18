@@ -644,21 +644,46 @@ with tab4:
                 if not r.success:
                     st.error(f"**에러:** {r.error_message}")
 
-        # 다운로드
-        if st.button("📥 CSV 다운로드"):
-            csv_lines = ["시간,제공자,모델,기능,토큰,비용,상태,프로젝트"]
-            for r in records:
-                status = "성공" if r.success else "실패"
-                tokens = r.tokens_input + r.tokens_output
-                csv_lines.append(f"{r.timestamp},{r.provider},{r.model_id},{r.function},{tokens},{r.cost_estimate:.4f},{status},{r.project_name}")
+        # 다운로드 - v1.1: 생성/다운로드 분리 (rerun 버그 수정)
+        csv_cache_key = "_api_usage_csv_cache"
+        csv_meta_key = "_api_usage_csv_meta"
 
-            csv_data = "\n".join(csv_lines)
-            st.download_button(
-                "💾 다운로드",
-                data=csv_data.encode("utf-8-sig"),
-                file_name=f"api_usage_{datetime.now().strftime('%Y%m%d')}.csv",
-                mime="text/csv"
-            )
+        # 현재 레코드 해시 계산 (데이터 변경 감지용)
+        current_record_hash = hash(tuple((r.timestamp, r.provider, r.model_id) for r in records))
+        cached_meta = st.session_state.get(csv_meta_key, {})
+        cached_csv = st.session_state.get(csv_cache_key)
+        data_changed = cached_meta.get("record_hash") != current_record_hash
+
+        dl_col1, dl_col2 = st.columns([1, 1])
+
+        with dl_col1:
+            gen_label = "📝 CSV 생성" if not cached_csv or data_changed else "🔄 CSV 재생성"
+            if st.button(gen_label, key="api_csv_generate"):
+                csv_lines = ["시간,제공자,모델,기능,토큰,비용,상태,프로젝트"]
+                for r in records:
+                    status = "성공" if r.success else "실패"
+                    tokens = r.tokens_input + r.tokens_output
+                    csv_lines.append(f"{r.timestamp},{r.provider},{r.model_id},{r.function},{tokens},{r.cost_estimate:.4f},{status},{r.project_name}")
+
+                csv_data = "\n".join(csv_lines)
+                st.session_state[csv_cache_key] = csv_data.encode("utf-8-sig")
+                st.session_state[csv_meta_key] = {
+                    "record_hash": current_record_hash,
+                    "generated_at": datetime.now().strftime('%Y%m%d_%H%M%S')
+                }
+                st.rerun()
+
+        with dl_col2:
+            if cached_csv and not data_changed:
+                st.download_button(
+                    "📥 다운로드",
+                    data=cached_csv,
+                    file_name=f"api_usage_{datetime.now().strftime('%Y%m%d')}.csv",
+                    mime="text/csv",
+                    key="api_csv_download"
+                )
+            else:
+                st.button("📥 다운로드", disabled=True, key="api_csv_download_disabled", help="먼저 CSV를 생성하세요")
     else:
         st.info("사용 기록이 없습니다.")
 

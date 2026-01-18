@@ -26,6 +26,16 @@ from utils.project_manager import (
 from config.settings import validate_api_keys, get_missing_api_keys
 from config.constants import WORKFLOW_STEPS
 
+# 외부 프로젝트 런처
+from utils.external_launcher import (
+    EXTERNAL_PROJECTS,
+    get_project_status,
+    launch_project,
+    open_folder,
+    open_in_browser,
+    is_port_in_use
+)
+
 # 페이지 설정
 st.set_page_config(
     page_title="AI 롱폼 유튜브 Tool",
@@ -122,6 +132,85 @@ if project_path:
     ├── script_for_vrew.txt
     └── image_mapping.xlsx
         """)
+
+    # ═══════════════════════════════════════════════════════
+    # 🚀 외부 프로젝트 실행 섹션 (v1.0)
+    # ═══════════════════════════════════════════════════════
+    st.divider()
+    st.subheader("🚀 외부 프로젝트 실행")
+
+    ext_cols = st.columns(len(EXTERNAL_PROJECTS))
+
+    for idx, (project_id, project) in enumerate(EXTERNAL_PROJECTS.items()):
+        with ext_cols[idx]:
+            status = get_project_status(project_id)
+
+            # 프로젝트 카드
+            st.markdown(f"#### {project['icon']} {project['name']}")
+            st.caption(f"📁 `{project['path']}`")
+            st.caption(f"📝 {project['description']}")
+
+            # 상태 표시
+            if not status.get("exists"):
+                st.error("❌ 경로 없음")
+            elif project["type"] == "streamlit":
+                if status.get("running"):
+                    st.success(f"🟢 실행 중 (포트: {status['port']})")
+                else:
+                    st.info("⚪ 중지됨")
+            else:
+                st.info(f"📦 {project['type']}")
+
+            # 버튼들
+            btn_col1, btn_col2 = st.columns(2)
+
+            with btn_col1:
+                if project["type"] == "streamlit" and status.get("running"):
+                    # 실행 중: 브라우저에서 열기
+                    if st.button(
+                        "🌐 열기",
+                        key=f"open_{project_id}",
+                        use_container_width=True
+                    ):
+                        open_in_browser(status["url"])
+                        st.toast(f"✅ {project['name']} 브라우저에서 열림")
+                elif status.get("exists"):
+                    # 실행 버튼
+                    btn_label = "🚀 실행" if project["type"] == "streamlit" else "🌐 열기"
+                    if st.button(
+                        btn_label,
+                        key=f"launch_{project_id}",
+                        type="primary",
+                        use_container_width=True
+                    ):
+                        with st.spinner(f"{project['name']} 실행 중..."):
+                            result = launch_project(project_id)
+
+                        if result["success"]:
+                            st.success(f"✅ {result['message']}")
+                            if result.get("url"):
+                                import time
+                                time.sleep(2)
+                                open_in_browser(result["url"])
+                            st.rerun()
+                        elif result.get("already_running"):
+                            st.warning(f"⚠️ {result['message']}")
+                            open_in_browser(result["url"])
+                        else:
+                            st.error(f"❌ {result['message']}")
+
+            with btn_col2:
+                # 폴더 열기 버튼
+                if st.button(
+                    "📂 폴더",
+                    key=f"folder_{project_id}",
+                    use_container_width=True,
+                    disabled=not status.get("exists")
+                ):
+                    if open_folder(project["path"]):
+                        st.toast(f"✅ 폴더 열림")
+                    else:
+                        st.error("❌ 폴더 열기 실패")
 
 else:
     # 프로젝트 미선택 시

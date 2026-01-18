@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-01-01T19:45:17.115646",
+  "last_updated": "2026-01-15T22:21:36.056421",
   "quotas": {
     "fal_ai_wan": {
       "api_name": "fal_ai_wan",
@@ -178,7 +178,7 @@
       "last_error": null
     }
   },
-  "total_videos_generated": 1,
+  "total_videos_generated": 3,
   "total_credits_used": 0,
   "generation_history": [],
   "platform_balances": {},
@@ -266,18 +266,252 @@
       "success": false,
       "error_message": "PixVerse API 오류 [400013]: Invalid field type or value. Please verify your input data.",
       "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T11:50:31.624245",
+      "platform": "replicate",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "Client error '422 Unprocessable Entity' for url 'https://api.replicate.com/v1/predictions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:02:14.208791",
+      "platform": "replicate",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "Client error '404 Not Found' for url 'https://api.replicate.com/v1/models/wan-lab/wan2.1-i2v-480p/predictions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:02:49.455683",
+      "platform": "fal_ai",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "Client error '403 Forbidden' for url 'https://fal.run/fal-ai/wan/v2.1/image-to-video'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:02:58.059352",
+      "platform": "pixverse",
+      "model_key": "v4.5",
+      "model_display_name": "PixVerse v4.5 (I2V)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "PixVerse API 오류 [400013]: Invalid field type or value. Please verify your input data.",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:12:41.174659",
+      "platform": "fal_ai",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "Client error '403 Forbidden' for url 'https://fal.run/fal-ai/wan/v2.1/image-to-video'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:12:48.601309",
+      "platform": "replicate",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "Client error '404 Not Found' for url 'https://api.replicate.com/v1/models/wavymulder/wan-2.1-i2v/predictions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:13:23.680242",
+      "platform": "pixverse",
+      "model_key": "v4.5",
+      "model_display_name": "PixVerse v4.5 (I2V)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "PixVerse API 오류 [400013]: Invalid field type or value. Please verify your input data.",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:54:05.498737",
+      "platform": "fal_ai",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "Path /v2.1/image-to-video not found",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:55:13.392898",
+      "platform": "replicate",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "모델을 찾을 수 없습니다: wavymulder/wan-2.1-i2v",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:55:38.299912",
+      "platform": "replicate",
+      "model_key": "luma_ray",
+      "model_display_name": "Luma Ray",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "Client error '402 Payment Required' for url 'https://api.replicate.com/v1/predictions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/402",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:55:50.312562",
+      "platform": "replicate",
+      "model_key": "haiper",
+      "model_display_name": "Haiper Video 2",
+      "prompt": "No character animation in this scene.",
+      "duration": 4,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "모델을 찾을 수 없습니다: haiper-ai/haiper-video-2",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T12:55:58.643884",
+      "platform": "replicate",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": "모델을 찾을 수 없습니다: wavymulder/wan-2.1-i2v",
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T13:16:12.879261",
+      "platform": "fal_ai",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.0,
+      "credits_used": 0,
+      "success": false,
+      "error_message": [
+        {
+          "loc": [
+            "body",
+            "resolution"
+          ],
+          "msg": "unexpected value; permitted: '480p', '720p'",
+          "type": "value_error.const",
+          "ctx": {
+            "given": 720,
+            "permitted": [
+              "480p",
+              "720p"
+            ]
+          }
+        }
+      ],
+      "video_url": null
+    },
+    {
+      "timestamp": "2026-01-15T21:49:25.733548",
+      "platform": "fal_ai",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "No character animation in this scene.",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.15,
+      "credits_used": 0,
+      "success": true,
+      "error_message": null,
+      "video_url": "https://v3b.fal.media/files/b/0a8a7d08/uxU2IbxQLAZJP3M3x5aI9_tmpqz2p4unx.mp4"
+    },
+    {
+      "timestamp": "2026-01-15T22:21:36.056272",
+      "platform": "replicate",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "A dramatic close-up of a car's sensor, symbolizing advanced automotive technology. The camera slowly",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.105,
+      "credits_used": 0,
+      "success": true,
+      "error_message": null,
+      "video_url": "https://replicate.delivery/xezq/vUpIjUlQdzpzMRe5VIE1nL4Jj2CmaSMhntqTxiFsYXNv30eVA/tmp8g6pvrgg.mp4"
     }
   ],
   "daily_stats": {
     "2025-12-31": {
       "videos": 1,
       "cost_usd": 0.225
+    },
+    "2026-01-15": {
+      "videos": 2,
+      "cost_usd": 0.255
     }
   },
   "monthly_stats": {
     "2025-12": {
       "videos": 1,
       "cost_usd": 0.225
+    },
+    "2026-01": {
+      "videos": 2,
+      "cost_usd": 0.255
     }
   }
 }

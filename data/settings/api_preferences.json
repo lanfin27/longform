@@ -9,7 +9,9 @@
     "celebrity_ai_model": "gemini-2.0-flash-exp",
     "rembg_enabled": false,
     "auto_save_storyboard": false,
-    "imagefx_model": "IMAGEN_4"
+    "imagefx_model": "IMAGEN_4",
+    "style_mode": "🖼️ 배경만 생성 (배경 스타일 사용)",
+    "character_composite_mode": "none"
   },
   "video_generation": {
     "platform": "replicate",
@@ -34,6 +36,13 @@
   "scene_analysis": {
     "ai_provider": "google",
     "ai_model": "gemini-2.0-flash-exp",
-    "language": "ko"
+    "language": "ko",
+    "srt_bundle_size": 1
+  },
+  "prompt_templates": {
+    "active_srt_prompts": {
+      "single": "srt_scene_single",
+      "batch": "srt_scene_analysis_ec62d6cb"
+    }
   }
 }

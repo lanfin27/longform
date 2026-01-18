@@ -286,16 +286,21 @@ def _create_single_scene_prompt(scene_id: int, narration: str, start_time: str, 
             )
 
             # ⭐ 메타데이터 저장 (첫 번째 호출에서만)
+            template_id = template.id if template else 'srt_scene_single'
+            template_name = template.name if template else 'v1.0'
+            is_default = getattr(template, 'is_default', True) if template else True
+
             if 'prompt_template' not in _analysis_metadata:
                 _analysis_metadata['mode'] = 'single'
-                _analysis_metadata['template_name'] = template.id if template else 'srt_scene_single'
-                _analysis_metadata['template_version'] = template.name if template else 'v1.0'
+                _analysis_metadata['template_name'] = template_id
+                _analysis_metadata['template_version'] = template_name
                 _analysis_metadata['prompt_template'] = template_prompt
                 _analysis_metadata['prompt_char_count'] = len(template_prompt)
                 _analysis_metadata['prompt_example'] = prompt  # 첫 씬에 적용된 예시
-                _analysis_metadata['is_default_template'] = False
+                _analysis_metadata['is_default_template'] = is_default
 
-            print(f"[SRT 분석] 템플릿 프롬프트 사용 (srt_scene_single)")
+            # v1.1: 실제 사용된 템플릿 ID 출력 (하드코딩 제거)
+            print(f"[SRT 분석] 템플릿 프롬프트 사용 ({template_id}: {template_name})")
             return prompt
     except Exception as e:
         print(f"[SRT 분석] 템플릿 로드 실패, 기본 프롬프트 사용: {e}")
@@ -363,16 +368,21 @@ def _create_batch_analysis_prompt(scenes: List[Dict]) -> str:
             prompt = template_prompt.format(scenes_content=scenes_content)
 
             # ⭐ 메타데이터 저장 (첫 번째 호출에서만)
+            template_id = template.id if template else 'srt_scene_batch'
+            template_name = template.name if template else 'v1.0'
+            is_default = getattr(template, 'is_default', True) if template else True
+
             if 'prompt_template' not in _analysis_metadata:
                 _analysis_metadata['mode'] = 'batch'
-                _analysis_metadata['template_name'] = template.id if template else 'srt_scene_batch'
-                _analysis_metadata['template_version'] = template.name if template else 'v1.0'
+                _analysis_metadata['template_name'] = template_id
+                _analysis_metadata['template_version'] = template_name
                 _analysis_metadata['prompt_template'] = template_prompt
                 _analysis_metadata['prompt_char_count'] = len(template_prompt)
                 _analysis_metadata['prompt_example'] = prompt  # 첫 배치에 적용된 예시
-                _analysis_metadata['is_default_template'] = False
+                _analysis_metadata['is_default_template'] = is_default
 
-            print(f"[SRT 분석] 템플릿 프롬프트 사용 (srt_scene_batch)")
+            # v1.1: 실제 사용된 템플릿 ID 출력 (하드코딩 제거)
+            print(f"[SRT 분석] 템플릿 프롬프트 사용 ({template_id}: {template_name})")
             return prompt
     except Exception as e:
         print(f"[SRT 분석] 템플릿 로드 실패, 기본 프롬프트 사용: {e}")

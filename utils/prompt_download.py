@@ -80,9 +80,78 @@ def get_latest_image_per_scene(backgrounds_folder: Path) -> Dict[int, Dict[str, 
 
 
 def get_scenes_with_images(backgrounds_folder: Path) -> Set[int]:
-    """이미지가 있는 씬 번호 집합 반환"""
+    """이미지가 있는 씬 번호 집합 반환 (backgrounds 폴더 기준)"""
     latest = get_latest_image_per_scene(backgrounds_folder)
     return set(latest.keys())
+
+
+def get_all_scenes_with_images(project_path: Path) -> Set[int]:
+    """
+    모든 이미지 폴더를 스캔하여 이미지가 있는 씬 번호 집합 반환
+
+    스캔 대상 (v4.2: 글로벌 폴더 추가):
+    - 프로젝트 폴더:
+      - images/backgrounds/ (bg_scene_NNN*.png)
+      - images/scenes/ (scene_NNN*.png, *_scene_NNN*.png)
+      - images/composited/ (*scene_NNN*.png)
+    - 글로벌 폴더:
+      - data/images/imagefx/ (ImageFX 생성 이미지)
+      - data/images/generated/
+      - data/images/backgrounds/
+
+    Returns:
+        이미지가 있는 씬 번호 집합
+    """
+    scenes_with_images = set()
+
+    project_path = Path(project_path)
+    images_dir = project_path / "images"
+
+    # 씬 번호 추출 패턴
+    scene_patterns = [
+        r'bg_scene_(\d+)',       # bg_scene_001_timestamp.png
+        r'scene[_\-]?(\d+)',     # scene_001.png, scene-001.png, scene001.png
+        r'_scene_(\d+)',         # xxx_scene_001.png
+        r'^(\d{3})_',            # 001_xxx.png (3자리 숫자로 시작)
+    ]
+
+    def scan_folder(folder_path: Path):
+        """폴더 내 이미지 스캔하여 씬 번호 추출"""
+        if not folder_path or not folder_path.exists():
+            return
+
+        # PNG, JPG 등 모든 이미지 확장자
+        for ext in ["*.png", "*.jpg", "*.jpeg", "*.webp"]:
+            for img_path in folder_path.glob(ext):
+                filename = img_path.name
+
+                # 패턴 매칭으로 씬 번호 추출
+                for pattern in scene_patterns:
+                    match = re.search(pattern, filename, re.IGNORECASE)
+                    if match:
+                        try:
+                            scene_num = int(match.group(1))
+                            scenes_with_images.add(scene_num)
+                            break  # 첫 번째 매치로 충분
+                        except (ValueError, IndexError):
+                            continue
+
+    # 1. 프로젝트 폴더 스캔
+    if images_dir.exists():
+        for folder_name in ["backgrounds", "scenes", "composited"]:
+            scan_folder(images_dir / folder_name)
+
+    # 2. ⭐ 글로벌 폴더 스캔 (v4.2 추가)
+    # longform/data/images/ 기준
+    root_dir = Path(__file__).parent.parent
+    global_images_dir = root_dir / "data" / "images"
+
+    if global_images_dir.exists():
+        for folder_name in ["imagefx", "generated", "backgrounds"]:
+            scan_folder(global_images_dir / folder_name)
+
+    print(f"[PromptDownload] 이미지 있는 씬 (프로젝트+글로벌): {len(scenes_with_images)}개", flush=True)
+    return scenes_with_images
 
 
 # ============================================================

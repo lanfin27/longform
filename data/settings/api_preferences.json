@@ -11,10 +11,11 @@
     "auto_save_storyboard": false,
     "imagefx_model": "IMAGEN_4",
     "style_mode": "🖼️ 배경만 생성 (배경 스타일 사용)",
-    "character_composite_mode": "none"
+    "character_composite_mode": "none",
+    "prompt_type": "background_prompt"
   },
   "video_generation": {
-    "platform": "replicate",
+    "platform": "fal_ai",
     "model": "wan_i2v",
     "duration": 5,
     "resolution": "720p",
@@ -37,12 +38,22 @@
     "ai_provider": "google",
     "ai_model": "gemini-2.0-flash-exp",
     "language": "ko",
-    "srt_bundle_size": 1
+    "srt_bundle_size": 3
   },
   "prompt_templates": {
     "active_srt_prompts": {
-      "single": "srt_scene_single",
-      "batch": "srt_scene_analysis_ec62d6cb"
+      "single": "srt_scene_analysis_7f5c9f62",
+      "batch": "srt_scene_batch"
     }
+  },
+  "storyboard": {
+    "filter_mode": "all",
+    "show_images": true,
+    "show_script": true,
+    "show_direction": true,
+    "show_characters": true,
+    "show_prompt": false,
+    "show_video_prompt": true,
+    "scenes_per_page": 10
   }
 }

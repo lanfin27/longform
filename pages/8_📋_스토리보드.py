@@ -59,6 +59,26 @@ try:
 except ImportError:
     STORYBOARD_FILTER_AVAILABLE = False
 
+# ⭐ v3.25: 씬 타입 필터 UI (Flow 1/2/3)
+# ⭐ v3.26: 파이프라인 워크플로우 통합
+try:
+    from utils.scene_type_ui import (
+        is_scene_type_available,
+        init_scene_type_for_project,
+        render_scene_type_expander,
+        render_combined_workflow_expander,
+        render_scene_card_type_badge,
+        execute_character_composite,
+        sync_scene_types_from_data,
+        is_pipeline_available,
+        get_pipeline_summary,
+        SCENE_TYPE_UI_AVAILABLE,
+        PIPELINE_UI_AVAILABLE
+    )
+except ImportError:
+    SCENE_TYPE_UI_AVAILABLE = False
+    PIPELINE_UI_AVAILABLE = False
+
 # 이미지 캐시 관리 (MediaFileStorageError 방지)
 try:
     from utils.image_cache import ImageCache, display_image_safe, refresh_session_images
@@ -131,6 +151,46 @@ try:
     IMAGE_COMPOSER_AVAILABLE = True
 except ImportError:
     IMAGE_COMPOSER_AVAILABLE = False
+
+# 나노바나나 이미지 대체 (v1.0)
+try:
+    from components.nano_banana_replacer import render_nano_banana_replacer
+    from utils.gemini_image_generator import check_gemini_api_key
+    NANO_BANANA_AVAILABLE = True
+except ImportError:
+    NANO_BANANA_AVAILABLE = False
+
+# 나노바나나 배경+캐릭터 합성 (v1.0)
+# v3.34: 캐릭터 자동 연동 함수 추가
+try:
+    from components.nano_banana_composite import (
+        render_nano_banana_composite,
+        auto_link_characters_to_scenes,
+        get_auto_linked_character_count
+    )
+    NANO_COMPOSITE_AVAILABLE = True
+except ImportError:
+    NANO_COMPOSITE_AVAILABLE = False
+    auto_link_characters_to_scenes = None
+    get_auto_linked_character_count = None
+
+# 타임라인 뷰 합성 유틸리티 (v1.0)
+try:
+    from utils.timeline_composite import (
+        get_latest_scene_image,
+        get_existing_scene_background,
+        create_composite_realshot,
+        replace_bundle_scenes,
+        extract_video_thumbnail,
+        save_realshot_file,
+        DEFAULT_COMPOSITE_SETTINGS,
+        POSITION_OPTIONS,
+        BG_SOURCE_OPTIONS
+    )
+    TIMELINE_COMPOSITE_AVAILABLE = True
+except ImportError as e:
+    TIMELINE_COMPOSITE_AVAILABLE = False
+    print(f"[스토리보드] 타임라인 합성 모듈 로드 실패: {e}", flush=True)
 
 # 인포그래픽 관련 import
 try:
@@ -1160,6 +1220,9 @@ def _render_video_conversion_modal(project_path):
                 key="video_modal_generate"
             ):
                 # 비디오 생성 실행
+                print(f"[VideoModal] 비디오 생성 시작 - 씬 {scene_id}")
+                print(f"[VideoModal] 플랫폼: {selected_platform}, 모델: {selected_model}, 길이: {selected_duration}초")
+
                 with st.spinner(f"씬 {scene_id} 비디오 생성 중... ({selected_duration}초)"):
                     result = generate_scene_video(
                         image_path=image_path,
@@ -1170,48 +1233,77 @@ def _render_video_conversion_modal(project_path):
                         output_dir=str(project_path / "videos" / "storyboard"),
                         scene_id=scene_id
                     )
+                    print(f"[VideoModal] 생성 결과: {result}")
 
                 if result.get("success"):
-                    st.success(f"✅ 비디오 생성 완료!")
-                    st.video(result.get("video_path"))
-
-                    # 다운로드 버튼
                     video_path = result.get("video_path")
-                    if video_path and os.path.exists(video_path):
-                        with open(video_path, "rb") as f:
-                            st.download_button(
-                                "📥 비디오 다운로드",
-                                data=f.read(),
-                                file_name=os.path.basename(video_path),
-                                mime="video/mp4"
-                            )
+                    print(f"[VideoModal] ✅ 생성 성공! 경로: {video_path}")
 
-                    # ⭐ v2.4: 프롬프트 뷰어 (최종 프롬프트 확인)
-                    original_prompt = result.get("original_prompt", edited_prompt)
-                    final_prompt = result.get("final_prompt", edited_prompt)
-                    prompt_expanded = result.get("prompt_expanded", False)
+                    # v3.23: 세션 상태에 결과 저장 (rerun 후에도 유지)
+                    st.session_state[f"video_modal_result_{scene_id}"] = result
 
-                    with st.expander("📝 사용된 프롬프트 보기", expanded=False):
-                        col_info1, col_info2 = st.columns([1, 2])
-
-                        with col_info1:
-                            st.markdown(f"**플랫폼:** {result.get('platform', 'N/A')}")
-                            st.markdown(f"**모델:** {result.get('model', 'N/A')}")
-                            st.markdown(f"**비용:** ${result.get('cost_usd', 0):.3f}")
-                            st.markdown(f"**생성 시간:** {result.get('generation_time', 0):.1f}초")
-
-                        with col_info2:
-                            if prompt_expanded:
-                                st.info("🔄 프롬프트가 AI에 의해 자동 확장되었습니다")
-
-                            st.markdown("**원본 프롬프트:**")
-                            st.code(original_prompt[:200] + "..." if len(original_prompt) > 200 else original_prompt, language=None)
-
-                            if final_prompt and final_prompt != original_prompt:
-                                st.markdown("**최종 프롬프트 (AI 확장):**")
-                                st.code(final_prompt[:300] + "..." if len(final_prompt) > 300 else final_prompt, language=None)
+                    st.success(f"✅ 비디오 생성 완료!")
                 else:
-                    st.error(f"❌ 비디오 생성 실패: {result.get('error', 'Unknown error')}")
+                    error_msg = result.get('error', 'Unknown error')
+                    print(f"[VideoModal] ❌ 생성 실패: {error_msg}")
+                    st.error(f"❌ 비디오 생성 실패: {error_msg}")
+
+        # v3.23: 세션 상태에서 최근 생성 결과 표시 (버튼 블록 외부)
+        recent_result = st.session_state.get(f"video_modal_result_{scene_id}")
+        if recent_result and recent_result.get("success"):
+            video_path = recent_result.get("video_path")
+
+            st.markdown("---")
+            st.markdown("**🎥 최근 생성된 비디오**")
+
+            if video_path and os.path.exists(video_path):
+                try:
+                    st.video(video_path)
+                    print(f"[VideoModal] st.video() 호출 성공: {video_path}")
+
+                    # 다운로드 버튼 (파일 데이터를 미리 읽어서 제공)
+                    with open(video_path, "rb") as f:
+                        video_data = f.read()
+
+                    st.download_button(
+                        "📥 비디오 다운로드",
+                        data=video_data,
+                        file_name=os.path.basename(video_path),
+                        mime="video/mp4",
+                        key=f"download_recent_{scene_id}"
+                    )
+                except Exception as e:
+                    print(f"[VideoModal] 비디오 표시 오류: {e}")
+                    st.error(f"비디오 표시 오류: {e}")
+                    # 폴백: 링크로 제공
+                    st.markdown(f"📁 비디오 경로: `{video_path}`")
+            else:
+                st.warning(f"비디오 파일을 찾을 수 없습니다: {video_path}")
+
+            # 프롬프트 뷰어 (최종 프롬프트 확인)
+            original_prompt = recent_result.get("original_prompt", edited_prompt)
+            final_prompt = recent_result.get("final_prompt", edited_prompt)
+            prompt_expanded = recent_result.get("prompt_expanded", False)
+
+            with st.expander("📝 사용된 프롬프트 보기", expanded=False):
+                col_info1, col_info2 = st.columns([1, 2])
+
+                with col_info1:
+                    st.markdown(f"**플랫폼:** {recent_result.get('platform', 'N/A')}")
+                    st.markdown(f"**모델:** {recent_result.get('model', 'N/A')}")
+                    st.markdown(f"**비용:** ${recent_result.get('cost_usd', 0):.3f}")
+                    st.markdown(f"**생성 시간:** {recent_result.get('generation_time', 0):.1f}초")
+
+                with col_info2:
+                    if prompt_expanded:
+                        st.info("🔄 프롬프트가 AI에 의해 자동 확장되었습니다")
+
+                    st.markdown("**원본 프롬프트:**")
+                    st.code(original_prompt[:200] + "..." if len(original_prompt) > 200 else original_prompt, language=None)
+
+                    if final_prompt and final_prompt != original_prompt:
+                        st.markdown("**최종 프롬프트 (AI 확장):**")
+                        st.code(final_prompt[:300] + "..." if len(final_prompt) > 300 else final_prompt, language=None)
 
         with col_btn2:
             if st.button("닫기", use_container_width=True, key="video_modal_close"):
@@ -4914,6 +5006,29 @@ with tab_auto:
         with open(scenes_path, "r", encoding="utf-8") as f:
             scenes = json.load(f)
 
+        # ═══════════════════════════════════════════════════════════════
+        # v3.34: 캐릭터 자동 연동 (페이지 로드 시 한 번 실행)
+        # ═══════════════════════════════════════════════════════════════
+        if NANO_COMPOSITE_AVAILABLE and auto_link_characters_to_scenes:
+            # 세션 캐시 키 (프로젝트 + 캐시 버전별)
+            auto_link_cache_key = f"_char_auto_linked_{str(project_path)}_{st.session_state.get('image_cache_version', 0)}"
+
+            if auto_link_cache_key not in st.session_state:
+                # 자동 연동 실행
+                link_result = auto_link_characters_to_scenes(scenes, str(project_path))
+
+                if link_result.get("linked_count", 0) > 0:
+                    # 씬 데이터 저장 (연동 정보 포함)
+                    try:
+                        with open(scenes_path, "w", encoding="utf-8") as f:
+                            json.dump(scenes, f, ensure_ascii=False, indent=2)
+                        print(f"[스토리보드] ✅ 캐릭터 자동 연동 완료: {link_result['linked_count']}개 씬")
+                    except Exception as e:
+                        print(f"[스토리보드] ⚠️ 씬 데이터 저장 실패: {e}")
+
+                # 캐시에 결과 저장 (중복 실행 방지)
+                st.session_state[auto_link_cache_key] = link_result
+
         if not scenes:
             st.warning("씬 데이터가 비어있습니다.")
         else:
@@ -4922,10 +5037,16 @@ with tab_auto:
             with sync_header_col1:
                 st.subheader("🔄 이미지 자동 동기화")
             with sync_header_col2:
-                if st.button("🔄 새로고침", key="refresh_image_cache_sync", help="이미지 캐시 새로고침 (새 이미지 반영)"):
+                if st.button("🔄 새로고침", key="refresh_image_cache_sync", help="이미지 캐시 새로고침 (새 이미지 반영, 캐릭터 재연동 포함)"):
                     # ⭐ 전체 캐시 초기화 (명시적 새로고침)
                     cleared = invalidate_all_image_caches(full_reset=True)
-                    st.toast(f"✅ 이미지 캐시 새로고침 완료! ({cleared}개 항목)")
+
+                    # ⭐ v3.34: 캐릭터 자동 연동 캐시 초기화 (재연동 실행)
+                    auto_link_keys = [k for k in st.session_state.keys() if k.startswith("_char_auto_linked_")]
+                    for key in auto_link_keys:
+                        del st.session_state[key]
+
+                    st.toast(f"✅ 이미지 캐시 새로고침 완료! ({cleared}개 항목, 캐릭터 재연동 예정)")
                     st.rerun()
 
             # ⭐ 캐싱된 ImageSceneMatcher 사용 (v3.17 성능 최적화)
@@ -5795,6 +5916,91 @@ Scene 4: (비워둠)
                     st.warning("⚠️ 실사 이미지 관리 모듈을 불러올 수 없습니다.")
 
             # ============================================================
+            # 🍌 나노바나나 이미지 대체 섹션 (v1.2 - 필터 동기화 수정)
+            # ============================================================
+            if NANO_BANANA_AVAILABLE:
+                with st.expander("🍌 나노바나나로 이미지 대체 (Gemini)", expanded=False):
+                    st.caption("필터로 선택된 씬들의 이미지를 Gemini Nano Banana 모델로 재생성합니다.")
+
+                    # ═══════════════════════════════════════════════════════════════
+                    # v1.2: 필터 상태 명확히 읽기 (체크박스 직접 상태 + 세션 상태)
+                    # ═══════════════════════════════════════════════════════════════
+
+                    # 선택된 씬 ID 가져오기
+                    storyboard_selected = st.session_state.get("storyboard_selected_scene_ids", set())
+                    if not isinstance(storyboard_selected, set):
+                        storyboard_selected = set(storyboard_selected) if storyboard_selected else set()
+
+                    # 선택된 씬만 표시 체크박스 상태 (두 가지 키 모두 확인)
+                    show_selected_only = (
+                        st.session_state.get('show_selected_scenes_only_cb', False) or  # 체크박스 직접 상태
+                        st.session_state.get('show_selected_scenes_only', False)  # 수동 동기화된 상태
+                    )
+
+                    # 디버그 로그
+                    print(f"[나노바나나] 선택된 씬 ID: {storyboard_selected}")
+                    print(f"[나노바나나] 선택된 씬만 표시 체크: {show_selected_only}")
+
+                    # 현재 필터링된 씬 가져오기
+                    nano_filtered_scenes = []
+
+                    # 복합 필터 모드 확인
+                    if st.session_state.get('use_complex_filter', False):
+                        complex_filters = st.session_state.get('complex_filters', {})
+                        combine_mode = st.session_state.get('filter_combine_mode', 'union')
+                        if complex_filters and any(complex_filters.get(f, False) for f in complex_filters):
+                            display_ids, _ = apply_complex_filters(scenes, complex_filters, combine_mode, "first")
+                            nano_filtered_scenes = [s for s in scenes if s.get('scene_id', 0) in display_ids]
+
+                    # 레거시 필터 모드
+                    if not nano_filtered_scenes:
+                        filter_mode = st.session_state.get('storyboard_scene_filter', 'all')
+                        if filter_mode == 'korean_only' and korean_text_ids:
+                            nano_filtered_scenes = [s for s in scenes if s.get('scene_id', 0) in korean_text_ids]
+                        elif filter_mode == 'bundle_rep' and bundle_rep_ids:
+                            nano_filtered_scenes = [s for s in scenes if s.get('scene_id', 0) in bundle_rep_ids]
+                        elif filter_mode != 'all':
+                            # 기타 필터 적용된 경우
+                            nano_filtered_scenes = filtered_scenes if 'filtered_scenes' in dir() else scenes
+                        else:
+                            nano_filtered_scenes = scenes
+
+                    # ═══════════════════════════════════════════════════════════════
+                    # v1.2: 선택된 씬만 표시 필터 적용 (핵심 수정!)
+                    # ═══════════════════════════════════════════════════════════════
+                    if show_selected_only and storyboard_selected:
+                        # scene_id 또는 scene_num으로 매칭
+                        nano_filtered_scenes = [
+                            s for s in nano_filtered_scenes
+                            if s.get('scene_id', s.get('scene_num', 0)) in storyboard_selected
+                        ]
+                        print(f"[나노바나나] ✅ 선택 필터 적용됨: {len(nano_filtered_scenes)}개 씬")
+                    else:
+                        print(f"[나노바나나] 선택 필터 미적용 (show_selected={show_selected_only}, selected_count={len(storyboard_selected)})")
+
+                    # 나노바나나 대체 UI 렌더링
+                    render_nano_banana_replacer(
+                        filtered_scenes=nano_filtered_scenes,
+                        project_path=str(project_path),
+                        all_scenes=scenes,
+                        on_complete=lambda results: st.session_state.update({'storyboard_refresh': True})
+                    )
+
+            # ============================================================
+            # 🎨 나노바나나 배경+캐릭터 합성 섹션 (v1.0)
+            # ============================================================
+            if NANO_COMPOSITE_AVAILABLE:
+                with st.expander("🎨 나노바나나 배경+캐릭터 합성 (Gemini)", expanded=False):
+                    st.caption("캐릭터가 있는 씬의 배경과 캐릭터를 분리 생성 후 합성합니다.")
+
+                    # 합성 UI 렌더링
+                    render_nano_banana_composite(
+                        scenes=scenes,
+                        project_path=str(project_path),
+                        on_complete=lambda results: st.session_state.update({'storyboard_refresh': True})
+                    )
+
+            # ============================================================
             # 배치 비디오 업로드 섹션
             # ============================================================
             if BATCH_VIDEO_AVAILABLE:
@@ -6036,6 +6242,14 @@ Scene 4: (비워둠)
                 if has_bundles:
                     bundle_rep_ids = get_bundle_representative_ids(scenes, mode="first")
 
+            # ⭐ v2.2: 합성 완료 씬 ID 계산 (씬 카드에서 🎨 배지 표시용)
+            composite_scene_ids = set()
+            for s in scenes:
+                if s.get("composite_image_path") or s.get("nano_composite_image") or s.get("composite_path"):
+                    sid = s.get('scene_id', 0)
+                    if sid:
+                        composite_scene_ids.add(sid)
+
             # ⭐ v3.20: expander 상태 유지 (체크박스 클릭 시 닫히지 않도록)
             if "scene_selector_expander_open" not in st.session_state:
                 st.session_state.scene_selector_expander_open = False
@@ -6047,6 +6261,8 @@ Scene 4: (비워둠)
                     tag_status_parts.append(f"📦 묶음대표: {len(bundle_rep_ids)}개")
                 if korean_text_ids:
                     tag_status_parts.append(f"🔤 한글텍스트: {len(korean_text_ids)}개")
+                if composite_scene_ids:
+                    tag_status_parts.append(f"🎨 합성완료: {len(composite_scene_ids)}개")
                 if tag_status_parts:
                     st.info(" | ".join(tag_status_parts))
 
@@ -6062,7 +6278,10 @@ Scene 4: (비워둠)
                         "korean_text": False,
                         "no_image": False,
                         "no_video": False,
-                        "not_generated": False
+                        "not_generated": False,
+                        "has_characters": False,  # v2.1: 캐릭터 필터 추가
+                        "has_composite": False,  # v2.2: 합성 완료 필터
+                        "no_composite": False  # v2.2: 합성 미완료 필터
                     }
                 if "filter_combine_mode" not in st.session_state:
                     st.session_state.filter_combine_mode = "union"
@@ -6079,6 +6298,14 @@ Scene 4: (비워둠)
                                    if not s.get("video_path")]
                     not_generated_ids_list = [s.get('scene_id', i + 1) for i, s in enumerate(scenes)
                                         if not s.get("image_path") and not s.get("composite_path") and not s.get("video_path")]
+                    # v2.1: 캐릭터 있는 씬 계산
+                    has_characters_ids_list = [s.get('scene_id', i + 1) for i, s in enumerate(scenes)
+                                               if s.get("characters") and len(s.get("characters", [])) > 0]
+                    # v2.2: 합성 이미지 씬 계산
+                    has_composite_ids_list = [s.get('scene_id', i + 1) for i, s in enumerate(scenes)
+                                              if s.get("composite_image_path") or s.get("nano_composite_image") or s.get("composite_path")]
+                    no_composite_ids_list = [s.get('scene_id', i + 1) for i, s in enumerate(scenes)
+                                             if not (s.get("composite_image_path") or s.get("nano_composite_image") or s.get("composite_path"))]
                     filter_summary = {
                         "total": len(scenes),
                         "bundle_representative": len(bundle_rep_ids) if has_bundles else 0,
@@ -6086,6 +6313,9 @@ Scene 4: (비워둠)
                         "no_image": len(no_image_ids_list),
                         "no_video": len(no_video_ids_list),
                         "not_generated": len(not_generated_ids_list),
+                        "has_characters": len(has_characters_ids_list),  # v2.1: 캐릭터 필터
+                        "has_composite": len(has_composite_ids_list),  # v2.2: 합성 완료 필터
+                        "no_composite": len(no_composite_ids_list),  # v2.2: 합성 미완료 필터
                         "bundle_korean_overlap": 0,
                         "has_bundles": has_bundles
                     }
@@ -6124,6 +6354,9 @@ Scene 4: (비워둠)
                 with preset_cols[0]:
                     if st.button("📋 전체", key="preset_all", use_container_width=True, help="모든 필터 해제, 전체 선택"):
                         st.session_state.complex_filters = {k: False for k in st.session_state.complex_filters}
+                        # v2.2: 새 필터 추가시 명시적 초기화
+                        st.session_state.complex_filters["has_composite"] = False
+                        st.session_state.complex_filters["no_composite"] = False
                         # 🆕 전체 씬 자동 선택
                         all_ids = set(s.get('scene_id', i + 1) for i, s in enumerate(scenes))
                         auto_select_filtered_scenes(all_ids)
@@ -6137,7 +6370,10 @@ Scene 4: (비워둠)
                             "korean_text": True,
                             "no_image": False,
                             "no_video": False,
-                            "not_generated": False
+                            "not_generated": False,
+                            "has_characters": False,
+                            "has_composite": False,
+                            "no_composite": False
                         }
                         st.session_state.filter_combine_mode = "union"
                         # 🆕 합집합 자동 선택
@@ -6153,7 +6389,10 @@ Scene 4: (비워둠)
                             "korean_text": True,
                             "no_image": False,
                             "no_video": False,
-                            "not_generated": False
+                            "not_generated": False,
+                            "has_characters": False,
+                            "has_composite": False,
+                            "no_composite": False
                         }
                         st.session_state.filter_combine_mode = "intersection"
                         # 🆕 교집합 자동 선택
@@ -6169,7 +6408,10 @@ Scene 4: (비워둠)
                             "korean_text": True,
                             "no_image": False,
                             "no_video": False,
-                            "not_generated": False
+                            "not_generated": False,
+                            "has_characters": False,
+                            "has_composite": False,
+                            "no_composite": False
                         }
                         st.session_state.filter_combine_mode = "union"
                         # 🆕 한글 텍스트 씬 자동 선택
@@ -6184,7 +6426,10 @@ Scene 4: (비워둠)
                             "korean_text": False,
                             "no_image": False,
                             "no_video": False,
-                            "not_generated": False
+                            "not_generated": False,
+                            "has_characters": False,
+                            "has_composite": False,
+                            "no_composite": False
                         }
                         st.session_state.filter_combine_mode = "union"
                         # 🆕 묶음 대표 씬 자동 선택
@@ -6199,7 +6444,10 @@ Scene 4: (비워둠)
                             "korean_text": False,
                             "no_image": False,
                             "no_video": False,
-                            "not_generated": True
+                            "not_generated": True,
+                            "has_characters": False,
+                            "has_composite": False,
+                            "no_composite": False
                         }
                         st.session_state.filter_combine_mode = "union"
                         # 🆕 미생성 씬 자동 선택
@@ -6228,7 +6476,7 @@ Scene 4: (비워둠)
                 # ═══════════════════════════════════════════════════════
                 st.markdown("**📌 필터 선택** (복수 선택 가능)")
 
-                filter_cols = st.columns(5)
+                filter_cols = st.columns(8)  # v2.2: 8열로 확장 (합성 필터 추가)
                 filters = st.session_state.complex_filters
 
                 with filter_cols[0]:
@@ -6273,6 +6521,41 @@ Scene 4: (비워둠)
                         value=filters.get("not_generated", False),
                         key="filter_cb_not_gen",
                         help="이미지, 비디오 모두 없는 씬"
+                    )
+
+                # v2.1: 등장 캐릭터 필터 추가
+                with filter_cols[5]:
+                    has_characters_count = filter_summary.get('has_characters', 0)
+                    char_disabled = has_characters_count == 0
+                    filters["has_characters"] = st.checkbox(
+                        f"👤 캐릭터 있음 ({has_characters_count}개)",
+                        value=filters.get("has_characters", False),
+                        key="filter_cb_has_char",
+                        disabled=char_disabled,
+                        help="캐릭터 있는 씬 없음" if char_disabled else "등장 캐릭터가 있는 씬"
+                    )
+
+                # v2.2: 합성 이미지 필터 추가
+                with filter_cols[6]:
+                    has_composite_count = filter_summary.get('has_composite', 0)
+                    composite_disabled = has_composite_count == 0
+                    filters["has_composite"] = st.checkbox(
+                        f"🎨 합성 완료 ({has_composite_count}개)",
+                        value=filters.get("has_composite", False),
+                        key="filter_cb_has_composite",
+                        disabled=composite_disabled,
+                        help="합성 완료된 씬 없음" if composite_disabled else "합성 이미지가 있는 씬"
+                    )
+
+                with filter_cols[7]:
+                    no_composite_count = filter_summary.get('no_composite', 0)
+                    no_composite_disabled = no_composite_count == 0
+                    filters["no_composite"] = st.checkbox(
+                        f"🖌️ 합성 미완료 ({no_composite_count}개)",
+                        value=filters.get("no_composite", False),
+                        key="filter_cb_no_composite",
+                        disabled=no_composite_disabled,
+                        help="합성 미완료된 씬 없음" if no_composite_disabled else "합성이 필요한 씬"
                     )
 
                 st.session_state.complex_filters = filters
@@ -6341,14 +6624,16 @@ Scene 4: (비워둠)
                         "korean_text": "🔤",
                         "no_image": "🖼️",
                         "no_video": "🎬",
-                        "not_generated": "⬜"
+                        "not_generated": "⬜",
+                        "has_characters": "👤"  # v2.1: 캐릭터 필터
                     }
                     filter_names = {
                         "bundle_representative": "묶음대표",
                         "korean_text": "한글텍스트",
                         "no_image": "이미지없음",
                         "no_video": "비디오없음",
-                        "not_generated": "미생성"
+                        "not_generated": "미생성",
+                        "has_characters": "캐릭터있음"  # v2.1: 캐릭터 필터
                     }
 
                     for filter_key, ids in filter_results.items():
@@ -6378,6 +6663,37 @@ Scene 4: (비워둠)
                     valid_scene_ids = all_scene_ids
                     filter_label = None
                     final_ids = set(all_scene_ids)
+
+                # ─────────────────────────────────────────────────────────
+                # ⭐ v3.25: 씬 타입 필터 (Flow 1/2/3)
+                # ⭐ v3.26: 파이프라인 워크플로우 통합 (순차 소거)
+                # ─────────────────────────────────────────────────────────
+                if SCENE_TYPE_UI_AVAILABLE:
+                    # 프로젝트 씬 타입 초기화
+                    init_scene_type_for_project(project_path)
+
+                    # 통합 워크플로우 Expander (파이프라인 + 씬 타입 필터)
+                    if PIPELINE_UI_AVAILABLE:
+                        st_filtered_ids, st_filter_label = render_combined_workflow_expander(scenes, project_path)
+
+                        # 파이프라인 요약 정보 (사이드바 또는 메트릭으로 표시 가능)
+                        pipeline_info = get_pipeline_summary(scenes, project_path)
+                        if pipeline_info.get("available") and pipeline_info.get("ai_savings_percent", 0) > 0:
+                            st.caption(f"💰 AI 비용 절감 예상: **{pipeline_info['ai_savings_percent']:.1f}%**")
+                    else:
+                        # 파이프라인 미사용 시 기존 씬 타입 필터만
+                        st_filtered_ids, st_filter_label = render_scene_type_expander(scenes, project_path)
+
+                    # 씬 타입/파이프라인 필터가 활성화되면 기존 필터와 교집합
+                    if st_filter_label != "전체" and st_filtered_ids:
+                        if valid_scene_ids:
+                            new_ids = set(valid_scene_ids).intersection(st_filtered_ids)
+                            if new_ids:
+                                valid_scene_ids = sorted(list(new_ids))
+                                if filter_label:
+                                    filter_label = f"{filter_label} + {st_filter_label}"
+                                else:
+                                    filter_label = st_filter_label
 
                 st.divider()
 
@@ -6468,6 +6784,10 @@ Scene 4: (비워둠)
                     filter_icons.append("🎬")
                 if complex_filters.get("not_generated"):
                     filter_icons.append("⬜")
+                if complex_filters.get("has_composite"):
+                    filter_icons.append("🎨")
+                if complex_filters.get("no_composite"):
+                    filter_icons.append("🖌️")
 
                 separator = " + " if combine_mode == "union" else " ∩ "
                 icon_str = separator.join(filter_icons)
@@ -6763,6 +7083,20 @@ Scene 4: (비워둠)
                     st.session_state["storyboard_page"] = 0
 
                 current_page = st.session_state["storyboard_page"]
+
+                # v3.30: 먼저 total_pages 계산하여 current_page 범위 검증
+                total_pages = max(1, (len(filtered_scenes) + SCENES_PER_PAGE - 1) // SCENES_PER_PAGE)
+
+                # ✅ 필터 변경으로 페이지 수가 줄어든 경우 current_page 조정
+                if current_page >= total_pages:
+                    current_page = max(0, total_pages - 1)
+                    st.session_state["storyboard_page"] = current_page
+                    print(f"[스토리보드] 페이지 조정됨: → {current_page + 1}/{total_pages} (필터로 씬 수 감소)")
+
+                if current_page < 0:
+                    current_page = 0
+                    st.session_state["storyboard_page"] = current_page
+
                 paginated_scenes, start_idx, end_idx, total_pages = get_paginated_scenes(
                     filtered_scenes, current_page, SCENES_PER_PAGE
                 )
@@ -6803,11 +7137,15 @@ Scene 4: (비워둠)
                 quick_nav_cols = st.columns([2, 1, 1])
                 with quick_nav_cols[0]:
                     page_options = [f"페이지 {p+1} (씬 {p*SCENES_PER_PAGE+1}~{min((p+1)*SCENES_PER_PAGE, len(filtered_scenes))})" for p in range(total_pages)]
+
+                    # v3.30: selectbox 인덱스 안전 검증 (이중 보호)
+                    safe_page_index = max(0, min(current_page, total_pages - 1)) if total_pages > 0 else 0
+
                     selected_page = st.selectbox(
                         "빠른 이동",
-                        options=range(total_pages),
-                        format_func=lambda x: page_options[x],
-                        index=current_page,
+                        options=range(total_pages) if total_pages > 0 else [0],
+                        format_func=lambda x: page_options[x] if x < len(page_options) else f"페이지 {x+1}",
+                        index=safe_page_index,
                         key="quick_page_select",
                         label_visibility="collapsed"
                     )
@@ -6833,8 +7171,24 @@ Scene 4: (비워둠)
                     script_text = scene.get("script_text", "")
                     direction = scene.get("direction_guide", "")
                     characters = scene.get("characters", [])
-                    image_prompt = scene.get("image_prompt_en", "")
-                    image_prompt_korean = scene.get("image_prompt_korean_text", "")  # v3.16 한글 프롬프트
+                    # v3.19: 세분화된 프롬프트 지원 (필드명 직접 매핑)
+                    # 배경 프롬프트: background_prompt_en 필드 (없으면 빈 문자열, 폴백 없음)
+                    background_prompt_en = scene.get("background_prompt_en", "")
+                    background_prompt_ko = scene.get("background_prompt_ko", "")
+                    # 캐릭터 프롬프트: character_prompt_en 필드
+                    character_prompt_en = scene.get("character_prompt_en", "")
+                    character_prompt_ko = scene.get("character_prompt_ko", "")
+                    # 전체 프롬프트: image_prompt_en 필드 (기존 통합 프롬프트)
+                    # 없으면 배경+캐릭터 조합으로 생성
+                    full_prompt_en = scene.get("image_prompt_en", "")
+                    if not full_prompt_en and (background_prompt_en or character_prompt_en):
+                        full_prompt_en = ", ".join(filter(None, [background_prompt_en, character_prompt_en]))
+                    full_prompt_ko = scene.get("image_prompt_ko", "")
+                    if not full_prompt_ko and (background_prompt_ko or character_prompt_ko):
+                        full_prompt_ko = ", ".join(filter(None, [background_prompt_ko, character_prompt_ko]))
+                    # 하위 호환성: 기존 변수명 유지
+                    image_prompt = full_prompt_en
+                    image_prompt_korean = full_prompt_ko or scene.get("image_prompt_korean_text", "")
                     duration = scene.get("duration_estimate", 10)
                     filename = scene.get("filename", "")
 
@@ -6843,12 +7197,14 @@ Scene 4: (비워둠)
                         cols = st.columns([1, 3, 2])
 
                         with cols[0]:
-                            # ⭐ v3.17: 씬 태그 표시 (묶음 대표 + 한글 텍스트)
+                            # ⭐ v3.17: 씬 태그 표시 (묶음 대표 + 한글 텍스트 + 합성 완료)
                             tags = []
                             if scene_id in bundle_rep_ids:
                                 tags.append("📦")
                             if scene_id in korean_text_ids:
                                 tags.append("🔤")
+                            if scene_id in composite_scene_ids:
+                                tags.append("🎨")
                             tag_str = " ".join(tags)
                             if tag_str:
                                 st.markdown(f"### 씬 {scene_id} {tag_str}")
@@ -6879,47 +7235,78 @@ Scene 4: (비워둠)
                                 video_prompt_char = get_video_prompt_for_scene(scene, "character") if show_video_prompt else ""
                                 video_prompt_full = get_video_prompt_for_scene(scene, "full") if show_video_prompt else ""
 
-                                # 표시할 프롬프트가 있는지 확인
-                                has_image = image_prompt and image_prompt.upper() != "N/A"
-                                has_korean = image_prompt_korean and image_prompt_korean.upper() != "N/A"
+                                # v3.18: 세분화된 프롬프트 표시 여부 확인
+                                has_full_en = full_prompt_en and full_prompt_en.upper() != "N/A"
+                                has_full_ko = full_prompt_ko and full_prompt_ko.upper() != "N/A"
+                                has_bg_en = background_prompt_en and background_prompt_en.upper() != "N/A"
+                                has_char_en = character_prompt_en and character_prompt_en.upper() != "N/A"
                                 has_video = (video_prompt_char and video_prompt_char.upper() != "N/A") or \
                                            (video_prompt_full and video_prompt_full.upper() != "N/A")
+                                # 하위 호환성
+                                has_image = has_full_en
+                                has_korean = has_full_ko or (image_prompt_korean and image_prompt_korean.upper() != "N/A")
 
-                                if has_image or has_korean or has_video:
+                                if has_image or has_korean or has_bg_en or has_char_en or has_video:
                                     st.markdown("**📝 프롬프트**")
                                     with st.container(border=True):
-                                        prompt_tabs = st.tabs(["🖼️ 이미지", "🇰🇷 한글이미지", "🎬 비디오"])
+                                        # v3.18: 5개 탭 (이미지전체, 한글전체, 배경, 캐릭터, 비디오)
+                                        prompt_tabs = st.tabs(["🖼️ 이미지(전체)", "🇰🇷 한글(전체)", "🏞️ 배경", "👤 캐릭터", "🎬 비디오"])
 
-                                        # 🖼️ 이미지 프롬프트 탭
+                                        # 🖼️ 이미지(전체) 프롬프트 탭 - 배경 + 캐릭터 조합
                                         with prompt_tabs[0]:
-                                            if has_image:
-                                                st.code(image_prompt[:300] + "..." if len(image_prompt) > 300 else image_prompt, language=None)
-                                                # v1.2: 즉시 복사 버튼
+                                            if has_full_en:
+                                                st.code(full_prompt_en[:300] + "..." if len(full_prompt_en) > 300 else full_prompt_en, language=None)
                                                 render_instant_copy_button(
-                                                    text=image_prompt,
-                                                    key=f"copy_img_prompt_{i}_{scene_id}",
+                                                    text=full_prompt_en,
+                                                    key=f"copy_full_en_{i}_{scene_id}",
                                                     label="📋 복사",
-                                                    help_text="영문 이미지 프롬프트 복사"
+                                                    help_text="전체 영문 프롬프트 복사 (배경+캐릭터)"
                                                 )
                                             else:
                                                 st.caption("이미지 프롬프트 없음")
 
-                                        # 🇰🇷 한글 이미지 프롬프트 탭
+                                        # 🇰🇷 한글(전체) 이미지 프롬프트 탭
                                         with prompt_tabs[1]:
-                                            if has_korean:
-                                                st.code(image_prompt_korean[:300] + "..." if len(image_prompt_korean) > 300 else image_prompt_korean, language=None)
-                                                # v1.2: 즉시 복사 버튼
+                                            display_korean = full_prompt_ko or image_prompt_korean
+                                            if display_korean and display_korean.upper() != "N/A":
+                                                st.code(display_korean[:300] + "..." if len(display_korean) > 300 else display_korean, language=None)
                                                 render_instant_copy_button(
-                                                    text=image_prompt_korean,
-                                                    key=f"copy_kr_prompt_{i}_{scene_id}",
+                                                    text=display_korean,
+                                                    key=f"copy_full_ko_{i}_{scene_id}",
                                                     label="📋 복사",
-                                                    help_text="한글 이미지 프롬프트 복사"
+                                                    help_text="전체 한글 프롬프트 복사"
                                                 )
                                             else:
                                                 st.caption("한글 프롬프트 없음 (씬 재분석 필요)")
 
-                                        # 🎬 비디오 프롬프트 탭
+                                        # 🏞️ 배경 프롬프트 탭
                                         with prompt_tabs[2]:
+                                            if has_bg_en:
+                                                st.code(background_prompt_en[:300] + "..." if len(background_prompt_en) > 300 else background_prompt_en, language=None)
+                                                render_instant_copy_button(
+                                                    text=background_prompt_en,
+                                                    key=f"copy_bg_en_{i}_{scene_id}",
+                                                    label="📋 복사",
+                                                    help_text="배경 프롬프트 복사"
+                                                )
+                                            else:
+                                                st.caption("배경 프롬프트 없음")
+
+                                        # 👤 캐릭터 프롬프트 탭
+                                        with prompt_tabs[3]:
+                                            if has_char_en:
+                                                st.code(character_prompt_en[:300] + "..." if len(character_prompt_en) > 300 else character_prompt_en, language=None)
+                                                render_instant_copy_button(
+                                                    text=character_prompt_en,
+                                                    key=f"copy_char_en_{i}_{scene_id}",
+                                                    label="📋 복사",
+                                                    help_text="캐릭터 프롬프트 복사"
+                                                )
+                                            else:
+                                                st.caption("캐릭터 프롬프트 없음")
+
+                                        # 🎬 비디오 프롬프트 탭
+                                        with prompt_tabs[4]:
                                             if has_video:
                                                 vp_tab1, vp_tab2 = st.tabs(["👤 캐릭터", "🌍 전체"])
 
@@ -6974,9 +7361,18 @@ Scene 4: (비워둠)
                             # 🖼️ 이미지 표시
                             elif show_images:
                                 scene_image = None
+                                is_composite_image = False  # v2.2: 합성 이미지 여부 플래그
+
+                                # ⭐ v2.2: 합성 이미지 우선 매칭 (최고 우선순위)
+                                composite_path = scene.get("composite_image_path") or scene.get("nano_composite_image") or scene.get("composite_path")
+                                if composite_path:
+                                    composite_path_obj = Path(composite_path)
+                                    if composite_path_obj.exists():
+                                        scene_image = composite_path_obj
+                                        is_composite_image = True
 
                                 # 파일명으로 매칭
-                                if filename and filename.replace(".png", "") in image_map:
+                                if not scene_image and filename and filename.replace(".png", "") in image_map:
                                     scene_image = image_map[filename.replace(".png", "")]
 
                                 # ⭐ v2.3: 실사 이미지 우선 매칭
@@ -7008,6 +7404,10 @@ Scene 4: (비워둠)
 
                                 if scene_image and scene_image.exists():
                                     render_lightbox_image(str(scene_image), width=300, key=f"storyboard_img_{i}_{scene_id}")
+
+                                    # v2.2: 합성 이미지인 경우 배지 표시
+                                    if is_composite_image:
+                                        st.caption("🎨 합성 이미지")
 
                                     # === 실사 이미지 대체 기능 ===
                                     img_btn_cols = st.columns(6)  # v1.1: 6열로 변경 (다운로드 버튼 추가)
@@ -7118,12 +7518,142 @@ Scene 4: (비워둠)
                 df = pd.DataFrame(table_data)
                 st.dataframe(df, use_container_width=True)
 
-            # === 타임라인 뷰 ===
+            # === 타임라인 뷰 (v2.0: 개선된 버전) ===
             elif view_mode == "타임라인 뷰":
                 st.subheader("🎬 스토리보드 (타임라인 뷰)")
 
-                # 이미지 그리드로 표시
-                cols_per_row = 4
+                # ─────────────────────────────────────────────────────────
+                # 타임라인 설정 패널
+                # ─────────────────────────────────────────────────────────
+                with st.expander("⚙️ 타임라인 설정 & 이미지 대체", expanded=False):
+
+                    # 한 행 당 씬 수 설정
+                    tl_col1, tl_col2, tl_col3 = st.columns([1, 1, 1])
+
+                    with tl_col1:
+                        cols_per_row = st.slider(
+                            "한 행 당 씬 수",
+                            min_value=2, max_value=6, value=4,
+                            key="timeline_cols_per_row"
+                        )
+
+                    with tl_col2:
+                        # 새로고침 버튼
+                        if st.button("🔄 이미지 새로고침", key="tl_refresh_btn", use_container_width=True):
+                            st.cache_data.clear()
+                            st.rerun()
+
+                    with tl_col3:
+                        # 묶음 대체 모드
+                        bundle_replace_mode = st.toggle(
+                            "📦 묶음 대체 모드",
+                            value=st.session_state.get('tl_bundle_replace_mode', False),
+                            key="tl_bundle_toggle",
+                            help="활성화하면 같은 묶음의 모든 씬이 함께 대체됩니다"
+                        )
+                        st.session_state['tl_bundle_replace_mode'] = bundle_replace_mode
+
+                    # 합성 설정 (타임라인 합성 모듈 사용 가능할 때만)
+                    if TIMELINE_COMPOSITE_AVAILABLE:
+                        st.markdown("---")
+                        st.markdown("#### 🎨 이미지 합성 설정")
+
+                        comp_col1, comp_col2, comp_col3 = st.columns(3)
+
+                        with comp_col1:
+                            realshot_width_pct = st.slider(
+                                "실사 가로 비율 (%)",
+                                min_value=20, max_value=100, value=60, step=5,
+                                key="tl_realshot_width"
+                            )
+
+                        with comp_col2:
+                            realshot_height_pct = st.slider(
+                                "실사 세로 비율 (%)",
+                                min_value=20, max_value=100, value=60, step=5,
+                                key="tl_realshot_height"
+                            )
+
+                        with comp_col3:
+                            position_options = [opt[1] for opt in POSITION_OPTIONS]
+                            position_values = [opt[0] for opt in POSITION_OPTIONS]
+                            position_idx = st.selectbox(
+                                "위치",
+                                options=range(len(position_options)),
+                                format_func=lambda i: position_options[i],
+                                index=0,
+                                key="tl_position"
+                            )
+                            position = position_values[position_idx]
+
+                        # 배경 설정
+                        bg_col1, bg_col2 = st.columns(2)
+
+                        with bg_col1:
+                            bg_source_options = [opt[1] for opt in BG_SOURCE_OPTIONS]
+                            bg_source_values = [opt[0] for opt in BG_SOURCE_OPTIONS]
+                            bg_source_idx = st.selectbox(
+                                "배경 소스",
+                                options=range(len(bg_source_options)),
+                                format_func=lambda i: bg_source_options[i],
+                                index=0,
+                                key="tl_bg_source"
+                            )
+                            bg_source = bg_source_values[bg_source_idx]
+
+                        with bg_col2:
+                            if bg_source == 'existing':
+                                bg_opacity = st.slider(
+                                    "배경 투명도",
+                                    min_value=0.0, max_value=1.0, value=0.3, step=0.05,
+                                    key="tl_bg_opacity",
+                                    help="0 = 검정, 1 = 완전히 보임"
+                                )
+                                bg_darken = st.slider(
+                                    "배경 어둡게",
+                                    min_value=0.0, max_value=1.0, value=0.2, step=0.05,
+                                    key="tl_bg_darken"
+                                )
+                            elif bg_source == 'color':
+                                bg_color = st.color_picker(
+                                    "배경 색상",
+                                    value="#1a1a2e",
+                                    key="tl_bg_color"
+                                )
+                            elif bg_source == 'blur':
+                                blur_radius = st.slider(
+                                    "블러 강도",
+                                    min_value=5, max_value=50, value=20, step=5,
+                                    key="tl_blur_radius"
+                                )
+
+                        # 합성 설정 저장
+                        composite_settings = {
+                            'realshot_width_pct': realshot_width_pct,
+                            'realshot_height_pct': realshot_height_pct,
+                            'position': position,
+                            'bg_source': bg_source,
+                            'bg_settings': {}
+                        }
+
+                        if bg_source == 'existing':
+                            composite_settings['bg_settings']['opacity'] = bg_opacity
+                            composite_settings['bg_settings']['darken'] = bg_darken
+                        elif bg_source == 'color':
+                            composite_settings['bg_settings']['color'] = bg_color
+                        elif bg_source == 'blur':
+                            composite_settings['bg_settings']['blur_radius'] = blur_radius
+
+                        st.session_state['tl_composite_settings'] = composite_settings
+                    else:
+                        cols_per_row = 4
+                        composite_settings = None
+
+                st.markdown("---")
+
+                # ─────────────────────────────────────────────────────────
+                # 타임라인 그리드
+                # ─────────────────────────────────────────────────────────
                 current_time = 0
 
                 for row_start in range(0, len(filtered_scenes), cols_per_row):
@@ -7136,33 +7666,51 @@ Scene 4: (비워둠)
 
                         scene = filtered_scenes[idx]
                         scene_id = scene.get("scene_id", idx + 1)
+                        bundle_id = scene.get("bundle_id")
                         duration = scene.get("duration_estimate", 10)
 
                         with col:
-                            # 타임코드
-                            minutes = current_time // 60
-                            seconds = current_time % 60
-                            st.caption(f"{minutes:02d}:{seconds:02d}")
+                            # ⭐ 씬 번호 헤더 (v2.0)
+                            header_col1, header_col2 = st.columns([2, 1])
+                            with header_col1:
+                                if bundle_id:
+                                    st.markdown(f"**씬 {scene_id}** <span style='color:#888;font-size:11px;'>묶음{bundle_id}</span>", unsafe_allow_html=True)
+                                else:
+                                    st.markdown(f"**씬 {scene_id}**")
+                            with header_col2:
+                                minutes = current_time // 60
+                                seconds = current_time % 60
+                                st.caption(f"⏱️{minutes:02d}:{seconds:02d}")
 
-                            # 이미지 (확대 + 프롬프트 기능 포함)
-                            if idx < len(image_files):
+                            # ⭐ 이미지 실시간 동기화 (v2.0)
+                            img_path = None
+                            if TIMELINE_COMPOSITE_AVAILABLE:
+                                img_path = get_latest_scene_image(scene, str(project_path))
+
+                            # 폴백: 기존 방식
+                            if not img_path and idx < len(image_files):
                                 img_path = str(image_files[idx])
+
+                            if img_path and os.path.exists(img_path):
                                 st.image(img_path, use_container_width=True)
+
                                 # 확대/프롬프트 버튼
                                 btn_c1, btn_c2 = st.columns(2)
                                 with btn_c1:
-                                    if st.button("🔍", key=f"tl_zoom_{idx}", help="확대"):
-                                        st.session_state[f'tl_zoom_{idx}'] = True
+                                    if st.button("🔍", key=f"tl_zoom_{idx}_{scene_id}", help="확대"):
+                                        st.session_state[f'tl_zoom_{idx}_{scene_id}'] = True
                                 with btn_c2:
-                                    if st.button("📝", key=f"tl_prompt_{idx}", help="프롬프트"):
-                                        st.session_state[f'tl_prompt_{idx}'] = not st.session_state.get(f'tl_prompt_{idx}', False)
+                                    if st.button("📝", key=f"tl_prompt_{idx}_{scene_id}", help="프롬프트"):
+                                        st.session_state[f'tl_prompt_{idx}_{scene_id}'] = not st.session_state.get(f'tl_prompt_{idx}_{scene_id}', False)
+
                                 # 확대 모달
-                                if st.session_state.get(f'tl_zoom_{idx}', False):
+                                if st.session_state.get(f'tl_zoom_{idx}_{scene_id}', False):
                                     from utils.image_viewer import show_image_modal
                                     show_image_modal(img_path, scene_id, scene, f"씬 {scene_id}")
-                                    st.session_state[f'tl_zoom_{idx}'] = False
+                                    st.session_state[f'tl_zoom_{idx}_{scene_id}'] = False
+
                                 # 프롬프트 expander
-                                if st.session_state.get(f'tl_prompt_{idx}', False):
+                                if st.session_state.get(f'tl_prompt_{idx}_{scene_id}', False):
                                     prompt_info = ImagePromptManager.get_prompt_from_scene(scene)
                                     prompt_text = prompt_info.get('image_prompt', '')
                                     if prompt_text:
@@ -7170,7 +7718,65 @@ Scene 4: (비워둠)
                                     else:
                                         st.caption("프롬프트 없음")
                             else:
-                                st.info(f"씬 {scene_id}")
+                                st.info(f"씬 {scene_id} - 이미지 없음")
+
+                            # ⭐ 드래그 앤 드롭 이미지 대체 (v2.0)
+                            if TIMELINE_COMPOSITE_AVAILABLE:
+                                uploaded_file = st.file_uploader(
+                                    "이미지/비디오",
+                                    type=['png', 'jpg', 'jpeg', 'webp', 'mp4', 'mov'],
+                                    key=f"tl_drop_{idx}_{scene_id}",
+                                    label_visibility="collapsed"
+                                )
+
+                                if uploaded_file:
+                                    # 합성 설정 가져오기
+                                    settings = st.session_state.get('tl_composite_settings', DEFAULT_COMPOSITE_SETTINGS)
+
+                                    with st.spinner(f"씬 {scene_id} 처리 중..."):
+                                        # 파일 타입 확인
+                                        file_ext = uploaded_file.name.split('.')[-1].lower()
+                                        is_video = file_ext in ['mp4', 'mov', 'avi', 'mkv', 'webm']
+
+                                        if is_video:
+                                            # 비디오: 썸네일 추출 후 합성
+                                            thumb_path = extract_video_thumbnail(uploaded_file, scene_id, str(project_path))
+                                            if thumb_path:
+                                                realshot_source = thumb_path
+                                            else:
+                                                st.error("비디오 썸네일 추출 실패")
+                                                realshot_source = None
+
+                                            # 비디오 파일도 저장
+                                            save_realshot_file(uploaded_file, scene_id, str(project_path))
+                                        else:
+                                            realshot_source = uploaded_file
+
+                                        if realshot_source:
+                                            if bundle_replace_mode and bundle_id:
+                                                # 묶음 대체
+                                                count = replace_bundle_scenes(
+                                                    realshot_source=realshot_source,
+                                                    scene=scene,
+                                                    all_scenes=filtered_scenes,
+                                                    project_path=str(project_path),
+                                                    settings=settings
+                                                )
+                                                st.success(f"✅ 묶음 {bundle_id} 대체 완료! ({count}개 씬)")
+                                            else:
+                                                # 단일 씬 대체
+                                                result = create_composite_realshot(
+                                                    realshot_source=realshot_source,
+                                                    scene_num=scene_id,
+                                                    project_path=str(project_path),
+                                                    settings=settings
+                                                )
+                                                if result:
+                                                    st.success(f"✅ 씬 {scene_id} 합성 완료!")
+                                                else:
+                                                    st.error("합성 실패")
+
+                                    st.rerun()
 
                             # 스크립트 미리보기
                             script_preview = scene.get("script_text", "")[:30]

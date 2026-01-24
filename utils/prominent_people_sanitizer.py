@@ -39,28 +39,45 @@ class SanitizeResult:
 
 
 # AI 프롬프트 템플릿
-SANITIZE_PROMPT_TEMPLATE = """You are an expert at identifying and replacing celebrity/famous person names in image generation prompts.
+SANITIZE_PROMPT_TEMPLATE = """You are an expert at identifying and replacing problematic names in image generation prompts for Google ImageFX.
 
-TASK: Analyze the following prompt and replace any celebrity, famous person, or public figure names with generic physical descriptions.
+TASK: Analyze the following prompt and replace ANY of these with generic descriptions:
+1. Celebrity/famous person names
+2. Real company names (Samsung, Tesla, Apple, Google, Hyundai, ZF, Bosch, etc.)
+3. Corporate titles combined with company names (e.g., "삼성전자 임원", "Tesla CEO")
+4. Public figures or recognizable individuals
 
 RULES:
-1. Replace celebrity names with detailed physical descriptions (age, gender, ethnicity, hair color, body type, etc.)
-2. Keep the original context and action
-3. Preserve non-celebrity names (fictional characters from the story are OK)
-4. Return ONLY valid JSON, no markdown formatting
+1. Replace celebrity names with detailed physical descriptions (age, gender, ethnicity, hair, etc.)
+2. Replace company names with generic industry descriptions:
+   - "삼성전자 임원" → "middle-aged Korean man in formal business suit, professional appearance"
+   - "Tesla CEO" → "businessman in smart casual attire"
+   - "ZF 독일 임원" → "German businessman in formal suit"
+3. Keep the original context and action
+4. Preserve fictional character names from the story
+5. Return ONLY valid JSON, no markdown formatting
+
+IMPORTANT COMPANY PATTERNS TO DETECT (Korean):
+- 삼성, 삼성전자, 현대, 현대자동차, LG, SK, 롯데, 카카오, 네이버
+- 임원, 대표, 사장, 회장, 부회장, 전무, 상무, 이사, 팀장
+
+IMPORTANT COMPANY PATTERNS TO DETECT (Global):
+- Tesla, Apple, Google, Microsoft, Amazon, Meta, NVIDIA, Intel
+- Samsung, Hyundai, Sony, Toyota, BMW, Mercedes, Bosch, ZF
+- CEO, executive, director, manager
 
 INPUT PROMPT:
 {prompt}
 
 OUTPUT FORMAT (strict JSON only):
 {{
-    "detected_names": ["list of celebrity names found"],
-    "replacements": {{"original name": "replacement description"}},
+    "detected_names": ["list of celebrities/companies found"],
+    "replacements": {{"original text": "replacement description"}},
     "sanitized_prompt": "the modified prompt with replacements applied",
     "was_modified": true/false
 }}
 
-If no celebrities are detected, return:
+If no problematic content is detected, return:
 {{
     "detected_names": [],
     "replacements": {{}},
@@ -348,6 +365,247 @@ def check_prominent_people_error(error_message: str) -> bool:
     ]
 
     return any(pattern in error_lower for pattern in patterns)
+
+
+# ============================================================
+# 캐릭터 데이터 처리 헬퍼 함수 (v3.31)
+# ============================================================
+
+@dataclass
+class CharacterSanitizeResult:
+    """캐릭터 치환 결과"""
+    original_name: str
+    sanitized_name: str
+    original_visual_prompt: str
+    sanitized_visual_prompt: str
+    name_was_modified: bool
+    prompt_was_modified: bool
+    name_detected_names: List[str]
+    prompt_detected_names: List[str]
+    model_used: str
+    error: Optional[str] = None
+
+
+def sanitize_character_for_imagefx(
+    character: Dict[str, Any],
+    ai_model: str = None
+) -> Tuple[Dict[str, Any], CharacterSanitizeResult]:
+    """
+    캐릭터 데이터 전체를 치환 (이름 + visual_prompt)
+
+    Args:
+        character: 캐릭터 딕셔너리 (name, visual_prompt 등 포함)
+        ai_model: 사용할 AI 모델 (None이면 자동 선택)
+
+    Returns:
+        Tuple[Dict, CharacterSanitizeResult]: (익명화된 캐릭터, 상세 결과)
+    """
+    if ai_model is None:
+        ai_model = get_recommended_model()
+
+    original_name = character.get("name", "")
+    original_visual_prompt = character.get("visual_prompt", "")
+
+    # 결과 초기화
+    result = CharacterSanitizeResult(
+        original_name=original_name,
+        sanitized_name=original_name,
+        original_visual_prompt=original_visual_prompt,
+        sanitized_visual_prompt=original_visual_prompt,
+        name_was_modified=False,
+        prompt_was_modified=False,
+        name_detected_names=[],
+        prompt_detected_names=[],
+        model_used=ai_model
+    )
+
+    try:
+        sanitizer = ProminentPeopleSanitizer(ai_model=ai_model)
+
+        # 1. 이름 치환
+        if original_name:
+            name_result = sanitizer.sanitize(original_name)
+            result.sanitized_name = name_result.sanitized_prompt
+            result.name_was_modified = name_result.was_modified
+            result.name_detected_names = name_result.detected_names
+
+            if name_result.was_modified:
+                logger.info(f"[캐릭터 익명화] 이름 변환: '{original_name}' → '{result.sanitized_name}'")
+
+        # 2. visual_prompt 치환
+        if original_visual_prompt:
+            prompt_result = sanitizer.sanitize(original_visual_prompt)
+            result.sanitized_visual_prompt = prompt_result.sanitized_prompt
+            result.prompt_was_modified = prompt_result.was_modified
+            result.prompt_detected_names = prompt_result.detected_names
+
+            if prompt_result.was_modified:
+                logger.info(f"[캐릭터 익명화] 프롬프트 변환: {len(prompt_result.detected_names)}명 감지")
+
+    except Exception as e:
+        logger.error(f"[캐릭터 익명화] 오류: {e}")
+        result.error = str(e)
+
+    # 익명화된 캐릭터 데이터 생성 (원본 정보 보존)
+    sanitized_character = character.copy()
+    sanitized_character["name"] = result.sanitized_name
+    sanitized_character["visual_prompt"] = result.sanitized_visual_prompt
+
+    # 원본 정보 보존 (파일 저장/표시용)
+    sanitized_character["_original_name"] = original_name
+    sanitized_character["_original_visual_prompt"] = original_visual_prompt
+    sanitized_character["_name_was_anonymized"] = result.name_was_modified
+    sanitized_character["_prompt_was_anonymized"] = result.prompt_was_modified
+
+    return sanitized_character, result
+
+
+def sanitize_characters_batch(
+    characters: List[Dict[str, Any]],
+    ai_model: str = None,
+    on_progress: callable = None
+) -> Tuple[List[Dict[str, Any]], List[CharacterSanitizeResult]]:
+    """
+    여러 캐릭터를 배치로 익명화
+
+    Args:
+        characters: 캐릭터 목록
+        ai_model: 사용할 AI 모델
+        on_progress: 진행 콜백 (current, total, character_name)
+
+    Returns:
+        Tuple[List[Dict], List[CharacterSanitizeResult]]: (익명화된 캐릭터 목록, 결과 목록)
+    """
+    sanitized_characters = []
+    results = []
+    total = len(characters)
+
+    logger.info(f"[캐릭터 익명화] 배치 시작: {total}명")
+
+    for i, char in enumerate(characters):
+        char_name = char.get("name", f"캐릭터 {i+1}")
+
+        if on_progress:
+            on_progress(i + 1, total, char_name)
+
+        sanitized_char, result = sanitize_character_for_imagefx(char, ai_model)
+        sanitized_characters.append(sanitized_char)
+        results.append(result)
+
+    # 통계 로깅
+    name_modified_count = sum(1 for r in results if r.name_was_modified)
+    prompt_modified_count = sum(1 for r in results if r.prompt_was_modified)
+
+    logger.info(f"[캐릭터 익명화] 배치 완료: 이름 {name_modified_count}명, 프롬프트 {prompt_modified_count}명 변환됨")
+
+    return sanitized_characters, results
+
+
+def preview_character_sanitization(
+    characters: List[Dict[str, Any]],
+    ai_model: str = None
+) -> List[Dict[str, Any]]:
+    """
+    캐릭터 익명화 미리보기 (이름만, 빠른 확인용)
+
+    Args:
+        characters: 캐릭터 목록
+        ai_model: 사용할 AI 모델
+
+    Returns:
+        미리보기 결과 목록
+    """
+    if ai_model is None:
+        ai_model = get_recommended_model()
+
+    previews = []
+
+    try:
+        sanitizer = ProminentPeopleSanitizer(ai_model=ai_model)
+
+        for char in characters:
+            original_name = char.get("name", "")
+
+            if original_name:
+                result = sanitizer.sanitize(original_name)
+                preview = {
+                    "original_name": original_name,
+                    "sanitized_name": result.sanitized_prompt,
+                    "changed": result.was_modified,
+                    "detected_names": result.detected_names,
+                    "visual_prompt_preview": (char.get("visual_prompt", "")[:50] + "...")
+                        if char.get("visual_prompt") else ""
+                }
+            else:
+                preview = {
+                    "original_name": "(이름 없음)",
+                    "sanitized_name": "(이름 없음)",
+                    "changed": False,
+                    "detected_names": [],
+                    "visual_prompt_preview": ""
+                }
+
+            previews.append(preview)
+
+    except Exception as e:
+        logger.error(f"[캐릭터 익명화 미리보기] 오류: {e}")
+        # 오류 시 빈 결과 반환
+        for char in characters:
+            previews.append({
+                "original_name": char.get("name", ""),
+                "sanitized_name": char.get("name", ""),
+                "changed": False,
+                "detected_names": [],
+                "visual_prompt_preview": "",
+                "error": str(e)
+            })
+
+    return previews
+
+
+# 빠른 체크: 변환 필요 여부 판단 (API 호출 없이)
+def needs_sanitization_quick_check(text: str) -> bool:
+    """
+    API 호출 없이 빠르게 익명화 필요 여부 확인
+
+    Args:
+        text: 확인할 텍스트
+
+    Returns:
+        bool: 익명화 필요 여부 (True면 API 호출 필요)
+    """
+    if not text:
+        return False
+
+    # 위험 키워드 목록 (기업명, 유명인, 직책 조합 등)
+    danger_keywords = [
+        # 한국 대기업
+        "삼성", "삼성전자", "현대", "현대자동차", "현대차", "LG", "LG전자",
+        "SK", "SK하이닉스", "롯데", "카카오", "네이버", "쿠팡",
+        "기아", "포스코", "한화", "GS", "CJ", "두산", "신세계",
+        # 글로벌 기업
+        "Apple", "Google", "Microsoft", "Amazon", "Tesla", "Meta", "Facebook",
+        "Samsung", "Hyundai", "Sony", "Toyota", "BMW", "Mercedes", "Bosch", "ZF",
+        "NVIDIA", "Intel", "OpenAI", "Anthropic", "SpaceX",
+        # 유명인 관련 키워드
+        "이재용", "정의선", "최태원", "신동빈", "정몽구",
+        "Elon", "Musk", "Tim Cook", "Zuckerberg", "Bezos", "Gates",
+        "트럼프", "바이든", "Trump", "Biden",
+        # 한국 직책 키워드 (기업명과 조합 시 위험)
+        "임원", "대표", "회장", "부회장", "사장", "전무", "상무", "이사", "팀장",
+        # 글로벌 직책 키워드
+        "CEO", "executive", "director",
+        # 추가 기업명
+        "테슬라", "애플", "구글", "페이스북", "아마존",
+    ]
+
+    text_check = text.lower() if text else ""
+
+    for keyword in danger_keywords:
+        if keyword.lower() in text_check:
+            return True
+
+    return False
 
 
 # ============================================================

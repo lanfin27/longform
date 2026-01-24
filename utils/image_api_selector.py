@@ -69,6 +69,25 @@ IMAGE_API_OPTIONS: Dict[str, dict] = {
         "icon": "🎭",
         "cost": "유료"
     },
+    # v1.1: Gemini 이미지 생성 모델 추가 (레퍼런스 이미지 지원)
+    "Gemini (Nano Banana)": {
+        "models": [
+            ("gemini_nano_banana", "Nano Banana (~15원, 레퍼런스 지원)"),
+        ],
+        "default_model": "gemini_nano_banana",
+        "setting_key": "gemini_banana_model",
+        "icon": "🍌",
+        "cost": "유료 (~15원/장, 레퍼런스 지원)"
+    },
+    "Gemini (Nano Banana Pro)": {
+        "models": [
+            ("gemini_nano_banana_pro", "Nano Banana Pro (~25원, 레퍼런스 지원)"),
+        ],
+        "default_model": "gemini_nano_banana_pro",
+        "setting_key": "gemini_banana_pro_model",
+        "icon": "🍌",
+        "cost": "유료 (~25원/장, 레퍼런스 지원)"
+    },
 }
 
 

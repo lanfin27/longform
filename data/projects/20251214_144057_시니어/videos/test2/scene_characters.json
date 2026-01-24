@@ -1,0 +1,602 @@
+{
+  "43": {
+    "characters": {
+      "비즈니스 사람들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_비즈니스_사람들_standing_1769174601439.png",
+            "updated_at": "2026-01-23T22:24:19.057120"
+          }
+        }
+      }
+    }
+  },
+  "44": {
+    "characters": {
+      "비즈니스 사람들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_비즈니스_사람들_standing_1769174601439.png",
+            "updated_at": "2026-01-23T22:24:19.057127"
+          }
+        }
+      }
+    }
+  },
+  "45": {
+    "characters": {
+      "비즈니스 사람들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_비즈니스_사람들_standing_1769174601439.png",
+            "updated_at": "2026-01-23T22:24:19.057129"
+          }
+        }
+      }
+    }
+  },
+  "46": {
+    "characters": {
+      "이재용": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_이재용_standing_1769174605353.png",
+            "updated_at": "2026-01-23T22:24:19.079378"
+          }
+        }
+      }
+    }
+  },
+  "47": {
+    "characters": {
+      "이재용": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_이재용_standing_1769174605353.png",
+            "updated_at": "2026-01-23T22:24:19.079385"
+          }
+        }
+      }
+    }
+  },
+  "48": {
+    "characters": {
+      "이재용": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_이재용_standing_1769174605353.png",
+            "updated_at": "2026-01-23T22:24:19.079387"
+          }
+        }
+      }
+    }
+  },
+  "112": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_운전자_standing_1769174610475.png",
+            "updated_at": "2026-01-23T22:24:19.105485"
+          }
+        }
+      }
+    }
+  },
+  "113": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_운전자_standing_1769174610475.png",
+            "updated_at": "2026-01-23T22:24:19.105490"
+          }
+        }
+      }
+    }
+  },
+  "114": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_운전자_standing_1769174610475.png",
+            "updated_at": "2026-01-23T22:24:19.105492"
+          }
+        }
+      }
+    }
+  },
+  "124": {
+    "characters": {
+      "디자이너": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_디자이너_standing_1769174612319.png",
+            "updated_at": "2026-01-23T22:24:19.128352"
+          }
+        }
+      },
+      "자동차 디자이너": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_자동차_디자이너_standing_1769174623916.png",
+            "updated_at": "2026-01-23T22:24:19.190351"
+          }
+        }
+      }
+    }
+  },
+  "125": {
+    "characters": {
+      "디자이너": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_디자이너_standing_1769174612319.png",
+            "updated_at": "2026-01-23T22:24:19.128358"
+          }
+        }
+      },
+      "자동차 디자이너": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_자동차_디자이너_standing_1769174623916.png",
+            "updated_at": "2026-01-23T22:24:19.190360"
+          }
+        }
+      }
+    }
+  },
+  "126": {
+    "characters": {
+      "디자이너": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_디자이너_standing_1769174612319.png",
+            "updated_at": "2026-01-23T22:24:19.128360"
+          }
+        }
+      },
+      "자동차 디자이너": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_자동차_디자이너_standing_1769174623916.png",
+            "updated_at": "2026-01-23T22:24:19.190363"
+          }
+        }
+      }
+    }
+  },
+  "151": {
+    "characters": {
+      "임원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_임원들_standing_1769174619535.png",
+            "updated_at": "2026-01-23T22:24:19.157978"
+          }
+        }
+      }
+    }
+  },
+  "152": {
+    "characters": {
+      "임원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_임원들_standing_1769174619535.png",
+            "updated_at": "2026-01-23T22:24:19.157988"
+          }
+        }
+      }
+    }
+  },
+  "153": {
+    "characters": {
+      "임원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_임원들_standing_1769174619535.png",
+            "updated_at": "2026-01-23T22:24:19.157990"
+          }
+        }
+      }
+    }
+  },
+  "280": {
+    "characters": {
+      "임원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_임원들_standing_1769174619535.png",
+            "updated_at": "2026-01-23T22:24:19.157993"
+          }
+        }
+      }
+    }
+  },
+  "281": {
+    "characters": {
+      "임원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_임원들_standing_1769174619535.png",
+            "updated_at": "2026-01-23T22:24:19.157995"
+          }
+        }
+      }
+    }
+  },
+  "282": {
+    "characters": {
+      "임원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_임원들_standing_1769174619535.png",
+            "updated_at": "2026-01-23T22:24:19.157997"
+          }
+        }
+      }
+    }
+  },
+  "160": {
+    "characters": {
+      "엔지니어": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어_standing_1769174630375.png",
+            "updated_at": "2026-01-23T22:24:19.217673"
+          }
+        }
+      },
+      "엔지니어들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어들_standing_1769174659017.png",
+            "updated_at": "2026-01-23T22:24:19.339630"
+          }
+        }
+      }
+    }
+  },
+  "161": {
+    "characters": {
+      "엔지니어": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어_standing_1769174630375.png",
+            "updated_at": "2026-01-23T22:24:19.217730"
+          }
+        }
+      },
+      "엔지니어들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어들_standing_1769174659017.png",
+            "updated_at": "2026-01-23T22:24:19.339635"
+          }
+        }
+      }
+    }
+  },
+  "162": {
+    "characters": {
+      "엔지니어": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어_standing_1769174630375.png",
+            "updated_at": "2026-01-23T22:24:19.217734"
+          }
+        }
+      },
+      "엔지니어들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어들_standing_1769174659017.png",
+            "updated_at": "2026-01-23T22:24:19.339636"
+          }
+        }
+      }
+    }
+  },
+  "175": {
+    "characters": {
+      "엔지니어": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어_standing_1769174630375.png",
+            "updated_at": "2026-01-23T22:24:19.217737"
+          }
+        }
+      },
+      "엔지니어들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어들_standing_1769174659017.png",
+            "updated_at": "2026-01-23T22:24:19.339637"
+          }
+        }
+      }
+    }
+  },
+  "176": {
+    "characters": {
+      "엔지니어": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어_standing_1769174630375.png",
+            "updated_at": "2026-01-23T22:24:19.217739"
+          }
+        }
+      },
+      "엔지니어들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어들_standing_1769174659017.png",
+            "updated_at": "2026-01-23T22:24:19.339638"
+          }
+        }
+      }
+    }
+  },
+  "177": {
+    "characters": {
+      "엔지니어": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어_standing_1769174630375.png",
+            "updated_at": "2026-01-23T22:24:19.217741"
+          }
+        }
+      },
+      "엔지니어들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어들_standing_1769174659017.png",
+            "updated_at": "2026-01-23T22:24:19.339639"
+          }
+        }
+      }
+    }
+  },
+  "208": {
+    "characters": {
+      "엔지니어": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어_standing_1769174630375.png",
+            "updated_at": "2026-01-23T22:24:19.217743"
+          }
+        }
+      },
+      "엔지니어들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어들_standing_1769174659017.png",
+            "updated_at": "2026-01-23T22:24:19.339640"
+          }
+        }
+      }
+    }
+  },
+  "209": {
+    "characters": {
+      "엔지니어": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어_standing_1769174630375.png",
+            "updated_at": "2026-01-23T22:24:19.217745"
+          }
+        }
+      },
+      "엔지니어들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어들_standing_1769174659017.png",
+            "updated_at": "2026-01-23T22:24:19.339641"
+          }
+        }
+      }
+    }
+  },
+  "210": {
+    "characters": {
+      "엔지니어": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어_standing_1769174630375.png",
+            "updated_at": "2026-01-23T22:24:19.217747"
+          }
+        }
+      },
+      "엔지니어들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_엔지니어들_standing_1769174659017.png",
+            "updated_at": "2026-01-23T22:24:19.339642"
+          }
+        }
+      }
+    }
+  },
+  "196": {
+    "characters": {
+      "경영진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_경영진_standing_1769174634523.png",
+            "updated_at": "2026-01-23T22:24:19.244790"
+          }
+        }
+      }
+    }
+  },
+  "197": {
+    "characters": {
+      "경영진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_경영진_standing_1769174634523.png",
+            "updated_at": "2026-01-23T22:24:19.244798"
+          }
+        }
+      }
+    }
+  },
+  "198": {
+    "characters": {
+      "경영진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_경영진_standing_1769174634523.png",
+            "updated_at": "2026-01-23T22:24:19.244801"
+          }
+        }
+      }
+    }
+  },
+  "205": {
+    "characters": {
+      "경영진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_경영진_standing_1769174634523.png",
+            "updated_at": "2026-01-23T22:24:19.244803"
+          }
+        }
+      }
+    }
+  },
+  "206": {
+    "characters": {
+      "경영진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_경영진_standing_1769174634523.png",
+            "updated_at": "2026-01-23T22:24:19.244805"
+          }
+        }
+      }
+    }
+  },
+  "207": {
+    "characters": {
+      "경영진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_경영진_standing_1769174634523.png",
+            "updated_at": "2026-01-23T22:24:19.244807"
+          }
+        }
+      }
+    }
+  },
+  "214": {
+    "characters": {
+      "작업자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_작업자_standing_1769174641894.png",
+            "updated_at": "2026-01-23T22:24:19.267369"
+          }
+        }
+      }
+    }
+  },
+  "215": {
+    "characters": {
+      "작업자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_작업자_standing_1769174641894.png",
+            "updated_at": "2026-01-23T22:24:19.267374"
+          }
+        }
+      }
+    }
+  },
+  "216": {
+    "characters": {
+      "작업자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_작업자_standing_1769174641894.png",
+            "updated_at": "2026-01-23T22:24:19.267375"
+          }
+        }
+      }
+    }
+  },
+  "220": {
+    "characters": {
+      "임원진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_임원진_standing_1769174646633.png",
+            "updated_at": "2026-01-23T22:24:19.292747"
+          }
+        }
+      }
+    }
+  },
+  "221": {
+    "characters": {
+      "임원진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_임원진_standing_1769174646633.png",
+            "updated_at": "2026-01-23T22:24:19.292755"
+          }
+        }
+      }
+    }
+  },
+  "222": {
+    "characters": {
+      "임원진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_임원진_standing_1769174646633.png",
+            "updated_at": "2026-01-23T22:24:19.292758"
+          }
+        }
+      }
+    }
+  },
+  "232": {
+    "characters": {
+      "과학자들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_과학자들_standing_1769174653277.png",
+            "updated_at": "2026-01-23T22:24:19.318241"
+          }
+        }
+      }
+    }
+  },
+  "233": {
+    "characters": {
+      "과학자들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_과학자들_standing_1769174653277.png",
+            "updated_at": "2026-01-23T22:24:19.318249"
+          }
+        }
+      }
+    }
+  },
+  "234": {
+    "characters": {
+      "과학자들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test2\\images\\characters\\char_과학자들_standing_1769174653277.png",
+            "updated_at": "2026-01-23T22:24:19.318251"
+          }
+        }
+      }
+    }
+  }
+}

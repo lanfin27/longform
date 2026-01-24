@@ -46,6 +46,16 @@ from utils.youtube_service import (
     filter_videos_by_search_scope,
     get_search_scope_description
 )
+# v3.0: 채널 생성일 필터 추가
+from components.channel_age_filter import (
+    render_channel_age_filter,
+    get_channel_age_badge,
+    render_channel_age_badge_html
+)
+from utils.youtube_channel_filter import (
+    apply_channel_age_filter,
+    render_channel_filter_result
+)
 
 
 # Helper function for safe attribute access (dict or object)
@@ -386,6 +396,11 @@ with tab_search:
 
     st.markdown("---")
 
+    # === 채널 생성일 필터 (v3.0) ===
+    channel_age_filter = render_channel_age_filter(key_prefix="video_research")
+
+    st.markdown("---")
+
     # === 기간 필터 ===
     st.markdown('<div class="section-header">📅 업로드 기간</div>', unsafe_allow_html=True)
 
@@ -519,6 +534,32 @@ with tab_search:
                 # 필터링된 video_id 목록
                 filtered_ids = {v.get('video_id') for v in filtered_dicts}
                 videos = [v for v in videos if v.video_id in filtered_ids]
+
+                # v3.0: 채널 생성일 필터 적용
+                if channel_age_filter.get('enabled') and videos:
+                    try:
+                        youtube_svc = YouTubeService()
+                        video_dicts_for_channel = [v.to_dict() for v in videos]
+                        filtered_channel_dicts, channel_stats = apply_channel_age_filter(
+                            video_dicts_for_channel,
+                            channel_age_filter,
+                            youtube_svc
+                        )
+
+                        # 필터링된 video_id 목록
+                        channel_filtered_ids = {v.get('video_id') for v in filtered_channel_dicts}
+                        videos = [v for v in videos if v.video_id in channel_filtered_ids]
+
+                        # 채널 생성일 정보 저장
+                        for v in videos:
+                            for fd in filtered_channel_dicts:
+                                if fd.get('video_id') == v.video_id and '_channel_published_at' in fd:
+                                    v._channel_published_at = fd['_channel_published_at']
+                                    break
+
+                        render_channel_filter_result(channel_stats, channel_age_filter.get('preset'))
+                    except Exception as cf_error:
+                        st.warning(f"채널 생성일 필터 적용 중 오류: {cf_error}")
 
                 # 세션에 저장 (VideoInfo 객체 리스트)
                 st.session_state["search_results"] = videos

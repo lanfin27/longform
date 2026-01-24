@@ -21,6 +21,7 @@ class AIProvider(Enum):
     ANTHROPIC = "anthropic"
     GOOGLE = "google"
     OPENAI = "openai"
+    LOCAL = "local"  # Claude Code (로컬 실행)
 
 
 @dataclass
@@ -157,6 +158,20 @@ ALL_MODELS: Dict[str, AIModel] = {
         supports_vision=True,
         api_key_env="OPENAI_API_KEY"
     ),
+
+    # ==================== Local (Claude Code) ====================
+    "claude_code": AIModel(
+        id="claude_code",
+        name="Claude Code (Max Plan)",
+        provider=AIProvider.LOCAL,
+        speed="medium",
+        quality="best",
+        cost="free",
+        description="🤖 Max Plan 무료, 로컬 CLI 실행",
+        max_tokens=16384,
+        supports_vision=False,
+        api_key_env=""  # API 키 불필요 (CLI 설치 확인)
+    ),
 }
 
 
@@ -182,6 +197,12 @@ PROVIDER_INFO = {
         "icon": "🟢",
         "display": "🟢 OpenAI (GPT)",
         "env_var": "OPENAI_API_KEY"
+    },
+    AIProvider.LOCAL: {
+        "name": "Local",
+        "icon": "🤖",
+        "display": "🤖 Claude Code (Max Plan)",
+        "env_var": ""  # CLI 설치 확인
     }
 }
 
@@ -221,9 +242,26 @@ def get_provider_icon(provider: AIProvider) -> str:
 
 def check_api_key(provider: AIProvider) -> bool:
     """프로바이더의 API 키 존재 여부 확인"""
+    # LOCAL (Claude Code)는 CLI 설치 여부로 확인
+    if provider == AIProvider.LOCAL:
+        return _check_claude_code_installed()
+
     env_var = PROVIDER_INFO.get(provider, {}).get("env_var", "")
     key = os.getenv(env_var, "")
     return bool(key and key.strip())
+
+
+def _check_claude_code_installed() -> bool:
+    """Claude Code CLI 설치 여부 확인"""
+    try:
+        from utils.claude_code_runner import check_claude_code_installation
+        status = check_claude_code_installation()
+        return status.get('installed', False)
+    except ImportError:
+        # 모듈 없으면 False
+        return False
+    except Exception:
+        return False
 
 
 def get_available_providers() -> List[AIProvider]:

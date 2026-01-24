@@ -1,11 +1,16 @@
 """
-캐릭터 이미지 관리 유틸리티
+캐릭터 이미지 관리 유틸리티 (v2.0 - 캐싱 최적화)
 
 기능:
 - 이미지 목록 조회
 - 전체/개별 선택
 - 일괄 삭제
 - 대표 이미지 관리 (최신 이미지 자동 대표)
+
+v2.0 변경사항:
+- 클래스 레벨 캐싱 추가 (중복 호출 방지)
+- 씬-캐릭터 연동 결과 캐싱
+- 로그 출력 최소화 (캐시 히트 시 무출력)
 """
 
 import os
@@ -18,6 +23,39 @@ from typing import List, Dict, Optional, Tuple
 
 
 class CharacterImageManager:
+    # ═══════════════════════════════════════════════════════════════════
+    # 클래스 레벨 캐시 (v2.0)
+    # ═══════════════════════════════════════════════════════════════════
+    _instance_cache = {}          # 프로젝트별 인스턴스 캐시
+    _scene_link_cache = {}        # 씬-캐릭터 연동 결과 캐시
+    _all_images_cache = {}        # 전체 이미지 목록 캐시
+    _cache_timestamp = {}         # 캐시 타임스탬프
+    CACHE_TTL = 60                # 캐시 유효 시간 (초)
+
+    @classmethod
+    def get_instance(cls, project_path: str) -> 'CharacterImageManager':
+        """싱글톤 패턴 - 프로젝트별 인스턴스 재사용"""
+        if project_path not in cls._instance_cache:
+            cls._instance_cache[project_path] = cls(project_path)
+        return cls._instance_cache[project_path]
+
+    @classmethod
+    def clear_all_caches(cls):
+        """모든 캐시 초기화"""
+        cls._instance_cache.clear()
+        cls._scene_link_cache.clear()
+        cls._all_images_cache.clear()
+        cls._cache_timestamp.clear()
+        print("[CharImageManager] 모든 캐시 초기화됨")
+
+    @classmethod
+    def is_cache_valid(cls, cache_key: str) -> bool:
+        """캐시 유효성 확인"""
+        import time
+        if cache_key not in cls._cache_timestamp:
+            return False
+        elapsed = time.time() - cls._cache_timestamp[cache_key]
+        return elapsed < cls.CACHE_TTL
     """캐릭터 이미지 관리자"""
 
     def __init__(self, project_path: str):
@@ -35,9 +73,12 @@ class CharacterImageManager:
         self.characters_dir.mkdir(parents=True, exist_ok=True)
         self.images_dir.mkdir(parents=True, exist_ok=True)
 
-    def get_all_character_images(self) -> List[Dict]:
+    def get_all_character_images(self, use_cache: bool = True) -> List[Dict]:
         """
-        모든 캐릭터 이미지 목록 조회
+        모든 캐릭터 이미지 목록 조회 (v2.0: 캐싱 지원)
+
+        Args:
+            use_cache: 캐시 사용 여부 (기본 True)
 
         Returns:
             [
@@ -54,6 +95,14 @@ class CharacterImageManager:
                 ...
             ]
         """
+        import time
+
+        # 캐시 확인
+        cache_key = f"all_images_{self.project_path}"
+        if use_cache and cache_key in CharacterImageManager._all_images_cache:
+            if CharacterImageManager.is_cache_valid(cache_key):
+                return CharacterImageManager._all_images_cache[cache_key]
+
         images = []
 
         # 여러 디렉토리에서 이미지 검색
@@ -96,6 +145,10 @@ class CharacterImageManager:
 
         # 대표 이미지 표시
         self._mark_representative_images(unique_images)
+
+        # 캐시에 저장
+        CharacterImageManager._all_images_cache[cache_key] = unique_images
+        CharacterImageManager._cache_timestamp[cache_key] = time.time()
 
         return unique_images
 
@@ -453,6 +506,270 @@ class CharacterImageManager:
             self.update_character_data_with_latest_images()
 
         return total_result
+
+
+    # ===================================================================
+    # v3.28: 씬-캐릭터 이미지 연동 메서드
+    # ===================================================================
+
+    def find_character_image(self, character_name: str) -> Optional[Dict]:
+        """
+        캐릭터 이름으로 이미지 찾기 (유연한 매칭 지원)
+
+        매칭 우선순위:
+        1. 정확한 이름 매칭
+        2. 정규화된 이름 매칭 (공백, 특수문자 무시)
+        3. 부분 매칭 (포함 관계)
+        4. 유사도 매칭 (60% 이상)
+
+        Args:
+            character_name: 캐릭터 이름 (예: "노동자")
+
+        Returns:
+            {
+                "path": "full/path/to/image.png",
+                "name": "노동자",
+                "is_representative": True,
+                "match_type": "exact" | "normalized" | "partial" | "similar"
+            } 또는 None
+        """
+        if not character_name or not character_name.strip():
+            return None
+
+        character_name = character_name.strip()
+        all_images = self.get_all_character_images()
+
+        if not all_images:
+            print(f"[CharImageManager] 캐릭터 이미지 없음 (전체 0개)")
+            return None
+
+        # 캐릭터별로 그룹화
+        char_groups = {}
+        for img in all_images:
+            name = img["character_name"]
+            if name not in char_groups:
+                char_groups[name] = []
+            char_groups[name].append(img)
+
+        # 1. 정확한 이름 매칭
+        if character_name in char_groups:
+            img = char_groups[character_name][0]  # 최신(대표) 이미지
+            print(f"[CharImageManager] ✅ 정확 매칭: '{character_name}'")
+            return {
+                "path": img["path"],
+                "name": character_name,
+                "is_representative": img.get("is_representative", True),
+                "match_type": "exact"
+            }
+
+        # 2. 정규화된 이름 매칭
+        normalized_query = self._normalize_name(character_name)
+        for name, images in char_groups.items():
+            if self._normalize_name(name) == normalized_query:
+                img = images[0]
+                print(f"[CharImageManager] ✅ 정규화 매칭: '{character_name}' → '{name}'")
+                return {
+                    "path": img["path"],
+                    "name": name,
+                    "is_representative": img.get("is_representative", True),
+                    "match_type": "normalized"
+                }
+
+        # 3. 부분 매칭 (포함 관계)
+        for name, images in char_groups.items():
+            if character_name in name or name in character_name:
+                img = images[0]
+                print(f"[CharImageManager] ✅ 부분 매칭: '{character_name}' ~ '{name}'")
+                return {
+                    "path": img["path"],
+                    "name": name,
+                    "is_representative": img.get("is_representative", True),
+                    "match_type": "partial"
+                }
+
+        # 4. 유사도 매칭
+        best_match = self._find_similar_name(character_name, list(char_groups.keys()))
+        if best_match:
+            images = char_groups[best_match]
+            img = images[0]
+            print(f"[CharImageManager] ✅ 유사도 매칭: '{character_name}' ≈ '{best_match}'")
+            return {
+                "path": img["path"],
+                "name": best_match,
+                "is_representative": img.get("is_representative", True),
+                "match_type": "similar"
+            }
+
+        print(f"[CharImageManager] ❌ 캐릭터 '{character_name}' 이미지 없음")
+        return None
+
+    def _normalize_name(self, name: str) -> str:
+        """이름 정규화 (공백, 특수문자 제거, 소문자)"""
+        if not name:
+            return ""
+        # 공백, 특수문자 제거
+        normalized = re.sub(r'[^가-힣a-zA-Z0-9]', '', name)
+        return normalized.lower()
+
+    def _find_similar_name(self, query: str, names: List[str], threshold: float = 0.6) -> Optional[str]:
+        """유사한 이름 찾기 (SequenceMatcher 기반)"""
+        from difflib import SequenceMatcher
+
+        best_match = None
+        best_ratio = 0
+
+        for name in names:
+            # 한글 이름 비교
+            ratio = SequenceMatcher(None, query, name).ratio()
+
+            # 정규화된 이름으로도 비교
+            norm_ratio = SequenceMatcher(
+                None,
+                self._normalize_name(query),
+                self._normalize_name(name)
+            ).ratio()
+
+            max_ratio = max(ratio, norm_ratio)
+
+            if max_ratio > best_ratio and max_ratio >= threshold:
+                best_ratio = max_ratio
+                best_match = name
+
+        return best_match
+
+    def get_character_for_scene(self, scene: Dict, use_cache: bool = True) -> Optional[Dict]:
+        """
+        씬 데이터에서 캐릭터 이미지 찾기 (v2.0: 캐싱 지원)
+
+        Args:
+            scene: 씬 데이터 (characters 배열 또는 character_prompt 포함)
+            use_cache: 캐시 사용 여부 (기본 True)
+
+        Returns:
+            캐릭터 이미지 정보 또는 None
+        """
+        import time
+
+        scene_id = scene.get('scene_id') or scene.get('scene_number', '?')
+
+        # v2.0: 캐시 확인
+        cache_key = f"scene_char_{self.project_path}_{scene_id}"
+        if use_cache and cache_key in CharacterImageManager._scene_link_cache:
+            if CharacterImageManager.is_cache_valid(cache_key):
+                # 캐시 히트 - 로그 출력 없이 반환
+                return CharacterImageManager._scene_link_cache[cache_key]
+
+        # 0. appearance_scenes 기반 매칭 (v3.33 추가)
+        # characters.json에서 이 씬에 등장하는 캐릭터 찾기
+        char_data = self._load_character_data()
+        for char in char_data:
+            appearance_scenes = char.get('appearance_scenes', [])
+            if scene_id in appearance_scenes or str(scene_id) in [str(s) for s in appearance_scenes]:
+                char_name = char.get('name', '')
+                if char_name:
+                    result = self.find_character_image(char_name)
+                    if result:
+                        # 캐시에 저장
+                        CharacterImageManager._scene_link_cache[cache_key] = result
+                        CharacterImageManager._cache_timestamp[cache_key] = time.time()
+                        return result
+
+        # 1. characters 배열에서 이름 추출
+        characters = scene.get('characters', [])
+        for char in characters:
+            char_name = char.get('name', '').strip()
+            if char_name:
+                result = self.find_character_image(char_name)
+                if result:
+                    # 캐시에 저장
+                    CharacterImageManager._scene_link_cache[cache_key] = result
+                    CharacterImageManager._cache_timestamp[cache_key] = time.time()
+                    return result
+
+        # 2. character_prompt에서 이름 추출 시도
+        char_prompt = (
+            scene.get('character_prompt_en', '') or
+            scene.get('character_prompt', '')
+        )
+
+        if char_prompt:
+            # 알려진 캐릭터 이름과 매칭
+            all_images = self.get_all_character_images()
+            known_names = list(set(img["character_name"] for img in all_images))
+
+            for name in known_names:
+                if name in char_prompt or name.lower() in char_prompt.lower():
+                    result = self.find_character_image(name)
+                    if result:
+                        # 캐시에 저장
+                        CharacterImageManager._scene_link_cache[cache_key] = result
+                        CharacterImageManager._cache_timestamp[cache_key] = time.time()
+                        return result
+
+        # 결과 없음 - None도 캐시에 저장 (재호출 방지)
+        CharacterImageManager._scene_link_cache[cache_key] = None
+        CharacterImageManager._cache_timestamp[cache_key] = time.time()
+        return None
+
+    def get_all_characters_for_scene(self, scene: Dict, use_cache: bool = True) -> List[Dict]:
+        """
+        씬에 등장하는 모든 캐릭터의 이미지 찾기 (v2.0: 캐싱 지원)
+
+        Args:
+            scene: 씬 데이터
+            use_cache: 캐시 사용 여부 (기본 True)
+
+        Returns:
+            캐릭터 이미지 정보 리스트 (여러 캐릭터 지원)
+        """
+        import time
+
+        scene_id = scene.get('scene_id') or scene.get('scene_number', '?')
+
+        # v2.0: 캐시 확인
+        cache_key = f"scene_all_chars_{self.project_path}_{scene_id}"
+        if use_cache and cache_key in CharacterImageManager._scene_link_cache:
+            if CharacterImageManager.is_cache_valid(cache_key):
+                # 캐시 히트 - 로그 출력 없이 반환
+                return CharacterImageManager._scene_link_cache[cache_key]
+
+        matched_characters = []
+        seen_names = set()
+
+        # 1. appearance_scenes 기반 매칭
+        char_data = self._load_character_data()
+        for char in char_data:
+            appearance_scenes = char.get('appearance_scenes', [])
+            if scene_id in appearance_scenes or str(scene_id) in [str(s) for s in appearance_scenes]:
+                char_name = char.get('name', '')
+                if char_name and char_name not in seen_names:
+                    result = self.find_character_image(char_name)
+                    if result:
+                        matched_characters.append(result)
+                        seen_names.add(char_name)
+
+        # 2. characters 배열에서 이름 추출
+        characters = scene.get('characters', [])
+        for char in characters:
+            char_name = char.get('name', '').strip()
+            if char_name and char_name not in seen_names:
+                result = self.find_character_image(char_name)
+                if result:
+                    matched_characters.append(result)
+                    seen_names.add(char_name)
+
+        # 캐시에 저장 (빈 리스트도 저장하여 재호출 방지)
+        CharacterImageManager._scene_link_cache[cache_key] = matched_characters
+        CharacterImageManager._cache_timestamp[cache_key] = time.time()
+
+        return matched_characters
+
+    def get_all_character_names(self) -> List[str]:
+        """모든 캐릭터 이름 목록"""
+        all_images = self.get_all_character_images()
+        names = list(set(img["character_name"] for img in all_images))
+        names.sort()
+        return names
 
 
 def on_character_image_generated(project_path: str, character_name: str, image_path: str):

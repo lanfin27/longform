@@ -15,8 +15,8 @@ from typing import Dict, Optional, List
 from dataclasses import dataclass, asdict
 from datetime import datetime
 
-# 디버그 모드
-DEBUG = True
+# 디버그 모드 (v3.41: 성능 최적화 - 기본 비활성화)
+DEBUG = False
 
 def _debug_log(message: str):
     """디버그 로그"""
@@ -308,6 +308,24 @@ AI 비디오 생성 도구는 영어 프롬프트에서만 최적의 결과를 �
 
 ---
 
+## 🏞️ 배경 프롬프트 규칙 (Background Prompt)
+
+배경만 묘사하는 프롬프트를 별도로 생성합니다. **캐릭터/인물을 제외한 순수 배경만 설명합니다.**
+
+### background_prompt (한글 배경 프롬프트)
+- 씬의 배경, 장소, 환경만 묘사
+- 인물/캐릭터 정보 절대 포함 금지
+- 예시: "현대적인 사무실 내부, 유리 창문으로 도시 스카이라인이 보임, 깔끔한 책상과 컴퓨터, 밝은 조명"
+
+### background_prompt_en (영문 배경 프롬프트)
+- **⭐ 반드시 영어(English)로 작성**
+- 배경/환경만 상세하게 묘사 (NO people, NO characters)
+- 예시: "Modern office interior, glass windows overlooking city skyline, clean desk with computer, bright ambient lighting, minimalist decor, no text, no letters"
+
+⚠️ **중요**: background_prompt에는 **인물/캐릭터를 절대 포함하지 마세요!** 순수 배경/환경만 묘사합니다.
+
+---
+
 ## 📤 출력 형식 (JSON) - 🔴 persons + characters 분리!
 
 ```json
@@ -326,6 +344,8 @@ AI 비디오 생성 도구는 영어 프롬프트에서만 최적의 결과를 �
       "mood": "분위기",
       "camera_suggestion": "카메라 앵글",
       "image_prompt_en": "..., no text, no letters...",
+      "background_prompt": "배경만 묘사하는 한글 프롬프트 (캐릭터/인물 제외)",
+      "background_prompt_en": "English background-only prompt (NO characters, NO people, just environment/scene)",
       "video_prompt_character": "Character speaking with natural expression, subtle head movements, mouth moving naturally, camera slowly zooms in (MUST BE IN ENGLISH)",
       "video_prompt_full": "Dynamic scene with smooth camera movement, natural lighting, atmospheric mood, subtle background motion (MUST BE IN ENGLISH)"
     }
@@ -602,6 +622,8 @@ JSON 배열로만 응답해주세요.'''
 {{
     "image_prompt": "한국어 이미지 프롬프트 (상세한 시각적 묘사)",
     "image_prompt_en": "English image prompt for FLUX (detailed visual description, cinematic style)",
+    "background_prompt": "배경만 묘사하는 한글 프롬프트 (캐릭터/인물 제외, 순수 환경/장소만)",
+    "background_prompt_en": "English background-only prompt (NO characters, NO people, just environment/scene, no text, no letters)",
     "character_prompt": "한국어 캐릭터 프롬프트 (인물이 있다면)",
     "character_prompt_en": "English character prompt (if characters present)",
     "direction_guide": "연출가이드 (카메라 앵글, 조명, 분위기 등)",
@@ -637,6 +659,8 @@ JSON으로만 응답해주세요. 추가 설명 없이 JSON만 출력하세요.'
 - scene_id: 씬 번호
 - image_prompt: 한국어 이미지 생성 프롬프트
 - image_prompt_en: 영문 이미지 프롬프트 (FLUX용, 상세하게)
+- background_prompt: 배경만 묘사하는 한글 프롬프트 (캐릭터/인물 제외!)
+- background_prompt_en: 영문 배경 프롬프트 (NO characters, NO people, environment only)
 - character_prompt: 한국어 캐릭터 프롬프트
 - character_prompt_en: 영문 캐릭터 프롬프트
 - visual_elements: 시각 요소 리스트
@@ -665,6 +689,8 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
     "scene_id": 1,
     "image_prompt": "...",
     "image_prompt_en": "...",
+    "background_prompt": "배경만 묘사 (캐릭터 제외)",
+    "background_prompt_en": "Background only description, NO characters, NO people...",
     "characters": [
       {{"name": "캐릭터명", "visual_prompt": "영문 외모 설명..."}}
     ],
@@ -1191,17 +1217,25 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
         try:
             from utils.settings_manager import get_setting, set_setting
 
-            _debug_log(f"set_active_prompt 호출: {prompt_type} -> {prompt_id}")
+            # v2.1: 상세 로깅 강화 (진단용)
+            print(f"[PromptTemplate] ========== set_active_prompt 시작 ==========")
+            print(f"[PromptTemplate] prompt_type: {prompt_type}")
+            print(f"[PromptTemplate] prompt_id: {prompt_id}")
 
             # 프롬프트 ID 검증
             if prompt_id and prompt_id not in self.templates:
-                _debug_log(f"⚠️ 잘못된 프롬프트 ID: {prompt_id} (templates에 없음)")
-                _debug_log(f"현재 templates 키 목록: {list(self.templates.keys())[:10]}...")
+                print(f"[PromptTemplate] ❌ 잘못된 프롬프트 ID: {prompt_id} (templates에 없음)")
+                print(f"[PromptTemplate] 현재 templates 키 목록: {list(self.templates.keys())[:10]}...")
                 return False
+
+            # 프롬프트 이름도 출력
+            if prompt_id and prompt_id in self.templates:
+                template = self.templates[prompt_id]
+                print(f"[PromptTemplate] 프롬프트 이름: {template.name}")
 
             # 현재 설정 로드
             active_prompts = get_setting(self._ACTIVE_PROMPTS_PAGE, self._ACTIVE_PROMPTS_KEY, {})
-            _debug_log(f"저장 전 active_prompts: {active_prompts}")
+            print(f"[PromptTemplate] 저장 전 active_prompts: {active_prompts}")
 
             # 업데이트
             if prompt_id:
@@ -1211,18 +1245,24 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
 
             # 저장
             set_setting(self._ACTIVE_PROMPTS_PAGE, self._ACTIVE_PROMPTS_KEY, active_prompts)
-            _debug_log(f"✅ 활성 프롬프트 설정 완료: {prompt_type} -> {prompt_id}")
-            _debug_log(f"저장 후 active_prompts: {active_prompts}")
+            print(f"[PromptTemplate] ✅ 활성 프롬프트 설정 완료: {prompt_type} -> {prompt_id}")
+            print(f"[PromptTemplate] 저장 후 active_prompts: {active_prompts}")
 
-            # 저장 확인
+            # 저장 확인 (즉시 다시 읽어서 검증)
             verify = get_setting(self._ACTIVE_PROMPTS_PAGE, self._ACTIVE_PROMPTS_KEY, {})
-            _debug_log(f"저장 검증: {verify}")
+            print(f"[PromptTemplate] 저장 검증 (즉시 재로드): {verify}")
 
+            if verify.get(prompt_type) == prompt_id:
+                print(f"[PromptTemplate] ✅ 검증 성공: {prompt_type}={prompt_id}")
+            else:
+                print(f"[PromptTemplate] ❌ 검증 실패! 저장된 값: {verify.get(prompt_type)}, 기대값: {prompt_id}")
+
+            print(f"[PromptTemplate] ========== set_active_prompt 완료 ==========")
             return True
         except Exception as e:
-            _debug_log(f"❌ 활성 프롬프트 설정 실패: {e}")
+            print(f"[PromptTemplate] ❌ 활성 프롬프트 설정 실패: {e}")
             import traceback
-            _debug_log(f"상세 오류: {traceback.format_exc()}")
+            print(f"[PromptTemplate] 상세 오류: {traceback.format_exc()}")
             return False
 
     def get_active_prompts_info(self) -> dict:

@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-01-15T22:21:36.056421",
+  "last_updated": "2026-01-22T20:32:20.594590",
   "quotas": {
     "fal_ai_wan": {
       "api_name": "fal_ai_wan",
@@ -178,7 +178,7 @@
       "last_error": null
     }
   },
-  "total_videos_generated": 3,
+  "total_videos_generated": 4,
   "total_credits_used": 0,
   "generation_history": [],
   "platform_balances": {},
@@ -492,6 +492,20 @@
       "success": true,
       "error_message": null,
       "video_url": "https://replicate.delivery/xezq/vUpIjUlQdzpzMRe5VIE1nL4Jj2CmaSMhntqTxiFsYXNv30eVA/tmp8g6pvrgg.mp4"
+    },
+    {
+      "timestamp": "2026-01-22T20:32:20.594410",
+      "platform": "fal_ai",
+      "model_key": "wan_i2v",
+      "model_display_name": "Wan 2.1 I2V (가장 저렴)",
+      "prompt": "A close-up of the Harman logo, surrounded by high-end audio equipment and complex circuit boards. Cu",
+      "duration": 5,
+      "resolution": "720p",
+      "cost_usd": 0.15,
+      "credits_used": 0,
+      "success": true,
+      "error_message": null,
+      "video_url": "https://v3b.fal.media/files/b/0a8b6779/evRDHmZYZAxifMoWprL3X_tmp0k99kuqx.mp4"
     }
   ],
   "daily_stats": {
@@ -502,6 +516,10 @@
     "2026-01-15": {
       "videos": 2,
       "cost_usd": 0.255
+    },
+    "2026-01-22": {
+      "videos": 1,
+      "cost_usd": 0.15
     }
   },
   "monthly_stats": {
@@ -510,8 +528,8 @@
       "cost_usd": 0.225
     },
     "2026-01": {
-      "videos": 2,
-      "cost_usd": 0.255
+      "videos": 3,
+      "cost_usd": 0.405
     }
   }
 }

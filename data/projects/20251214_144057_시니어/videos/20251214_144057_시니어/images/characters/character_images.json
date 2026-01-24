@@ -192,5 +192,16 @@
     "background": "solid_gray",
     "generation_time": 6.675052881240845,
     "api_provider": "Google ImageFX"
+  },
+  "삼성전자 임원": {
+    "success": true,
+    "character_name": "삼성전자 임원",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_삼성전자_임원_standing_1768995356967.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_삼성전자_임원_standing_1768995356967.png",
+    "prompt": "Korean webtoon manhwa style illustration, clean bold black outlines on all elements,\nflat solid color fills with minimal shading, simplified shapes with clear silhouettes,\n2D digital illustration style, consistent 2-3px black lineart throughout,\nmale character by default, man, masculine features unless specified otherwise., Middle-aged Asian man, CEO, confident expression, business suit, no text, no logos, full body character, standing pose, front view, neutral expression, simple solid light gray background (#E0E0E0), no shadows on background, clean edges suitable for compositing, centered in frame, single character only, Muted desaturated color palette, clean cel-shaded look with minimal gradients,\nteal-gray and warm beige neutral tones, muted accent colors for focal points,\nsimple solid light gray background, clean background without text or watermarks,\nno speech bubbles, no dialogue boxes, no thought bubbles, no caption boxes,\nno signature, no watermark, no corner text, clean corners, empty corners,\npristine image edges, no artist marks, unsigned artwork,\nno text of any kind, no logos, no brand names, no labels on products,\nblank screens on devices, generic unbranded products, text-free design.",
+    "pose": "standing",
+    "background": "solid_gray",
+    "generation_time": 7.412513971328735,
+    "api_provider": "Google ImageFX"
   }
 }

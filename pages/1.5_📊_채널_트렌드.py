@@ -397,7 +397,7 @@ def render_metrics(result: TrendAnalysisResult):
         st.metric(
             "🎯 키워드 관련",
             f"{relevant_count}개",
-            help="채널명/설명에 키워드가 포함된 채널"
+            help="키워드 검색 결과에서 발견된 관련 채널 (채널명/설명/영상제목 기반)"
         )
 
     with col5:

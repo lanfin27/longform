@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-23T00:31:34.969014",
+  "image_file": "bg_scene_013_1769095894968.png",
+  "scene_id": 13,
+  "prompts": {
+    "original": "Wide angle full frame shot, entire scene visible from corner to corner, luxurious home library with wooden desk and leather chair in foreground, open laptop displaying financial charts and graphs, warm ambient lighting casting soft glow throughout the scene, floor-to-ceiling bookshelf spanning the entire back wall filled with classic literature, Persian rug on the floor adding warmth and texture, rich earth tone color palette throughout, sophisticated and intellectual atmosphere, expansive view filling the complete canvas from top to bottom and left to right, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Wide angle full frame shot, entire scene visible from corner to corner, luxurious home library with wooden desk and leather chair in foreground, open laptop displaying financial charts and graphs, warm ambient lighting casting soft glow throughout the scene, floor-to-ceiling bookshelf spanning the entire back wall filled with classic literature, Persian rug on the floor adding warmth and texture, rich earth tone color palette throughout, sophisticated and intellectual atmosphere, expansive view filling the complete canvas from top to bottom and left to right, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1241898599
+  }
+}

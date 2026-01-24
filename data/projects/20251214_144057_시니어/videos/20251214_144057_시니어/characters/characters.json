@@ -18,44 +18,12 @@
       "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_발표자_pointing_1767696501733.png"
     ],
     "appearance_scenes": [
-      76,
-      77,
-      78,
-      79,
-      80,
-      81,
-      82,
-      83,
-      84,
-      85,
-      86,
-      87,
-      88,
-      89,
-      90,
-      91,
-      92,
-      93,
-      94,
-      95,
-      96,
-      97,
-      98,
-      99,
-      100,
-      131,
-      132,
-      133,
-      134,
-      135,
-      181,
-      182,
-      183,
-      184,
-      185
+      15,
+      128,
+      134
     ],
     "created_at": "2026-01-06T19:44:28.556754",
-    "updated_at": "2026-01-14T12:12:30.125487"
+    "updated_at": "2026-01-21T20:35:48.568554"
   },
   {
     "id": "char_1",
@@ -76,7 +44,7 @@
       24
     ],
     "created_at": "2026-01-06T19:44:28.558592",
-    "updated_at": "2026-01-14T12:12:30.124348"
+    "updated_at": "2026-01-21T20:35:48.568565"
   },
   {
     "id": "char_2",
@@ -110,7 +78,7 @@
       245
     ],
     "created_at": "2026-01-06T19:44:28.560053",
-    "updated_at": "2026-01-14T12:12:30.125734"
+    "updated_at": "2026-01-21T20:35:48.568571"
   },
   {
     "id": "char_3",
@@ -131,7 +99,7 @@
       44
     ],
     "created_at": "2026-01-06T19:44:28.561390",
-    "updated_at": "2026-01-14T12:12:30.124358"
+    "updated_at": "2026-01-21T20:35:48.568575"
   },
   {
     "id": "char_4",
@@ -155,7 +123,7 @@
       50
     ],
     "created_at": "2026-01-06T19:44:28.562555",
-    "updated_at": "2026-01-14T12:12:30.125875"
+    "updated_at": "2026-01-21T20:35:48.568580"
   },
   {
     "id": "char_5",
@@ -177,7 +145,7 @@
       120
     ],
     "created_at": "2026-01-06T19:44:28.563630",
-    "updated_at": "2026-01-14T12:12:30.126032"
+    "updated_at": "2026-01-21T20:35:48.568584"
   },
   {
     "id": "char_6",
@@ -214,7 +182,7 @@
       80
     ],
     "created_at": "2026-01-06T19:44:28.564847",
-    "updated_at": "2026-01-14T12:12:30.124370"
+    "updated_at": "2026-01-21T20:35:48.568589"
   },
   {
     "id": "char_7",
@@ -251,7 +219,7 @@
       100
     ],
     "created_at": "2026-01-06T19:44:28.566081",
-    "updated_at": "2026-01-14T12:12:30.124374"
+    "updated_at": "2026-01-21T20:35:48.568593"
   },
   {
     "id": "char_8",
@@ -272,7 +240,7 @@
       88
     ],
     "created_at": "2026-01-06T19:44:28.567559",
-    "updated_at": "2026-01-14T12:12:30.124378"
+    "updated_at": "2026-01-21T20:35:48.568597"
   },
   {
     "id": "char_9",
@@ -294,7 +262,7 @@
       145
     ],
     "created_at": "2026-01-06T19:44:28.568868",
-    "updated_at": "2026-01-14T12:12:30.126093"
+    "updated_at": "2026-01-21T20:35:48.568601"
   },
   {
     "id": "char_10",
@@ -309,19 +277,10 @@
     "reference_urls": [],
     "generated_images": [],
     "appearance_scenes": [
-      56,
-      57,
-      58,
-      59,
-      60,
-      71,
-      72,
-      73,
-      74,
-      75
+      6
     ],
     "created_at": "2026-01-06T19:44:28.570226",
-    "updated_at": "2026-01-14T12:12:30.126146"
+    "updated_at": "2026-01-21T20:35:48.568605"
   },
   {
     "id": "char_11",
@@ -342,7 +301,7 @@
       128
     ],
     "created_at": "2026-01-06T19:44:28.571794",
-    "updated_at": "2026-01-14T12:12:30.124390"
+    "updated_at": "2026-01-21T20:35:48.568609"
   },
   {
     "id": "char_12",
@@ -379,7 +338,7 @@
       300
     ],
     "created_at": "2026-01-06T19:44:28.573284",
-    "updated_at": "2026-01-14T12:12:30.124395"
+    "updated_at": "2026-01-21T20:35:48.568613"
   },
   {
     "id": "char_13",
@@ -402,6 +361,1373 @@
       318
     ],
     "created_at": "2026-01-06T19:44:28.575691",
-    "updated_at": "2026-01-14T12:12:30.124398"
+    "updated_at": "2026-01-21T20:35:48.568617"
+  },
+  {
+    "id": "char_14",
+    "name": "학생",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Young adult, raising hand, inquisitive expression, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.417603",
+    "updated_at": "2026-01-21T20:35:48.568621"
+  },
+  {
+    "id": "char_15",
+    "name": "하만카돈 사운드바",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Sleek Harman Kardon soundbar, modern design, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.420139",
+    "updated_at": "2026-01-21T20:35:48.568625"
+  },
+  {
+    "id": "char_16",
+    "name": "하만 로고",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Harman logo, partially obscured, mysterious lighting, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.421497",
+    "updated_at": "2026-01-21T20:35:48.568629"
+  },
+  {
+    "id": "char_17",
+    "name": "미래형 운전자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Futuristic driver, 30s male, stylish clothing, focused expression, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.423091",
+    "updated_at": "2026-01-21T20:35:48.568633"
+  },
+  {
+    "id": "char_18",
+    "name": "놀란 사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Diverse group of people, various ages, surprised expressions, confused looks, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.424298",
+    "updated_at": "2026-01-21T20:35:48.568636"
+  },
+  {
+    "id": "char_19",
+    "name": "이재용 회장",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Lee Jae-yong (stylized representation), visionary expression, looking towards the future, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.426031",
+    "updated_at": "2026-01-21T20:35:48.568640"
+  },
+  {
+    "id": "char_20",
+    "name": "사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Diverse people (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features) with surprised and curious expressions, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.427415",
+    "updated_at": "2026-01-21T20:35:48.568644"
+  },
+  {
+    "id": "char_21",
+    "name": "사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A person (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features) with a serious and thoughtful expression, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      9
+    ],
+    "created_at": "2026-01-21T20:34:42.429033",
+    "updated_at": "2026-01-21T20:35:48.568648"
+  },
+  {
+    "id": "char_22",
+    "name": "음악 감상하는 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A person (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features) with a relaxed and happy expression, enjoying music, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.430433",
+    "updated_at": "2026-01-21T20:35:48.568652"
+  },
+  {
+    "id": "char_23",
+    "name": "사람 1",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Young adult woman, casual clothing, smiling, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.431991",
+    "updated_at": "2026-01-21T20:35:48.568656"
+  },
+  {
+    "id": "char_24",
+    "name": "사람 2",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged man, business casual attire, thoughtful expression, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.433436",
+    "updated_at": "2026-01-21T20:35:48.568660"
+  },
+  {
+    "id": "char_25",
+    "name": "사람 3",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Elderly woman, comfortable clothing, inquisitive look, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.434931",
+    "updated_at": "2026-01-21T20:35:48.568664"
+  },
+  {
+    "id": "char_26",
+    "name": "궁금해하는 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Person with a questioning look, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.437466",
+    "updated_at": "2026-01-21T20:35:48.568668"
+  },
+  {
+    "id": "char_27",
+    "name": "자동차 눈",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Car headlight with human-like eye features, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.440052",
+    "updated_at": "2026-01-21T20:35:48.568672"
+  },
+  {
+    "id": "char_28",
+    "name": "엔지니어",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Engineer (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features) in a clean suit, observing the robotic arms, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      84,
+      133,
+      137,
+      162
+    ],
+    "created_at": "2026-01-21T20:34:42.441818",
+    "updated_at": "2026-01-21T20:35:48.568676"
+  },
+  {
+    "id": "char_29",
+    "name": "청중",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Diverse audience members (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features) listening attentively, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_청중_1_standing_1767685243799.png"
+    ],
+    "appearance_scenes": [
+      10,
+      15
+    ],
+    "created_at": "2026-01-21T20:34:42.443853",
+    "updated_at": "2026-01-21T20:35:48.568681"
+  },
+  {
+    "id": "char_30",
+    "name": "시청자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.445755",
+    "updated_at": "2026-01-21T20:35:48.568685"
+  },
+  {
+    "id": "char_31",
+    "name": "화자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_화자_standing_1767685234463.png"
+    ],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.447794",
+    "updated_at": "2026-01-21T20:35:48.568689"
+  },
+  {
+    "id": "char_32",
+    "name": "ZF 직원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A German engineer in a clean, modern environment, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      7
+    ],
+    "created_at": "2026-01-21T20:34:42.450077",
+    "updated_at": "2026-01-21T20:35:48.568693"
+  },
+  {
+    "id": "char_33",
+    "name": "강연자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A passionate speaker in a modern conference room, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.452572",
+    "updated_at": "2026-01-21T20:35:48.568697"
+  },
+  {
+    "id": "char_34",
+    "name": "질문자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A generic person, mid-30s, casually dressed, looking directly at the camera, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.454238",
+    "updated_at": "2026-01-21T20:35:48.568701"
+  },
+  {
+    "id": "char_35",
+    "name": "답변자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A generic person, mid-30s, casually dressed, looking slightly to the side, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.456674",
+    "updated_at": "2026-01-21T20:35:48.568705"
+  },
+  {
+    "id": "char_36",
+    "name": "놀라는 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A generic person, mid-30s, casually dressed, looking surprised, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.458551",
+    "updated_at": "2026-01-21T20:35:48.568709"
+  },
+  {
+    "id": "char_37",
+    "name": "설명자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A generic person, mid-30s, casually dressed, pointing towards the headlight, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.460452",
+    "updated_at": "2026-01-21T20:35:48.568713"
+  },
+  {
+    "id": "char_38",
+    "name": "기술 설명자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A generic person, mid-30s, casually dressed, explaining the technology, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.462285",
+    "updated_at": "2026-01-21T20:35:48.568717"
+  },
+  {
+    "id": "char_39",
+    "name": "생각하는 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Silhouette of a person, contemplative pose, minimalist style, no text, no logos...",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.464194",
+    "updated_at": "2026-01-21T20:35:48.568721"
+  },
+  {
+    "id": "char_40",
+    "name": "스마트폰",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Modern Samsung smartphone, sleek design, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.465982",
+    "updated_at": "2026-01-21T20:35:48.568725"
+  },
+  {
+    "id": "char_41",
+    "name": "반도체",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Advanced semiconductor chip, intricate details, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.467701",
+    "updated_at": "2026-01-21T20:35:48.568729"
+  },
+  {
+    "id": "char_42",
+    "name": "계약서",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Formal contract document, important clauses highlighted, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.469769",
+    "updated_at": "2026-01-21T20:35:48.568733"
+  },
+  {
+    "id": "char_43",
+    "name": "자동차",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Autonomous car, sleek and modern design, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.471627",
+    "updated_at": "2026-01-21T20:35:48.568737"
+  },
+  {
+    "id": "char_44",
+    "name": "삼성전자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Samsung Electronics logo, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_삼성전자_임원_standing_1768995356967.png"
+    ],
+    "appearance_scenes": [
+      6
+    ],
+    "created_at": "2026-01-21T20:34:42.473592",
+    "updated_at": "2026-01-21T20:35:48.568741"
+  },
+  {
+    "id": "char_45",
+    "name": "계약 당사자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "People signing a contract, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.475883",
+    "updated_at": "2026-01-21T20:35:48.568745"
+  },
+  {
+    "id": "char_46",
+    "name": "경청자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Person listening with earphones, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.478296",
+    "updated_at": "2026-01-21T20:35:48.568749"
+  },
+  {
+    "id": "char_47",
+    "name": "청자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Person with goosebumps, back view, dark silhouette, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.480061",
+    "updated_at": "2026-01-21T20:35:48.568753"
+  },
+  {
+    "id": "char_48",
+    "name": "관찰자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Silhouette of a person, gender neutral, expressing surprise, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "created_at": "2026-01-21T20:34:42.482279",
+    "updated_at": "2026-01-21T20:35:48.568757"
+  },
+  {
+    "id": "char_49",
+    "name": "다양한 사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Diverse group of people, hands clasped together, no text, no logos...",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.484668",
+    "updated_at": "2026-01-21T20:35:48.568761"
+  },
+  {
+    "id": "char_50",
+    "name": "변호사",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged man, professional attire, determined expression, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      11
+    ],
+    "created_at": "2026-01-21T20:34:42.486674",
+    "updated_at": "2026-01-21T20:35:48.568765"
+  },
+  {
+    "id": "char_51",
+    "name": "검사",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged woman, professional attire, skeptical expression, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      11
+    ],
+    "created_at": "2026-01-21T20:34:42.488640",
+    "updated_at": "2026-01-21T20:35:48.568769"
+  },
+  {
+    "id": "char_52",
+    "name": "기자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Young woman, professional attire, attentive expression, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      12
+    ],
+    "created_at": "2026-01-21T20:34:42.490616",
+    "updated_at": "2026-01-21T20:35:48.568773"
+  },
+  {
+    "id": "char_53",
+    "name": "시민",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Various ages and ethnicities, diverse clothing, candid expressions, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      12
+    ],
+    "created_at": "2026-01-21T20:34:42.492765",
+    "updated_at": "2026-01-21T20:35:48.568777"
+  },
+  {
+    "id": "char_54",
+    "name": "과학자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged man, lab coat, focused expression, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      14
+    ],
+    "created_at": "2026-01-21T20:34:42.494527",
+    "updated_at": "2026-01-21T20:35:48.568781"
+  },
+  {
+    "id": "char_55",
+    "name": "강인한 남성",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Muscular man, strong jawline, intense gaze, determined expression, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      19
+    ],
+    "created_at": "2026-01-21T20:34:42.496634",
+    "updated_at": "2026-01-21T20:35:48.568787"
+  },
+  {
+    "id": "char_56",
+    "name": "승리자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Smiling person holding a trophy, radiating joy and confidence, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      20
+    ],
+    "created_at": "2026-01-21T20:34:42.499025",
+    "updated_at": "2026-01-21T20:35:48.568791"
+  },
+  {
+    "id": "char_57",
+    "name": "군중",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Cheering crowd, diverse group of people, expressing excitement and support, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      1,
+      20
+    ],
+    "created_at": "2026-01-21T20:34:42.500890",
+    "updated_at": "2026-01-21T20:35:48.568795"
+  },
+  {
+    "id": "char_58",
+    "name": "로봇 팔",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Industrial robot arm, metallic finish, multiple joints, precise movements, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      21
+    ],
+    "created_at": "2026-01-21T20:34:42.503500",
+    "updated_at": "2026-01-21T20:35:48.568799"
+  },
+  {
+    "id": "char_59",
+    "name": "1등 깃발",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Flag with the number one, bright colors, symbolizing victory, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      24
+    ],
+    "created_at": "2026-01-21T20:34:42.506058",
+    "updated_at": "2026-01-21T20:35:48.568803"
+  },
+  {
+    "id": "char_60",
+    "name": "프로판 가스 사업자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Confident business owner, professional attire, trustworthy expression, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      25
+    ],
+    "created_at": "2026-01-21T20:34:42.508171",
+    "updated_at": "2026-01-21T20:35:48.568807"
+  },
+  {
+    "id": "char_61",
+    "name": "건설 노동자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Construction worker wearing a safety helmet, serious expression, no text, no logos...",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      28,
+      73,
+      77,
+      106
+    ],
+    "created_at": "2026-01-21T20:34:42.510823",
+    "updated_at": "2026-01-21T20:35:48.568811"
+  },
+  {
+    "id": "char_62",
+    "name": "팀장",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged Asian man, wearing a suit, confident expression, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      49,
+      79
+    ],
+    "created_at": "2026-01-21T20:34:42.513291",
+    "updated_at": "2026-01-21T20:35:48.568815"
+  },
+  {
+    "id": "char_63",
+    "name": "팀원A",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Young Caucasian woman, wearing business casual attire, attentive expression, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      49
+    ],
+    "created_at": "2026-01-21T20:34:42.515931",
+    "updated_at": "2026-01-21T20:35:48.568819"
+  },
+  {
+    "id": "char_64",
+    "name": "팀원B",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Young African man, wearing business casual attire, engaged in the discussion, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      49
+    ],
+    "created_at": "2026-01-21T20:34:42.518636",
+    "updated_at": "2026-01-21T20:35:48.568823"
+  },
+  {
+    "id": "char_65",
+    "name": "직원들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Diverse group of employees, collaborating, professional attire, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      58
+    ],
+    "created_at": "2026-01-21T20:34:42.521456",
+    "updated_at": "2026-01-21T20:35:48.568827"
+  },
+  {
+    "id": "char_66",
+    "name": "여행자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Person from behind, contemplating, simple clothing, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      68
+    ],
+    "created_at": "2026-01-21T20:34:42.523757",
+    "updated_at": "2026-01-21T20:35:48.568831"
+  },
+  {
+    "id": "char_67",
+    "name": "희망에 찬 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Person with a hopeful expression, bright eyes, slight smile, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.526249",
+    "updated_at": "2026-01-21T20:35:48.568835"
+  },
+  {
+    "id": "char_68",
+    "name": "책임감 있는 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Person with a determined expression, slightly furrowed brow, bag slung over the shoulder, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      41
+    ],
+    "created_at": "2026-01-21T20:34:42.529064",
+    "updated_at": "2026-01-21T20:35:48.568839"
+  },
+  {
+    "id": "char_69",
+    "name": "여성",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A woman in her 30s, anxious expression, slightly disheveled hair, wearing casual clothes, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_여성_standing_1767687585295.png"
+    ],
+    "appearance_scenes": [
+      71
+    ],
+    "created_at": "2026-01-21T20:34:42.531628",
+    "updated_at": "2026-01-21T20:35:48.568843"
+  },
+  {
+    "id": "char_70",
+    "name": "팀원 A",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged woman, professional attire, glasses, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      49
+    ],
+    "created_at": "2026-01-21T20:34:42.534069",
+    "updated_at": "2026-01-21T20:35:48.568847"
+  },
+  {
+    "id": "char_71",
+    "name": "팀원 B",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Young man, business casual attire, short hair, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      49
+    ],
+    "created_at": "2026-01-21T20:34:42.536564",
+    "updated_at": "2026-01-21T20:35:48.568851"
+  },
+  {
+    "id": "char_72",
+    "name": "팀원 C",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Young woman, anxious expression, business attire, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      79
+    ],
+    "created_at": "2026-01-21T20:34:42.539214",
+    "updated_at": "2026-01-21T20:35:48.568913"
+  },
+  {
+    "id": "char_73",
+    "name": "팀원 1",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Young Asian woman, wearing casual business attire, smiling",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      91,
+      121
+    ],
+    "created_at": "2026-01-21T20:34:42.542120",
+    "updated_at": "2026-01-21T20:35:48.568925"
+  },
+  {
+    "id": "char_74",
+    "name": "팀원 2",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged African American man, wearing glasses, attentive",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      91,
+      121
+    ],
+    "created_at": "2026-01-21T20:34:42.545042",
+    "updated_at": "2026-01-21T20:35:48.568930"
+  },
+  {
+    "id": "char_75",
+    "name": "전문가1",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged woman, business attire, confident expression, no text, no logos...",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      100
+    ],
+    "created_at": "2026-01-21T20:34:42.547713",
+    "updated_at": "2026-01-21T20:35:48.568936"
+  },
+  {
+    "id": "char_76",
+    "name": "전문가2",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Young man, casual professional attire, engaged in discussion, no text, no logos...",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      100
+    ],
+    "created_at": "2026-01-21T20:34:42.551717",
+    "updated_at": "2026-01-21T20:35:48.568940"
+  },
+  {
+    "id": "char_77",
+    "name": "회사원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Clean-cut office worker in a business suit, focused and professional, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      106
+    ],
+    "created_at": "2026-01-21T20:34:42.554773",
+    "updated_at": "2026-01-21T20:35:48.568946"
+  },
+  {
+    "id": "char_78",
+    "name": "운동선수",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Athlete sprinting towards the finish line, focused and determined, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      109,
+      149
+    ],
+    "created_at": "2026-01-21T20:34:42.558165",
+    "updated_at": "2026-01-21T20:35:48.568951"
+  },
+  {
+    "id": "char_79",
+    "name": "익명의 개발자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Silhouette of a person hunched over a computer, focused on coding, late at night, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      123
+    ],
+    "created_at": "2026-01-21T20:34:42.562064",
+    "updated_at": "2026-01-21T20:35:48.568955"
+  },
+  {
+    "id": "char_80",
+    "name": "익명의 디자이너",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Silhouette of a person sketching on a tablet, brainstorming ideas, surrounded by empty coffee cups, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      123
+    ],
+    "created_at": "2026-01-21T20:34:42.565474",
+    "updated_at": "2026-01-21T20:35:48.568960"
+  },
+  {
+    "id": "char_81",
+    "name": "결정자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Silhouette of a person, faceless, representing anyone facing a difficult choice, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      131,
+      132
+    ],
+    "created_at": "2026-01-21T20:34:42.568749",
+    "updated_at": "2026-01-21T20:35:48.568964"
+  },
+  {
+    "id": "char_82",
+    "name": "에너지 구체",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Energy sphere with a Taegeuk pattern, glowing blue and red, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      211
+    ],
+    "created_at": "2026-01-21T20:34:42.572219",
+    "updated_at": "2026-01-21T20:35:48.568968"
+  },
+  {
+    "id": "char_83",
+    "name": "기차",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Modern high-speed train, silver and blue, sleek design, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      212
+    ],
+    "created_at": "2026-01-21T20:34:42.575779",
+    "updated_at": "2026-01-21T20:35:48.568973"
+  },
+  {
+    "id": "char_84",
+    "name": "도시",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "City skyline at night, silhouetted buildings, soft lighting, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      213
+    ],
+    "created_at": "2026-01-21T20:34:42.579037",
+    "updated_at": "2026-01-21T20:35:48.568977"
+  },
+  {
+    "id": "char_85",
+    "name": "다리",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Large stone bridge, sturdy construction, weathered appearance, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      214
+    ],
+    "created_at": "2026-01-21T20:34:42.582357",
+    "updated_at": "2026-01-21T20:35:48.568982"
+  },
+  {
+    "id": "char_86",
+    "name": "톱니바퀴",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Metal gears, interlocking, rotating, clean and efficient, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      215
+    ],
+    "created_at": "2026-01-21T20:34:42.585531",
+    "updated_at": "2026-01-21T20:35:48.568986"
+  },
+  {
+    "id": "char_87",
+    "name": "삼성전자 임원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged Asian man, CEO, confident expression, business suit, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_삼성전자_임원_standing_1768995356967.png"
+    ],
+    "appearance_scenes": [
+      6
+    ],
+    "created_at": "2026-01-21T20:34:42.588453",
+    "updated_at": "2026-01-21T20:35:48.568991"
+  },
+  {
+    "id": "char_88",
+    "name": "하만 임원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged Caucasian woman, CEO, confident expression, business attire, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      6
+    ],
+    "created_at": "2026-01-21T20:34:42.591824",
+    "updated_at": "2026-01-21T20:35:48.568995"
+  },
+  {
+    "id": "char_89",
+    "name": "은행원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged Caucasian man, banker, serious expression, counting money, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      8
+    ],
+    "created_at": "2026-01-21T20:34:42.594824",
+    "updated_at": "2026-01-21T20:35:48.569000"
+  },
+  {
+    "id": "char_90",
+    "name": "혼란스러워하는 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Young Asian woman, confused expression, looking directly at the camera, no text, no logos",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      9
+    ],
+    "created_at": "2026-01-21T20:34:42.598004",
+    "updated_at": "2026-01-21T20:35:48.569004"
   }
 ]

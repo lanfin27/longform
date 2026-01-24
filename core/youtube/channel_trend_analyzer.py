@@ -363,6 +363,18 @@ class ChannelTrendAnalyzer:
         update_progress("채널 정보 조회 중...")
         all_channel_data = []
 
+        # ⭐ 채널별 검색된 영상 매핑 (관련성 분석용)
+        channel_videos_map = {}
+        for video in all_videos:
+            ch_id = video['snippet'].get('channelId')
+            if ch_id:
+                if ch_id not in channel_videos_map:
+                    channel_videos_map[ch_id] = []
+                channel_videos_map[ch_id].append({
+                    'title': video['snippet'].get('title', ''),
+                    'description': video['snippet'].get('description', '')
+                })
+
         for i in range(0, len(channel_ids), 50):
             batch_ids = channel_ids[i:i+50]
 
@@ -422,9 +434,10 @@ class ChannelTrendAnalyzer:
 
                     new_channel.calculate_metrics()
 
-                    # ⭐ 키워드 관련성 계산 (핵심!)
+                    # ⭐ 키워드 관련성 계산 (핵심!) - 영상 정보 포함
+                    channel_videos = channel_videos_map.get(ch['id'], [])
                     relevance_score, is_relevant, reason = self._calculate_keyword_relevance(
-                        title, description, keyword_variants
+                        title, description, keyword_variants, channel_videos
                     )
                     new_channel.relevance_score = relevance_score
                     new_channel.keyword_relevant = is_relevant
@@ -705,6 +718,22 @@ class ChannelTrendAnalyzer:
                       "카리뷰", "시승기"],
             "반려동물": ["pet", "반려동물", "강아지", "dog", "고양이", "cat", "애완동물",
                        "펫", "동물"],
+
+            # === 재테크/금융 (신규 추가) ===
+            "연말정산": ["연말정산", "세금", "tax", "세무", "절세", "소득공제", "세액공제",
+                       "국세청", "홈택스", "세무사", "회계사", "연금", "보험", "급여",
+                       "13월의월급", "환급", "신고", "원천징수", "근로소득"],
+            "재테크": ["재테크", "finance", "투자", "investment", "주식", "stock", "부동산",
+                      "real estate", "저축", "적금", "예금", "펀드", "etf", "배당",
+                      "자산", "경제", "돈", "money", "부업", "파이프라인"],
+            "세금": ["세금", "tax", "세무", "절세", "연말정산", "국세청", "홈택스",
+                    "세무사", "회계", "신고", "납세", "종합소득세", "부가세"],
+            "주식": ["주식", "stock", "투자", "investment", "배당", "etf", "증권",
+                    "주린이", "주식투자", "차트", "매매", "종목", "코스피", "코스닥"],
+            "부동산": ["부동산", "real estate", "아파트", "청약", "분양", "임대", "전세",
+                      "월세", "매매", "갭투자", "투자", "재건축", "재개발"],
+            "경제": ["경제", "economy", "금융", "finance", "시장", "market", "투자",
+                    "돈", "money", "자산", "wealth"],
         }
 
         # 정확한 키워드 매칭
@@ -726,10 +755,19 @@ class ChannelTrendAnalyzer:
         self,
         title: str,
         description: str,
-        keyword_variants: List[str]
+        keyword_variants: List[str],
+        channel_videos: List[Dict] = None
     ) -> Tuple[int, bool, str]:
         """
-        채널의 키워드 관련성 점수 계산
+        채널의 키워드 관련성 점수 계산 (v2.0 - 영상 정보 활용)
+
+        핵심 통찰: 키워드로 검색해서 나온 채널은 기본적으로 관련있음!
+
+        Args:
+            title: 채널명
+            description: 채널 설명
+            keyword_variants: 키워드 변형 목록
+            channel_videos: 해당 채널에서 검색된 영상 목록 (관련성 판단에 활용)
 
         Returns:
             Tuple[int, bool, str]: (점수 0-10, 직접관련여부, 관련성 이유)
@@ -743,18 +781,35 @@ class ChannelTrendAnalyzer:
         # 원본 키워드 (첫 번째)
         main_keyword = keyword_variants[0] if keyword_variants else ""
 
+        # ⭐ 0. 검색 결과에서 나온 채널 = 기본 관련성 있음 (+3점)
+        # 키워드로 검색해서 나온 영상의 채널이므로 기본적으로 관련있다고 판단
+        if channel_videos:
+            score += 3
+            reasons.append(f"키워드 검색 결과 채널")
+
+            # 영상 제목에서 키워드 매칭 확인 (+2점)
+            video_title_matched = False
+            for video in channel_videos:
+                video_title = video.get('title', '').lower()
+                for variant in keyword_variants:
+                    if variant in video_title:
+                        if not video_title_matched:
+                            score += 2
+                            reasons.append(f"영상 제목에 '{variant}' 포함")
+                            video_title_matched = True
+                        break
+                if video_title_matched:
+                    break
+
         # 1. 채널명에 키워드 직접 포함 (가장 중요: 최대 +5점)
         title_match = False
-        title_matched_keyword = None
         for variant in keyword_variants:
             if variant in title_lower:
                 # 메인 키워드 매칭은 +5점, 관련 키워드는 +3점
                 if variant == main_keyword:
                     score += 5
-                    title_matched_keyword = variant
                 elif not title_match:  # 첫 번째 관련 키워드만
                     score += 3
-                    title_matched_keyword = variant
                 title_match = True
                 reasons.append(f"채널명에 '{variant}' 포함")
                 break
@@ -793,6 +848,15 @@ class ChannelTrendAnalyzer:
             "여행": ["여행유튜버", "traveler", "travel vlog", "여행크리에이터"],
             "음악": ["musician", "singer", "cover artist", "음악유튜버"],
             "요리": ["chef", "cook", "cooking channel", "요리유튜버", "쿡방"],
+
+            # ⭐ 재테크/금융 테마 (신규 추가)
+            "연말정산": ["세무", "tax", "세금", "절세", "소득공제", "세액공제", "국세청", "홈택스",
+                       "세무사", "회계사", "재테크", "연금", "보험", "급여", "월급", "소득"],
+            "재테크": ["투자", "주식", "부동산", "금융", "저축", "적금", "예금", "펀드",
+                      "etf", "배당", "자산", "경제", "돈", "money", "finance"],
+            "세금": ["tax", "세무", "절세", "국세청", "홈택스", "세무사", "회계", "신고"],
+            "주식": ["stock", "투자", "배당", "etf", "증권", "주린이", "주식투자"],
+            "부동산": ["real estate", "아파트", "청약", "분양", "임대", "전세", "월세"],
         }
 
         if main_keyword in theme_keywords:
@@ -815,9 +879,9 @@ class ChannelTrendAnalyzer:
                         break
                 break
 
-        # 5. 관련 없는 패턴 감점 (스팸, 자동생성 등)
+        # 5. 관련 없는 패턴 감점 (스팸, 자동생성 등) - 단, 검색 결과 채널은 덜 감점
         spam_patterns = ["shorts", "쇼츠", "클립", "clip", "highlight", "하이라이트", "best moments"]
-        if title_match is False:  # 채널명에 키워드 없는 경우만 감점
+        if not title_match and not channel_videos:  # 채널명에 키워드 없고 검색 결과도 아닌 경우만 감점
             for pattern in spam_patterns:
                 if pattern in title_lower:
                     score = max(0, score - 1)
@@ -827,8 +891,10 @@ class ChannelTrendAnalyzer:
         # 6. 최종 점수 정규화 (0-10)
         final_score = min(10, max(0, score))
 
-        # 키워드 직접 관련 여부 (채널명에 포함되거나 점수 4 이상)
-        is_relevant = title_match or final_score >= 4
+        # ⭐ 키워드 직접 관련 여부 (검색 결과 채널이거나, 채널명에 포함되거나, 점수 3 이상)
+        # 기존: title_match or final_score >= 4
+        # 수정: 검색 결과에서 나온 채널은 기본적으로 관련있음
+        is_relevant = bool(channel_videos) or title_match or final_score >= 3
 
         reason_str = ", ".join(reasons) if reasons else "관련성 낮음"
 

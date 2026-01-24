@@ -545,11 +545,18 @@ class ImageGenerator:
         output_path: str,
         config: ImageConfig
     ) -> ImageResult:
-        """Google ImageFX (Imagen) 이미지 생성 - 쿠키 기반"""
+        """
+        Google ImageFX (Imagen) 이미지 생성 - 쿠키 기반
+
+        v2.0: 최적화된 Worker Manager 사용
+        - Node.js 프로세스 재사용 (싱글톤)
+        - 초기화 1회만 수행
+        - 쿠키 캐싱
+        """
 
         # === 디버깅: 받은 프롬프트 확인 ===
         print("\n" + "=" * 60)
-        print("[ImageGenerator._generate_imagefx] 호출됨")
+        print("[ImageGenerator._generate_imagefx] 호출됨 (v2.0 최적화)")
         print(f"받은 프롬프트 (앞 300자): {prompt[:300] if len(prompt) > 300 else prompt}")
         print(f"프롬프트 전체 길이: {len(prompt)} 문자")
         print(f"모델: {config.model}")
@@ -568,12 +575,75 @@ class ImageGenerator:
             )
 
         try:
+            # v2.0: 최적화된 Worker Manager 사용 시도
+            try:
+                from utils.imagefx_client import (
+                    get_optimized_imagefx_client,
+                    get_aspect_ratio_for_size,
+                    ImageFXCache
+                )
+
+                # 쿠키 캐싱
+                ImageFXCache.set_cookie(cookie)
+
+                # 비율 설정 (크기 기반 자동 선택)
+                aspect_ratio = get_aspect_ratio_for_size(config.width, config.height)
+
+                print(f"[ImageFX v2.0] ⚡ 최적화된 워커 사용")
+                print(f"  모델: {config.model}")
+                print(f"  비율: {aspect_ratio.value}")
+
+                # 최적화된 클라이언트 사용
+                manager = get_optimized_imagefx_client(cookie)
+
+                # 이미지 생성 (워커 재사용)
+                result = manager.generate_image(
+                    prompt=prompt,
+                    output_path=output_path,
+                    model=config.model or "IMAGEN_4",
+                    aspect_ratio=aspect_ratio.value,
+                    seed=config.seed,
+                    negative_prompt=config.negative_prompt or "",
+                    timeout=180
+                )
+
+                if result.get("success"):
+                    saved_path = result.get("path", output_path)
+                    print(f"[ImageFX v2.0] ✅ 이미지 저장 완료: {saved_path}")
+
+                    return ImageResult(
+                        success=True,
+                        image_path=saved_path,
+                        path=saved_path,
+                        prompt=prompt,
+                        model=config.model,
+                        provider="imagefx",
+                        metadata={"seed": result.get("seed")}
+                    )
+                else:
+                    error_msg = result.get("error", "Unknown error")
+                    print(f"[ImageFX v2.0] ❌ 생성 실패: {error_msg}")
+
+                    return ImageResult(
+                        success=False,
+                        prompt=prompt,
+                        model=config.model,
+                        provider="imagefx",
+                        error=error_msg
+                    )
+
+            except ImportError as ie:
+                print(f"[ImageFX v2.0] ⚠️ 최적화 모듈 로드 실패, 기존 방식 사용: {ie}")
+                # 기존 방식으로 폴백
+
+            # === 폴백: 기존 ImageFXClient 방식 ===
             from utils.imagefx_client import (
                 ImageFXClient,
                 ImagenModel,
                 get_aspect_ratio_for_size
             )
 
+            print(f"[ImageFX] ⚠️ 기존 방식으로 폴백")
             client = ImageFXClient(cookie)
 
             # 모델 설정
@@ -594,7 +664,9 @@ class ImageGenerator:
                 prompt=prompt,
                 model=model_enum,
                 aspect_ratio=aspect_ratio,
-                num_images=1
+                num_images=1,
+                seed=config.seed,
+                negative_prompt=config.negative_prompt or ""
             )
 
             if not images:
@@ -620,7 +692,8 @@ class ImageGenerator:
                 path=output_path,
                 prompt=prompt,
                 model=config.model,
-                provider="imagefx"
+                provider="imagefx",
+                metadata={"seed": images[0].seed if hasattr(images[0], 'seed') else None}
             )
 
         except ImportError:

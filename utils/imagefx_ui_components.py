@@ -372,12 +372,15 @@ def render_cookie_status_indicator():
 # 시드 잠금 기능 (v1.1) - 이미지 일관성 유지
 # ============================================================
 
-def render_seed_lock_options(key_prefix: str = "seed") -> Tuple[bool, Optional[int]]:
+def render_seed_lock_options(key_prefix: str = "seed", style_segment: str = "background") -> Tuple[bool, Optional[int]]:
     """
     시드 잠금 옵션 UI 렌더링
 
     Args:
         key_prefix: Streamlit 위젯 키 접두사
+        style_segment: 스타일 세그먼트 ("character" 또는 "background", 기본값: "background")
+                      - "character": 캐릭터 스타일 선택 UI 표시
+                      - "background": 배경 스타일 선택 UI 표시
 
     Returns:
         (seed_lock_enabled: bool, locked_seed: int or None)
@@ -457,7 +460,8 @@ def render_seed_lock_options(key_prefix: str = "seed") -> Tuple[bool, Optional[i
 
         elif seed_mode == "custom":
             # v1.3: 커스텀 시드 이미지 생성
-            locked_seed = _render_custom_seed_generation_mode(key_prefix, locked_seed)
+            # v1.5: style_segment 파라미터 전달 (캐릭터/배경 스타일 선택)
+            locked_seed = _render_custom_seed_generation_mode(key_prefix, locked_seed, style_segment)
 
         # 버튼 행
         btn_col1, btn_col2 = st.columns(2)
@@ -479,6 +483,21 @@ def render_seed_lock_options(key_prefix: str = "seed") -> Tuple[bool, Optional[i
         # 일관성 유지 팁
         with st.expander("💡 일관성 유지 팁", expanded=False):
             st.markdown("""
+            **⚠️ ImageFX/Imagen 시드 특성:**
+
+            | API | 시드 효과 |
+            |-----|-----------|
+            | Stable Diffusion | ✅ 완전히 동일한 이미지 |
+            | **ImageFX/Imagen** | ⚡ **유사한 스타일/구도** (완전 동일 X) |
+            | DALL-E | ❌ 시드 미지원 |
+
+            > 💡 ImageFX에서 시드 잠금 시:
+            > - ✅ 비슷한 색감, 스타일, 전체적 분위기 유지
+            > - ✅ 유사한 구도와 레이아웃
+            > - ❌ **픽셀 단위 동일 이미지는 보장되지 않음**
+
+            ---
+
             **시드 잠금 사용 시 팁:**
 
             1. **첫 이미지가 중요**: 마음에 드는 첫 이미지가 나올 때까지 시도 후 시드 잠금
@@ -785,28 +804,36 @@ def _render_current_reference_info(key_prefix: str):
 # v1.4: 배경 스타일 선택 기능 추가 (prefix/suffix/negative 적용)
 # ============================================================
 
-def _render_custom_seed_generation_mode(key_prefix: str, current_locked_seed: Optional[int]) -> Optional[int]:
+def _render_custom_seed_generation_mode(key_prefix: str, current_locked_seed: Optional[int], style_segment: str = "background") -> Optional[int]:
     """
     🎨 커스텀 시드 이미지 생성 UI
 
     사용자가 직접 프롬프트를 입력하여 시드 잠금용 기준 이미지를 생성
     v1.4: 배경 스타일 선택 및 prefix/suffix/negative 적용
+    v1.5: style_segment 파라미터 추가 (캐릭터/배경 스타일 선택 지원)
 
     Args:
         key_prefix: session_state 키 접두사
         current_locked_seed: 현재 잠긴 시드 값
+        style_segment: 스타일 세그먼트 ("character" 또는 "background")
 
     Returns:
         설정된 시드 값 (또는 기존 값)
     """
     from utils.style_manager import get_styles_by_segment, get_style_by_id
 
+    # ⭐ v1.5: 스타일 세그먼트에 따른 UI 레이블 설정
+    is_character = style_segment == "character"
+    style_label = "캐릭터 스타일" if is_character else "배경 스타일"
+    style_icon = "👤" if is_character else "🎨"
+    style_desc = "캐릭터" if is_character else "배경"
+
     st.markdown("---")
     st.markdown("#### 🎨 커스텀 시드 이미지 생성")
 
-    st.info("""
+    st.info(f"""
     **사용 방법:**
-    1. 배경 스타일 선택 (실제 이미지 생성과 동일한 스타일 적용)
+    1. **{style_label} 선택** (실제 이미지 생성과 동일한 스타일 적용)
     2. 원본 씬 프롬프트 작성 (스타일 없이 순수 묘사)
     3. "시드 이미지 생성" 버튼 클릭
     4. 마음에 드는 이미지가 나올 때까지 재생성
@@ -814,14 +841,14 @@ def _render_custom_seed_generation_mode(key_prefix: str, current_locked_seed: Op
     """)
 
     # ═══════════════════════════════════════════════════════
-    # v1.4: 배경 스타일 선택
+    # v1.5: 스타일 세그먼트에 따른 스타일 선택
     # ═══════════════════════════════════════════════════════
-    st.markdown("##### 🎨 배경 스타일")
+    st.markdown(f"##### {style_icon} {style_label}")
 
-    # 배경 스타일 목록 로드
-    bg_styles = get_styles_by_segment("background")
-    style_names = ["(스타일 없음)"] + [f"{s.name_ko} ({s.name})" for s in bg_styles]
-    style_ids = [None] + [s.id for s in bg_styles]
+    # 스타일 목록 로드 (캐릭터 또는 배경)
+    styles = get_styles_by_segment(style_segment)
+    style_names = ["(스타일 없음)"] + [f"{s.name_ko} ({s.name})" for s in styles]
+    style_ids = [None] + [s.id for s in styles]
 
     # 기본값: 상위 생성 옵션에서 선택된 스타일 동기화
     default_style_id = st.session_state.get(f'{key_prefix}_selected_style_id')
@@ -830,11 +857,11 @@ def _render_custom_seed_generation_mode(key_prefix: str, current_locked_seed: Op
         default_idx = style_ids.index(default_style_id)
 
     selected_style_name = st.selectbox(
-        "배경 스타일 선택",
+        f"{style_label} 선택",
         options=style_names,
         index=default_idx,
-        key=f"{key_prefix}_custom_bg_style",
-        help="실제 이미지 생성 시와 동일한 배경 스타일의 Prefix/Suffix/Negative가 적용됩니다."
+        key=f"{key_prefix}_custom_{style_segment}_style",
+        help=f"실제 이미지 생성 시와 동일한 {style_desc} 스타일의 Prefix/Suffix/Negative가 적용됩니다."
     )
 
     # 선택된 스타일 정보 가져오기
@@ -960,32 +987,54 @@ def _render_custom_seed_generation_mode(key_prefix: str, current_locked_seed: Op
                 if negative_prompt:
                     print(f"[CustomSeed v1.4] 네거티브: {negative_prompt[:80]}...")
 
-                # ImageFX 클라이언트 임포트 및 생성
-                from utils.imagefx_client import ImageFXClient, AspectRatio
+                # ImageFX 클라이언트 임포트 및 생성 (v2.0 최적화)
+                from utils.imagefx_client import (
+                    get_optimized_imagefx_client,
+                    ImageFXCache,
+                    AspectRatio,
+                    GeneratedImage
+                )
+                from config.settings import load_imagefx_cookie
 
-                client = ImageFXClient()
+                # ⭐ 쿠키 로드 (session_state > 파일 순서)
+                imagefx_cookie = st.session_state.get("imagefx_cookie", "") or load_imagefx_cookie()
+                if not imagefx_cookie:
+                    st.error("❌ ImageFX 쿠키가 설정되지 않았습니다. API 관리 페이지에서 쿠키를 입력해주세요.")
+                    st.info("⚙️ API 관리 → ImageFX 쿠키 설정에서 쿠키를 입력하세요.")
+                    raise ValueError("ImageFX 쿠키 미설정")
+
+                print(f"[CustomSeed v2.0] ⚡ 최적화된 워커 사용")
+                print(f"[CustomSeed v2.0] ImageFX 쿠키 로드됨 (길이: {len(imagefx_cookie)})")
+
+                # v2.0: 최적화된 클라이언트 사용 (싱글톤 워커 재사용)
+                manager = get_optimized_imagefx_client(imagefx_cookie)
 
                 # 비율 변환
                 aspect_map = {
-                    "IMAGE_ASPECT_RATIO_LANDSCAPE": AspectRatio.LANDSCAPE,
-                    "IMAGE_ASPECT_RATIO_PORTRAIT": AspectRatio.PORTRAIT,
-                    "IMAGE_ASPECT_RATIO_SQUARE": AspectRatio.SQUARE
+                    "IMAGE_ASPECT_RATIO_LANDSCAPE": "LANDSCAPE",
+                    "IMAGE_ASPECT_RATIO_PORTRAIT": "PORTRAIT",
+                    "IMAGE_ASPECT_RATIO_SQUARE": "SQUARE"
                 }
-                aspect_ratio = aspect_map.get(selected_aspect, AspectRatio.LANDSCAPE)
+                aspect_value = aspect_map.get(selected_aspect, "LANDSCAPE")
 
-                # v1.4: 이미지 생성 (시드 없이 + 네거티브 프롬프트 적용)
-                results = client.generate_image(
+                # v2.0: 이미지 생성 (워커 재사용 + 네거티브 프롬프트 적용)
+                gen_result = manager.generate_image(
                     prompt=final_prompt,
-                    aspect_ratio=aspect_ratio,
-                    num_images=1,
+                    aspect_ratio=aspect_value,
                     seed=None,  # 랜덤 시드 사용
-                    negative_prompt=negative_prompt  # v1.4: 스타일 네거티브 적용
+                    negative_prompt=negative_prompt  # 스타일 네거티브 적용
                 )
 
-                if results and len(results) > 0:
-                    result = results[0]
+                if gen_result.get("success"):
+                    # GeneratedImage 객체로 변환 (호환성)
+                    result = GeneratedImage(
+                        file_path=gen_result.get("path", ""),
+                        prompt=final_prompt,
+                        seed=gen_result.get("seed")
+                    )
 
                     # v1.4: 결과 저장 (스타일 정보 포함)
+                    # v1.5: style_segment 추가
                     st.session_state[f'{key_prefix}_custom_generated'] = True
                     st.session_state[f'{key_prefix}_custom_result'] = {
                         'image_path': result.path,
@@ -994,14 +1043,17 @@ def _render_custom_seed_generation_mode(key_prefix: str, current_locked_seed: Op
                         'final_prompt': final_prompt,
                         'negative_prompt': negative_prompt,
                         'style_id': selected_style_id,
-                        'style_name': selected_style.name_ko if selected_style else "없음"
+                        'style_name': selected_style.name_ko if selected_style else "없음",
+                        'style_segment': style_segment  # ⭐ v1.5: 캐릭터/배경 구분
                     }
                     st.session_state[f'{key_prefix}_custom_prompt'] = custom_prompt
 
                     st.success(f"✅ 시드 이미지 생성 완료! (시드: {result.seed:,})")
                     st.rerun()
                 else:
-                    st.error("❌ 이미지 생성 실패 - 결과가 비어 있습니다.")
+                    # v2.0: 상세 오류 메시지 표시
+                    error_msg = gen_result.get("error", "알 수 없는 오류")
+                    st.error(f"❌ 이미지 생성 실패: {error_msg}")
 
             except Exception as e:
                 st.error(f"❌ 이미지 생성 오류: {str(e)}")
@@ -1024,10 +1076,14 @@ def _render_custom_seed_generation_mode(key_prefix: str, current_locked_seed: Op
 
         with info_col:
             # v1.4: 스타일 정보 표시 개선
+            # v1.5: style_segment에 따른 레이블 변경
+            result_style_segment = result.get('style_segment', 'background')
+            style_type_label = "캐릭터 스타일" if result_style_segment == "character" else "배경 스타일"
+            style_icon = "👤" if result_style_segment == "character" else "🎨"
             st.markdown(f"""
             **🔢 생성된 시드:** `{result.get('seed', 'N/A'):,}`
 
-            **🎨 배경 스타일:** {result.get('style_name', '없음')}
+            **{style_icon} {style_type_label}:** {result.get('style_name', '없음')}
             """)
 
             st.markdown("**📝 사용된 프롬프트:**")

@@ -222,6 +222,447 @@ def format_character_names(characters: list, max_count: int = None) -> str:
     return result
 
 
+# ============================================================
+# ⭐ v3.70: Claude Code 에이전트 수동 실행 헬퍼 함수
+# ============================================================
+
+def generate_claude_agent_prompt(scenes_json_path: str, scene_range: str = None) -> str:
+    """
+    Claude Code 앱에서 직접 실행할 에이전트 프롬프트 생성
+
+    Args:
+        scenes_json_path: scenes.json 파일 경로
+        scene_range: 분석할 씬 범위 (예: "1-30"), None이면 전체
+
+    Returns:
+        복사용 프롬프트 문자열
+    """
+    range_text = f"씬 {scene_range}" if scene_range else "전체 씬"
+
+    prompt = f'''# 씬 분석 작업
+
+## 파일
+`{scenes_json_path}`
+
+## 범위
+{range_text}
+
+## 작업
+1. 위 파일을 읽으세요
+2. 각 씬의 script 필드를 분석하세요
+3. 다음 필드를 각 씬에 추가하세요:
+
+| 필드 | 설명 |
+|------|------|
+| background_prompt_en | 배경 영문 프롬프트 (80-150단어, "2D animation style" 포함, 사람X) |
+| character_prompt_en | 캐릭터 영문 프롬프트 (50-100단어, "2D animated style" 포함) |
+| characters | 등장인물 리스트 - 한글 (예: ["진행자", "전문가"]) |
+| visual_elements | 시각 요소 - 한글 (예: "회의실, 모니터") |
+| scene_mood | 분위기 - 영문 (예: "professional, serious") |
+
+4. 수정된 JSON을 같은 파일에 저장하세요
+
+## 규칙
+- script 필드 절대 수정 금지!
+- 기존 필드 유지, 새 필드만 추가
+
+## 시작
+지금 바로 파일을 읽고 분석을 시작하세요.
+완료 후 "분석 완료: X개 씬" 형식으로 알려주세요.
+'''
+    return prompt
+
+
+def check_scenes_analysis_status(scenes: list) -> dict:
+    """
+    씬 분석 상태 확인
+
+    Args:
+        scenes: 씬 데이터 리스트
+
+    Returns:
+        각 필드별 완료 개수를 담은 딕셔너리
+    """
+    stats = {
+        'total': len(scenes),
+        'background_prompt_en': 0,
+        'character_prompt_en': 0,
+        'characters': 0,
+        'visual_elements': 0,
+        'scene_mood': 0
+    }
+
+    for scene in scenes:
+        for field in ['background_prompt_en', 'character_prompt_en', 'characters', 'visual_elements', 'scene_mood']:
+            value = scene.get(field)
+
+            if value:
+                if isinstance(value, list) and len(value) > 0:
+                    stats[field] += 1
+                elif isinstance(value, str) and len(value) > 10:
+                    stats[field] += 1
+
+    return stats
+
+
+def create_agent_file_for_scene_analysis(project_path: str, scenes_json_path: str, scene_range: str = None) -> str:
+    """
+    에이전트 파일 생성 (Claude Code에서 직접 실행 가능)
+
+    Args:
+        project_path: 프로젝트 경로
+        scenes_json_path: scenes.json 파일 경로
+        scene_range: 분석할 씬 범위
+
+    Returns:
+        생성된 에이전트 파일 경로 또는 None
+    """
+    agents_dir = os.path.join(project_path, 'agents')
+    os.makedirs(agents_dir, exist_ok=True)
+
+    agent_file = os.path.join(agents_dir, 'run_scene_analysis.md')
+    prompt = generate_claude_agent_prompt(scenes_json_path, scene_range)
+
+    try:
+        with open(agent_file, 'w', encoding='utf-8') as f:
+            f.write(prompt)
+        return agent_file
+    except Exception as e:
+        print(f"[에이전트] 파일 생성 실패: {e}")
+        return None
+
+
+def render_claude_code_manual_execution_ui(project_path, scenes_json_path: str):
+    """
+    Claude Code 수동 실행 UI 렌더링 (Max Plan 무료 활용)
+
+    subprocess 대신 사용자가 Claude Code 앱에서 직접 실행
+    """
+    st.markdown("---")
+    st.markdown("### 🤖 Claude Code 수동 실행 (Max Plan 무료)")
+
+    st.info("""
+    **✨ 수동 실행 장점:**
+    - 🆓 **완전 무료** (Claude Max Plan 구독자)
+    - 🧠 Claude Opus 4.5 수준의 고품질 분석
+    - 📁 파일 직접 수정으로 빠른 처리
+    - 🔄 API 크레딧 소모 없음
+    """)
+
+    # 분석 대상 파일 표시
+    st.markdown("**📁 분석 대상 파일:**")
+    st.code(scenes_json_path, language="text")
+
+    # 분석 범위 선택
+    col1, col2 = st.columns(2)
+
+    with col1:
+        analyze_all = st.checkbox("전체 씬 분석", value=True, key="agent_analyze_all")
+
+    with col2:
+        if not analyze_all:
+            scene_range = st.text_input(
+                "씬 범위 (예: 1-30)",
+                value="1-30",
+                key="agent_scene_range"
+            )
+        else:
+            scene_range = None
+
+    # 프롬프트 생성
+    agent_prompt = generate_claude_agent_prompt(scenes_json_path, scene_range)
+
+    # 탭으로 두 가지 방법 제공
+    tab1, tab2 = st.tabs(["📋 방법 1: 프롬프트 복사", "📄 방법 2: 에이전트 파일"])
+
+    with tab1:
+        st.markdown("""
+        **단계:**
+        1. 아래 "프롬프트 복사" 버튼 클릭
+        2. Claude Code 앱 열기 (longform 폴더에서)
+        3. 프롬프트를 붙여넣고 실행
+        4. 완료 후 아래 "결과 확인" 버튼 클릭
+        """)
+
+        btn_col1, btn_col2 = st.columns([3, 1])
+
+        with btn_col1:
+            if st.button("📋 프롬프트 복사", type="primary", use_container_width=True, key="copy_agent_prompt"):
+                try:
+                    import pyperclip
+                    pyperclip.copy(agent_prompt)
+                    st.success("✅ 클립보드에 복사되었습니다! Claude Code에서 붙여넣기하세요.")
+                except ImportError:
+                    st.warning("pyperclip 패키지가 설치되지 않았습니다. 아래 프롬프트를 직접 복사해주세요.")
+                    st.code(agent_prompt, language="markdown")
+                except Exception as e:
+                    st.error(f"복사 실패: {e}")
+                    st.code(agent_prompt, language="markdown")
+
+        with btn_col2:
+            if st.button("📂 폴더 열기", key="open_folder"):
+                try:
+                    folder = os.path.dirname(scenes_json_path)
+                    os.startfile(folder)
+                except Exception as e:
+                    st.error(f"폴더 열기 실패: {e}")
+
+        # 프롬프트 미리보기
+        with st.expander("📝 프롬프트 미리보기", expanded=False):
+            st.code(agent_prompt, language="markdown")
+
+        # Claude Code 실행 명령어
+        st.markdown("**💻 Claude Code 실행:**")
+        st.code("cd C:\\Users\\KIMJAEHEON\\longform\nclaude", language="bash")
+
+    with tab2:
+        st.markdown("""
+        **단계:**
+        1. "에이전트 파일 생성" 버튼 클릭
+        2. Claude Code에서 에이전트 실행
+        """)
+
+        if st.button("📄 에이전트 파일 생성", type="primary", use_container_width=True, key="create_agent_file"):
+            agent_file = create_agent_file_for_scene_analysis(
+                str(project_path), scenes_json_path, scene_range
+            )
+
+            if agent_file:
+                st.success(f"✅ 에이전트 파일 생성됨!")
+                st.code(agent_file, language="text")
+                st.markdown("**실행 명령어:**")
+                st.code(f'claude "{agent_file} 파일의 지시대로 씬 분석을 수행해줘"', language="bash")
+            else:
+                st.error("❌ 에이전트 파일 생성 실패")
+
+    # ─────────────────────────────────────────────────────────
+    # 분석 상태 모니터링 섹션
+    # ─────────────────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("### 📊 분석 상태")
+
+    # 파일 수정 시간 표시
+    if os.path.exists(scenes_json_path):
+        mtime = os.path.getmtime(scenes_json_path)
+        mtime_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(mtime))
+        st.caption(f"📅 마지막 수정: {mtime_str}")
+
+    # 새로고침 버튼
+    refresh_col1, refresh_col2 = st.columns(2)
+
+    with refresh_col1:
+        if st.button("🔄 결과 확인", use_container_width=True, key="refresh_analysis_result"):
+            # scenes.json 다시 로드
+            try:
+                with open(scenes_json_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                scenes = data.get('scenes', data) if isinstance(data, dict) else data
+
+                if scenes:
+                    stats = check_scenes_analysis_status(scenes)
+
+                    # 세션에 저장
+                    st.session_state['scenes'] = scenes
+                    st.session_state['_agent_analysis_stats'] = stats
+
+                    st.success(f"✅ 데이터 새로고침 완료! ({len(scenes)}개 씬)")
+                    st.rerun()
+                else:
+                    st.warning("씬 데이터가 없습니다.")
+            except Exception as e:
+                st.error(f"파일 로드 실패: {e}")
+
+    with refresh_col2:
+        if st.button("📁 JSON 파일 열기", use_container_width=True, key="open_json_file"):
+            try:
+                os.startfile(scenes_json_path)
+            except Exception as e:
+                st.error(f"파일 열기 실패: {e}")
+
+    # 현재 분석 상태 표시
+    if '_agent_analysis_stats' in st.session_state:
+        stats = st.session_state['_agent_analysis_stats']
+
+        col1, col2, col3, col4, col5 = st.columns(5)
+
+        with col1:
+            st.metric("총 씬", stats['total'])
+
+        with col2:
+            st.metric("배경 프롬프트", f"{stats['background_prompt_en']}/{stats['total']}")
+
+        with col3:
+            st.metric("캐릭터 프롬프트", f"{stats['character_prompt_en']}/{stats['total']}")
+
+        with col4:
+            st.metric("캐릭터 목록", f"{stats['characters']}/{stats['total']}")
+
+        with col5:
+            completion = stats['background_prompt_en'] / stats['total'] * 100 if stats['total'] > 0 else 0
+            st.metric("완료율", f"{completion:.0f}%")
+    else:
+        # 초기 로드 시 상태 계산
+        if os.path.exists(scenes_json_path):
+            try:
+                with open(scenes_json_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                scenes = data.get('scenes', data) if isinstance(data, dict) else data
+
+                if scenes:
+                    stats = check_scenes_analysis_status(scenes)
+                    st.session_state['_agent_analysis_stats'] = stats
+
+                    col1, col2, col3, col4, col5 = st.columns(5)
+
+                    with col1:
+                        st.metric("총 씬", stats['total'])
+
+                    with col2:
+                        st.metric("배경 프롬프트", f"{stats['background_prompt_en']}/{stats['total']}")
+
+                    with col3:
+                        st.metric("캐릭터 프롬프트", f"{stats['character_prompt_en']}/{stats['total']}")
+
+                    with col4:
+                        st.metric("캐릭터 목록", f"{stats['characters']}/{stats['total']}")
+
+                    with col5:
+                        completion = stats['background_prompt_en'] / stats['total'] * 100 if stats['total'] > 0 else 0
+                        st.metric("완료율", f"{completion:.0f}%")
+            except Exception:
+                st.caption("분석 상태를 확인하려면 '결과 확인' 버튼을 클릭하세요.")
+        else:
+            st.warning("scenes.json 파일이 없습니다. 먼저 SRT를 파싱하거나 씬 분석을 실행하세요.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# v3.71: 에이전트 모드 UI (배치 분석에서 사용)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _render_claude_code_agent_ui():
+    """
+    Claude Code 에이전트 모드 UI 렌더링 (v3.71)
+
+    배치 분석에서 AGENT_MODE_REQUIRED 반환 시 표시됩니다.
+    session_state에서 프롬프트 정보를 가져옵니다.
+    """
+    st.markdown("---")
+    st.markdown("### 🤖 Claude Code 에이전트 모드")
+
+    st.warning("""
+    **Claude Code CLI (subprocess)는 API 크레딧을 소모합니다.**
+
+    대신 Claude Code 앱에서 직접 실행하면 **Max Plan이 적용되어 무료**입니다!
+    """)
+
+    # session_state에서 프롬프트 정보 가져오기
+    prompt_text = st.session_state.get('claude_code_prompt', '')
+    prompt_file = st.session_state.get('claude_code_prompt_file', '')
+    scenes_path = st.session_state.get('claude_code_scenes_path', '')
+
+    # 실행 방법 안내
+    st.markdown("### 📝 실행 방법")
+    st.markdown("""
+    1. **"프롬프트 복사"** 버튼 클릭
+    2. Claude Code 앱 열기 (`cd longform && claude`)
+    3. 프롬프트 붙여넣기
+    4. 완료 후 **"결과 확인"** 버튼 클릭
+    """)
+
+    # 버튼들
+    copy_col1, copy_col2, copy_col3 = st.columns([2, 2, 1])
+
+    with copy_col1:
+        if st.button("📋 프롬프트 복사", type="primary", use_container_width=True, key="copy_prompt_batch_agent"):
+            if prompt_text:
+                try:
+                    import pyperclip
+                    pyperclip.copy(prompt_text)
+                    st.success("✅ 클립보드에 복사되었습니다!")
+                    st.toast("Claude Code 앱에 붙여넣기하세요!")
+                except ImportError:
+                    st.warning("pyperclip 패키지가 설치되지 않았습니다.")
+                    with st.expander("프롬프트 직접 복사", expanded=True):
+                        st.code(prompt_text, language="markdown")
+                except Exception as e:
+                    st.error(f"복사 실패: {e}")
+                    with st.expander("프롬프트 직접 복사", expanded=True):
+                        st.code(prompt_text, language="markdown")
+            else:
+                st.error("프롬프트를 찾을 수 없습니다.")
+
+    with copy_col2:
+        if st.button("🔄 결과 확인", use_container_width=True, key="check_result_batch_agent"):
+            if scenes_path and os.path.exists(scenes_path):
+                try:
+                    with open(scenes_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+
+                    reload_scenes = data.get('scenes', data) if isinstance(data, dict) else data
+
+                    if reload_scenes:
+                        stats = check_scenes_analysis_status(reload_scenes)
+
+                        if stats['background_prompt_en'] > 0:
+                            st.success(f"✅ 분석 결과 감지! {stats['background_prompt_en']}/{stats['total']} 씬 완료")
+
+                            # 세션 업데이트
+                            st.session_state['scenes'] = reload_scenes
+                            st.session_state['_agent_analysis_stats'] = stats
+                            st.session_state['claude_code_agent_mode'] = False  # 에이전트 모드 해제
+
+                            st.info("💡 '페이지 새로고침' 버튼을 클릭하면 분석 결과가 적용됩니다.")
+
+                            if st.button("🔄 페이지 새로고침", key="refresh_page_after_agent"):
+                                st.rerun()
+                        else:
+                            st.warning("아직 분석 결과가 없습니다. Claude Code에서 실행을 완료해주세요.")
+
+                            # 파일 수정 시간 표시
+                            mtime = os.path.getmtime(scenes_path)
+                            mtime_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(mtime))
+                            st.caption(f"📅 마지막 수정: {mtime_str}")
+                    else:
+                        st.warning("씬 데이터가 비어있습니다.")
+                except Exception as e:
+                    st.error(f"파일 로드 실패: {e}")
+            else:
+                st.error("scenes.json 파일을 찾을 수 없습니다.")
+
+    with copy_col3:
+        if st.button("📂", help="폴더 열기", key="open_folder_batch_agent"):
+            try:
+                if prompt_file and os.path.exists(prompt_file):
+                    os.startfile(os.path.dirname(prompt_file))
+                elif scenes_path and os.path.exists(scenes_path):
+                    os.startfile(os.path.dirname(scenes_path))
+            except Exception as e:
+                st.error(f"폴더 열기 실패: {e}")
+
+    # 프롬프트 미리보기
+    if prompt_text:
+        with st.expander("📝 프롬프트 미리보기", expanded=False):
+            st.code(prompt_text, language="markdown")
+
+    # Claude Code 실행 명령어
+    st.markdown("### 💻 Claude Code 실행")
+    st.code("cd C:\\Users\\KIMJAEHEON\\longform\nclaude", language="bash")
+
+    # 파일 경로 표시
+    if prompt_file:
+        st.caption(f"📄 프롬프트 파일: `{prompt_file}`")
+    if scenes_path:
+        st.caption(f"📁 분석 대상: `{scenes_path}`")
+
+    # 에이전트 모드 닫기 버튼
+    st.markdown("---")
+    if st.button("❌ 닫기 (에이전트 모드 취소)", key="close_agent_mode"):
+        st.session_state['claude_code_agent_mode'] = False
+        st.rerun()
+
+
 def check_api_availability() -> dict:
     """각 AI API의 사용 가능 여부 확인"""
     availability = {}
@@ -1616,7 +2057,7 @@ with tab2:
             if generate_prompts:
                 st.markdown("##### ⚙️ AI 분석 설정")
 
-                from utils.ai_model_selector import render_model_selector, render_processing_mode_selector, render_api_key_status
+                from utils.ai_model_selector import render_model_selector, render_processing_mode_selector, render_api_key_status, is_claude_code_selected, render_claude_code_settings
                 from utils.ai_providers import get_available_models, get_model
 
                 # API 키 상태 확인
@@ -1645,8 +2086,14 @@ with tab2:
                     # 현재 선택된 모델 정보 표시
                     model_info = get_model(selected_model) if selected_model else None
                     if model_info:
-                        provider_icon = {"anthropic": "🟠", "google": "🔵", "openai": "🟢"}.get(model_info.provider.value, "")
+                        provider_icon = {"anthropic": "🟠", "google": "🔵", "openai": "🟢", "local": "🤖"}.get(model_info.provider.value, "")
                         st.caption(f"{provider_icon} 선택된 모델: **{model_info.name}** - {model_info.description}")
+
+                    # v3.60: Claude Code 선택 시 설정 UI 표시
+                    if is_claude_code_selected("srt_model"):
+                        cc_settings = render_claude_code_settings(key="srt_claude_code")
+                        if cc_settings is None:
+                            st.warning("⚠️ Claude Code를 사용하려면 CLI를 먼저 설치하세요.")
 
                     # 속도 예상 표시 (선택된 씬 수 기반)
                     selected_count = len(st.session_state.get("srt_selected_scene_ids", srt_scenes))
@@ -1749,19 +2196,33 @@ with tab2:
                         if default_prompt_applied:
                             st.info(f"⭐ 설정된 기본 프롬프트가 적용되었습니다.")
 
+                        # ⭐ v3.27: on_change 콜백으로 사용자 변경만 감지
+                        # 문제: 페이지 리런 시 selectbox 값과 settings 값이 달라지면 자동 저장되어 버림
+                        # 해결: on_change 콜백을 사용하여 사용자가 실제로 변경할 때만 저장
+
+                        def on_prompt_selection_change():
+                            """사용자가 프롬프트 선택을 변경했을 때만 호출됨"""
+                            new_id = st.session_state.get(selectbox_key)
+                            if new_id:
+                                # 현재 prompt_type을 가져옴 (클로저 사용 불가하므로 세션에서)
+                                current_prompt_type = st.session_state.get(mode_key, "batch")
+                                template_manager.set_active_prompt(current_prompt_type, new_id)
+                                st.session_state['_prompt_selection_changed'] = True
+
                         # selectbox 렌더링 (session_state[key]가 이미 설정되어 있으므로 그 값을 사용함)
                         selected_prompt_id = st.selectbox(
                             "사용할 프롬프트",
                             options=prompt_ids,
                             format_func=lambda x: prompt_options.get(x, x),
                             key=selectbox_key,
+                            on_change=on_prompt_selection_change,
                             help="선택한 프롬프트가 분석에 바로 적용됩니다. ⭐ 기본 프롬프트 설정에서 기본값을 변경할 수 있습니다."
                         )
 
-                        # 선택이 변경되면 자동으로 활성 프롬프트로 저장
-                        if selected_prompt_id and selected_prompt_id != active_prompt_id:
-                            template_manager.set_active_prompt(prompt_type, selected_prompt_id)
+                        # ⭐ v3.27: 사용자가 실제로 변경했을 때만 성공 메시지 표시
+                        if st.session_state.get('_prompt_selection_changed'):
                             st.success(f"✅ 프롬프트가 적용되었습니다.")
+                            del st.session_state['_prompt_selection_changed']
 
                         # 선택된 프롬프트 정보 표시
                         selected_prompt_template = template_manager.get_template(selected_prompt_id)
@@ -1891,14 +2352,45 @@ with tab2:
                                 ps['_original_narration'] = ps.get('narration', '')
                                 ps['narration'] = ps.get('bundle_text', ps.get('narration', ''))
 
+                            # ⭐ v3.27: UI에서 선택된 프롬프트 ID 가져오기
+                            selected_prompt_id_for_analysis = st.session_state.get('selected_srt_prompt_id')
+                            print(f"[씬분석UI] ========== 분석 실행 ==========")
+                            print(f"[씬분석UI] 선택된 프롬프트 ID: {selected_prompt_id_for_analysis}")
+                            print(f"[씬분석UI] 처리 모드: {processing_mode}")
+                            print(f"[씬분석UI] 모델: {selected_model}")
+
                             # 새로운 속도 개선 분석기 사용 (멀티 프로바이더 지원)
+                            # ⭐ v3.27: prompt_id 직접 전달!
+                            # ⭐ v3.60: Claude Code 파라미터 추가
+                            cc_kwargs = {}
+                            if selected_model == "claude_code" or "Claude Code" in str(selected_model):
+                                cc_kwargs = {
+                                    'project_path': str(project_path),
+                                    'scenes_json_path': str(existing_scenes_path) if existing_scenes_path.exists() else str(analysis_dir / "scenes.json"),
+                                    'timeout': st.session_state.get("srt_claude_code_timeout", st.session_state.get("claude_code_timeout", 600)),
+                                    'bundle_mode': st.session_state.get("srt_claude_code_bundle_mode", st.session_state.get("claude_code_bundle_mode", True)),
+                                    'custom_instructions': st.session_state.get("srt_claude_code_custom_instructions", st.session_state.get("claude_code_custom_instructions", ""))
+                                }
+
                             analyzed_primary = analyze_scenes_with_mode(
                                 scenes=primary_scenes,
                                 mode=processing_mode,
                                 model=selected_model,
                                 progress_callback=lambda p: progress.progress(p * 0.7),  # 70%까지
-                                status_callback=lambda s: status.text(s)
+                                status_callback=lambda s: status.text(s),
+                                prompt_id=selected_prompt_id_for_analysis,  # ⭐ UI 선택값 직접 전달!
+                                **cc_kwargs  # v3.60: Claude Code 파라미터
                             )
+
+                            # ═══════════════════════════════════════════════════════════
+                            # v3.71: 에이전트 모드 감지 및 UI 표시
+                            # ═══════════════════════════════════════════════════════════
+                            if st.session_state.get('claude_code_agent_mode'):
+                                progress.progress(1.0)
+                                status.text("🤖 에이전트 모드: 프롬프트 복사 필요")
+
+                                _render_claude_code_agent_ui()
+                                st.stop()  # 에이전트 모드에서는 여기서 중단
 
                             # 대표 씬 narration 복원
                             for ps in analyzed_primary:
@@ -1912,6 +2404,13 @@ with tab2:
 
                             for analyzed in analyzed_primary:
                                 apply_bundle_analysis_result(analysis_scenes, analyzed)
+
+                            # v3.29: 묶음 병합 후 확인 로깅
+                            bg_count_after_bundle = sum(1 for s in analysis_scenes if s.get('background_prompt_en'))
+                            print(f"[묶음 병합 후] background_prompt_en 있는 씬: {bg_count_after_bundle}/{len(analysis_scenes)}")
+                            for s in analysis_scenes:
+                                has_bg = "✅" if s.get('background_prompt_en') else "❌"
+                                print(f"  씬 {s.get('scene_id', '?')}: {has_bg} (bundle_id={s.get('bundle_id')}, primary={s.get('is_bundle_primary')})")
 
                             # 캐릭터 visual_prompt 후처리 (빠른 모델 사용)
                             progress.progress(0.85)
@@ -2173,27 +2672,102 @@ with tab2:
         col1, col2 = st.columns(2)
 
         with col1:
-            selected_api = render_api_selector(
-                task="scene_analysis",
-                label="씬 분석 AI",
-                key_prefix="scene_analysis"
+            # ═══════════════════════════════════════════════════════════
+            # v3.40: Claude Code 옵션 추가 (v3.50 에이전트 방식 업그레이드)
+            # ═══════════════════════════════════════════════════════════
+            use_claude_code = st.checkbox(
+                "🖥️ Claude Code 사용 (Max Plan 무료)",
+                value=False,
+                key="use_claude_code_for_analysis",
+                help="Claude Code Max Plan을 사용하여 무료로 씬 분석합니다. Claude Code CLI가 설치되어 있어야 합니다."
             )
 
-            # 선택된 API 상태 표시
-            if selected_api:
-                selected_lower = selected_api.lower() if isinstance(selected_api, str) else ""
-                if "gemini" in selected_lower or "google" in selected_lower:
-                    status = api_status.get("gemini", {})
-                    if not status.get("installed"):
-                        st.error("❌ google-generativeai 패키지가 설치되지 않았습니다. `pip install google-generativeai` 실행 후 재시작하세요.")
-                    elif not status.get("api_key"):
-                        st.warning("⚠️ GOOGLE_API_KEY 또는 GEMINI_API_KEY가 설정되지 않았습니다.")
-                elif "gpt" in selected_lower or "openai" in selected_lower:
-                    status = api_status.get("openai", {})
-                    if not status.get("installed"):
-                        st.error("❌ openai 패키지가 설치되지 않았습니다.")
-                    elif not status.get("api_key"):
-                        st.warning("⚠️ OPENAI_API_KEY가 설정되지 않았습니다.")
+            if use_claude_code:
+                # Claude Code 상태 확인 (새 함수 사용)
+                try:
+                    from utils.claude_code_runner import check_claude_code_installation
+                    status = check_claude_code_installation()
+
+                    if status['installed']:
+                        st.success(f"✅ Claude Code 설치됨: {status['version']}")
+
+                        # Claude Code 설정 옵션
+                        with st.expander("⚙️ Claude Code 설정", expanded=False):
+                            cc_col1, cc_col2 = st.columns(2)
+
+                            with cc_col1:
+                                claude_code_timeout = st.number_input(
+                                    "타임아웃 (초)",
+                                    min_value=60,
+                                    max_value=1800,
+                                    value=600,
+                                    step=60,
+                                    key="claude_code_timeout",
+                                    help="분석 작업의 최대 실행 시간"
+                                )
+
+                            with cc_col2:
+                                claude_code_bundle = st.checkbox(
+                                    "묶음 모드 사용",
+                                    value=True,
+                                    key="claude_code_bundle_mode",
+                                    help="동일한 bundle_id를 가진 씬들은 같은 프롬프트 공유"
+                                )
+
+                            claude_code_instructions = st.text_area(
+                                "추가 지시사항 (선택)",
+                                placeholder="예: 배경 프롬프트에 '네온 조명' 스타일 강조",
+                                height=60,
+                                key="claude_code_custom_instructions"
+                            )
+
+                            st.markdown("""
+                            **Claude Code 장점:**
+                            - 🆓 Max Plan 사용 시 API 비용 무료
+                            - 🧠 Claude Opus 4 수준의 고품질 분석
+                            - 📁 파일 직접 수정으로 빠른 처리
+                            """)
+
+                        # ═══════════════════════════════════════════════════════════
+                        # v3.70: Claude Code 수동 실행 UI 추가 (Max Plan 무료 활용)
+                        # ═══════════════════════════════════════════════════════════
+                        scenes_json_path = project_path / "analysis" / "scenes.json"
+                        if scenes_json_path.exists():
+                            render_claude_code_manual_execution_ui(
+                                project_path,
+                                str(scenes_json_path)
+                            )
+                        else:
+                            st.info("💡 먼저 아래 '씬 분석 시작' 버튼으로 기본 분석을 수행하세요. 그 후 수동 실행이 가능합니다.")
+                    else:
+                        st.error(f"❌ Claude Code CLI 미설치: {status['error']}")
+                        st.code("npm i -g @anthropic-ai/claude-code", language="bash")
+
+                except ImportError:
+                    st.error("❌ claude_code_runner 모듈을 불러올 수 없습니다")
+                selected_api = None  # Claude Code 사용 시 API 선택 비활성화
+            else:
+                selected_api = render_api_selector(
+                    task="scene_analysis",
+                    label="씬 분석 AI",
+                    key_prefix="scene_analysis"
+                )
+
+                # 선택된 API 상태 표시
+                if selected_api:
+                    selected_lower = selected_api.lower() if isinstance(selected_api, str) else ""
+                    if "gemini" in selected_lower or "google" in selected_lower:
+                        status = api_status.get("gemini", {})
+                        if not status.get("installed"):
+                            st.error("❌ google-generativeai 패키지가 설치되지 않았습니다. `pip install google-generativeai` 실행 후 재시작하세요.")
+                        elif not status.get("api_key"):
+                            st.warning("⚠️ GOOGLE_API_KEY 또는 GEMINI_API_KEY가 설정되지 않았습니다.")
+                    elif "gpt" in selected_lower or "openai" in selected_lower:
+                        status = api_status.get("openai", {})
+                        if not status.get("installed"):
+                            st.error("❌ openai 패키지가 설치되지 않았습니다.")
+                        elif not status.get("api_key"):
+                            st.warning("⚠️ OPENAI_API_KEY가 설정되지 않았습니다.")
 
         with col2:
             # 프롬프트 템플릿 선택 (Content Type 대체)
@@ -2222,8 +2796,17 @@ with tab2:
 
         st.divider()
 
+        # ═══════════════════════════════════════════════════════════
+        # v3.35: 폴백 요청 처리
+        # ═══════════════════════════════════════════════════════════
+        fallback_requested = st.session_state.pop("_analysis_fallback_requested", False)
+        fallback_provider = st.session_state.pop("_analysis_fallback_provider", None)
+
+        if fallback_requested and fallback_provider:
+            st.info(f"🔄 **{fallback_provider.upper()}**로 폴백 분석을 시작합니다...")
+
         # 분석 버튼
-        if st.button("🎬 씬 분석 시작", type="primary", use_container_width=True):
+        if st.button("🎬 씬 분석 시작", type="primary", use_container_width=True) or fallback_requested:
             api_manager = get_api_manager()
 
             # 프로그레스 UI
@@ -2234,8 +2817,6 @@ with tab2:
             )
 
             try:
-                from core.script.scene_analyzer import SceneAnalyzer
-
                 progress.update(1, "AI 분석기 초기화...")
                 progress.info("스크립트 분석을 시작합니다.")
 
@@ -2244,130 +2825,520 @@ with tab2:
                 print(f"[씬 분석 페이지] 스크립트 미리보기: {script[:100]}...")
                 progress.info(f"로드된 스크립트: {len(script)}자")
 
-                # ⭐ API 매니저에서 선택된 API 정보 가져오기
-                api_config = api_manager.get_api_by_id(selected_api) if selected_api else None
+                # ═══════════════════════════════════════════════════════════
+                # v3.60: Claude Code 에이전트 분석 모드 (드롭다운 통합)
+                # ═══════════════════════════════════════════════════════════
+                # 체크박스 또는 드롭다운에서 Claude Code 선택 여부 확인
+                from utils.ai_model_selector import is_claude_code_selected as check_cc_selected
+                use_claude_code_mode = use_claude_code or check_cc_selected("srt_model")
 
-                if api_config:
-                    provider = api_config.provider
-                    model_name = api_config.model_id
-                    max_output_tokens = api_config.max_output_tokens
-                    print(f"[씬 분석 페이지] 선택된 API: {selected_api}")
-                    print(f"[씬 분석 페이지]   provider: {provider}")
-                    print(f"[씬 분석 페이지]   model_id: {model_name}")
-                    print(f"[씬 분석 페이지]   max_output_tokens: {max_output_tokens:,}")
+                if use_claude_code_mode and not fallback_requested:
+                    from utils.claude_code_runner import (
+                        run_scene_analysis_with_claude_code,
+                        run_scene_analysis_agent,
+                        enable_claude_cli,
+                        SceneAnalysisResult
+                    )
+
+                    progress.info("🖥️ Claude Code 에이전트 모드로 분석합니다...")
+                    print(f"[씬 분석 페이지] Claude Code 에이전트 모드 활성화")
+
+                    # Claude CLI 활성화 (비활성화 상태일 수 있음)
+                    enable_claude_cli()
+
+                    # UI에서 설정값 가져오기 (드롭다운 설정 우선, 없으면 체크박스 설정)
+                    cc_timeout = st.session_state.get("srt_claude_code_timeout", st.session_state.get("claude_code_timeout", 600))
+                    cc_bundle = st.session_state.get("srt_claude_code_bundle_mode", st.session_state.get("claude_code_bundle_mode", True))
+                    cc_instructions = st.session_state.get("srt_claude_code_custom_instructions", st.session_state.get("claude_code_custom_instructions", ""))
+
+                    # 기존 scenes.json이 있는지 확인
+                    scenes_json_path = project_path / "analysis" / "scenes.json"
+                    analysis_dir = project_path / "analysis"
+                    analysis_dir.mkdir(parents=True, exist_ok=True)
+
+                    # 기존 scenes.json이 있으면 에이전트로 프롬프트만 추가
+                    # 없으면 기존 방식으로 전체 분석
+                    use_agent_mode = scenes_json_path.exists()
+
+                    progress.update(2, "Claude Code 실행 중...")
+
+                    def progress_cb(msg):
+                        progress.info(msg)
+
+                    start_time = time.time()
+
+                    if use_agent_mode:
+                        # 에이전트 모드: 기존 scenes.json에 프롬프트 필드 추가
+                        progress.info("📝 기존 씬 데이터에 프롬프트 추가 (에이전트 모드)...")
+                        print(f"[씬 분석 페이지] 에이전트 모드: scenes.json 보강")
+
+                        agent_result = run_scene_analysis_agent(
+                            scenes_json_path=str(scenes_json_path),
+                            project_path=str(project_path),
+                            scene_range=None,  # 전체 씬
+                            bundle_mode=cc_bundle,
+                            custom_instructions=cc_instructions,
+                            timeout=cc_timeout,
+                            progress_callback=progress_cb
+                        )
+
+                        elapsed = time.time() - start_time
+
+                        # ═══════════════════════════════════════════════════════════
+                        # v3.70: AGENT_MODE_REQUIRED 처리 (subprocess 비활성화)
+                        # ═══════════════════════════════════════════════════════════
+                        if agent_result.error == "AGENT_MODE_REQUIRED":
+                            # 에이전트 모드: 프롬프트 복사 + 수동 실행 또는 자동 실행
+                            progress.update(4, "에이전트 모드: 실행 방법 선택")
+
+                            st.warning("🤖 **Claude Code 에이전트 모드**")
+
+                            st.info("""
+                            **Claude Code Max Plan을 사용하여 무료로 분석합니다!**
+
+                            - 🚀 **자동 실행**: 버튼 클릭 → 새 CMD 창에서 자동 실행
+                            - 📋 **수동 실행**: 프롬프트 복사 → Claude Code 앱에서 붙여넣기
+                            """)
+
+                            # 프롬프트 정보 가져오기
+                            prompt_text = agent_result.output  # 프롬프트가 output에 저장됨
+                            fields_info = agent_result.fields_generated or {}
+                            prompt_file = fields_info.get('prompt_file', '')
+
+                            # 세션에 저장
+                            st.session_state['claude_code_prompt'] = prompt_text
+                            st.session_state['claude_code_prompt_file'] = prompt_file
+                            st.session_state['claude_code_scenes_path'] = str(scenes_json_path)
+                            st.session_state['claude_code_agent_ready'] = True
+
+                            # ═══════════════════════════════════════════════════════════
+                            # v3.71: 자동 실행 버튼 추가
+                            # ═══════════════════════════════════════════════════════════
+                            st.markdown("### 🚀 자동 실행 (권장)")
+
+                            auto_col1, auto_col2 = st.columns([3, 2])
+
+                            with auto_col1:
+                                if st.button("🚀 Claude Code 자동 실행", type="primary", use_container_width=True, key="auto_execute_claude_code"):
+                                    try:
+                                        from utils.claude_code_runner import execute_claude_code_in_new_window
+
+                                        # 자동 실행
+                                        auto_result = execute_claude_code_in_new_window(
+                                            prompt_text=prompt_text,
+                                            project_path=str(project_path),
+                                            scenes_json_path=str(scenes_json_path)
+                                        )
+
+                                        if auto_result.success:
+                                            st.success("✅ Claude Code가 새 창에서 실행되었습니다!")
+                                            st.info(f"""
+                                            **다음 단계:**
+                                            1. 새로 열린 CMD 창에서 Claude Code 실행을 확인하세요
+                                            2. 완료되면 아래 **"결과 확인"** 버튼을 클릭하세요
+                                            """)
+
+                                            # 세션에 실행 정보 저장
+                                            st.session_state['claude_code_auto_executed'] = True
+                                            st.session_state['claude_code_batch_file'] = auto_result.batch_file
+                                        else:
+                                            st.error(f"❌ 실행 오류: {auto_result.error}")
+
+                                    except Exception as e:
+                                        st.error(f"❌ 자동 실행 실패: {e}")
+                                        import traceback
+                                        st.code(traceback.format_exc())
+
+                            with auto_col2:
+                                if st.button("🔄 결과 확인", use_container_width=True, key="check_result_auto"):
+                                    # scenes.json 다시 로드
+                                    try:
+                                        with open(scenes_json_path, 'r', encoding='utf-8') as f:
+                                            data = json.load(f)
+
+                                        reload_scenes = data.get('scenes', data) if isinstance(data, dict) else data
+
+                                        if reload_scenes:
+                                            stats = check_scenes_analysis_status(reload_scenes)
+
+                                            if stats['background_prompt_en'] > 0:
+                                                st.success(f"✅ 분석 결과 감지! {stats['background_prompt_en']}/{stats['total']} 씬 완료")
+                                                st.session_state['scenes'] = reload_scenes
+                                                st.session_state['_agent_analysis_stats'] = stats
+                                                st.balloons()
+                                                time.sleep(1)
+                                                st.rerun()
+                                            else:
+                                                st.warning("아직 분석 결과가 없습니다. Claude Code 실행이 완료될 때까지 기다려주세요.")
+                                    except Exception as e:
+                                        st.error(f"파일 로드 실패: {e}")
+
+                            # ─────────────────────────────────────────────────────────
+                            # 수동 실행 옵션 (접힌 상태)
+                            # ─────────────────────────────────────────────────────────
+                            with st.expander("📋 수동 실행 (대안)", expanded=False):
+                                st.markdown("""
+                                **수동 실행 방법:**
+                                1. "프롬프트 복사" 버튼 클릭
+                                2. Claude Code 앱 열기 (`cd longform && claude`)
+                                3. 프롬프트 붙여넣기
+                                4. 완료 후 "결과 확인" 버튼 클릭
+                                """)
+
+                                manual_col1, manual_col2, manual_col3 = st.columns([2, 2, 1])
+
+                                with manual_col1:
+                                    if st.button("📋 프롬프트 복사", use_container_width=True, key="copy_prompt_agent_mode"):
+                                        try:
+                                            import pyperclip
+                                            pyperclip.copy(prompt_text)
+                                            st.success("✅ 클립보드에 복사되었습니다!")
+                                        except ImportError:
+                                            st.warning("pyperclip 패키지가 없습니다.")
+                                            st.code(prompt_text[:500] + "...", language="markdown")
+                                        except Exception as e:
+                                            st.error(f"복사 실패: {e}")
+
+                                with manual_col2:
+                                    if st.button("🔄 결과 확인", use_container_width=True, key="check_result_manual"):
+                                        try:
+                                            with open(scenes_json_path, 'r', encoding='utf-8') as f:
+                                                data = json.load(f)
+                                            reload_scenes = data.get('scenes', data) if isinstance(data, dict) else data
+                                            if reload_scenes:
+                                                stats = check_scenes_analysis_status(reload_scenes)
+                                                if stats['background_prompt_en'] > 0:
+                                                    st.success(f"✅ {stats['background_prompt_en']}/{stats['total']} 씬 완료")
+                                                    st.session_state['scenes'] = reload_scenes
+                                                    st.rerun()
+                                                else:
+                                                    st.warning("아직 분석 결과가 없습니다.")
+                                        except Exception as e:
+                                            st.error(f"파일 로드 실패: {e}")
+
+                                with manual_col3:
+                                    if st.button("📂", help="폴더 열기", key="open_folder_agent_mode"):
+                                        try:
+                                            os.startfile(os.path.dirname(str(scenes_json_path)))
+                                        except Exception as e:
+                                            st.error(f"폴더 열기 실패: {e}")
+
+                                # 프롬프트 미리보기
+                                st.markdown("**프롬프트 미리보기:**")
+                                st.code(prompt_text, language="markdown")
+
+                                # Claude Code 실행 명령어
+                                st.markdown("**Claude Code 실행:**")
+                                st.code("cd C:\\Users\\KIMJAEHEON\\longform\nclaude", language="bash")
+
+                            # 작업 중단 (에이전트 모드에서는 더 이상 진행하지 않음)
+                            st.stop()
+
+                        elif agent_result.success:
+                            # scenes.json 다시 로드
+                            with open(scenes_json_path, 'r', encoding='utf-8') as f:
+                                scenes_data = json.load(f)
+                            success = True
+                            message = f"분석 완료 ({agent_result.scenes_analyzed}개 씬)"
+
+                            # 분석 통계 표시
+                            if agent_result.fields_generated:
+                                stats_msg = ", ".join([f"{k}: {v}" for k, v in agent_result.fields_generated.items()])
+                                progress.info(f"📊 생성된 필드: {stats_msg}")
+                        else:
+                            success = False
+                            message = agent_result.error
+                            scenes_data = None
+                    else:
+                        # 기존 방식: 스크립트에서 새로 분석
+                        progress.info("📝 스크립트에서 새로 분석...")
+                        print(f"[씬 분석 페이지] 기존 방식: 스크립트 분석")
+
+                        # 임시 스크립트 파일 저장
+                        script_file = project_path / "analysis" / "temp_script.txt"
+                        script_file.write_text(script, encoding='utf-8')
+
+                        success, message, scenes_data = run_scene_analysis_with_claude_code(
+                            script_path=str(script_file),
+                            output_path=str(scenes_json_path),
+                            language=language,
+                            timeout=cc_timeout,
+                            progress_callback=progress_cb
+                        )
+                        elapsed = time.time() - start_time
+
+                    if success and scenes_data:
+                        progress.update(3, "결과 저장 중...")
+
+                        # 결과 구성
+                        result = {
+                            "scenes": scenes_data,
+                            "characters": [],  # 캐릭터는 씬에서 추출
+                            "total_scenes": len(scenes_data),
+                            "estimated_duration": sum(s.get("duration_estimate", 0) for s in scenes_data)
+                        }
+
+                        # 캐릭터 추출
+                        all_characters = set()
+                        for scene in scenes_data:
+                            for char in scene.get("characters", []):
+                                if char and isinstance(char, str):
+                                    all_characters.add(char)
+
+                        result["characters"] = [{"name": c} for c in all_characters]
+
+                        # 파일 저장
+                        analysis_dir = project_path / "analysis"
+                        with open(analysis_dir / "characters.json", "w", encoding="utf-8") as f:
+                            json.dump(result.get("characters", []), f, ensure_ascii=False, indent=2)
+                        with open(analysis_dir / "full_analysis.json", "w", encoding="utf-8") as f:
+                            json.dump(result, f, ensure_ascii=False, indent=2)
+
+                        # 세션 저장
+                        scenes = result.get("scenes", [])
+                        characters = result.get("characters", [])
+                        st.session_state["scene_analysis_result"] = result
+                        st.session_state["scenes"] = scenes
+                        st.session_state["characters"] = characters
+                        st.session_state["scene_characters"] = characters
+                        st.session_state["extracted_characters"] = characters
+
+                        # 캐시 클리어
+                        clear_scene_cache(str(project_path))
+
+                        progress.update(4, "완료!")
+                        progress.complete(f"Claude Code: 씬 {len(scenes)}개, 캐릭터 {len(characters)}명 추출 완료!")
+                        st.success(f"✅ Claude Code 분석 완료 ({elapsed:.1f}초)")
+
+                        time.sleep(1)
+                        st.rerun()
+                    else:
+                        # Claude Code 실패 시 Gemini 폴백 제안
+                        progress.fail(f"Claude Code 실패: {message}")
+                        st.error(f"❌ Claude Code 분석 실패: {message}")
+
+                        col_retry1, col_retry2 = st.columns(2)
+                        with col_retry1:
+                            if st.button("🔄 Gemini로 다시 분석", type="primary"):
+                                st.session_state["_analysis_fallback_requested"] = True
+                                st.session_state["_analysis_fallback_provider"] = "google"
+                                st.rerun()
+                        with col_retry2:
+                            if st.button("🔄 다시 시도"):
+                                st.rerun()
+                        raise Exception(f"Claude Code 분석 실패: {message}")
+
+                # ═══════════════════════════════════════════════════════════
+                # 기존 API 기반 분석
+                # ═══════════════════════════════════════════════════════════
                 else:
-                    # 폴백: 키워드 기반으로 provider 결정
-                    provider = "anthropic"  # 기본값
-                    model_name = None
-                    max_output_tokens = 65536
-                    if selected_api:
-                        selected_lower = selected_api.lower() if isinstance(selected_api, str) else ""
-                        if "gemini" in selected_lower or "google" in selected_lower:
-                            provider = "google"
-                        elif "gpt" in selected_lower or "openai" in selected_lower:
-                            provider = "openai"
-                        elif "claude" in selected_lower or "anthropic" in selected_lower:
-                            provider = "anthropic"
-                    print(f"[씬 분석 페이지] 폴백 모드: {selected_api} -> provider: {provider}")
+                    from core.script.scene_analyzer import SceneAnalyzer
 
-                # ⭐ 모델명과 max_output_tokens를 SceneAnalyzer에 전달
-                analyzer = SceneAnalyzer(
-                    provider=provider,
-                    model_name=model_name,
-                    max_output_tokens=max_output_tokens
-                )
+                    # ⭐ v3.35: 폴백 요청 시 provider 강제 설정
+                    if fallback_requested and fallback_provider:
+                        provider = fallback_provider
+                        model_name = None  # 기본 모델 사용
+                        max_output_tokens = 65536
+                        print(f"[씬 분석 페이지] 🔄 폴백 분석: provider={provider}")
+                        progress.info(f"🔄 폴백 모드: {provider.upper()} 사용")
 
-                progress.update(2, "스크립트 분석 중...")
-                progress.info(f"사용 프롬프트: {selected_template_name}")
-                progress.info(f"스크립트 길이: {len(script):,}자")
+                    # ⭐ API 매니저에서 선택된 API 정보 가져오기
+                    elif selected_api:
+                        api_config = api_manager.get_api_by_id(selected_api)
 
-                # ⭐ 실제 사용되는 모델 상세 표시
-                if provider == "google" and hasattr(analyzer, 'gemini_model_name'):
-                    actual_tokens = getattr(analyzer, 'max_output_tokens', 65536)
-                    progress.info(f"🤖 사용 AI: {analyzer.gemini_model_name}")
-                    progress.info(f"📊 최대 출력: {actual_tokens:,} 토큰")
-                else:
-                    progress.info(f"🤖 사용 AI: {provider}")
+                        if api_config:
+                            provider = api_config.provider
+                            model_name = api_config.model_id
+                            max_output_tokens = api_config.max_output_tokens
+                            print(f"[씬 분석 페이지] 선택된 API: {selected_api}")
+                            print(f"[씬 분석 페이지]   provider: {provider}")
+                            print(f"[씬 분석 페이지]   model_id: {model_name}")
+                            print(f"[씬 분석 페이지]   max_output_tokens: {max_output_tokens:,}")
+                        else:
+                            # 폴백: 키워드 기반으로 provider 결정
+                            provider = "anthropic"  # 기본값
+                            model_name = None
+                            max_output_tokens = 65536
+                            selected_lower = selected_api.lower() if isinstance(selected_api, str) else ""
+                            if "gemini" in selected_lower or "google" in selected_lower:
+                                provider = "google"
+                            elif "gpt" in selected_lower or "openai" in selected_lower:
+                                provider = "openai"
+                            elif "claude" in selected_lower or "anthropic" in selected_lower:
+                                provider = "anthropic"
+                            print(f"[씬 분석 페이지] 폴백 모드: {selected_api} -> provider: {provider}")
+                    else:
+                        # 기본값
+                        provider = "google"  # 기본은 Gemini (무료)
+                        model_name = None
+                        max_output_tokens = 65536
+                        print(f"[씬 분석 페이지] 기본 provider 사용: {provider}")
 
-                start_time = time.time()
-                result = analyzer.analyze_script(script, language, template_id=selected_template_id)
-                elapsed = time.time() - start_time
+                    # ⭐ 모델명과 max_output_tokens를 SceneAnalyzer에 전달
+                    analyzer = SceneAnalyzer(
+                        provider=provider,
+                        model_name=model_name,
+                        max_output_tokens=max_output_tokens
+                    )
 
-                # 디버그: 결과 확인
-                print(f"[씬 분석 페이지] 분석 결과: 씬 {len(result.get('scenes', []))}개, 캐릭터 {len(result.get('characters', []))}개")
-                if result.get('error'):
-                    print(f"[씬 분석 페이지] 오류: {result.get('error')}")
-                    progress.info(f"분석 오류: {result.get('error')}")
+                    progress.update(2, "스크립트 분석 중...")
+                    progress.info(f"사용 프롬프트: {selected_template_name}")
+                    progress.info(f"스크립트 길이: {len(script):,}자")
 
-                progress.update(3, "결과 저장 중...")
+                    # ⭐ 실제 사용되는 모델 상세 표시
+                    if provider == "google" and hasattr(analyzer, 'gemini_model_name'):
+                        actual_tokens = getattr(analyzer, 'max_output_tokens', 65536)
+                        progress.info(f"🤖 사용 AI: {analyzer.gemini_model_name}")
+                        progress.info(f"📊 최대 출력: {actual_tokens:,} 토큰")
+                    else:
+                        progress.info(f"🤖 사용 AI: {provider}")
 
-                # 결과 저장
-                analysis_dir = project_path / "analysis"
-                analysis_dir.mkdir(parents=True, exist_ok=True)
+                    start_time = time.time()
+                    result = analyzer.analyze_script(script, language, template_id=selected_template_id)
+                    elapsed = time.time() - start_time
 
-                with open(analysis_dir / "scenes.json", "w", encoding="utf-8") as f:
-                    json.dump(result.get("scenes", []), f, ensure_ascii=False, indent=2)
+                    # 디버그: 결과 확인
+                    print(f"[씬 분석 페이지] 분석 결과: 씬 {len(result.get('scenes', []))}개, 캐릭터 {len(result.get('characters', []))}개")
+                    if result.get('error'):
+                        print(f"[씬 분석 페이지] 오류: {result.get('error')}")
+                        progress.info(f"분석 오류: {result.get('error')}")
 
-                with open(analysis_dir / "characters.json", "w", encoding="utf-8") as f:
-                    json.dump(result.get("characters", []), f, ensure_ascii=False, indent=2)
+                    progress.update(3, "결과 저장 중...")
 
-                with open(analysis_dir / "full_analysis.json", "w", encoding="utf-8") as f:
-                    json.dump(result, f, ensure_ascii=False, indent=2)
+                    # 결과 저장
+                    analysis_dir = project_path / "analysis"
+                    analysis_dir.mkdir(parents=True, exist_ok=True)
 
-                # === 세션에도 저장 (캐릭터 관리 페이지 연동용) ===
-                scenes = result.get("scenes", [])
-                characters = result.get("characters", [])
+                    with open(analysis_dir / "scenes.json", "w", encoding="utf-8") as f:
+                        json.dump(result.get("scenes", []), f, ensure_ascii=False, indent=2)
 
-                st.session_state["scene_analysis_result"] = result
-                st.session_state["scenes"] = scenes
-                st.session_state["characters"] = characters
-                # 캐릭터 관리 페이지 호환용 키
-                st.session_state["scene_characters"] = characters
-                st.session_state["extracted_characters"] = characters
+                    with open(analysis_dir / "characters.json", "w", encoding="utf-8") as f:
+                        json.dump(result.get("characters", []), f, ensure_ascii=False, indent=2)
 
-                # 다른 페이지 캐시 클리어 (Problem 56)
-                clear_scene_cache(str(project_path))
+                    with open(analysis_dir / "full_analysis.json", "w", encoding="utf-8") as f:
+                        json.dump(result, f, ensure_ascii=False, indent=2)
 
-                print(f"[씬 분석 페이지] 세션 저장 완료: 씬 {len(scenes)}개, 캐릭터 {len(characters)}개")
+                    # === 세션에도 저장 (캐릭터 관리 페이지 연동용) ===
+                    scenes = result.get("scenes", [])
+                    characters = result.get("characters", [])
 
-                # 캐릭터 visual_prompt 디버그 출력
-                for char in characters[:3]:  # 처음 3개만
-                    name = char.get("name", "Unknown")
-                    has_prompt = bool(char.get("visual_prompt"))
-                    print(f"  - {name}: visual_prompt={'있음' if has_prompt else '없음'}")
+                    st.session_state["scene_analysis_result"] = result
+                    st.session_state["scenes"] = scenes
+                    st.session_state["characters"] = characters
+                    # 캐릭터 관리 페이지 호환용 키
+                    st.session_state["scene_characters"] = characters
+                    st.session_state["extracted_characters"] = characters
 
-                # 사용량 기록 (provider에 따른 모델 ID 결정)
-                model_id_map = {
-                    "anthropic": "claude-sonnet-4-20250514",
-                    "google": "gemini-2.0-flash-exp",
-                    "openai": "gpt-4o"
-                }
-                record_model_id = model_id_map.get(provider, "claude-sonnet-4-20250514")
+                    # 다른 페이지 캐시 클리어 (Problem 56)
+                    clear_scene_cache(str(project_path))
 
-                api_manager.record_usage(
-                    provider=provider,
-                    model_id=record_model_id,
-                    function="text_generation",
-                    tokens_input=len(script) // 4,
-                    tokens_output=len(json.dumps(result)) // 4,
-                    duration_seconds=elapsed,
-                    success=True,
-                    project_name=project_path.name,
-                    step_name="scene_analysis"
-                )
+                    print(f"[씬 분석 페이지] 세션 저장 완료: 씬 {len(scenes)}개, 캐릭터 {len(characters)}개")
 
-                progress.update(4, "완료!")
+                    # 캐릭터 visual_prompt 디버그 출력
+                    for char in characters[:3]:  # 처음 3개만
+                        name = char.get("name", "Unknown")
+                        has_prompt = bool(char.get("visual_prompt"))
+                        print(f"  - {name}: visual_prompt={'있음' if has_prompt else '없음'}")
 
-                scene_count = result.get("total_scenes", len(result.get("scenes", [])))
-                char_count = len(result.get("characters", []))
-                progress.complete(f"씬 {scene_count}개, 캐릭터 {char_count}명 추출 완료!")
+                    # 사용량 기록 (provider에 따른 모델 ID 결정)
+                    model_id_map = {
+                        "anthropic": "claude-sonnet-4-20250514",
+                        "google": "gemini-2.0-flash-exp",
+                        "openai": "gpt-4o"
+                    }
+                    record_model_id = model_id_map.get(provider, "claude-sonnet-4-20250514")
 
-                time.sleep(1)
-                st.rerun()
+                    api_manager.record_usage(
+                        provider=provider,
+                        model_id=record_model_id,
+                        function="text_generation",
+                        tokens_input=len(script) // 4,
+                        tokens_output=len(json.dumps(result)) // 4,
+                        duration_seconds=elapsed,
+                        success=True,
+                        project_name=project_path.name,
+                        step_name="scene_analysis"
+                    )
+
+                    progress.update(4, "완료!")
+
+                    scene_count = result.get("total_scenes", len(result.get("scenes", [])))
+                    char_count = len(result.get("characters", []))
+                    progress.complete(f"씬 {scene_count}개, 캐릭터 {char_count}명 추출 완료!")
+
+                    time.sleep(1)
+                    st.rerun()
 
             except Exception as e:
                 elapsed = time.time() - start_time if 'start_time' in dir() else 0
-                progress.fail(str(e))
+
+                # ═══════════════════════════════════════════════════════════
+                # v3.35: 개선된 API 에러 처리
+                # v3.40: Claude Code 모드 에러 처리 추가
+                # ═══════════════════════════════════════════════════════════
+
+                # provider가 정의되어 있지 않으면 기본값 설정 (Claude Code 모드)
+                if 'provider' not in dir() or provider is None:
+                    provider = "claude_code" if use_claude_code else "google"
+
+                try:
+                    from utils.api_error_handler import (
+                        extract_error_from_exception,
+                        get_error_display_message,
+                        is_credit_error,
+                        is_fallback_recommended,
+                        APIErrorType
+                    )
+
+                    # 에러 파싱
+                    api_error = extract_error_from_exception(e, provider=provider)
+
+                    # 에러 타입별 처리
+                    if api_error.error_type == APIErrorType.CREDIT_INSUFFICIENT:
+                        progress.fail("💳 API 크레딧 부족")
+                        st.error(get_error_display_message(api_error))
+
+                        # 폴백 옵션 제공
+                        st.markdown("---")
+                        col_fb1, col_fb2 = st.columns(2)
+                        with col_fb1:
+                            fallback_provider = "Gemini" if provider == "anthropic" else "Claude"
+                            if st.button(f"🔄 {fallback_provider}로 다시 분석", type="primary", key="fallback_btn"):
+                                # 세션에 폴백 요청 저장
+                                st.session_state["_analysis_fallback_requested"] = True
+                                st.session_state["_analysis_fallback_provider"] = "google" if provider == "anthropic" else "anthropic"
+                                st.rerun()
+                        with col_fb2:
+                            if provider == "anthropic":
+                                st.link_button("💳 크레딧 충전하기", "https://console.anthropic.com/settings/billing")
+
+                    elif api_error.error_type == APIErrorType.RATE_LIMIT:
+                        progress.fail("⏱️ API 속도 제한")
+                        st.warning(get_error_display_message(api_error))
+                        retry_seconds = api_error.retry_after_seconds or 30
+                        st.info(f"💡 {retry_seconds}초 후 자동 재시도하거나, 다른 모델로 전환하세요.")
+
+                    elif api_error.error_type == APIErrorType.AUTHENTICATION:
+                        progress.fail("🔑 API 인증 실패")
+                        st.error(get_error_display_message(api_error))
+                        st.info("💡 API 관리 페이지에서 API 키를 확인하세요.")
+
+                    else:
+                        # 기타 에러
+                        progress.fail(str(e)[:100])
+                        st.error(get_error_display_message(api_error))
+
+                        if api_error.fallback_available:
+                            fallback_provider = "Gemini" if provider == "anthropic" else "Claude"
+                            if st.button(f"🔄 {fallback_provider}로 다시 시도", key="fallback_other_btn"):
+                                st.session_state["_analysis_fallback_requested"] = True
+                                st.session_state["_analysis_fallback_provider"] = "google" if provider == "anthropic" else "anthropic"
+                                st.rerun()
+
+                except ImportError:
+                    # api_error_handler import 실패 시 기존 동작
+                    progress.fail(str(e))
+                    st.error(f"❌ 분석 실패: {e}")
 
                 # 에러 기록 (provider에 따른 모델 ID 결정)
                 model_id_map = {
@@ -2388,8 +3359,10 @@ with tab2:
                     step_name="scene_analysis"
                 )
 
-                import traceback
-                st.code(traceback.format_exc())
+                # 디버그 정보 (접힌 상태)
+                with st.expander("🔧 디버그 정보", expanded=False):
+                    import traceback
+                    st.code(traceback.format_exc())
 
         # 기존 분석 결과 로드
         analysis_path = project_path / "analysis" / "full_analysis.json"

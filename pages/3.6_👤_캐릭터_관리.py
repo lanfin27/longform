@@ -36,7 +36,12 @@ from utils.scene_character_loader import (
 from components.image_viewer import (
     render_lightbox_container,
     render_lightbox_image,
-    clickable_image
+    clickable_image,
+    # v3.0: Streamlit 네이티브 확대 기능 (JavaScript 의존성 제거)
+    render_clickable_thumbnail,
+    render_image_zoom_modal,
+    render_zoomable_image,
+    DIALOG_AVAILABLE
 )
 
 # 대표 캐릭터 시스템
@@ -49,6 +54,22 @@ from utils.representative_character import (
     get_rep_char_manager
 )
 
+# v1.1: 시드 잠금 기능
+from utils.imagefx_ui_components import (
+    render_seed_lock_options,
+    get_seed_for_generation,
+    update_locked_seed_from_result
+)
+
+# v3.31: 유명인 일반화 필터
+from utils.prominent_people_sanitizer import (
+    sanitize_characters_batch,
+    preview_character_sanitization,
+    needs_sanitization_quick_check,
+    get_recommended_model as get_sanitizer_recommended_model,
+    get_available_sanitizer_models
+)
+
 # 대표 캐릭터 라이브러리 (다중 캐릭터 관리)
 from utils.rep_char_library import (
     get_rep_char_library,
@@ -59,6 +80,15 @@ from utils.character_action_generator import (
     CharacterActionGenerator,
     get_available_models as get_action_ai_models
 )
+
+# v3.35: 씬별 캐릭터 갤러리
+try:
+    from utils.character_gallery import CharacterGalleryManager, get_gallery_manager
+    from components.scene_character_gallery import render_scene_character_gallery
+    GALLERY_AVAILABLE = True
+except ImportError as e:
+    print(f"[캐릭터 관리] 갤러리 모듈 로드 실패: {e}")
+    GALLERY_AVAILABLE = False
 
 # 페이지 설정
 st.set_page_config(
@@ -75,8 +105,169 @@ if not ensure_project_selected():
 
 project_path = get_current_project()
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# v3.32: 캐릭터 속성 안전 접근 헬퍼 함수
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def get_character_attr(char, attr_name: str, default: str = '') -> str:
+    """
+    Character 객체에서 속성을 안전하게 가져오기
+    dict와 클래스 객체 모두 지원
+    """
+    if char is None:
+        return default
+    if isinstance(char, dict):
+        return char.get(attr_name, default) or default
+    else:
+        return getattr(char, attr_name, default) or default
+
+
+def get_character_name(char) -> str:
+    """캐릭터 이름 안전하게 가져오기"""
+    return get_character_attr(char, 'name', '')
+
+
+def get_character_visual_prompt(char) -> str:
+    """
+    캐릭터 비주얼 프롬프트 안전하게 가져오기
+    여러 가능한 속성명을 시도: character_prompt, description, appearance, visual_prompt
+    """
+    for attr in ['character_prompt', 'description', 'appearance', 'visual_prompt', 'prompt']:
+        value = get_character_attr(char, attr, '')
+        if value:
+            return value
+    return ''
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# v3.36: 씬 데이터에서 캐릭터 추출 헬퍼 함수
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _extract_characters_from_scenes(scenes_data: list) -> list:
+    """
+    씬 데이터에서 캐릭터 정보 추출
+
+    다양한 필드명 지원:
+    - characters, character_names, character_list
+    - character_prompt_en, character_prompt_ko
+    - 등장_캐릭터, 캐릭터
+
+    Args:
+        scenes_data: 씬 데이터 리스트 (scenes.json 내용)
+
+    Returns:
+        추출된 캐릭터 정보 리스트
+    """
+    # 캐릭터 이름 → 정보 매핑 (중복 제거용)
+    character_map = {}
+
+    for scene in scenes_data:
+        scene_num = scene.get('scene_number', scene.get('scene_id', 0))
+        if isinstance(scene_num, str) and scene_num.isdigit():
+            scene_num = int(scene_num)
+
+        # ─────────────────────────────────────────────────────────
+        # 방법 1: characters 필드 (리스트)
+        # ─────────────────────────────────────────────────────────
+        characters = scene.get('characters', [])
+
+        if isinstance(characters, list):
+            for char in characters:
+                if isinstance(char, str):
+                    char_name = char.strip()
+                    char_prompt = ''
+                elif isinstance(char, dict):
+                    char_name = char.get('name', '') or char.get('이름', '')
+                    char_prompt = char.get('visual_prompt', '') or char.get('character_prompt', '')
+                else:
+                    continue
+
+                if char_name and char_name.lower() not in ['n/a', 'none', '없음', '', 'null']:
+                    if char_name not in character_map:
+                        character_map[char_name] = {
+                            'name': char_name,
+                            'name_ko': char_name,
+                            'role': '등장인물',
+                            'description': '',
+                            'visual_prompt': char_prompt,
+                            'appearance_scenes': []
+                        }
+                    if scene_num and scene_num not in character_map[char_name]['appearance_scenes']:
+                        character_map[char_name]['appearance_scenes'].append(scene_num)
+                    if char_prompt and not character_map[char_name]['visual_prompt']:
+                        character_map[char_name]['visual_prompt'] = char_prompt
+
+        # ─────────────────────────────────────────────────────────
+        # 방법 2: character_names 필드 (문자열 또는 리스트)
+        # ─────────────────────────────────────────────────────────
+        char_names = scene.get('character_names') or scene.get('character_list') or scene.get('등장_캐릭터')
+
+        if char_names:
+            if isinstance(char_names, str):
+                names = [n.strip() for n in char_names.replace(';', ',').split(',')]
+            elif isinstance(char_names, list):
+                names = char_names
+            else:
+                names = []
+
+            for name in names:
+                if name and name.lower() not in ['n/a', 'none', '없음', '', 'null']:
+                    if name not in character_map:
+                        character_map[name] = {
+                            'name': name,
+                            'name_ko': name,
+                            'role': '등장인물',
+                            'description': '',
+                            'visual_prompt': '',
+                            'appearance_scenes': []
+                        }
+                    if scene_num and scene_num not in character_map[name]['appearance_scenes']:
+                        character_map[name]['appearance_scenes'].append(scene_num)
+
+        # ─────────────────────────────────────────────────────────
+        # 방법 3: character_prompt에서 캐릭터 이름 추출 및 visual_prompt 업데이트
+        # ─────────────────────────────────────────────────────────
+        char_prompt = (
+            scene.get('character_prompt_en') or
+            scene.get('character_prompt_ko') or
+            scene.get('character_prompt') or
+            scene.get('캐릭터_프롬프트') or
+            ''
+        )
+
+        if char_prompt and char_prompt.lower() not in ['n/a', 'none', '없음', '', 'null']:
+            # 기존 캐릭터에 프롬프트 연결
+            for char_name in character_map:
+                if char_name.lower() in char_prompt.lower():
+                    if not character_map[char_name]['visual_prompt']:
+                        character_map[char_name]['visual_prompt'] = char_prompt
+
+    # 결과 리스트 변환
+    result = list(character_map.values())
+
+    # appearance_scenes 정렬
+    for char in result:
+        char['appearance_scenes'] = sorted(char['appearance_scenes'])
+
+    # 등장 횟수 순으로 정렬 (많이 등장하는 캐릭터 먼저)
+    result.sort(key=lambda x: len(x.get('appearance_scenes', [])), reverse=True)
+
+    print(f"[캐릭터 관리] 📊 씬 데이터에서 {len(result)}개 캐릭터 추출됨")
+
+    for char in result[:5]:  # 상위 5개만 로그
+        scenes_count = len(char.get('appearance_scenes', []))
+        print(f"[캐릭터 관리]    - {char['name']}: {scenes_count}개 씬 등장")
+
+    return result
+
+
 # Lightbox 컨테이너 초기화 (페이지당 한 번)
 render_lightbox_container()
+
+# v3.0: Streamlit 네이티브 이미지 확대 모달 (JavaScript 미지원 시 사용)
+if not DIALOG_AVAILABLE:
+    render_image_zoom_modal()
 
 st.title("👤 3.6단계: 캐릭터 관리")
 st.caption("캐릭터 생성, 편집, 배치 이미지 생성")
@@ -222,6 +413,53 @@ def _cached_load_scene_data(project_path_str: str) -> tuple:
         return [], None, None
 
 
+# ⭐ v3.60: 캐릭터 데이터 캐싱 (성능 최적화)
+@st.cache_data(ttl=60, show_spinner=False)
+def _cached_load_characters_from_analysis(project_path_str: str) -> tuple:
+    """
+    분석 파일에서 캐릭터 데이터 로드 (캐싱 적용)
+
+    Returns:
+        (캐릭터 리스트, 데이터 소스 문자열)
+    """
+    from pathlib import Path
+    project_path_obj = Path(project_path_str)
+
+    # 1. characters.json 파일에서 로드 시도
+    analysis_path = project_path_obj / "analysis" / "characters.json"
+    if analysis_path.exists():
+        try:
+            with open(analysis_path, "r", encoding="utf-8") as f:
+                file_chars = json.load(f)
+            if file_chars and isinstance(file_chars, list) and len(file_chars) > 0:
+                # 최초 1회만 로그 출력
+                if 'char_load_logged' not in st.session_state:
+                    print(f"[캐릭터 관리] ✅ 파일에서 {len(file_chars)}개 캐릭터 로드: {analysis_path}")
+                    st.session_state['char_load_logged'] = True
+                return file_chars, f"📁 파일: {analysis_path.name}"
+        except Exception as e:
+            print(f"[캐릭터 관리] ❌ 파일 로드 실패: {e}")
+
+    # 2. characters.json 없으면 scenes.json에서 캐릭터 추출
+    scenes_path = project_path_obj / "analysis" / "scenes.json"
+    if scenes_path.exists():
+        try:
+            with open(scenes_path, "r", encoding="utf-8") as f:
+                scenes_data = json.load(f)
+
+            # 씬 데이터에서 캐릭터 추출
+            extracted = _extract_characters_from_scenes(scenes_data)
+            if extracted:
+                if 'char_load_logged' not in st.session_state:
+                    print(f"[캐릭터 관리] ✅ 씬에서 {len(extracted)}개 캐릭터 추출")
+                    st.session_state['char_load_logged'] = True
+                return extracted, f"🎬 씬 데이터에서 추출 ({len(scenes_data) if isinstance(scenes_data, list) else len(scenes_data.get('scenes', []))}개 씬)"
+        except Exception as e:
+            print(f"[캐릭터 관리] ❌ 씬 데이터 로드 실패: {e}")
+
+    return [], None
+
+
 def load_scene_analysis_data(force_refresh: bool = False) -> tuple:
     """
     최신 씬 분석 결과 로드 (v2.0)
@@ -247,14 +485,15 @@ def load_scene_analysis_data(force_refresh: bool = False) -> tuple:
 # PoseManager 초기화
 pose_manager = get_pose_manager()
 
-# 탭 구성
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+# 탭 구성 (v3.35: 씬별 갤러리 탭 추가)
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📋 캐릭터 목록",
     "➕ 캐릭터 추가",
     "🎨 배치 생성",
     "🧍 포즈 설정",
     "📥 가져오기",
-    "⭐ 대표 캐릭터"
+    "⭐ 대표 캐릭터",
+    "🖼️ 씬별 갤러리"
 ])
 
 # === 탭 1: 캐릭터 목록 ===
@@ -446,7 +685,13 @@ with tab1:
                         if char.generated_images:
                             for img_idx, img_path in enumerate(char.generated_images[-3:]):  # 최근 3개만
                                 if Path(img_path).exists():
-                                    clickable_image(img_path, width=120, key=f"char_img_{char.id}_{img_idx}")
+                                    # v3.0: Streamlit 네이티브 확대 기능 사용
+                                    render_clickable_thumbnail(
+                                        img_path,
+                                        caption=f"{char.name} #{img_idx+1}",
+                                        width=120,
+                                        key=f"char_img_{char.id}_{img_idx}"
+                                    )
                         else:
                             st.info("이미지가 없습니다.")
 
@@ -742,10 +987,10 @@ with tab3:
 
     st.info(f"📊 선택된 캐릭터: {len(selected_chars)}명")
 
-    # 프롬프트 없는 캐릭터 경고
-    chars_without_prompt = [c for c in selected_chars if not c.character_prompt]
+    # 프롬프트 없는 캐릭터 경고 (v3.32: 안전한 속성 접근)
+    chars_without_prompt = [c for c in selected_chars if not get_character_visual_prompt(c)]
     if chars_without_prompt:
-        st.warning(f"⚠️ {len(chars_without_prompt)}명의 캐릭터에 프롬프트가 없습니다: {', '.join([c.name for c in chars_without_prompt])}")
+        st.warning(f"⚠️ {len(chars_without_prompt)}명의 캐릭터에 프롬프트가 없습니다: {', '.join([get_character_name(c) for c in chars_without_prompt])}")
 
     # ═══════════════════════════════════════════════════════════════
     # ⭐ 포즈별 씬 선택 UI
@@ -1096,6 +1341,86 @@ with tab3:
     else:
         st.caption("생성할 캐릭터를 선택하세요")
 
+    # v2.0: 시드 잠금 옵션 (캐릭터 이미지 배치 생성용)
+    # ⭐ v2.1: style_segment="character"로 캐릭터 스타일 선택 UI 사용
+    if char_api_provider == "Google ImageFX":
+        with st.expander("🔒 이미지 일관성 유지 (시드 잠금)", expanded=False):
+            char_seed_lock_enabled, char_locked_seed = render_seed_lock_options(key_prefix="char_batch_seed", style_segment="character")
+            if char_parallel > 1 and char_seed_lock_enabled:
+                st.warning("⚠️ 병렬 처리에서는 '첫 이미지 자동 잠금' 기능이 지원되지 않습니다. 수동으로 시드를 지정하거나, 동시 생성 수를 1로 설정하세요.")
+    else:
+        char_seed_lock_enabled = False
+        char_locked_seed = None
+        with st.expander("🔒 이미지 일관성 유지 (시드 잠금)", expanded=False):
+            st.info("💡 시드 잠금 기능은 **Google ImageFX** API에서만 사용 가능합니다.")
+            st.caption("다른 API는 현재 시드 파라미터를 지원하지 않습니다.")
+
+    # ═══════════════════════════════════════════════════════════════
+    # ⭐ v3.31: 유명인 일반화 필터 (Google ImageFX 오류 방지)
+    # ═══════════════════════════════════════════════════════════════
+    if char_api_provider == "Google ImageFX" and total_chars > 0:
+        with st.expander("🛡️ 유명인 일반화 필터 (ImageFX 오류 방지)", expanded=False):
+            st.markdown("""
+            💡 **Google ImageFX 오류 방지 기능**
+
+            실제 기업명/인물명이 포함된 캐릭터는 이미지 생성 시
+            `PUBLIC_ERROR_PROMINENT_PEOPLE_FILTER` 오류가 발생할 수 있습니다.
+
+            이 필터를 적용하면 AI가 자동으로 일반화된 표현으로 변환합니다.
+            - 삼성전자 임원 → 대형 전자회사의 임원
+            - ZF 독일 임원 → 독일 자동차 부품회사의 임원
+            """)
+
+            use_anonymization_filter = st.checkbox(
+                "🛡️ 유명인 일반화 필터 적용",
+                value=st.session_state.get("use_char_anonymization_filter", False),
+                key="char_anonymization_filter_checkbox",
+                help="캐릭터 이미지 생성 전 AI가 기업명/인물명을 일반화합니다"
+            )
+            st.session_state["use_char_anonymization_filter"] = use_anonymization_filter
+
+            if use_anonymization_filter:
+                # 빠른 위험도 체크 (v3.32 fix: 안전한 헬퍼 함수 사용)
+                needs_check_count = sum(
+                    1 for c in selected_chars
+                    if needs_sanitization_quick_check(get_character_name(c)) or needs_sanitization_quick_check(get_character_visual_prompt(c))
+                )
+
+                if needs_check_count > 0:
+                    st.warning(f"⚠️ {needs_check_count}명의 캐릭터에서 변환이 필요할 수 있습니다.")
+                else:
+                    st.success("✅ 모든 캐릭터가 안전해 보입니다. (API 호출 시 추가 검증)")
+
+                # 미리보기 버튼
+                if st.button("🔍 변환 미리보기", key="preview_char_anonymization"):
+                    with st.spinner("AI 분석 중..."):
+                        # 캐릭터 데이터 변환 (v3.32 fix: 안전한 헬퍼 함수 사용)
+                        char_dicts = [{"name": get_character_name(c), "visual_prompt": get_character_visual_prompt(c)} for c in selected_chars]
+                        previews = preview_character_sanitization(char_dicts)
+
+                        changed_count = sum(1 for p in previews if p["changed"])
+
+                        if changed_count == 0:
+                            st.success("✅ 모든 캐릭터가 이미 안전합니다. 변환이 필요하지 않습니다.")
+                        else:
+                            st.info(f"📋 **{changed_count}명** 캐릭터의 이름이 변환됩니다:")
+
+                            for preview in previews:
+                                if preview["changed"]:
+                                    col1, col2, col3 = st.columns([2, 0.5, 2])
+                                    with col1:
+                                        st.code(preview["original_name"], language=None)
+                                    with col2:
+                                        st.markdown("→")
+                                    with col3:
+                                        st.code(preview["sanitized_name"], language=None)
+                                    if preview.get("detected_names"):
+                                        st.caption(f"  감지된 이름: {', '.join(preview['detected_names'])}")
+                                else:
+                                    st.text(f"✓ {preview['original_name']} (변경 없음)")
+    else:
+        use_anonymization_filter = False
+
     if st.button("🎨 캐릭터 이미지 배치 생성", type="primary", use_container_width=True, disabled=total_chars==0):
         from core.image.character_image_generator import CharacterImageGenerator, CharacterImageConfig
         from utils.image_storage import save_character_image
@@ -1191,7 +1516,12 @@ with tab3:
             style_suffix = selected_style.prompt_suffix if selected_style else ""
             style_name = selected_style.name if selected_style else "animation"
 
-            # 설정 생성 (⭐ API 선택 + 병렬 처리 적용)
+            # v2.0: 네거티브 프롬프트 (스타일에서 가져오기)
+            negative_prompt = ""
+            if selected_style and hasattr(selected_style, 'negative_prompt'):
+                negative_prompt = selected_style.negative_prompt or ""
+
+            # 설정 생성 (⭐ API 선택 + 병렬 처리 + 시드 잠금 적용)
             config = CharacterImageConfig(
                 style=style_name,
                 pose=char_pose,
@@ -1202,7 +1532,11 @@ with tab3:
                 style_prefix=style_prefix,
                 style_suffix=style_suffix,
                 api_provider=char_api_provider,
-                parallel_count=char_parallel
+                parallel_count=char_parallel,
+                # v2.0: 시드 잠금 설정
+                seed=char_locked_seed,
+                negative_prompt=negative_prompt,
+                seed_lock_enabled=char_seed_lock_enabled
             )
 
             generator = CharacterImageGenerator(str(project_path))
@@ -1210,6 +1544,11 @@ with tab3:
             generation_logs.append(f"[{time.strftime('%H:%M:%S')}] 총 {total_chars}명 이미지 생성 시작")
             generation_logs.append(f"[{time.strftime('%H:%M:%S')}] API: {char_api_provider}, 병렬: {char_parallel}")
             generation_logs.append(f"[{time.strftime('%H:%M:%S')}] 🔴 포즈: {char_pose}, 배경: {char_background}")
+            # v2.0: 시드 잠금 로그
+            if char_seed_lock_enabled:
+                generation_logs.append(f"[{time.strftime('%H:%M:%S')}] 🔒 시드 잠금: 활성화 (시드: {char_locked_seed if char_locked_seed else '자동'})")
+            if negative_prompt:
+                generation_logs.append(f"[{time.strftime('%H:%M:%S')}] ✅ 네거티브 프롬프트: {len(negative_prompt)}자")
 
             # 캐릭터 데이터를 딕셔너리 리스트로 변환
             char_dicts = []
@@ -1221,6 +1560,53 @@ with tab3:
                     "visual_prompt": char.character_prompt,
                     "character_prompt": char.character_prompt
                 })
+
+            # ═══════════════════════════════════════════════════════════════
+            # ⭐ v3.31: 유명인 일반화 필터 적용
+            # ═══════════════════════════════════════════════════════════════
+            if use_anonymization_filter:
+                generation_logs.append(f"[{time.strftime('%H:%M:%S')}] 🛡️ 유명인 일반화 필터 적용 중...")
+
+                with st.spinner("🛡️ AI가 캐릭터 이름을 분석하고 있습니다..."):
+                    def on_sanitize_progress(current, total, char_name):
+                        generation_logs.append(f"[{time.strftime('%H:%M:%S')}] 🔍 분석 중: {char_name} ({current}/{total})")
+                        log_area.code("\n".join(generation_logs[-15:]))
+
+                    sanitized_chars, sanitize_results = sanitize_characters_batch(
+                        char_dicts,
+                        on_progress=on_sanitize_progress
+                    )
+
+                    # 결과 로깅 및 매핑 생성
+                    name_changed_count = sum(1 for r in sanitize_results if r.name_was_modified)
+                    prompt_changed_count = sum(1 for r in sanitize_results if r.prompt_was_modified)
+
+                    generation_logs.append(f"[{time.strftime('%H:%M:%S')}] ✅ 익명화 완료: 이름 {name_changed_count}명, 프롬프트 {prompt_changed_count}명 변환됨")
+
+                    # 익명화 결과 표시
+                    if name_changed_count > 0:
+                        st.info(f"🛡️ **{name_changed_count}명**의 캐릭터 이름이 일반화되었습니다.")
+
+                        # 변환 내역 표시
+                        for orig_char, result in zip(char_dicts, sanitize_results):
+                            if result.name_was_modified:
+                                generation_logs.append(
+                                    f"  - '{result.original_name}' → '{result.sanitized_name}' "
+                                    f"(감지: {', '.join(result.name_detected_names) if result.name_detected_names else 'N/A'})"
+                                )
+
+                    # 익명화된 캐릭터 데이터 사용
+                    char_dicts = sanitized_chars
+
+                    # 상태 테이블도 업데이트 (원본 이름으로 표시하되, 익명화 정보 추가)
+                    for orig_char, result in zip(selected_chars, sanitize_results):
+                        original_name = orig_char.name
+                        if result.name_was_modified:
+                            char_statuses[original_name]["status"] = f"🛡️ → {result.sanitized_name[:15]}..."
+                        else:
+                            char_statuses[original_name]["status"] = "⏳ 대기"
+
+                    log_area.code("\n".join(generation_logs[-15:]))
 
             # ═══════════════════════════════════════════════════════════════
             # ⭐ 포즈 모드에 따른 분기 처리
@@ -1240,8 +1626,11 @@ with tab3:
                 results = []
 
                 for char_idx, char in enumerate(selected_chars):
-                    char_name = char.name
-                    visual_prompt = char.character_prompt
+                    # v3.31: 익명화된 데이터 사용 (해당 인덱스의 char_dicts 참조)
+                    char_dict = char_dicts[char_idx]
+                    original_char_name = char.name  # 원본 이름 (상태 표시용)
+                    char_name = char_dict.get("name", char.name)  # 익명화된 이름 (프롬프트용)
+                    visual_prompt = char_dict.get("visual_prompt") or char_dict.get("character_prompt") or char.character_prompt
 
                     # 해당 캐릭터의 포즈 할당 필터
                     char_pose_assignments = [
@@ -1251,19 +1640,19 @@ with tab3:
                     ]
 
                     if not char_pose_assignments:
-                        generation_logs.append(f"[{time.strftime('%H:%M:%S')}] ⚠️ {char_name}: 포즈 분석 결과 없음")
+                        generation_logs.append(f"[{time.strftime('%H:%M:%S')}] ⚠️ {original_char_name}: 포즈 분석 결과 없음")
                         results.append({
                             "success": False,
-                            "character_name": char_name,
+                            "character_name": original_char_name,
                             "error": "포즈 분석 결과 없음"
                         })
-                        on_char_complete(char_name, 0, False, "포즈 분석 결과 없음")
+                        on_char_complete(original_char_name, 0, False, "포즈 분석 결과 없음")
                         continue
 
                     unique_poses = list(set(p.get("pose", "standing") for p in char_pose_assignments))
-                    generation_logs.append(f"[{time.strftime('%H:%M:%S')}] {char_name}: {len(unique_poses)}개 포즈 발견 ({', '.join(unique_poses)})")
+                    generation_logs.append(f"[{time.strftime('%H:%M:%S')}] {original_char_name}: {len(unique_poses)}개 포즈 발견 ({', '.join(unique_poses)})")
 
-                    on_char_start(char_name)
+                    on_char_start(original_char_name)
                     char_start_time = time.time()
 
                     # 진행률 콜백
@@ -1293,7 +1682,7 @@ with tab3:
                             if img_path:
                                 results.append({
                                     "success": True,
-                                    "character_name": char_name,
+                                    "character_name": original_char_name,
                                     "image_path": img_path,
                                     "pose": pose_id,
                                     "generation_time": char_elapsed / max(images_generated, 1)
@@ -1301,18 +1690,18 @@ with tab3:
 
                                 # 이미지 미리보기
                                 if Path(img_path).exists():
-                                    image_preview.image(img_path, caption=f"{char_name} ({pose_id})", width=300)
+                                    image_preview.image(img_path, caption=f"{original_char_name} ({pose_id})", width=300)
 
-                        generation_logs.append(f"[{time.strftime('%H:%M:%S')}] ✅ {char_name}: {images_generated}개 이미지 생성 완료 ({char_elapsed:.1f}초)")
-                        on_char_complete(char_name, char_elapsed, True)
+                        generation_logs.append(f"[{time.strftime('%H:%M:%S')}] ✅ {original_char_name}: {images_generated}개 이미지 생성 완료 ({char_elapsed:.1f}초)")
+                        on_char_complete(original_char_name, char_elapsed, True)
                     else:
                         results.append({
                             "success": False,
-                            "character_name": char_name,
+                            "character_name": original_char_name,
                             "error": "이미지 생성 실패"
                         })
-                        generation_logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ {char_name}: 이미지 생성 실패")
-                        on_char_complete(char_name, char_elapsed, False, "이미지 생성 실패")
+                        generation_logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ {original_char_name}: 이미지 생성 실패")
+                        on_char_complete(original_char_name, char_elapsed, False, "이미지 생성 실패")
 
                     update_progress_ui()
 
@@ -1330,26 +1719,42 @@ with tab3:
                     if result.get("success") and result.get("image_path"):
                         image_preview.image(result["image_path"], caption=result.get("character_name", ""), width=300)
 
+                # v2.0: 시드 잠금 콜백 (첫 이미지 시드 자동 잠금 시 세션에 저장)
+                def on_seed_locked(seed: int):
+                    update_locked_seed_from_result(seed, key_prefix="char_batch_seed")
+                    generation_logs.append(f"[{time.strftime('%H:%M:%S')}] 🔒 첫 이미지 시드 자동 잠금: {seed}")
+
                 results = generator.generate_batch(
                     characters=char_dicts,
                     config=config,
                     output_dir=output_dir,
                     on_progress=on_batch_progress,
                     on_start=on_char_start,
-                    on_complete=on_char_complete
+                    on_complete=on_char_complete,
+                    on_seed_locked=on_seed_locked  # v2.0: 시드 잠금 콜백
                 )
 
             # 결과 처리
             scene_linker = CharacterSceneLinker(project_path)
             linked_count = 0
 
-            # 캐릭터 이름 → ID 맵핑 생성
+            # 캐릭터 이름 → ID 맵핑 생성 (원본 이름 기준)
             char_name_to_id = {char.name: char.id for char in selected_chars}
             char_name_to_obj = {char.name: char for char in selected_chars}
             processed_chars = set()  # 이미 처리된 캐릭터 (성공)
 
+            # v3.31: 익명화된 이름 → 원본 이름 매핑 생성
+            anonymized_to_original = {}
+            for i, char_dict in enumerate(char_dicts):
+                if char_dict.get("_original_name"):
+                    anonymized_to_original[char_dict.get("name", "")] = char_dict.get("_original_name")
+                elif i < len(selected_chars):
+                    anonymized_to_original[char_dict.get("name", "")] = selected_chars[i].name
+
             for result in results:
-                char_name = result.get("character_name", "")
+                result_char_name = result.get("character_name", "")
+                # v3.31: 익명화된 이름을 원본 이름으로 변환
+                char_name = anonymized_to_original.get(result_char_name, result_char_name)
                 elapsed = result.get("generation_time", 0)
 
                 # 캐릭터 객체 찾기
@@ -1407,19 +1812,25 @@ with tab3:
                                 target_scenes = pose_data.get("scenes", [])
                                 break
 
-                    # 씬 연결 시도
-                    if target_scenes or (char and char_scenes_map.get(char.name)):
-                        link_result = scene_linker.link_character_image_to_scenes(
-                            character_name=char_name,
-                            image_path=result.get("image_path", ""),
-                            pose=result_pose,
-                            specific_scenes=target_scenes if target_scenes else None
+                    # 씬 연결 시도 (Problem 62: 항상 시도, 실패 시 경고 표시)
+                    # 캐릭터 등장 씬 정보가 없어도 linker가 씬 데이터에서 직접 검색 시도
+                    link_result = scene_linker.link_character_image_to_scenes(
+                        character_name=char_name,
+                        image_path=result.get("image_path", ""),
+                        pose=result_pose,
+                        specific_scenes=target_scenes if target_scenes else None
+                    )
+                    if link_result.get("success"):
+                        linked_count += len(link_result.get("linked_scenes", []))
+                        generation_logs.append(
+                            f"[{time.strftime('%H:%M:%S')}] {char_name} ({result_pose}) → 씬 {link_result.get('linked_scenes', [])}에 연결됨"
                         )
-                        if link_result.get("success"):
-                            linked_count += len(link_result.get("linked_scenes", []))
-                            generation_logs.append(
-                                f"[{time.strftime('%H:%M:%S')}] {char_name} ({result_pose}) → 씬 {link_result.get('linked_scenes', [])}에 연결됨"
-                            )
+                    else:
+                        # 연결 실패 경고 (Problem 62: 연결 실패 시 경고 표시)
+                        generation_logs.append(
+                            f"[{time.strftime('%H:%M:%S')}] ⚠️ {char_name}: 씬 연결 실패 - {link_result.get('error', '알 수 없는 오류')}"
+                        )
+                        print(f"[캐릭터 관리] ⚠️ {char_name}: 씬 연결 실패 - {link_result.get('error')}")
 
                     # 사용량 기록
                     provider_name_map = {"Together.ai FLUX": "together", "Google ImageFX": "imagefx"}
@@ -1623,9 +2034,15 @@ with tab3:
                             st.session_state.char_selected_images.discard(img["filename"])
 
                         # 이미지 표시 (작은 썸네일 - 클릭 시 확대)
+                        # v3.0: Streamlit 네이티브 확대 기능 사용
                         try:
-                            clickable_image(img["path"], width=100, key=f"gallery_img_{img['filename']}")
-                        except:
+                            render_clickable_thumbnail(
+                                img["path"],
+                                caption=img.get("filename", ""),
+                                width=100,
+                                key=f"gallery_img_{img['filename']}"
+                            )
+                        except Exception:
                             st.error("❌")
 
                         # 대표 이미지 배지
@@ -1837,6 +2254,25 @@ with tab4:
 with tab5:
     st.subheader("📥 캐릭터 가져오기")
 
+    # ═══════════════════════════════════════════════════════════════════
+    # v3.36: 프로젝트 경로 확인 및 디버깅 정보
+    # ═══════════════════════════════════════════════════════════════════
+
+    # 프로젝트 경로 유효성 확인
+    if project_path is None:
+        st.error("❌ 프로젝트 경로가 설정되지 않았습니다.")
+        st.info("👈 사이드바에서 프로젝트와 영상을 다시 선택해주세요.")
+
+        with st.expander("🔍 디버그 정보"):
+            st.write("**Session State 키:**")
+            st.write(f"- current_channel: {st.session_state.get('current_channel', 'None')}")
+            st.write(f"- current_video: {st.session_state.get('current_video', 'None')}")
+            st.write(f"- current_project_path: {st.session_state.get('current_project_path', 'None')}")
+
+        st.stop()
+
+    st.caption(f"📂 프로젝트: `{project_path}`")
+
     st.info("""
     **캐릭터를 가져올 수 있는 방법:**
     - 🔄 씬 분석 결과에서 자동 가져오기
@@ -1859,24 +2295,12 @@ with tab5:
     if "씬 분석" in import_method:
         st.markdown("### 🔄 씬 분석 결과에서 가져오기")
 
-        analysis_chars = None
-        data_source = None
+        # ═══════════════════════════════════════════════════════════════
+        # v3.60: 캐싱된 함수 사용 (성능 최적화)
+        # ═══════════════════════════════════════════════════════════════
+        analysis_chars, data_source = _cached_load_characters_from_analysis(str(project_path))
 
-        # 🔴 v3.11: 파일 우선 로드 (세션 상태보다 파일이 더 신뢰성 높음)
-        # 1. 먼저 파일에서 로드 시도
-        analysis_path = project_path / "analysis" / "characters.json"
-        if analysis_path.exists():
-            try:
-                with open(analysis_path, "r", encoding="utf-8") as f:
-                    file_chars = json.load(f)
-                if file_chars and isinstance(file_chars, list) and len(file_chars) > 0:
-                    analysis_chars = file_chars
-                    data_source = f"📁 파일: {analysis_path.name}"
-                    print(f"[캐릭터 관리] ✅ 파일에서 {len(analysis_chars)}개 캐릭터 로드: {analysis_path}")
-            except Exception as e:
-                print(f"[캐릭터 관리] ❌ 파일 로드 실패: {e}")
-
-        # 2. 파일에서 못 찾으면 세션에서 로드 시도 (fallback)
+        # 파일에서 못 찾으면 세션에서 로드 시도 (fallback)
         if not analysis_chars:
             session_keys = ["characters", "scene_characters", "extracted_characters"]
             for key in session_keys:
@@ -1885,10 +2309,9 @@ with tab5:
                     if isinstance(session_data, list) and len(session_data) > 0:
                         analysis_chars = session_data
                         data_source = f"💾 세션: {key}"
-                        print(f"[캐릭터 관리] ✅ 세션 '{key}'에서 {len(analysis_chars)}개 캐릭터 로드")
                         break
 
-        # 3. 결과 표시
+        # 결과 표시
         if analysis_chars and len(analysis_chars) > 0:
             # visual_prompt 통계 계산
             chars_with_prompt = sum(1 for c in analysis_chars if c.get("visual_prompt") or c.get("character_prompt"))
@@ -1988,23 +2411,67 @@ with tab5:
             if len(analysis_chars) > 5:
                 st.caption(f"... 외 {len(analysis_chars) - 5}명 더 있음")
         else:
-            st.warning("⚠️ 씬 분석 결과가 없습니다. 3.5단계에서 먼저 씬 분석을 실행하세요.")
-            st.page_link("pages/3.5_🎬_씬_분석.py", label="🎬 3.5단계: 씬 분석으로 이동", icon="➡️")
+            st.warning("⚠️ 씬 분석 결과에서 캐릭터를 찾을 수 없습니다.")
 
-            # 🔴 v3.11: 향상된 디버그 정보
-            with st.expander("🔍 디버그 정보"):
+            # v3.36: scenes.json에서 수동 추출 버튼
+            scenes_path = project_path / "analysis" / "scenes.json"
+            if scenes_path.exists():
+                st.info("💡 씬 데이터에서 캐릭터를 수동으로 추출할 수 있습니다.")
+                if st.button("🔄 씬 데이터에서 캐릭터 추출", key="manual_extract_chars"):
+                    try:
+                        with open(scenes_path, "r", encoding="utf-8") as f:
+                            scenes_data = json.load(f)
+                        extracted = _extract_characters_from_scenes(scenes_data)
+                        if extracted:
+                            # 파일로 저장
+                            analysis_path.parent.mkdir(parents=True, exist_ok=True)
+                            with open(analysis_path, "w", encoding="utf-8") as f:
+                                json.dump(extracted, f, ensure_ascii=False, indent=2)
+                            st.success(f"✅ {len(extracted)}명의 캐릭터가 추출되어 저장되었습니다!")
+                            time.sleep(1)
+                            st.rerun()
+                        else:
+                            st.warning("씬 데이터에서 캐릭터 정보를 찾을 수 없습니다.")
+                    except Exception as e:
+                        st.error(f"추출 실패: {e}")
+            else:
+                st.page_link("pages/3.5_🎬_씬_분석.py", label="🎬 3.5단계: 씬 분석으로 이동", icon="➡️")
+
+            # 🔴 v3.36: 향상된 디버그 정보
+            with st.expander("🔍 디버그 정보", expanded=False):
                 st.write("**📁 파일 상태:**")
+
+                # characters.json 확인
+                st.write(f"- characters.json: {'✅ 존재' if analysis_path.exists() else '❌ 없음'}")
                 if analysis_path.exists():
                     try:
                         with open(analysis_path, "r", encoding="utf-8") as f:
                             raw = json.load(f)
-                        st.write(f"- {analysis_path.name}: 존재함 ({len(raw) if isinstance(raw, list) else 'dict'})")
+                        st.write(f"  - 내용: {len(raw) if isinstance(raw, list) else 'dict'}")
                         if raw:
                             st.json(raw[:2] if isinstance(raw, list) else raw)
                     except Exception as e:
-                        st.write(f"- {analysis_path.name}: 읽기 오류 - {e}")
-                else:
-                    st.write(f"- {analysis_path.name}: ❌ 파일 없음")
+                        st.write(f"  - 읽기 오류: {e}")
+
+                # scenes.json 확인
+                st.write(f"- scenes.json: {'✅ 존재' if scenes_path.exists() else '❌ 없음'}")
+                if scenes_path.exists():
+                    try:
+                        with open(scenes_path, "r", encoding="utf-8") as f:
+                            scenes_raw = json.load(f)
+                        scene_count = len(scenes_raw) if isinstance(scenes_raw, list) else len(scenes_raw.get('scenes', []))
+                        st.write(f"  - 씬 수: {scene_count}개")
+
+                        # 샘플 씬의 캐릭터 필드 확인
+                        sample_scenes = scenes_raw[:2] if isinstance(scenes_raw, list) else scenes_raw.get('scenes', [])[:2]
+                        if sample_scenes:
+                            st.write("  - **샘플 씬 캐릭터 필드:**")
+                            for s in sample_scenes:
+                                sid = s.get('scene_number', s.get('scene_id', '?'))
+                                chars = s.get('characters', s.get('character_names', 'N/A'))
+                                st.write(f"    - 씬 {sid}: {chars}")
+                    except Exception as e:
+                        st.write(f"  - 읽기 오류: {e}")
 
                 st.write("**💾 세션 상태:**")
                 for key in ["characters", "scene_characters", "extracted_characters"]:
@@ -2272,10 +2739,10 @@ with tab6:
 
                 for i, char in enumerate(all_characters):
                     with cols[i % 6]:
-                        # 썸네일 (클릭 시 확대)
+                        # 썸네일 (클릭 시 확대) - v3.0: 네이티브 방식
                         thumb_path = rep_library.get_thumbnail_path(char["id"])
                         if thumb_path and os.path.exists(thumb_path):
-                            render_lightbox_image(thumb_path, width=80, key=f"lib_thumb_{char['id']}")
+                            render_clickable_thumbnail(thumb_path, width=80, key=f"lib_thumb_{char['id']}")
                         else:
                             st.markdown("🎭", help="썸네일 없음")
 
@@ -2535,7 +3002,8 @@ with tab6:
                     for idx, (img_type, img_path) in enumerate(rep_char.base_images.items()):
                         if os.path.exists(img_path):
                             with img_cols[idx % 2]:
-                                render_lightbox_image(
+                                # v3.0: 네이티브 확대 방식
+                                render_clickable_thumbnail(
                                     img_path,
                                     caption=BASE_IMAGE_TYPES.get(img_type, {}).get("name", img_type),
                                     width=150,
@@ -3081,6 +3549,12 @@ with tab6:
                         a.scene_num for a in actions if a.generation_status == "pending"
                     ]
 
+            # v1.2: 자동 초기화 - 처음 로드 시 미생성 씬들로 초기화
+            if "batch_selected_scenes" not in st.session_state:
+                pending_scenes = [a.scene_num for a in actions if a.generation_status == "pending"]
+                st.session_state["batch_selected_scenes"] = pending_scenes
+                print(f"[캐릭터 일괄생성] 🔄 자동 초기화: 미생성 {len(pending_scenes)}개 씬 선택됨")
+
             selected_scenes = st.session_state.get("batch_selected_scenes", [])
             st.caption(f"선택됨: {len(selected_scenes)}개 씬")
 
@@ -3088,12 +3562,44 @@ with tab6:
             from utils.image_api_manager import API_MODELS
             batch_api_options = list(API_MODELS.keys())
 
+            # v1.1: 기본 API 설정 (Google ImageFX 우선)
+            default_api_index = 0
+            if "Google ImageFX" in batch_api_options:
+                default_api_index = batch_api_options.index("Google ImageFX")
+
             batch_selected_api = st.selectbox(
                 "이미지 생성 API",
                 options=batch_api_options,
-                index=0,
+                index=default_api_index,
                 key="batch_image_api"
             )
+
+            # v1.2: Gemini 레퍼런스 이미지 업로더 (Gemini 모델 선택 시에만 표시)
+            reference_config = {"enabled": False, "images": [], "reference_type": "style", "reference_strength": 0.8}
+            if "Gemini" in batch_selected_api:
+                from components.reference_image_uploader import render_reference_image_uploader
+                reference_config = render_reference_image_uploader(
+                    key_prefix="batch_char_ref",
+                    max_images=5,
+                    show_only_for_gemini=False,
+                    current_api=batch_selected_api
+                )
+
+            # v1.1: 시드 잠금 옵션 (이미지 일관성 유지)
+            # ⭐ v1.2: style_segment="character"로 캐릭터 스타일 선택 UI 사용
+            st.markdown("---")
+
+            # ImageFX API 선택 시에만 시드 잠금 활성화
+            if batch_selected_api == "Google ImageFX":
+                with st.expander("🔒 이미지 일관성 유지 (시드 잠금)", expanded=False):
+                    seed_lock_enabled, locked_seed = render_seed_lock_options(key_prefix="batch_char_seed", style_segment="character")
+            else:
+                seed_lock_enabled = False
+                locked_seed = None
+                # ImageFX가 아닌 경우 안내 메시지
+                with st.expander("🔒 이미지 일관성 유지 (시드 잠금)", expanded=False):
+                    st.info("💡 시드 잠금 기능은 **Google ImageFX** API에서만 사용 가능합니다.")
+                    st.caption("다른 API는 현재 시드 파라미터를 지원하지 않습니다.")
 
             # 프롬프트 미리보기 및 수정
             with st.expander("최종 프롬프트 미리보기 및 수정", expanded=False):
@@ -3257,11 +3763,16 @@ with tab6:
                             full_prompt = rep_manager.build_full_prompt(action.action_prompt)
                             negative = rep_manager.get_negative_prompt()
 
-                        # 이미지 생성
+                        # v1.1: 시드 가져오기
+                        generation_seed = get_seed_for_generation(key_prefix="batch_char_seed")
+
+                        # 이미지 생성 (v1.2: Gemini 레퍼런스 이미지 지원)
                         result = api_manager.generate_image(
                             prompt=full_prompt,
                             api_provider=batch_selected_api,
-                            negative_prompt=negative
+                            negative_prompt=negative,
+                            seed=generation_seed,
+                            reference_config=reference_config  # v1.2: Gemini 레퍼런스 전달
                         )
 
                         if result.success and result.image_data:
@@ -3275,6 +3786,10 @@ with tab6:
                                 generation_status="completed"
                             )
                             success_count += 1
+
+                            # v1.1: 첫 번째 성공 시 시드 자동 잠금 (auto/first_image 모드)
+                            if result.seed and success_count == 1:
+                                update_locked_seed_from_result(result.seed, key_prefix="batch_char_seed")
                         else:
                             rep_manager.update_scene_action(
                                 scene_num,
@@ -3311,7 +3826,8 @@ with tab6:
                 for idx, action in enumerate(completed_actions[:20]):
                     if action.generated_image_path and os.path.exists(action.generated_image_path):
                         with img_cols[idx % 5]:
-                            render_lightbox_image(
+                            # v3.0: 네이티브 확대 방식
+                            render_clickable_thumbnail(
                                 action.generated_image_path,
                                 caption=f"씬 {action.scene_num}",
                                 width=120,
@@ -3320,6 +3836,153 @@ with tab6:
 
                 if len(completed_actions) > 20:
                     st.caption(f"... 외 {len(completed_actions) - 20}개 더 있음")
+
+
+# === 탭 7: 씬별 캐릭터 갤러리 ===
+with tab7:
+    st.subheader("🖼️ 씬별 캐릭터 이미지 갤러리")
+    st.caption("씬 번호순으로 캐릭터 이미지를 확인하고 재생성할 수 있습니다")
+
+    if not GALLERY_AVAILABLE:
+        st.error("갤러리 모듈을 로드할 수 없습니다.")
+        st.info("utils/character_gallery.py 및 components/scene_character_gallery.py 파일이 필요합니다.")
+    else:
+        # 갤러리 매니저 초기화
+        gallery_manager = get_gallery_manager(str(project_path))
+
+        # 갤러리 옵션
+        gal_col1, gal_col2 = st.columns([3, 1])
+
+        with gal_col1:
+            view_mode = st.radio(
+                "보기 모드",
+                options=["🎬 씬별 보기", "📋 캐릭터별 보기"],
+                horizontal=True,
+                key="gallery_view_mode",
+                index=0
+            )
+
+        with gal_col2:
+            thumbnail_size = st.select_slider(
+                "썸네일 크기",
+                options=[100, 150, 200, 250],
+                value=150,
+                key="gallery_thumbnail_size"
+            )
+
+        st.divider()
+
+        if view_mode == "🎬 씬별 보기":
+            # 씬별 갤러리 데이터 로드
+            try:
+                with st.spinner("갤러리 데이터 로드 중..."):
+                    scenes = gallery_manager.get_scenes_with_characters()
+
+                if not scenes:
+                    st.info("캐릭터 이미지가 있는 씬이 없습니다.")
+                    st.caption("먼저 '배치 생성' 탭에서 캐릭터 이미지를 생성하세요.")
+                else:
+                    # 재생성 콜백 함수
+                    def on_character_regenerate(char_name: str, pose: str, scene_num: int):
+                        """캐릭터 재생성 콜백"""
+                        st.session_state['regen_char_name'] = char_name
+                        st.session_state['regen_pose'] = pose
+                        st.session_state['regen_scene_num'] = scene_num
+                        st.session_state['show_regen_dialog'] = True
+                        st.rerun()
+
+                    def on_character_delete(char_name: str, pose: str):
+                        """캐릭터 삭제 콜백"""
+                        st.warning(f"'{char_name}' ({pose}) 삭제 기능은 아직 구현되지 않았습니다.")
+
+                    # 재생성 다이얼로그 처리
+                    if st.session_state.get('show_regen_dialog'):
+                        _render_regeneration_dialog()
+                    else:
+                        # 갤러리 렌더링
+                        render_scene_character_gallery(
+                            scenes=scenes,
+                            project_path=str(project_path),
+                            on_regenerate=on_character_regenerate,
+                            on_delete=on_character_delete,
+                            columns_per_row=4,
+                            thumbnail_size=thumbnail_size
+                        )
+
+            except Exception as e:
+                st.error(f"갤러리 로드 오류: {e}")
+                import traceback
+                st.code(traceback.format_exc())
+
+        else:
+            # 캐릭터별 보기 (기존 방식)
+            st.info("캐릭터별 보기는 상단의 '📋 캐릭터 목록' 탭을 사용하세요.")
+            st.caption("첫 번째 탭에서 캐릭터별로 그룹화된 목록을 확인할 수 있습니다.")
+
+
+def _render_regeneration_dialog():
+    """재생성 다이얼로그 렌더링"""
+    char_name = st.session_state.get('regen_char_name', '')
+    pose = st.session_state.get('regen_pose', 'standing')
+    scene_num = st.session_state.get('regen_scene_num', 0)
+
+    st.markdown("### 🔄 캐릭터 이미지 재생성")
+
+    st.info(f"""
+    **캐릭터**: {char_name}
+    **포즈**: {pose}
+    **씬**: {scene_num}
+    """)
+
+    # 스타일 선택
+    style_manager = get_style_manager()
+    available_styles = style_manager.get_all_styles()
+    style_names = [s['name'] for s in available_styles]
+
+    current_style = st.session_state.get('batch_style', style_names[0] if style_names else '')
+
+    selected_style = st.selectbox(
+        "스타일",
+        options=style_names,
+        index=style_names.index(current_style) if current_style in style_names else 0,
+        key="regen_style_select"
+    )
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        if st.button("재생성 시작", type="primary", use_container_width=True):
+            # 재생성 로직
+            st.session_state['show_regen_dialog'] = False
+
+            # 캐릭터 찾기
+            char_manager = CharacterManager(str(project_path))
+            all_chars = char_manager.get_all_characters()
+
+            target_char = None
+            for c in all_chars:
+                if get_character_name(c) == char_name:
+                    target_char = c
+                    break
+
+            if not target_char:
+                st.error(f"캐릭터 '{char_name}'를 찾을 수 없습니다.")
+            else:
+                st.info(f"'{char_name}' 재생성은 '배치 생성' 탭에서 진행하세요.")
+                st.session_state['selected_chars_for_regen'] = [char_name]
+
+            st.rerun()
+
+    with col2:
+        if st.button("취소", use_container_width=True):
+            st.session_state['show_regen_dialog'] = False
+            st.rerun()
+
+    with col3:
+        if st.button("갤러리로", use_container_width=True):
+            st.session_state['show_regen_dialog'] = False
+            st.rerun()
+
 
 # 다음 단계 안내
 st.divider()

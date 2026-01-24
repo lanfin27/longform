@@ -1,0 +1,392 @@
+[
+  {
+    "name": "깨달음을 얻은 사람",
+    "name_ko": "깨달음을 얻은 사람",
+    "role": "등장인물",
+    "visual_prompt": "Person with surprised and enlightened expression, slightly smiling, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "공포에 질린 사람",
+    "name_ko": "공포에 질린 사람",
+    "role": "등장인물",
+    "visual_prompt": "Person with terrified expression, goosebumps visible, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "질문하는 사람",
+    "name_ko": "질문하는 사람",
+    "role": "등장인물",
+    "visual_prompt": "Person with a questioning expression, raising hand, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "청중",
+    "name_ko": "청중",
+    "role": "등장인물",
+    "visual_prompt": "Group of people raising hands, attentive, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "회사원",
+    "name_ko": "회사원",
+    "role": "등장인물",
+    "visual_prompt": "A middle-aged man in a suit, smiling, holding a smartphone, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "CEO",
+    "name_ko": "CEO",
+    "role": "등장인물",
+    "visual_prompt": "A middle-aged man in a suit, confident expression, gesturing, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "관찰자",
+    "name_ko": "관찰자",
+    "role": "등장인물",
+    "visual_prompt": "Person with a surprised expression, wide eyes, slightly open mouth, goosebumps on skin, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "발표자",
+    "name_ko": "발표자",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged professional, wearing a suit, confident expression, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "테슬라",
+    "name_ko": "테슬라",
+    "role": "등장인물",
+    "visual_prompt": "Tesla logo, futuristic and sleek design, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "BMW",
+    "name_ko": "BMW",
+    "role": "등장인물",
+    "visual_prompt": "BMW logo, classic and luxurious design, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "현대차",
+    "name_ko": "현대차",
+    "role": "등장인물",
+    "visual_prompt": "Hyundai logo, modern and innovative design, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "삼성",
+    "name_ko": "삼성",
+    "role": "등장인물",
+    "visual_prompt": "Samsung logo, dark and imposing shadow, futuristic design, no text, no logos",
+    "description": "",
+    "appearance_scenes": [
+      7
+    ]
+  },
+  {
+    "name": "강사",
+    "name_ko": "강사",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged man in his 40s, wearing glasses, casually dressed, confident expression, standing in front of a classroom, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "남자",
+    "name_ko": "남자",
+    "role": "등장인물",
+    "visual_prompt": "Man with a surprised expression, looking slightly scared, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "회의 참석자들",
+    "name_ko": "회의 참석자들",
+    "role": "등장인물",
+    "visual_prompt": "People attending a meeting, various expressions, business attire, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "나레이터",
+    "name_ko": "나레이터",
+    "role": "등장인물",
+    "visual_prompt": "Friendly-looking man in casual attire, speaking directly to the camera, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "남성",
+    "name_ko": "남성",
+    "role": "등장인물",
+    "visual_prompt": "Man with surprised expression, slightly disheveled hair, casual clothing, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      21,
+      22
+    ]
+  },
+  {
+    "name": "사람들",
+    "name_ko": "사람들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse group of people, varied ages and ethnicities, casual clothing, expressive faces, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "삼성 임원",
+    "name_ko": "삼성 임원",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged Samsung executive in formal suit, confident expression, presenting gesture, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "다른 임원진",
+    "name_ko": "다른 임원진",
+    "role": "등장인물",
+    "visual_prompt": "Other executives in business attire, attentive expressions, listening gestures, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "비즈니스맨 1",
+    "name_ko": "비즈니스맨 1",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged businessman in formal suit, signing gesture, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "비즈니스맨 2",
+    "name_ko": "비즈니스맨 2",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged businessman in formal suit, signing gesture, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "청취자",
+    "name_ko": "청취자",
+    "role": "등장인물",
+    "visual_prompt": "Person with a focused expression, listening attentively, neutral background, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "뇌",
+    "name_ko": "뇌",
+    "role": "등장인물",
+    "visual_prompt": "Animated brain with expressive features, glowing, struck by lightning, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "화자",
+    "name_ko": "화자",
+    "role": "등장인물",
+    "visual_prompt": "Expressive person speaking frankly, casual attire, confident expression, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "생각에 잠긴 사람",
+    "name_ko": "생각에 잠긴 사람",
+    "role": "등장인물",
+    "visual_prompt": "Person with a thoughtful expression, contemplative gaze, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "설명하는 사람",
+    "name_ko": "설명하는 사람",
+    "role": "등장인물",
+    "visual_prompt": "Person explaining basic concepts, clear and engaging tone, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "하만 임원",
+    "name_ko": "하만 임원",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged Harman executive in business attire, signing a document, serious expression, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "테슬라 모델",
+    "name_ko": "테슬라 모델",
+    "role": "등장인물",
+    "visual_prompt": "Sleek Tesla model, futuristic design, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "BMW 모델",
+    "name_ko": "BMW 모델",
+    "role": "등장인물",
+    "visual_prompt": "Classic BMW model, luxurious design, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "현대차 모델",
+    "name_ko": "현대차 모델",
+    "role": "등장인물",
+    "visual_prompt": "Modern Hyundai model, innovative design, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "조사하는 사람",
+    "name_ko": "조사하는 사람",
+    "role": "등장인물",
+    "visual_prompt": "Person looking surprised, dark clothing, concerned expression, no text, no logos",
+    "description": ""
+  },
+  {
+    "name": "음향기기 덕후 1",
+    "name_ko": "음향기기 덕후 1",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged man with a beard, wearing a vintage t-shirt, passionate expression, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "음향기기 덕후 2",
+    "name_ko": "음향기기 덕후 2",
+    "role": "등장인물",
+    "visual_prompt": "Young woman with headphones around her neck, intently listening, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "엔지니어",
+    "name_ko": "엔지니어",
+    "role": "등장인물",
+    "visual_prompt": "An engineer in their 40s, wearing glasses and a lab coat, knowledgeable expression, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "role": "등장인물",
+    "visual_prompt": "A stylish driver in their 30s, wearing sunglasses, relaxed expression, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      27,
+      28,
+      30,
+      31,
+      104,
+      105,
+      113,
+      114
+    ]
+  },
+  {
+    "name": "젊은 남성",
+    "name_ko": "젊은 남성",
+    "role": "등장인물",
+    "visual_prompt": "Young man, casually dressed, looking at audio equipment, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      21,
+      22
+    ]
+  },
+  {
+    "name": "분석가",
+    "name_ko": "분석가",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged man in his 40s, sharp eyes, analytical expression, confident in future technologies. Wearing a stylish suit. Short dark hair, slightly receding hairline.",
+    "description": ""
+  },
+  {
+    "name": "분석가 (과거)",
+    "name_ko": "분석가 (과거)",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged man in his 40s, the analyst in a flashback, a thoughtful expression, on the verge of making an important decision. Wearing a suit in the style of 2017. Slightly longer hair than in the present.",
+    "description": ""
+  },
+  {
+    "name": "사업가",
+    "name_ko": "사업가",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged businessman, wearing an expensive suit, confident expression, well-groomed hair, holding a cigar (optional).",
+    "description": ""
+  },
+  {
+    "name": "노동자",
+    "name_ko": "노동자",
+    "role": "등장인물",
+    "visual_prompt": "Workers in 1915-style work clothes, serious expressions, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      79,
+      80
+    ]
+  },
+  {
+    "name": "삼성전자 임원",
+    "name_ko": "삼성전자 임원",
+    "role": "등장인물",
+    "visual_prompt": "High-ranking Samsung Electronics executive in a suit, confident expression, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      7
+    ]
+  },
+  {
+    "name": "ZF 경영진",
+    "name_ko": "ZF 경영진",
+    "role": "등장인물",
+    "visual_prompt": "German ZF executives in business attire, professional demeanor, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "사람",
+    "name_ko": "사람",
+    "role": "등장인물",
+    "visual_prompt": "Back of a person using a laptop, tense atmosphere, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "사업가들",
+    "name_ko": "사업가들",
+    "role": "등장인물",
+    "visual_prompt": "Business people in professional attire, diverse ethnicities, focused on the meeting",
+    "description": ""
+  },
+  {
+    "name": "자동차 디자이너 팀",
+    "name_ko": "자동차 디자이너 팀",
+    "role": "등장인물",
+    "visual_prompt": "Diverse team of automotive designers in modern casual attire, passionate expressions, various ages and ethnicities, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      11,
+      12
+    ]
+  },
+  {
+    "name": "비즈니스 전문가들",
+    "name_ko": "비즈니스 전문가들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse group of business professionals in modern attire, serious expressions, various ages and ethnicities, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "비즈니스 전문가",
+    "name_ko": "비즈니스 전문가",
+    "role": "등장인물",
+    "visual_prompt": "Business professionals in formal attire, serious expressions, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "디자이너 팀",
+    "name_ko": "디자이너 팀",
+    "role": "등장인물",
+    "visual_prompt": "Team of diverse automotive designers, modern clothing, engaged and passionate expressions, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      11,
+      12
+    ]
+  },
+  {
+    "name": "앵커",
+    "name_ko": "앵커",
+    "role": "등장인물",
+    "visual_prompt": "Female news anchor in professional attire, serious expression, sitting at desk, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      3,
+      6
+    ]
+  }
+]

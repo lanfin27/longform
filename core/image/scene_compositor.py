@@ -17,6 +17,38 @@ except ImportError:
     Image = None
     print("[SceneCompositor] PIL/Pillow가 설치되지 않았습니다. pip install Pillow")
 
+# ⭐ 성능 최적화: 조건부 Streamlit 캐싱
+try:
+    import streamlit as st
+    _HAS_STREAMLIT = True
+except ImportError:
+    _HAS_STREAMLIT = False
+
+
+# ⭐ 이미지 로드 캐싱 (Streamlit 환경)
+def _load_image_from_path_impl(path_str: str) -> bytes:
+    """로컬 파일에서 이미지 바이트 로드"""
+    with open(path_str, "rb") as f:
+        return f.read()
+
+
+def _load_image_from_url_impl(url: str) -> bytes:
+    """URL에서 이미지 바이트 로드"""
+    response = requests.get(url, timeout=30)
+    return response.content
+
+
+if _HAS_STREAMLIT:
+    @st.cache_data(ttl=600, show_spinner=False, max_entries=100)
+    def _load_image_from_path_cached(path_str: str, _mtime: float) -> bytes:
+        """로컬 파일에서 이미지 바이트 로드 (캐싱 적용)"""
+        return _load_image_from_path_impl(path_str)
+
+    @st.cache_data(ttl=600, show_spinner=False, max_entries=50)
+    def _load_image_from_url_cached(url: str) -> bytes:
+        """URL에서 이미지 바이트 로드 (캐싱 적용)"""
+        return _load_image_from_url_impl(url)
+
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -78,11 +110,22 @@ class SceneCompositor:
         self.ai_analyzer = AICompositionAnalyzer()
 
     def _load_image(self, url_or_path: str) -> Image.Image:
-        """이미지 로드 (URL 또는 로컬 경로)"""
+        """이미지 로드 (URL 또는 로컬 경로) - 캐싱 적용"""
         if url_or_path.startswith("http"):
-            response = requests.get(url_or_path, timeout=30)
-            return Image.open(BytesIO(response.content)).convert("RGBA")
+            # URL에서 로드 (캐싱)
+            if _HAS_STREAMLIT:
+                data = _load_image_from_url_cached(url_or_path)
+            else:
+                data = _load_image_from_url_impl(url_or_path)
+            return Image.open(BytesIO(data)).convert("RGBA")
         else:
+            # 로컬 파일에서 로드 (캐싱)
+            if _HAS_STREAMLIT:
+                path = Path(url_or_path)
+                if path.exists():
+                    mtime = path.stat().st_mtime
+                    data = _load_image_from_path_cached(str(path), _mtime=mtime)
+                    return Image.open(BytesIO(data)).convert("RGBA")
             return Image.open(url_or_path).convert("RGBA")
 
     def _remove_solid_background(

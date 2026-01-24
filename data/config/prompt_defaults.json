@@ -1,15 +1,15 @@
 {
   "default_prompts": {
     "single_scene_analysis": {
-      "prompt_id": "srt_scene_analysis_42976284",
-      "prompt_name": "🔴 단일 씬 분석용 | SRT 단일 씬 분석 프롬프트 v1.0_숫자날짜 한글프롬프트추",
-      "set_at": "2026-01-16T23:25:45.158629"
+      "prompt_id": "srt_scene_analysis_55bbf2ad",
+      "prompt_name": "# SRT 씬 분석 프롬프트 (v2.9.3 - 배경 프롬프트 추가)",
+      "set_at": "2026-01-22T01:38:44.560417"
     },
     "batch_scene_analysis": {
-      "prompt_id": "srt_scene_analysis_ec62d6cb",
-      "prompt_name": "🟠 배치 분석용 | SRT 배치 씬 분석 프롬프트 v1.0_숫자날짜 한글프롬프트 추가",
-      "set_at": "2026-01-16T23:25:48.224330"
+      "prompt_id": "srt_scene_analysis_e6849804",
+      "prompt_name": "# SRT 배치 씬 분석 프롬프트 (v2.9.7 - 스크립트 주제/키워드 기반 이미지 생성 강화)",
+      "set_at": "2026-01-23T22:15:02.701542"
     }
   },
-  "last_updated": "2026-01-16T23:25:48.224683"
+  "last_updated": "2026-01-23T22:15:02.701892"
 }

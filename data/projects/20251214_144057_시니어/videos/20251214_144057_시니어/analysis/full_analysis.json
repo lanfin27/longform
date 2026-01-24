@@ -4,939 +4,992 @@
       "scene_id": 1,
       "scene_number": 1,
       "start_time": "00:00:00,100",
-      "end_time": "00:00:02,066",
+      "end_time": "00:00:02,580",
       "start_seconds": 0.1,
-      "end_seconds": 2.066,
-      "duration": 1.966,
-      "duration_estimate": 1,
-      "narration": "2021년 우리는",
-      "script_text": "2021년 우리는",
-      "char_count": 9,
-      "image_prompt": "어두운 밤하늘, 별들이 빛나는 모습, 2021년이라는 숫자",
-      "image_prompt_en": "A dark night sky filled with twinkling stars, prominently displaying the number '2021' formed by constellations. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "없음",
-      "character_prompt_en": "N/A",
+      "end_seconds": 2.58,
+      "duration": 2.48,
+      "duration_estimate": 2,
+      "narration": "여러분, 삼성전자 하면 뭐가 떠오르세요?",
+      "script_text": "여러분, 삼성전자 하면 뭐가 떠오르세요?",
+      "char_count": 22,
+      "image_prompt": "삼성전자 로고와 함께 스마트폰, 반도체, TV 등 다양한 전자 제품이 나열된 이미지. 돋보기를 사용하여 '미래'라는 단어를 확대하는 모습",
+      "image_prompt_en": "Montage of Samsung Electronics logo, smartphones, semiconductors, TVs, and other electronic products. A magnifying glass focusing on the word 'Future'. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "정장을 입은 남성 분석가가 궁금한 표정으로 질문하는 모습",
+      "character_prompt_en": "A male analyst in a suit looking curious and questioning. no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "밤하늘",
-        "별",
-        "2021 숫자"
+        "삼성전자 로고",
+        "스마트폰",
+        "반도체",
+        "TV",
+        "돋보기",
+        "미래"
       ],
-      "direction_guide": "밤하늘에서 별들이 반짝이며 2021이라는 숫자를 형성하는 모습으로 시작",
+      "direction_guide": "카메라가 삼성전자 제품에서 '미래'라는 단어로 줌인",
       "camera_suggestion": "",
-      "video_prompt_character": "N/A",
-      "video_prompt_full": "A wide shot of a dark night sky. Stars begin to twinkle, gradually forming the shape of the number '2021'. Camera slowly zooms in.",
-      "characters": [],
-      "location": "밤하늘",
-      "mood": "희망찬, 설레는",
+      "video_prompt_character": "A male analyst in a suit is looking curious and questioning, expressing curiosity and inviting the audience to ponder.",
+      "video_prompt_full": "A montage of Samsung Electronics products transitions to a magnifying glass focusing on the word 'Future.' The scene evokes curiosity about Samsung's future investments, with a zoom-in effect on the word 'Future'.",
+      "characters": [
+        {
+          "name": "분석가",
+          "visual_prompt": "Male analyst in a suit, looking curious and questioning, short dark hair, clean-shaven, no text, no logos"
+        }
+      ],
+      "location": "스튜디오",
+      "mood": "궁금증 유발, 흥미로운",
       "source": "srt",
       "needs_analysis": false,
       "bundle_id": 1,
-      "bundle_size": 1,
+      "bundle_size": 3,
       "bundle_scenes": [
-        1
+        1,
+        2,
+        3
       ],
-      "bundle_text": "2021년 우리는",
+      "bundle_text": "여러분, 삼성전자 하면 뭐가 떠오르세요? 스마트폰? 반도체? TV? 근데요, 지금 삼성이 2조 원을 들여서 사려는 게 뭔지 아세요?",
       "bundle_start_time": "00:00:00,100",
-      "bundle_end_time": "00:00:02,066",
+      "bundle_end_time": "00:00:09,580",
       "bundle_start_seconds": 0.1,
-      "bundle_end_seconds": 2.066,
-      "bundle_duration": 1.966,
+      "bundle_end_seconds": 9.58,
+      "bundle_duration": 9.48,
       "is_bundle_primary": true,
-      "image_prompt_korean_text": "A dark night sky filled with twinkling stars, prominently displaying the number '2021' formed by constellations, headline text in Korean reading \"새로운 시작\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"2021년의 다짐\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, the number '2021' formed by constellations"
+      "image_prompt_korean_text": "Montage of Samsung Electronics logo, smartphones, semiconductors, TVs, and other electronic products. A magnifying glass focusing on the word '미래', headline text in Korean reading \"삼성의 미래는?\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"2조 원 투자\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally"
     },
     {
       "scene_id": 2,
       "scene_number": 2,
-      "start_time": "00:00:02,166",
-      "end_time": "00:00:04,366",
-      "start_seconds": 2.166,
-      "end_seconds": 4.366,
-      "duration": 2.2,
+      "start_time": "00:00:03,040",
+      "end_time": "00:00:05,280",
+      "start_seconds": 3.04,
+      "end_seconds": 5.28,
+      "duration": 2.24,
       "duration_estimate": 2,
-      "narration": "국내 최초라는 설레임을 안고",
-      "script_text": "국내 최초라는 설레임을 안고",
-      "char_count": 15,
-      "image_prompt": "웅장한 배가 바다를 항해하는 모습, 깃발에 '국내 최초'라는 글자가 새겨져 있음",
-      "image_prompt_en": "A majestic ship sailing on the ocean, a flag with the words 'Domestic First' inscribed on it. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "없음",
-      "character_prompt_en": "N/A",
+      "narration": "스마트폰? 반도체? TV?",
+      "script_text": "스마트폰? 반도체? TV?",
+      "char_count": 14,
+      "image_prompt": "삼성전자 로고와 함께 스마트폰, 반도체, TV 등 다양한 전자 제품이 나열된 이미지. 돋보기를 사용하여 '미래'라는 단어를 확대하는 모습",
+      "image_prompt_en": "Montage of Samsung Electronics logo, smartphones, semiconductors, TVs, and other electronic products. A magnifying glass focusing on the word 'Future'. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "정장을 입은 남성 분석가가 궁금한 표정으로 질문하는 모습",
+      "character_prompt_en": "A male analyst in a suit looking curious and questioning. no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "배",
-        "바다",
-        "깃발",
-        "국내 최초"
+        "삼성전자 로고",
+        "스마트폰",
+        "반도체",
+        "TV",
+        "돋보기",
+        "미래"
       ],
-      "direction_guide": "배가 바다를 항해하는 역동적인 모습, 깃발에 '국내 최초' 강조",
+      "direction_guide": "카메라가 삼성전자 제품에서 '미래'라는 단어로 줌인",
       "camera_suggestion": "",
-      "video_prompt_character": "N/A",
-      "video_prompt_full": "A grand ship sails across a vast ocean. The camera pans to follow the ship's movement. A flag with 'Domestic First' written on it flutters in the wind. The scene is bright and hopeful.",
-      "characters": [],
-      "location": "바다",
-      "mood": "설레는, 도전적인",
+      "video_prompt_character": "A male analyst in a suit is looking curious and questioning, expressing curiosity and inviting the audience to ponder.",
+      "video_prompt_full": "A montage of Samsung Electronics products transitions to a magnifying glass focusing on the word 'Future.' The scene evokes curiosity about Samsung's future investments, with a zoom-in effect on the word 'Future'.",
+      "characters": [
+        {
+          "name": "분석가",
+          "visual_prompt": "Male analyst in a suit, looking curious and questioning, short dark hair, clean-shaven, no text, no logos"
+        }
+      ],
+      "location": "스튜디오",
+      "mood": "궁금증 유발, 흥미로운",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 2,
-      "bundle_size": 1,
+      "bundle_id": 1,
+      "bundle_size": 3,
       "bundle_scenes": [
-        2
+        1,
+        2,
+        3
       ],
-      "bundle_text": "국내 최초라는 설레임을 안고",
-      "bundle_start_time": "00:00:02,166",
-      "bundle_end_time": "00:00:04,366",
-      "bundle_start_seconds": 2.166,
-      "bundle_end_seconds": 4.366,
-      "bundle_duration": 2.2,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "A majestic ship sailing on the ocean, a flag fluttering in the wind, headline text in Korean reading \"국내 최초\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"새로운 도전의 시작\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, a flag with the words '국내 최초' inscribed on it (replace with hand-drawn style)"
+      "bundle_text": "여러분, 삼성전자 하면 뭐가 떠오르세요? 스마트폰? 반도체? TV? 근데요, 지금 삼성이 2조 원을 들여서 사려는 게 뭔지 아세요?",
+      "bundle_start_time": "00:00:00,100",
+      "bundle_end_time": "00:00:09,580",
+      "bundle_start_seconds": 0.1,
+      "bundle_end_seconds": 9.58,
+      "bundle_duration": 9.48,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 3,
       "scene_number": 3,
-      "start_time": "00:00:04,566",
-      "end_time": "00:00:05,700",
-      "start_seconds": 4.566,
-      "end_seconds": 5.7,
-      "duration": 1.134,
-      "duration_estimate": 1,
-      "narration": "wego라는 새로운",
-      "script_text": "wego라는 새로운",
-      "char_count": 10,
-      "image_prompt": "새로운 로고 'wego'가 떠오르는 모습, 미래적인 느낌",
-      "image_prompt_en": "The new logo 'wego' emerging with a futuristic feel. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "없음",
-      "character_prompt_en": "N/A",
+      "start_time": "00:00:05,679",
+      "end_time": "00:00:09,580",
+      "start_seconds": 5.679,
+      "end_seconds": 9.58,
+      "duration": 3.901,
+      "duration_estimate": 3,
+      "narration": "근데요, 지금 삼성이 2조 원을 들여서 사려는 게 뭔지 아세요?",
+      "script_text": "근데요, 지금 삼성이 2조 원을 들여서 사려는 게 뭔지 아세요?",
+      "char_count": 35,
+      "image_prompt": "삼성전자 로고와 함께 스마트폰, 반도체, TV 등 다양한 전자 제품이 나열된 이미지. 돋보기를 사용하여 '미래'라는 단어를 확대하는 모습",
+      "image_prompt_en": "Montage of Samsung Electronics logo, smartphones, semiconductors, TVs, and other electronic products. A magnifying glass focusing on the word 'Future'. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "정장을 입은 남성 분석가가 궁금한 표정으로 질문하는 모습",
+      "character_prompt_en": "A male analyst in a suit looking curious and questioning. no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "wego 로고",
-        "미래적인 느낌"
+        "삼성전자 로고",
+        "스마트폰",
+        "반도체",
+        "TV",
+        "돋보기",
+        "미래"
       ],
-      "direction_guide": "wego 로고가 서서히 나타나며 미래적인 분위기 연출",
+      "direction_guide": "카메라가 삼성전자 제품에서 '미래'라는 단어로 줌인",
       "camera_suggestion": "",
-      "video_prompt_character": "N/A",
-      "video_prompt_full": "A sleek, futuristic logo 'wego' gradually materializes. The background is a vibrant, abstract design. The camera zooms in slightly as the logo becomes fully formed.",
-      "characters": [],
-      "location": "가상 공간",
-      "mood": "혁신적인, 미래지향적인",
+      "video_prompt_character": "A male analyst in a suit is looking curious and questioning, expressing curiosity and inviting the audience to ponder.",
+      "video_prompt_full": "A montage of Samsung Electronics products transitions to a magnifying glass focusing on the word 'Future.' The scene evokes curiosity about Samsung's future investments, with a zoom-in effect on the word 'Future'.",
+      "characters": [
+        {
+          "name": "분석가",
+          "visual_prompt": "Male analyst in a suit, looking curious and questioning, short dark hair, clean-shaven, no text, no logos"
+        }
+      ],
+      "location": "스튜디오",
+      "mood": "궁금증 유발, 흥미로운",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 3,
-      "bundle_size": 1,
+      "bundle_id": 1,
+      "bundle_size": 3,
       "bundle_scenes": [
+        1,
+        2,
         3
       ],
-      "bundle_text": "wego라는 새로운",
-      "bundle_start_time": "00:00:04,566",
-      "bundle_end_time": "00:00:05,700",
-      "bundle_start_seconds": 4.566,
-      "bundle_end_seconds": 5.7,
-      "bundle_duration": 1.134,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "The new logo 'wego' emerging with a futuristic feel, headline text in Korean reading \"새로운 이름\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"미래를 향한 도약\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, the logo 'wego' (replace with hand-drawn style)"
+      "bundle_text": "여러분, 삼성전자 하면 뭐가 떠오르세요? 스마트폰? 반도체? TV? 근데요, 지금 삼성이 2조 원을 들여서 사려는 게 뭔지 아세요?",
+      "bundle_start_time": "00:00:00,100",
+      "bundle_end_time": "00:00:09,580",
+      "bundle_start_seconds": 0.1,
+      "bundle_end_seconds": 9.58,
+      "bundle_duration": 9.48,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 4,
       "scene_number": 4,
-      "start_time": "00:00:05,766",
-      "end_time": "00:00:06,900",
-      "start_seconds": 5.766,
-      "end_seconds": 6.9,
-      "duration": 1.134,
-      "duration_estimate": 1,
-      "narration": "항해를 시작했습니다",
-      "script_text": "항해를 시작했습니다",
-      "char_count": 10,
-      "image_prompt": "나침반이 북쪽을 가리키는 모습, 항해하는 배의 모습과 겹쳐짐",
-      "image_prompt_en": "A compass pointing north, superimposed on an image of a ship sailing. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "start_time": "00:00:10,019",
+      "end_time": "00:00:10,800",
+      "start_seconds": 10.019,
+      "end_seconds": 10.8,
+      "duration": 0.781,
+      "duration_estimate": 0,
+      "narration": "자동차 눈이에요.",
+      "script_text": "자동차 눈이에요.",
+      "char_count": 9,
+      "image_prompt": "미래형 자율주행차의 헤드라이트가 빛나는 모습, 첨단 기술과 연결성을 상징하는 추상적인 배경",
+      "image_prompt_en": "Illuminated headlights of a futuristic autonomous vehicle with an abstract background symbolizing advanced technology and connectivity. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
       "character_prompt": "없음",
       "character_prompt_en": "N/A",
       "visual_elements": [
-        "나침반",
-        "배",
-        "항해"
+        "자율주행차",
+        "헤드라이트",
+        "첨단 기술",
+        "연결성"
       ],
-      "direction_guide": "나침반이 북쪽을 가리키며 항해의 시작을 알림",
+      "direction_guide": "헤드라이트에 초점을 맞춘 클로즈업 샷, 미래적인 분위기 연출",
       "camera_suggestion": "",
       "video_prompt_character": "N/A",
-      "video_prompt_full": "A close-up of a compass pointing north. The image slowly transitions to a ship sailing on the ocean. The camera pans to show the vastness of the sea.",
+      "video_prompt_full": "Close-up shot of the illuminated headlights of a futuristic autonomous vehicle, emphasizing advanced technology and connectivity. The scene creates a futuristic atmosphere with a focus on the vehicle's headlights.",
       "characters": [],
-      "location": "바다",
-      "mood": "모험적인, 희망찬",
+      "location": "미래 도시, 연구소",
+      "mood": "미래지향적, 혁신적인",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 4,
-      "bundle_size": 1,
+      "bundle_id": 2,
+      "bundle_size": 3,
       "bundle_scenes": [
-        4
+        4,
+        5,
+        6
       ],
-      "bundle_text": "항해를 시작했습니다",
-      "bundle_start_time": "00:00:05,766",
-      "bundle_end_time": "00:00:06,900",
-      "bundle_start_seconds": 5.766,
-      "bundle_end_seconds": 6.9,
-      "bundle_duration": 1.134,
+      "bundle_text": "자동차 눈이에요. 자동차가 세상을 보는 눈. 2025년 12월, 삼성전자 자회사 하만이",
+      "bundle_start_time": "00:00:10,019",
+      "bundle_end_time": "00:00:16,059",
+      "bundle_start_seconds": 10.019,
+      "bundle_end_seconds": 16.059,
+      "bundle_duration": 6.040000000000001,
       "is_bundle_primary": true,
-      "image_prompt_korean_text": "A compass pointing north, superimposed on an image of a ship sailing, headline text in Korean reading \"새로운 항해\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"미지의 세계로\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, a compass and a ship sailing"
+      "image_prompt_korean_text": "Illuminated headlights of a futuristic autonomous vehicle with an abstract background symbolizing advanced technology and connectivity, headline text in Korean reading \"자동차의 눈\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"2025년 12월\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally"
     },
     {
       "scene_id": 5,
       "scene_number": 5,
-      "start_time": "00:00:08,100",
-      "end_time": "00:00:10,000",
-      "start_seconds": 8.1,
-      "end_seconds": 10.0,
-      "duration": 1.9,
+      "start_time": "00:00:10,800",
+      "end_time": "00:00:12,500",
+      "start_seconds": 10.8,
+      "end_seconds": 12.5,
+      "duration": 1.7,
       "duration_estimate": 1,
-      "narration": "아무도 가보지 않은 길이었기에",
-      "script_text": "아무도 가보지 않은 길이었기에",
-      "char_count": 16,
-      "image_prompt": "광활하고 험난한 지형, 발자국만 남아있는 길",
-      "image_prompt_en": "A vast and rugged landscape with only footprints visible on the path. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "narration": "자동차가 세상을 보는 눈.",
+      "script_text": "자동차가 세상을 보는 눈.",
+      "char_count": 14,
+      "image_prompt": "미래형 자율주행차의 헤드라이트가 빛나는 모습, 첨단 기술과 연결성을 상징하는 추상적인 배경",
+      "image_prompt_en": "Illuminated headlights of a futuristic autonomous vehicle with an abstract background symbolizing advanced technology and connectivity. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
       "character_prompt": "없음",
       "character_prompt_en": "N/A",
       "visual_elements": [
-        "험난한 지형",
-        "발자국",
-        "미지의 길"
+        "자율주행차",
+        "헤드라이트",
+        "첨단 기술",
+        "연결성"
       ],
-      "direction_guide": "아무도 가지 않은 길을 시각적으로 표현",
+      "direction_guide": "헤드라이트에 초점을 맞춘 클로즈업 샷, 미래적인 분위기 연출",
       "camera_suggestion": "",
       "video_prompt_character": "N/A",
-      "video_prompt_full": "A wide shot of a harsh and untouched landscape. Footprints are visible on a winding path. The camera slowly pans across the terrain, emphasizing its vastness and isolation.",
+      "video_prompt_full": "Close-up shot of the illuminated headlights of a futuristic autonomous vehicle, emphasizing advanced technology and connectivity. The scene creates a futuristic atmosphere with a focus on the vehicle's headlights.",
       "characters": [],
-      "location": "미지의 장소",
-      "mood": "도전적인, 고독한",
+      "location": "미래 도시, 연구소",
+      "mood": "미래지향적, 혁신적인",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 5,
-      "bundle_size": 1,
+      "bundle_id": 2,
+      "bundle_size": 3,
       "bundle_scenes": [
-        5
+        4,
+        5,
+        6
       ],
-      "bundle_text": "아무도 가보지 않은 길이었기에",
-      "bundle_start_time": "00:00:08,100",
-      "bundle_end_time": "00:00:10,000",
-      "bundle_start_seconds": 8.1,
-      "bundle_end_seconds": 10.0,
-      "bundle_duration": 1.9,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "A vast and rugged landscape with only footprints visible on the path, headline text in Korean reading \"미지의 길\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"개척의 발자취\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, footprints on the path"
+      "bundle_text": "자동차 눈이에요. 자동차가 세상을 보는 눈. 2025년 12월, 삼성전자 자회사 하만이",
+      "bundle_start_time": "00:00:10,019",
+      "bundle_end_time": "00:00:16,059",
+      "bundle_start_seconds": 10.019,
+      "bundle_end_seconds": 16.059,
+      "bundle_duration": 6.040000000000001,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 6,
       "scene_number": 6,
-      "start_time": "00:00:10,200",
-      "end_time": "00:00:11,000",
-      "start_seconds": 10.2,
-      "end_seconds": 11.0,
-      "duration": 0.8,
-      "duration_estimate": 0,
-      "narration": "지난 5년은",
-      "script_text": "지난 5년은",
-      "char_count": 6,
-      "image_prompt": "흐르는 모래시계, 시간의 흐름, 과거의 흔적",
-      "image_prompt_en": "An hourglass with sand flowing, representing the passage of time, subtle hints of the past, soft lighting, shallow depth of field. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "start_time": "00:00:13,019",
+      "end_time": "00:00:16,059",
+      "start_seconds": 13.019,
+      "end_seconds": 16.059,
+      "duration": 3.04,
+      "duration_estimate": 3,
+      "narration": "2025년 12월, 삼성전자 자회사 하만이",
+      "script_text": "2025년 12월, 삼성전자 자회사 하만이",
+      "char_count": 23,
+      "image_prompt": "미래형 자율주행차의 헤드라이트가 빛나는 모습, 첨단 기술과 연결성을 상징하는 추상적인 배경",
+      "image_prompt_en": "Illuminated headlights of a futuristic autonomous vehicle with an abstract background symbolizing advanced technology and connectivity. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
       "character_prompt": "없음",
-      "character_prompt_en": "No characters in this scene.",
+      "character_prompt_en": "N/A",
       "visual_elements": [
-        "모래시계",
-        "흐르는 모래",
-        "시간"
+        "자율주행차",
+        "헤드라이트",
+        "첨단 기술",
+        "연결성"
       ],
-      "direction_guide": "모래시계에 집중, 시간의 흐름을 강조",
+      "direction_guide": "헤드라이트에 초점을 맞춘 클로즈업 샷, 미래적인 분위기 연출",
       "camera_suggestion": "",
-      "video_prompt_character": "No character animation in this scene.",
-      "video_prompt_full": "Slow zoom into an hourglass as sand flows from the top to the bottom. Soft lighting and shallow depth of field to create a sense of nostalgia.",
+      "video_prompt_character": "N/A",
+      "video_prompt_full": "Close-up shot of the illuminated headlights of a futuristic autonomous vehicle, emphasizing advanced technology and connectivity. The scene creates a futuristic atmosphere with a focus on the vehicle's headlights.",
       "characters": [],
-      "location": "어두운 방",
-      "mood": "회상, 고요함",
+      "location": "미래 도시, 연구소",
+      "mood": "미래지향적, 혁신적인",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 6,
-      "bundle_size": 1,
+      "bundle_id": 2,
+      "bundle_size": 3,
       "bundle_scenes": [
+        4,
+        5,
         6
       ],
-      "bundle_text": "지난 5년은",
-      "bundle_start_time": "00:00:10,200",
-      "bundle_end_time": "00:00:11,000",
-      "bundle_start_seconds": 10.2,
-      "bundle_end_seconds": 11.0,
-      "bundle_duration": 0.8,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "An hourglass with sand flowing, representing the passage of time, headline text in Korean reading \"지난 5년\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"시간의 흐름과 변화\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, subtle hints of the past, soft lighting, shallow depth of field."
+      "bundle_text": "자동차 눈이에요. 자동차가 세상을 보는 눈. 2025년 12월, 삼성전자 자회사 하만이",
+      "bundle_start_time": "00:00:10,019",
+      "bundle_end_time": "00:00:16,059",
+      "bundle_start_seconds": 10.019,
+      "bundle_end_seconds": 16.059,
+      "bundle_duration": 6.040000000000001,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 7,
       "scene_number": 7,
-      "start_time": "00:00:11,100",
-      "end_time": "00:00:13,333",
-      "start_seconds": 11.1,
-      "end_seconds": 13.333,
-      "duration": 2.233,
-      "duration_estimate": 2,
-      "narration": "끊임없는 변화와 혁신을 통해",
-      "script_text": "끊임없는 변화와 혁신을 통해",
-      "char_count": 15,
-      "image_prompt": "톱니바퀴가 맞물려 돌아가는 모습, 혁신의 상징, 밝은 색상",
-      "image_prompt_en": "Interlocking gears turning smoothly, symbolizing constant change and innovation, bright and vibrant colors, dynamic composition. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "start_time": "00:00:16,059",
+      "end_time": "00:00:19,460",
+      "start_seconds": 16.059,
+      "end_seconds": 19.46,
+      "duration": 3.401,
+      "duration_estimate": 3,
+      "narration": "독일의 명문 부품사 ZF의 자율주행 사업부를",
+      "script_text": "독일의 명문 부품사 ZF의 자율주행 사업부를",
+      "char_count": 24,
+      "image_prompt": "ZF 자율주행 사업부 로고와 하만 로고가 함께 표시된 이미지, 인수 합병을 상징하는 화살표 이미지",
+      "image_prompt_en": "Image displaying the logos of ZF's autonomous driving division and Harman, with an arrow symbolizing acquisition. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
       "character_prompt": "없음",
-      "character_prompt_en": "No characters in this scene.",
+      "character_prompt_en": "N/A",
       "visual_elements": [
-        "톱니바퀴",
-        "맞물림",
-        "혁신"
+        "ZF 로고",
+        "하만 로고",
+        "화살표",
+        "인수 합병"
       ],
-      "direction_guide": "톱니바퀴의 움직임을 강조, 역동적인 느낌",
+      "direction_guide": "두 로고를 연결하는 화살표에 집중, 인수 합병 강조",
       "camera_suggestion": "",
-      "video_prompt_character": "No character animation in this scene.",
-      "video_prompt_full": "Animated gears interlocking and turning smoothly, bright vibrant colors, dynamic camera pan across the gears.",
+      "video_prompt_character": "N/A",
+      "video_prompt_full": "Image displaying the logos of ZF's autonomous driving division and Harman, connected by an arrow symbolizing acquisition. The scene emphasizes the acquisition of ZF's autonomous driving division by Harman.",
       "characters": [],
-      "location": "추상적인 공간",
-      "mood": "역동적, 혁신적",
+      "location": "기업 회의실, 뉴스 스튜디오",
+      "mood": "비즈니스, 전략적인",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 7,
-      "bundle_size": 1,
+      "bundle_id": 3,
+      "bundle_size": 3,
       "bundle_scenes": [
-        7
+        7,
+        8,
+        9
       ],
-      "bundle_text": "끊임없는 변화와 혁신을 통해",
-      "bundle_start_time": "00:00:11,100",
-      "bundle_end_time": "00:00:13,333",
-      "bundle_start_seconds": 11.1,
-      "bundle_end_seconds": 13.333,
-      "bundle_duration": 2.233,
+      "bundle_text": "독일의 명문 부품사 ZF의 자율주행 사업부를 15억 유로, 우리 돈으로 약 2조 원에 인수한다고 발표했거든요. 근데 이게 왜 중요하냐.",
+      "bundle_start_time": "00:00:16,059",
+      "bundle_end_time": "00:00:24,838",
+      "bundle_start_seconds": 16.059,
+      "bundle_end_seconds": 24.838,
+      "bundle_duration": 8.779,
       "is_bundle_primary": true,
-      "image_prompt_korean_text": "Interlocking gears turning smoothly, symbolizing constant change and innovation, headline text in Korean reading \"변화와 혁신\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"끊임없는 발전\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, bright and vibrant colors, dynamic composition."
+      "image_prompt_korean_text": "Image displaying the logos of ZF's autonomous driving division and Harman, with an arrow symbolizing acquisition, headline text in Korean reading \"2조 원 인수\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"ZF 자율주행 사업부\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally"
     },
     {
       "scene_id": 8,
       "scene_number": 8,
-      "start_time": "00:00:13,466",
-      "end_time": "00:00:14,733",
-      "start_seconds": 13.466,
-      "end_seconds": 14.733,
-      "duration": 1.267,
-      "duration_estimate": 1,
-      "narration": "현장과 하나가 되고",
-      "script_text": "현장과 하나가 되고",
-      "char_count": 10,
-      "image_prompt": "사람들이 손을 맞잡고 협력하는 모습, 현장 중심, 따뜻한 색감",
-      "image_prompt_en": "A diverse group of people holding hands in unity, symbolizing being one with the field, warm color palette, shallow focus on the hands. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "다양한 사람들",
-      "character_prompt_en": "Diverse group of people, hands clasped together, no text, no logos on clothing, no name tags",
+      "start_time": "00:00:19,460",
+      "end_time": "00:00:23,300",
+      "start_seconds": 19.46,
+      "end_seconds": 23.3,
+      "duration": 3.84,
+      "duration_estimate": 3,
+      "narration": "15억 유로, 우리 돈으로 약 2조 원에 인수한다고 발표했거든요.",
+      "script_text": "15억 유로, 우리 돈으로 약 2조 원에 인수한다고 발표했거든요.",
+      "char_count": 36,
+      "image_prompt": "ZF 자율주행 사업부 로고와 하만 로고가 함께 표시된 이미지, 인수 합병을 상징하는 화살표 이미지",
+      "image_prompt_en": "Image displaying the logos of ZF's autonomous driving division and Harman, with an arrow symbolizing acquisition. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "없음",
+      "character_prompt_en": "N/A",
       "visual_elements": [
-        "손",
-        "협력",
-        "현장"
+        "ZF 로고",
+        "하만 로고",
+        "화살표",
+        "인수 합병"
       ],
-      "direction_guide": "사람들의 손에 집중, 따뜻하고 긍정적인 분위기",
+      "direction_guide": "두 로고를 연결하는 화살표에 집중, 인수 합병 강조",
       "camera_suggestion": "",
-      "video_prompt_character": "Diverse group of people reaching out and clasping hands. Warm lighting.",
-      "video_prompt_full": "Camera pans across a diverse group of people reaching out to clasp hands. Soft, warm lighting creates a sense of unity and connection.",
-      "characters": [
-        {
-          "name": "다양한 사람들",
-          "visual_prompt": "Diverse group of people, hands clasped together, no text, no logos..."
-        }
-      ],
-      "location": "밝은 실내",
-      "mood": "화합, 협력",
+      "video_prompt_character": "N/A",
+      "video_prompt_full": "Image displaying the logos of ZF's autonomous driving division and Harman, connected by an arrow symbolizing acquisition. The scene emphasizes the acquisition of ZF's autonomous driving division by Harman.",
+      "characters": [],
+      "location": "기업 회의실, 뉴스 스튜디오",
+      "mood": "비즈니스, 전략적인",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 8,
-      "bundle_size": 1,
+      "bundle_id": 3,
+      "bundle_size": 3,
       "bundle_scenes": [
-        8
+        7,
+        8,
+        9
       ],
-      "bundle_text": "현장과 하나가 되고",
-      "bundle_start_time": "00:00:13,466",
-      "bundle_end_time": "00:00:14,733",
-      "bundle_start_seconds": 13.466,
-      "bundle_end_seconds": 14.733,
-      "bundle_duration": 1.267,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "A diverse group of people holding hands in unity, symbolizing being one with the field, headline text in Korean reading \"현장과 하나로\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"협력과 소통\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, warm color palette, shallow focus on the hands."
+      "bundle_text": "독일의 명문 부품사 ZF의 자율주행 사업부를 15억 유로, 우리 돈으로 약 2조 원에 인수한다고 발표했거든요. 근데 이게 왜 중요하냐.",
+      "bundle_start_time": "00:00:16,059",
+      "bundle_end_time": "00:00:24,838",
+      "bundle_start_seconds": 16.059,
+      "bundle_end_seconds": 24.838,
+      "bundle_duration": 8.779,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 9,
       "scene_number": 9,
-      "start_time": "00:00:15,466",
-      "end_time": "00:00:17,066",
-      "start_seconds": 15.466,
-      "end_seconds": 17.066,
-      "duration": 1.6,
+      "start_time": "00:00:23,300",
+      "end_time": "00:00:24,838",
+      "start_seconds": 23.3,
+      "end_seconds": 24.838,
+      "duration": 1.538,
       "duration_estimate": 1,
-      "narration": "wego의 진정한 전략적",
-      "script_text": "wego의 진정한 전략적",
+      "narration": "근데 이게 왜 중요하냐.",
+      "script_text": "근데 이게 왜 중요하냐.",
       "char_count": 13,
-      "image_prompt": "나침반이 정확한 방향을 가리키는 모습, 전략적 방향 제시, 푸른색",
-      "image_prompt_en": "A compass pointing towards a clear direction, symbolizing strategic guidance, blue color scheme, clean and modern design. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "image_prompt": "ZF 자율주행 사업부 로고와 하만 로고가 함께 표시된 이미지, 인수 합병을 상징하는 화살표 이미지",
+      "image_prompt_en": "Image displaying the logos of ZF's autonomous driving division and Harman, with an arrow symbolizing acquisition. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
       "character_prompt": "없음",
-      "character_prompt_en": "No characters in this scene.",
+      "character_prompt_en": "N/A",
       "visual_elements": [
-        "나침반",
-        "방향",
-        "전략"
+        "ZF 로고",
+        "하만 로고",
+        "화살표",
+        "인수 합병"
       ],
-      "direction_guide": "나침반 바늘에 집중, 명확하고 신뢰감 있는 분위기",
+      "direction_guide": "두 로고를 연결하는 화살표에 집중, 인수 합병 강조",
       "camera_suggestion": "",
-      "video_prompt_character": "No character animation in this scene.",
-      "video_prompt_full": "Close up of a compass needle spinning and then settling on a clear direction. Blue color scheme and clean design.",
+      "video_prompt_character": "N/A",
+      "video_prompt_full": "Image displaying the logos of ZF's autonomous driving division and Harman, connected by an arrow symbolizing acquisition. The scene emphasizes the acquisition of ZF's autonomous driving division by Harman.",
       "characters": [],
-      "location": "추상적인 공간",
-      "mood": "신뢰, 명확함",
+      "location": "기업 회의실, 뉴스 스튜디오",
+      "mood": "비즈니스, 전략적인",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 9,
-      "bundle_size": 1,
+      "bundle_id": 3,
+      "bundle_size": 3,
       "bundle_scenes": [
+        7,
+        8,
         9
       ],
-      "bundle_text": "wego의 진정한 전략적",
-      "bundle_start_time": "00:00:15,466",
-      "bundle_end_time": "00:00:17,066",
-      "bundle_start_seconds": 15.466,
-      "bundle_end_seconds": 17.066,
-      "bundle_duration": 1.6,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "A compass pointing towards a clear direction, symbolizing strategic guidance, headline text in Korean reading \"전략적 방향\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"wegO의 가치\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, blue color scheme, clean and modern design."
+      "bundle_text": "독일의 명문 부품사 ZF의 자율주행 사업부를 15억 유로, 우리 돈으로 약 2조 원에 인수한다고 발표했거든요. 근데 이게 왜 중요하냐.",
+      "bundle_start_time": "00:00:16,059",
+      "bundle_end_time": "00:00:24,838",
+      "bundle_start_seconds": 16.059,
+      "bundle_end_seconds": 24.838,
+      "bundle_duration": 8.779,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 10,
       "scene_number": 10,
-      "start_time": "00:00:17,166",
-      "end_time": "00:00:18,900",
-      "start_seconds": 17.166,
-      "end_seconds": 18.9,
-      "duration": 1.734,
-      "duration_estimate": 1,
-      "narration": "가치를 현실로 만드는",
-      "script_text": "가치를 현실로 만드는",
-      "char_count": 11,
-      "image_prompt": "씨앗에서 싹이 트는 모습, 가치의 현실화, 생명력",
-      "image_prompt_en": "A seed sprouting and growing into a plant, representing the realization of value, vibrant green colors, time-lapse photography style. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "start_time": "00:00:24,838",
+      "end_time": "00:00:27,300",
+      "start_seconds": 24.838,
+      "end_seconds": 27.3,
+      "duration": 2.462,
+      "duration_estimate": 2,
+      "narration": "지금부터 제가 하는 얘기 끝까지 들으시면요,",
+      "script_text": "지금부터 제가 하는 얘기 끝까지 들으시면요,",
+      "char_count": 24,
+      "image_prompt": "테슬라, BMW, 현대차 로고가 나란히 있는 이미지, 삼성의 자동차 산업 진출이 이들 기업에 미치는 영향을 시각적으로 표현",
+      "image_prompt_en": "Image featuring the logos of Tesla, BMW, and Hyundai side-by-side, visually representing the impact of Samsung's entry into the automotive industry on these companies. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
       "character_prompt": "없음",
-      "character_prompt_en": "No characters in this scene.",
+      "character_prompt_en": "N/A",
       "visual_elements": [
-        "씨앗",
-        "싹",
-        "성장"
+        "테슬라 로고",
+        "BMW 로고",
+        "현대차 로고",
+        "자동차 산업"
       ],
-      "direction_guide": "싹이 트는 과정을 강조, 희망적이고 긍정적인 분위기",
+      "direction_guide": "세 로고를 번갈아 비추며 긴장감 조성",
       "camera_suggestion": "",
-      "video_prompt_character": "No character animation in this scene.",
-      "video_prompt_full": "Time-lapse of a seed sprouting and growing into a plant. Vibrant green colors and dynamic camera movement.",
+      "video_prompt_character": "N/A",
+      "video_prompt_full": "Image featuring the logos of Tesla, BMW, and Hyundai side-by-side, visually representing the impact of Samsung's entry into the automotive industry on these companies. The scene creates tension by alternating between the logos.",
       "characters": [],
-      "location": "밝은 실내",
-      "mood": "희망, 성장",
+      "location": "자동차 전시회, 미래 도시",
+      "mood": "경쟁적인, 긴장감 있는",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 10,
-      "bundle_size": 1,
+      "bundle_id": 4,
+      "bundle_size": 3,
       "bundle_scenes": [
-        10
+        10,
+        11,
+        12
       ],
-      "bundle_text": "가치를 현실로 만드는",
-      "bundle_start_time": "00:00:17,166",
-      "bundle_end_time": "00:00:18,900",
-      "bundle_start_seconds": 17.166,
-      "bundle_end_seconds": 18.9,
-      "bundle_duration": 1.734,
+      "bundle_text": "지금부터 제가 하는 얘기 끝까지 들으시면요, 삼성이 왜 갑자기 자동차에 미쳤는지, 그리고 이게 테슬라, BMW, 현대차한테 어떤 의미인지",
+      "bundle_start_time": "00:00:24,838",
+      "bundle_end_time": "00:00:33,320",
+      "bundle_start_seconds": 24.838,
+      "bundle_end_seconds": 33.32,
+      "bundle_duration": 8.482,
       "is_bundle_primary": true,
-      "image_prompt_korean_text": "A seed sprouting and growing into a plant, representing the realization of value, headline text in Korean reading \"가치 현실화\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"성장과 발전\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, vibrant green colors, time-lapse photography style."
+      "image_prompt_korean_text": "Image featuring the logos of Tesla, BMW, and Hyundai side-by-side, visually representing the impact of Samsung's entry into the automotive industry on these companies, headline text in Korean reading \"자동차 시장 판도 변화\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"테슬라, BMW, 현대차\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally"
     },
     {
       "scene_id": 11,
       "scene_number": 11,
-      "start_time": "00:00:18,966",
-      "end_time": "00:00:20,266",
-      "start_seconds": 18.966,
-      "end_seconds": 20.266,
-      "duration": 1.3,
-      "duration_estimate": 1,
-      "narration": "증명의 시간이었습니다",
-      "script_text": "증명의 시간이었습니다",
-      "char_count": 11,
-      "image_prompt": "법정 내부, 증거들이 테이블 위에 놓여 있음, 변호사와 검사가 대립, 긴장감 감도는 분위기",
-      "image_prompt_en": "Courtroom interior, evidence scattered on a table, lawyers and prosecutors facing each other, tense atmosphere, dramatic lighting, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "변호사: 날카로운 눈빛, 정장을 입고 서류를 들고 있음",
-      "character_prompt_en": "Lawyer: Sharp gaze, wearing a suit and holding documents, determined expression, no text, no logos on clothing, no name tags",
+      "start_time": "00:00:27,300",
+      "end_time": "00:00:29,399",
+      "start_seconds": 27.3,
+      "end_seconds": 29.399,
+      "duration": 2.099,
+      "duration_estimate": 2,
+      "narration": "삼성이 왜 갑자기 자동차에 미쳤는지,",
+      "script_text": "삼성이 왜 갑자기 자동차에 미쳤는지,",
+      "char_count": 20,
+      "image_prompt": "테슬라, BMW, 현대차 로고가 나란히 있는 이미지, 삼성의 자동차 산업 진출이 이들 기업에 미치는 영향을 시각적으로 표현",
+      "image_prompt_en": "Image featuring the logos of Tesla, BMW, and Hyundai side-by-side, visually representing the impact of Samsung's entry into the automotive industry on these companies. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "없음",
+      "character_prompt_en": "N/A",
       "visual_elements": [
-        "법정",
-        "증거",
-        "변호사",
-        "검사"
+        "테슬라 로고",
+        "BMW 로고",
+        "현대차 로고",
+        "자동차 산업"
       ],
-      "direction_guide": "카메라, 변호사와 검사를 번갈아 비추며 긴장감을 고조시킨다.",
+      "direction_guide": "세 로고를 번갈아 비추며 긴장감 조성",
       "camera_suggestion": "",
-      "video_prompt_character": "Lawyer stands firm, presenting evidence with conviction. Subtle hand gestures emphasize key points.",
-      "video_prompt_full": "A tense courtroom scene. Lawyers and prosecutors face off. Zoom in on the evidence table, then pan across the faces of the jury. Dramatic lighting highlights the gravity of the situation.",
-      "characters": [
-        {
-          "name": "변호사",
-          "visual_prompt": "Middle-aged man, professional attire, determined expression, no text, no logos"
-        },
-        {
-          "name": "검사",
-          "visual_prompt": "Middle-aged woman, professional attire, skeptical expression, no text, no logos"
-        }
-      ],
-      "location": "법정",
-      "mood": "긴장감, 비장함",
+      "video_prompt_character": "N/A",
+      "video_prompt_full": "Image featuring the logos of Tesla, BMW, and Hyundai side-by-side, visually representing the impact of Samsung's entry into the automotive industry on these companies. The scene creates tension by alternating between the logos.",
+      "characters": [],
+      "location": "자동차 전시회, 미래 도시",
+      "mood": "경쟁적인, 긴장감 있는",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 11,
-      "bundle_size": 1,
+      "bundle_id": 4,
+      "bundle_size": 3,
       "bundle_scenes": [
-        11
+        10,
+        11,
+        12
       ],
-      "bundle_text": "증명의 시간이었습니다",
-      "bundle_start_time": "00:00:18,966",
-      "bundle_end_time": "00:00:20,266",
-      "bundle_start_seconds": 18.966,
-      "bundle_end_seconds": 20.266,
-      "bundle_duration": 1.3,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "Courtroom interior, evidence scattered on a table, lawyers and prosecutors facing each other, tense atmosphere, dramatic lighting, headline text in Korean reading \"증명의 시간\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"진실을 밝히다\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, evidence documents with Korean characters"
+      "bundle_text": "지금부터 제가 하는 얘기 끝까지 들으시면요, 삼성이 왜 갑자기 자동차에 미쳤는지, 그리고 이게 테슬라, BMW, 현대차한테 어떤 의미인지",
+      "bundle_start_time": "00:00:24,838",
+      "bundle_end_time": "00:00:33,320",
+      "bundle_start_seconds": 24.838,
+      "bundle_end_seconds": 33.32,
+      "bundle_duration": 8.482,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 12,
       "scene_number": 12,
-      "start_time": "00:00:21,133",
-      "end_time": "00:00:23,133",
-      "start_seconds": 21.133,
-      "end_seconds": 23.133,
-      "duration": 2.0,
-      "duration_estimate": 2,
-      "narration": "현장의 목소리에 귀",
-      "script_text": "현장의 목소리에 귀",
-      "char_count": 10,
-      "image_prompt": "사람들이 붐비는 거리, 다양한 인종의 사람들, 인터뷰하는 기자, 마이크를 들고 있는 모습",
-      "image_prompt_en": "Crowded street scene, diverse group of people, reporter conducting an interview, holding a microphone, bustling atmosphere, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "기자: 차분하고 진지한 표정으로 인터뷰를 진행",
-      "character_prompt_en": "Reporter: Calm and serious expression, conducting an interview, holding a microphone, professional attire, no text, no logos on clothing, no name tags",
+      "start_time": "00:00:29,399",
+      "end_time": "00:00:33,320",
+      "start_seconds": 29.399,
+      "end_seconds": 33.32,
+      "duration": 3.921,
+      "duration_estimate": 3,
+      "narration": "그리고 이게 테슬라, BMW, 현대차한테 어떤 의미인지",
+      "script_text": "그리고 이게 테슬라, BMW, 현대차한테 어떤 의미인지",
+      "char_count": 30,
+      "image_prompt": "테슬라, BMW, 현대차 로고가 나란히 있는 이미지, 삼성의 자동차 산업 진출이 이들 기업에 미치는 영향을 시각적으로 표현",
+      "image_prompt_en": "Image featuring the logos of Tesla, BMW, and Hyundai side-by-side, visually representing the impact of Samsung's entry into the automotive industry on these companies. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "없음",
+      "character_prompt_en": "N/A",
       "visual_elements": [
-        "거리",
-        "사람들",
-        "기자",
-        "마이크"
+        "테슬라 로고",
+        "BMW 로고",
+        "현대차 로고",
+        "자동차 산업"
       ],
-      "direction_guide": "카메라, 기자와 인터뷰 대상자를 번갈아 보여주며 주변의 혼잡한 분위기를 담는다.",
+      "direction_guide": "세 로고를 번갈아 비추며 긴장감 조성",
       "camera_suggestion": "",
-      "video_prompt_character": "Reporter attentively listens to the interviewee, nodding occasionally and taking notes. Genuine interest conveyed through facial expressions.",
-      "video_prompt_full": "A busy street corner. A reporter interviews a passerby. The camera follows the conversation, capturing the surrounding sounds and sights. Dolly shot to follow the reporter as she walks.",
-      "characters": [
-        {
-          "name": "기자",
-          "visual_prompt": "Young woman, professional attire, attentive expression, no text, no logos"
-        },
-        {
-          "name": "시민",
-          "visual_prompt": "Various ages and ethnicities, diverse clothing, candid expressions, no text, no logos"
-        }
-      ],
-      "location": "거리",
-      "mood": "활기참, 생생함",
+      "video_prompt_character": "N/A",
+      "video_prompt_full": "Image featuring the logos of Tesla, BMW, and Hyundai side-by-side, visually representing the impact of Samsung's entry into the automotive industry on these companies. The scene creates tension by alternating between the logos.",
+      "characters": [],
+      "location": "자동차 전시회, 미래 도시",
+      "mood": "경쟁적인, 긴장감 있는",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 12,
-      "bundle_size": 1,
+      "bundle_id": 4,
+      "bundle_size": 3,
       "bundle_scenes": [
+        10,
+        11,
         12
       ],
-      "bundle_text": "현장의 목소리에 귀",
-      "bundle_start_time": "00:00:21,133",
-      "bundle_end_time": "00:00:23,133",
-      "bundle_start_seconds": 21.133,
-      "bundle_end_seconds": 23.133,
-      "bundle_duration": 2.0,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "Crowded street scene, diverse group of people, reporter conducting an interview, holding a microphone, bustling atmosphere, headline text in Korean reading \"현장의 목소리\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"시민들의 이야기\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, Korean street signs blurred in the background"
+      "bundle_text": "지금부터 제가 하는 얘기 끝까지 들으시면요, 삼성이 왜 갑자기 자동차에 미쳤는지, 그리고 이게 테슬라, BMW, 현대차한테 어떤 의미인지",
+      "bundle_start_time": "00:00:24,838",
+      "bundle_end_time": "00:00:33,320",
+      "bundle_start_seconds": 24.838,
+      "bundle_end_seconds": 33.32,
+      "bundle_duration": 8.482,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 13,
       "scene_number": 13,
-      "start_time": "00:00:23,266",
-      "end_time": "00:00:24,100",
-      "start_seconds": 23.266,
-      "end_seconds": 24.1,
-      "duration": 0.834,
-      "duration_estimate": 0,
-      "narration": "기울이고 낯선",
-      "script_text": "기울이고 낯선",
-      "char_count": 7,
-      "image_prompt": "미지의 숲, 안개가 자욱하고 신비로운 분위기, 빛이 스며드는 모습",
-      "image_prompt_en": "Unknown forest, dense fog, mysterious atmosphere, light filtering through the trees, ethereal glow, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "없음",
-      "character_prompt_en": "No characters",
+      "start_time": "00:00:33,320",
+      "end_time": "00:00:35,039",
+      "start_seconds": 33.32,
+      "end_seconds": 35.039,
+      "duration": 1.719,
+      "duration_estimate": 1,
+      "narration": "완전히 이해하시게 될 거예요.",
+      "script_text": "완전히 이해하시게 될 거예요.",
+      "char_count": 16,
+      "image_prompt": "분석가가 소름 돋은 표정을 짓는 모습, 배경에 미래 도시의 홀로그램 이미지",
+      "image_prompt_en": "Analyst with a shocked expression, holographic image of a futuristic city in the background. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "정장을 입은 남성 분석가, 놀란 표정",
+      "character_prompt_en": "Male analyst in a suit with a shocked expression. no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "숲",
-        "안개",
-        "빛"
+        "분석가",
+        "놀란 표정",
+        "미래 도시",
+        "홀로그램"
       ],
-      "direction_guide": "카메라, 숲 속을 천천히 이동하며 신비로운 분위기를 강조한다.",
+      "direction_guide": "분석가의 얼굴을 클로즈업, 놀라움을 극대화",
       "camera_suggestion": "",
-      "video_prompt_character": "N/A",
-      "video_prompt_full": "A misty forest scene. Sunlight breaks through the canopy. The camera slowly pans across the landscape, revealing hidden details. Focus on the textures of the trees and the ethereal quality of the fog.",
-      "characters": [],
-      "location": "숲",
-      "mood": "신비로움, 몽환적",
+      "video_prompt_character": "Male analyst in a suit with a shocked expression, conveying surprise and intrigue through facial expressions and body language.",
+      "video_prompt_full": "Close-up shot of an analyst with a shocked expression, set against a holographic image of a futuristic city. The scene amplifies the analyst's surprise and hints at the shocking truth behind the investigation.",
+      "characters": [
+        {
+          "name": "분석가",
+          "visual_prompt": "Male analyst in a suit, looking curious and questioning, short dark hair, clean-shaven, no text, no logos"
+        }
+      ],
+      "location": "미래 도시, 연구소",
+      "mood": "충격적인, 흥미진진한",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 13,
-      "bundle_size": 1,
+      "bundle_id": 5,
+      "bundle_size": 3,
       "bundle_scenes": [
-        13
+        13,
+        14,
+        15
       ],
-      "bundle_text": "기울이고 낯선",
-      "bundle_start_time": "00:00:23,266",
-      "bundle_end_time": "00:00:24,100",
-      "bundle_start_seconds": 23.266,
-      "bundle_end_seconds": 24.1,
-      "bundle_duration": 0.834,
+      "bundle_text": "완전히 이해하시게 될 거예요. 아, 그리고 솔직히 말씀드리면요, 저도 이거 조사하면서 좀 소름 돋았어요.",
+      "bundle_start_time": "00:00:33,320",
+      "bundle_end_time": "00:00:39,100",
+      "bundle_start_seconds": 33.32,
+      "bundle_end_seconds": 39.1,
+      "bundle_duration": 5.780000000000001,
       "is_bundle_primary": true,
-      "image_prompt_korean_text": "Unknown forest, dense fog, mysterious atmosphere, light filtering through the trees, ethereal glow, headline text in Korean reading \"낯선 곳으로\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"미지의 세계 탐험\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, faint Korean characters on ancient stone tablets deep within the forest."
+      "image_prompt_korean_text": "Analyst with a shocked expression, holographic image of a futuristic city in the background, headline text in Korean reading \"미래 기술의 충격\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"소름 돋는 진실\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally"
     },
     {
       "scene_id": 14,
       "scene_number": 14,
-      "start_time": "00:00:24,166",
-      "end_time": "00:00:26,000",
-      "start_seconds": 24.166,
-      "end_seconds": 26.0,
-      "duration": 1.834,
-      "duration_estimate": 1,
-      "narration": "변화를 확신으로 바꾸기 위한",
-      "script_text": "변화를 확신으로 바꾸기 위한",
-      "char_count": 15,
-      "image_prompt": "연구실 내부, 과학자들이 실험에 몰두, 복잡한 장비들, 진지한 분위기",
-      "image_prompt_en": "Laboratory interior, scientists engrossed in experiments, complex equipment, serious atmosphere, focused expressions, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "과학자: 실험복을 입고 현미경을 들여다보며 집중",
-      "character_prompt_en": "Scientist: Wearing a lab coat, looking through a microscope with concentration, focused expression, no text, no logos on clothing, no name tags",
+      "start_time": "00:00:35,039",
+      "end_time": "00:00:37,179",
+      "start_seconds": 35.039,
+      "end_seconds": 37.179,
+      "duration": 2.14,
+      "duration_estimate": 2,
+      "narration": "아, 그리고 솔직히 말씀드리면요,",
+      "script_text": "아, 그리고 솔직히 말씀드리면요,",
+      "char_count": 18,
+      "image_prompt": "분석가가 소름 돋은 표정을 짓는 모습, 배경에 미래 도시의 홀로그램 이미지",
+      "image_prompt_en": "Analyst with a shocked expression, holographic image of a futuristic city in the background. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "정장을 입은 남성 분석가, 놀란 표정",
+      "character_prompt_en": "Male analyst in a suit with a shocked expression. no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "연구실",
-        "과학자",
-        "실험 장비"
+        "분석가",
+        "놀란 표정",
+        "미래 도시",
+        "홀로그램"
       ],
-      "direction_guide": "카메라, 실험 과정을 클로즈업하고 과학자들의 진지한 표정을 담는다.",
+      "direction_guide": "분석가의 얼굴을 클로즈업, 놀라움을 극대화",
       "camera_suggestion": "",
-      "video_prompt_character": "Scientist meticulously adjusts the microscope, observing the experiment with intense focus. Subtle facial cues reveal progress and challenges.",
-      "video_prompt_full": "A bustling laboratory. Scientists conduct experiments with precision. Zoom in on intricate equipment. Pan across the faces of the researchers, highlighting their dedication. Fast-motion montage of lab work.",
+      "video_prompt_character": "Male analyst in a suit with a shocked expression, conveying surprise and intrigue through facial expressions and body language.",
+      "video_prompt_full": "Close-up shot of an analyst with a shocked expression, set against a holographic image of a futuristic city. The scene amplifies the analyst's surprise and hints at the shocking truth behind the investigation.",
       "characters": [
         {
-          "name": "과학자",
-          "visual_prompt": "Middle-aged man, lab coat, focused expression, no text, no logos"
+          "name": "분석가",
+          "visual_prompt": "Male analyst in a suit, looking curious and questioning, short dark hair, clean-shaven, no text, no logos"
         }
       ],
-      "location": "연구실",
-      "mood": "진지함, 몰두",
+      "location": "미래 도시, 연구소",
+      "mood": "충격적인, 흥미진진한",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 14,
-      "bundle_size": 1,
+      "bundle_id": 5,
+      "bundle_size": 3,
       "bundle_scenes": [
-        14
+        13,
+        14,
+        15
       ],
-      "bundle_text": "변화를 확신으로 바꾸기 위한",
-      "bundle_start_time": "00:00:24,166",
-      "bundle_end_time": "00:00:26,000",
-      "bundle_start_seconds": 24.166,
-      "bundle_end_seconds": 26.0,
-      "bundle_duration": 1.834,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "Laboratory interior, scientists engrossed in experiments, complex equipment, serious atmosphere, focused expressions, headline text in Korean reading \"변화의 확신\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"미래를 향한 도전\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, Korean labels on scientific equipment (blurred)."
+      "bundle_text": "완전히 이해하시게 될 거예요. 아, 그리고 솔직히 말씀드리면요, 저도 이거 조사하면서 좀 소름 돋았어요.",
+      "bundle_start_time": "00:00:33,320",
+      "bundle_end_time": "00:00:39,100",
+      "bundle_start_seconds": 33.32,
+      "bundle_end_seconds": 39.1,
+      "bundle_duration": 5.780000000000001,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 15,
       "scene_number": 15,
-      "start_time": "00:00:26,133",
-      "end_time": "00:00:27,500",
-      "start_seconds": 26.133,
-      "end_seconds": 27.5,
-      "duration": 1.367,
+      "start_time": "00:00:37,179",
+      "end_time": "00:00:39,100",
+      "start_seconds": 37.179,
+      "end_seconds": 39.1,
+      "duration": 1.921,
       "duration_estimate": 1,
-      "narration": "치열한 노력의 결과",
-      "script_text": "치열한 노력의 결과",
-      "char_count": 10,
-      "image_prompt": "성공적인 결과 발표, 환호하는 사람들, 박수갈채, 밝은 분위기",
-      "image_prompt_en": "Successful results announcement, cheering people, applause, bright atmosphere, celebratory mood, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "발표자: 자신감 넘치는 표정으로 결과를 발표",
-      "character_prompt_en": "Presenter: Confidently announcing the results, smiling, enthusiastic expression, no text, no logos on clothing, no name tags",
+      "narration": "저도 이거 조사하면서 좀 소름 돋았어요.",
+      "script_text": "저도 이거 조사하면서 좀 소름 돋았어요.",
+      "char_count": 22,
+      "image_prompt": "분석가가 소름 돋은 표정을 짓는 모습, 배경에 미래 도시의 홀로그램 이미지",
+      "image_prompt_en": "Analyst with a shocked expression, holographic image of a futuristic city in the background. absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "정장을 입은 남성 분석가, 놀란 표정",
+      "character_prompt_en": "Male analyst in a suit with a shocked expression. no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "결과 발표",
-        "환호",
-        "박수"
+        "분석가",
+        "놀란 표정",
+        "미래 도시",
+        "홀로그램"
       ],
-      "direction_guide": "카메라, 발표자를 중심으로 환호하는 사람들을 넓게 보여준다.",
+      "direction_guide": "분석가의 얼굴을 클로즈업, 놀라움을 극대화",
       "camera_suggestion": "",
-      "video_prompt_character": "Presenter stands tall, delivering the announcement with passion. Hand gestures emphasize key achievements. Genuine joy radiates from their face.",
-      "video_prompt_full": "A celebratory scene. People cheer and applaud. Zoom in on the presenter's face, then pan across the excited crowd. Confetti falls from the ceiling. Upbeat music plays in the background.",
+      "video_prompt_character": "Male analyst in a suit with a shocked expression, conveying surprise and intrigue through facial expressions and body language.",
+      "video_prompt_full": "Close-up shot of an analyst with a shocked expression, set against a holographic image of a futuristic city. The scene amplifies the analyst's surprise and hints at the shocking truth behind the investigation.",
       "characters": [
         {
-          "name": "발표자",
-          "visual_prompt": "Young woman, professional attire, confident expression, no text, no logos"
-        },
-        {
-          "name": "청중",
-          "visual_prompt": "Various ages and ethnicities, diverse clothing, excited expressions, no text, no logos"
+          "name": "분석가",
+          "visual_prompt": "Male analyst in a suit, looking curious and questioning, short dark hair, clean-shaven, no text, no logos"
         }
       ],
-      "location": "강당",
-      "mood": "기쁨, 성취감",
+      "location": "미래 도시, 연구소",
+      "mood": "충격적인, 흥미진진한",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 15,
-      "bundle_size": 1,
+      "bundle_id": 5,
+      "bundle_size": 3,
       "bundle_scenes": [
+        13,
+        14,
         15
       ],
-      "bundle_text": "치열한 노력의 결과",
-      "bundle_start_time": "00:00:26,133",
-      "bundle_end_time": "00:00:27,500",
-      "bundle_start_seconds": 26.133,
-      "bundle_end_seconds": 27.5,
-      "bundle_duration": 1.367,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "Successful results announcement, cheering people, applause, bright atmosphere, celebratory mood, headline text in Korean reading \"치열한 노력\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"결실을 맺다\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, Korean congratulatory banner in the background."
+      "bundle_text": "완전히 이해하시게 될 거예요. 아, 그리고 솔직히 말씀드리면요, 저도 이거 조사하면서 좀 소름 돋았어요.",
+      "bundle_start_time": "00:00:33,320",
+      "bundle_end_time": "00:00:39,100",
+      "bundle_start_seconds": 33.32,
+      "bundle_end_seconds": 39.1,
+      "bundle_duration": 5.780000000000001,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 16,
       "scene_number": 16,
-      "start_time": "00:00:28,300",
-      "end_time": "00:00:30,566",
-      "start_seconds": 28.3,
-      "end_seconds": 30.566,
-      "duration": 2.266,
-      "duration_estimate": 2,
-      "narration": "드디어 그 땀방울들이 모여",
-      "script_text": "드디어 그 땀방울들이 모여",
-      "char_count": 14,
-      "image_prompt": "땀방울들이 모여 강을 이루는 모습, 새벽, 잔잔한 물결, 햇살, 희망적인 분위기",
-      "image_prompt_en": "A collection of glistening sweat droplets merging to form a river, early morning light, gentle ripples on the water's surface, soft sunlight filtering through, creating a hopeful and serene atmosphere, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "없음",
-      "character_prompt_en": "No characters present in this scene.",
+      "start_time": "00:00:39,600",
+      "end_time": "00:00:41,100",
+      "start_seconds": 39.6,
+      "end_seconds": 41.1,
+      "duration": 1.5,
+      "duration_estimate": 1,
+      "narration": "삼성이 진짜 무서운 회사구나,",
+      "script_text": "삼성이 진짜 무서운 회사구나,",
+      "char_count": 16,
+      "image_prompt": "강렬한 푸른색 배경, 삼성 로고의 은은한 빛, 생각에 잠긴 사람의 실루엣",
+      "image_prompt_en": "Intense blue background, subtle glow of the Samsung logo, silhouette of a person deep in thought, mysterious atmosphere, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "생각에 잠긴 듯한 사람의 실루엣, 어두운 배경",
+      "character_prompt_en": "Silhouette of a person lost in thought, dark background, no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "땀방울",
-        "강",
-        "새벽",
-        "햇살",
-        "물결"
+        "푸른색 배경",
+        "삼성 로고 빛",
+        "사람 실루엣"
       ],
-      "direction_guide": "강물이 잔잔하게 흐르는 모습 강조, 햇살이 땀방울을 비추는 장면 클로즈업",
+      "direction_guide": "미스터리하고 긴장감 넘치는 분위기 연출",
       "camera_suggestion": "",
-      "video_prompt_character": "No character animation in this scene. Focus on the river and droplets.",
-      "video_prompt_full": "A slow, peaceful animation showing sweat droplets merging into a river. The camera slowly zooms out to reveal the river flowing into the distance. Dawn light bathes the scene in a warm glow.",
-      "characters": [],
-      "location": "강",
-      "mood": "희망적, 평화로움",
+      "video_prompt_character": "A silhouette of a person slowly turns their head, looking thoughtful.",
+      "video_prompt_full": "The scene opens with an intense blue background and a subtle glow of the Samsung logo. A silhouette of a person deep in thought appears, creating a mysterious atmosphere. Camera slowly zooms in on the silhouette.",
+      "characters": [
+        {
+          "name": "청자",
+          "visual_prompt": "Silhouette of a person, gender neutral, facing away from the camera, deep in thought, no text, no logos"
+        }
+      ],
+      "location": "추상적인 공간",
+      "mood": "미스터리, 긴장감",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 16,
-      "bundle_size": 1,
+      "bundle_id": 6,
+      "bundle_size": 3,
       "bundle_scenes": [
-        16
+        16,
+        17,
+        18
       ],
-      "bundle_text": "드디어 그 땀방울들이 모여",
-      "bundle_start_time": "00:00:28,300",
-      "bundle_end_time": "00:00:30,566",
-      "bundle_start_seconds": 28.3,
-      "bundle_end_seconds": 30.566,
-      "bundle_duration": 2.266,
+      "bundle_text": "삼성이 진짜 무서운 회사구나, 이런 생각이 들더라고요. 자, 시작해볼게요.",
+      "bundle_start_time": "00:00:39,600",
+      "bundle_end_time": "00:00:44,118",
+      "bundle_start_seconds": 39.6,
+      "bundle_end_seconds": 44.118,
+      "bundle_duration": 4.518000000000001,
       "is_bundle_primary": true,
-      "image_prompt_korean_text": "A collection of glistening sweat droplets merging to form a river, early morning light, gentle ripples on the water's surface, soft sunlight filtering through, creating a hopeful and serene atmosphere, headline text in Korean reading \"노력의 결실\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"땀방울이 모여 강으로\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, "
+      "image_prompt_korean_text": "Intense blue background, subtle glow of the Samsung logo, silhouette of a person deep in thought, mysterious atmosphere, headline text in Korean reading \"삼성의 힘\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"진짜 무서운 회사\" in the upper-middle area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally, subtle light rays"
     },
     {
       "scene_id": 17,
       "scene_number": 17,
-      "start_time": "00:00:30,700",
-      "end_time": "00:00:32,733",
-      "start_seconds": 30.7,
-      "end_seconds": 32.733,
-      "duration": 2.033,
-      "duration_estimate": 2,
-      "narration": "올초부터 결실을 맺고 있습니다",
-      "script_text": "올초부터 결실을 맺고 있습니다",
-      "char_count": 16,
-      "image_prompt": "결실을 맺은 과일 나무, 황금빛 들판, 풍요로운 수확, 따뜻한 색감",
-      "image_prompt_en": "A bountiful fruit tree laden with ripe fruit, a golden wheat field stretching into the distance, a scene of abundant harvest, warm and inviting color palette, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "없음",
-      "character_prompt_en": "No characters present in this scene.",
+      "start_time": "00:00:41,100",
+      "end_time": "00:00:42,500",
+      "start_seconds": 41.1,
+      "end_seconds": 42.5,
+      "duration": 1.4,
+      "duration_estimate": 1,
+      "narration": "이런 생각이 들더라고요.",
+      "script_text": "이런 생각이 들더라고요.",
+      "char_count": 13,
+      "image_prompt": "강렬한 푸른색 배경, 삼성 로고의 은은한 빛, 생각에 잠긴 사람의 실루엣",
+      "image_prompt_en": "Intense blue background, subtle glow of the Samsung logo, silhouette of a person deep in thought, mysterious atmosphere, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "생각에 잠긴 듯한 사람의 실루엣, 어두운 배경",
+      "character_prompt_en": "Silhouette of a person lost in thought, dark background, no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "과일 나무",
-        "황금빛 들판",
-        "수확",
-        "곡식"
+        "푸른색 배경",
+        "삼성 로고 빛",
+        "사람 실루엣"
       ],
-      "direction_guide": "황금빛 들판을 넓게 보여주며 풍요로운 느낌 강조, 과일 나무에 열매가 가득 열린 모습 클로즈업",
+      "direction_guide": "미스터리하고 긴장감 넘치는 분위기 연출",
       "camera_suggestion": "",
-      "video_prompt_character": "No character animation in this scene. Focus on the harvest imagery.",
-      "video_prompt_full": "A sweeping animation showing a golden wheat field swaying gently in the breeze. The camera pans across to a fruit tree laden with ripe fruit. The scene evokes a sense of abundance and success.",
-      "characters": [],
-      "location": "들판",
-      "mood": "풍요, 성공, 만족",
+      "video_prompt_character": "A silhouette of a person slowly turns their head, looking thoughtful.",
+      "video_prompt_full": "The scene opens with an intense blue background and a subtle glow of the Samsung logo. A silhouette of a person deep in thought appears, creating a mysterious atmosphere. Camera slowly zooms in on the silhouette.",
+      "characters": [
+        {
+          "name": "청자",
+          "visual_prompt": "Silhouette of a person, gender neutral, facing away from the camera, deep in thought, no text, no logos"
+        }
+      ],
+      "location": "추상적인 공간",
+      "mood": "미스터리, 긴장감",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 17,
-      "bundle_size": 1,
+      "bundle_id": 6,
+      "bundle_size": 3,
       "bundle_scenes": [
-        17
+        16,
+        17,
+        18
       ],
-      "bundle_text": "올초부터 결실을 맺고 있습니다",
-      "bundle_start_time": "00:00:30,700",
-      "bundle_end_time": "00:00:32,733",
-      "bundle_start_seconds": 30.7,
-      "bundle_end_seconds": 32.733,
-      "bundle_duration": 2.033,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "A bountiful fruit tree laden with ripe fruit, a golden wheat field stretching into the distance, a scene of abundant harvest, warm and inviting color palette, headline text in Korean reading \"결실의 계절\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"올해의 풍성한 수확\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, "
+      "bundle_text": "삼성이 진짜 무서운 회사구나, 이런 생각이 들더라고요. 자, 시작해볼게요.",
+      "bundle_start_time": "00:00:39,600",
+      "bundle_end_time": "00:00:44,118",
+      "bundle_start_seconds": 39.6,
+      "bundle_end_seconds": 44.118,
+      "bundle_duration": 4.518000000000001,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 18,
       "scene_number": 18,
-      "start_time": "00:00:33,466",
-      "end_time": "00:00:35,200",
-      "start_seconds": 33.466,
-      "end_seconds": 35.2,
-      "duration": 1.734,
+      "start_time": "00:00:42,840",
+      "end_time": "00:00:44,118",
+      "start_seconds": 42.84,
+      "end_seconds": 44.118,
+      "duration": 1.278,
       "duration_estimate": 1,
-      "narration": "수송비 절감은 물론이고",
-      "script_text": "수송비 절감은 물론이고",
-      "char_count": 12,
-      "image_prompt": "화물 트럭이 연료를 절약하는 모습, 그래프가 하락하는 모습, 효율적인 운송 시스템",
-      "image_prompt_en": "Cargo trucks efficiently transporting goods while using less fuel, a graph showing a downward trend in transportation costs, highlighting an efficient and streamlined transportation system, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "없음",
-      "character_prompt_en": "No characters present in this scene.",
+      "narration": "자, 시작해볼게요.",
+      "script_text": "자, 시작해볼게요.",
+      "char_count": 10,
+      "image_prompt": "강렬한 푸른색 배경, 삼성 로고의 은은한 빛, 생각에 잠긴 사람의 실루엣",
+      "image_prompt_en": "Intense blue background, subtle glow of the Samsung logo, silhouette of a person deep in thought, mysterious atmosphere, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "생각에 잠긴 듯한 사람의 실루엣, 어두운 배경",
+      "character_prompt_en": "Silhouette of a person lost in thought, dark background, no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "화물 트럭",
-        "그래프",
-        "연료 절감",
-        "운송 시스템"
+        "푸른색 배경",
+        "삼성 로고 빛",
+        "사람 실루엣"
       ],
-      "direction_guide": "화물 트럭이 효율적으로 움직이는 모습 강조, 그래프가 하락하는 모습 시각적으로 표현",
+      "direction_guide": "미스터리하고 긴장감 넘치는 분위기 연출",
       "camera_suggestion": "",
-      "video_prompt_character": "No character animation in this scene. Focus on the trucks and graphs.",
-      "video_prompt_full": "Animation showing cargo trucks moving swiftly and efficiently. A graph appears showing a clear decrease in transportation costs. The scene emphasizes the benefits of cost reduction and efficiency.",
-      "characters": [],
-      "location": "도로",
-      "mood": "효율, 경제적, 발전",
+      "video_prompt_character": "A silhouette of a person slowly turns their head, looking thoughtful.",
+      "video_prompt_full": "The scene opens with an intense blue background and a subtle glow of the Samsung logo. A silhouette of a person deep in thought appears, creating a mysterious atmosphere. Camera slowly zooms in on the silhouette.",
+      "characters": [
+        {
+          "name": "청자",
+          "visual_prompt": "Silhouette of a person, gender neutral, facing away from the camera, deep in thought, no text, no logos"
+        }
+      ],
+      "location": "추상적인 공간",
+      "mood": "미스터리, 긴장감",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 18,
-      "bundle_size": 1,
+      "bundle_id": 6,
+      "bundle_size": 3,
       "bundle_scenes": [
+        16,
+        17,
         18
       ],
-      "bundle_text": "수송비 절감은 물론이고",
-      "bundle_start_time": "00:00:33,466",
-      "bundle_end_time": "00:00:35,200",
-      "bundle_start_seconds": 33.466,
-      "bundle_end_seconds": 35.2,
-      "bundle_duration": 1.734,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "Cargo trucks efficiently transporting goods while using less fuel, a graph showing a downward trend in transportation costs, highlighting an efficient and streamlined transportation system, headline text in Korean reading \"비용 절감\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"수송비 절약 효과\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, "
+      "bundle_text": "삼성이 진짜 무서운 회사구나, 이런 생각이 들더라고요. 자, 시작해볼게요.",
+      "bundle_start_time": "00:00:39,600",
+      "bundle_end_time": "00:00:44,118",
+      "bundle_start_seconds": 39.6,
+      "bundle_end_seconds": 44.118,
+      "bundle_duration": 4.518000000000001,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 19,
       "scene_number": 19,
-      "start_time": "00:00:35,566",
-      "end_time": "00:00:36,300",
-      "start_seconds": 35.566,
-      "end_seconds": 36.3,
-      "duration": 0.734,
-      "duration_estimate": 0,
-      "narration": "우리가 가진",
-      "script_text": "우리가 가진",
-      "char_count": 6,
-      "image_prompt": "강력한 힘을 상징하는 이미지, 근육질 팔, 불끈 쥔 주먹, 자신감 넘치는 표정",
-      "image_prompt_en": "An image symbolizing strength and power, a muscular arm flexing, a clenched fist, a confident and determined expression, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "근육질 남성, 강인한 인상",
-      "character_prompt_en": "A muscular man with a strong and determined expression, no text, no logos on clothing, no name tags",
+      "start_time": "00:00:44,439",
+      "end_time": "00:00:46,780",
+      "start_seconds": 44.439,
+      "end_seconds": 46.78,
+      "duration": 2.341,
+      "duration_estimate": 2,
+      "narration": "자, 일단 기본부터 깔고 가야 해요.",
+      "script_text": "자, 일단 기본부터 깔고 가야 해요.",
+      "char_count": 20,
+      "image_prompt": "강의실 풍경, 질문하는 손, 하만 로고의 은은한 배경, 칠판에 '하만' 글자",
+      "image_prompt_en": "Classroom setting, a hand raised asking a question, subtle Harman logo in the background, chalkboard with the word 'Harman' written on it, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "질문하는 학생, 밝은 표정",
+      "character_prompt_en": "Student raising their hand, bright expression, no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "근육질 팔",
-        "주먹",
-        "강렬한 눈빛"
+        "강의실",
+        "질문하는 손",
+        "하만 로고",
+        "칠판"
       ],
-      "direction_guide": "근육질 팔과 주먹을 클로즈업하여 강렬한 인상 강조, 자신감 넘치는 표정 부각",
+      "direction_guide": "친근하고 교육적인 분위기 연출",
       "camera_suggestion": "",
-      "video_prompt_character": "Animation of a muscular arm flexing powerfully. The character shows unwavering determination.",
-      "video_prompt_full": "Close-up animation of a muscular arm flexing, transitioning to a shot of a determined face. The scene conveys a sense of strength, resilience, and confidence.",
+      "video_prompt_character": "A student raises their hand enthusiastically, looking eager to learn.",
+      "video_prompt_full": "The scene shows a classroom setting. A student raises their hand to ask a question. The Harman logo is subtly visible in the background. Camera pans across the classroom.",
       "characters": [
         {
-          "name": "강인한 남성",
-          "visual_prompt": "Muscular man, strong jawline, intense gaze, determined expression, no text, no logos"
+          "name": "학생",
+          "visual_prompt": "Young student, raising hand, wearing casual clothes, no text, no logos"
+        },
+        {
+          "name": "강사",
+          "visual_prompt": "Middle-aged lecturer, standing at the front, friendly expression, no text, no logos"
         }
       ],
-      "location": "스튜디오",
-      "mood": "강렬함, 자신감, 결의",
+      "location": "강의실",
+      "mood": "교육적, 친근함",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 19,
-      "bundle_size": 1,
+      "bundle_id": 7,
+      "bundle_size": 2,
       "bundle_scenes": [
-        19
+        19,
+        20
       ],
-      "bundle_text": "우리가 가진",
-      "bundle_start_time": "00:00:35,566",
-      "bundle_end_time": "00:00:36,300",
-      "bundle_start_seconds": 35.566,
-      "bundle_end_seconds": 36.3,
-      "bundle_duration": 0.734,
+      "bundle_text": "자, 일단 기본부터 깔고 가야 해요. 하만이 뭐하는 회사인지 아시는 분 계세요?",
+      "bundle_start_time": "00:00:44,439",
+      "bundle_end_time": "00:00:49,118",
+      "bundle_start_seconds": 44.439,
+      "bundle_end_seconds": 49.118,
+      "bundle_duration": 4.679000000000002,
       "is_bundle_primary": true,
-      "image_prompt_korean_text": "An image symbolizing strength and power, a muscular arm flexing, a clenched fist, a confident and determined expression, headline text in Korean reading \"우리의 힘\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"우리가 가진 잠재력\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, "
+      "image_prompt_korean_text": "Classroom setting, a hand raised asking a question, subtle Harman logo in the background, chalkboard, headline text in Korean reading \"하만은?\" in the upper-middle area in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"기본부터 탄탄히\" integrated naturally with the main visual in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally, chalkboard with simple diagrams"
     },
     {
       "scene_id": 20,
       "scene_number": 20,
-      "start_time": "00:00:36,300",
-      "end_time": "00:00:37,266",
-      "start_seconds": 36.3,
-      "end_seconds": 37.266,
-      "duration": 0.966,
-      "duration_estimate": 0,
-      "narration": "경쟁력으로",
-      "script_text": "경쟁력으로",
-      "char_count": 5,
-      "image_prompt": "트로피를 들어올리는 모습, 승리의 세레모니, 환호하는 사람들, 밝은 조명",
-      "image_prompt_en": "A triumphant figure holding up a trophy, a victory celebration, cheering crowds, bright and celebratory lighting, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
-      "character_prompt": "승리자, 환호하는 사람들",
-      "character_prompt_en": "A victorious person holding a trophy, cheering crowd, no text, no logos on clothing, no name tags",
+      "start_time": "00:00:47,200",
+      "end_time": "00:00:49,118",
+      "start_seconds": 47.2,
+      "end_seconds": 49.118,
+      "duration": 1.918,
+      "duration_estimate": 1,
+      "narration": "하만이 뭐하는 회사인지 아시는 분 계세요?",
+      "script_text": "하만이 뭐하는 회사인지 아시는 분 계세요?",
+      "char_count": 23,
+      "image_prompt": "강의실 풍경, 질문하는 손, 하만 로고의 은은한 배경, 칠판에 '하만' 글자",
+      "image_prompt_en": "Classroom setting, a hand raised asking a question, subtle Harman logo in the background, chalkboard with the word 'Harman' written on it, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+      "character_prompt": "질문하는 학생, 밝은 표정",
+      "character_prompt_en": "Student raising their hand, bright expression, no text, no logos on clothing, no name tags",
       "visual_elements": [
-        "트로피",
-        "환호하는 사람들",
-        "밝은 조명",
-        "승리의 미소"
+        "강의실",
+        "질문하는 손",
+        "하만 로고",
+        "칠판"
       ],
-      "direction_guide": "트로피를 높이 들어올리는 모습 강조, 환호하는 사람들의 열광적인 분위기 연출",
+      "direction_guide": "친근하고 교육적인 분위기 연출",
       "camera_suggestion": "",
-      "video_prompt_character": "Animation of a person holding a trophy high above their head, radiating joy and accomplishment.",
-      "video_prompt_full": "Animation of a victorious figure holding a trophy amidst a cheering crowd. The scene is brightly lit and filled with celebratory energy, emphasizing the concept of competitive advantage.",
+      "video_prompt_character": "A student raises their hand enthusiastically, looking eager to learn.",
+      "video_prompt_full": "The scene shows a classroom setting. A student raises their hand to ask a question. The Harman logo is subtly visible in the background. Camera pans across the classroom.",
       "characters": [
         {
-          "name": "승리자",
-          "visual_prompt": "Smiling person holding a trophy, radiating joy and confidence, no text, no logos"
+          "name": "학생",
+          "visual_prompt": "Young student, raising hand, wearing casual clothes, no text, no logos"
         },
         {
-          "name": "군중",
-          "visual_prompt": "Cheering crowd, diverse group of people, expressing excitement and support, no text, no logos"
+          "name": "강사",
+          "visual_prompt": "Middle-aged lecturer, standing at the front, friendly expression, no text, no logos"
         }
       ],
-      "location": "경기장",
-      "mood": "승리, 환희, 경쟁",
+      "location": "강의실",
+      "mood": "교육적, 친근함",
       "source": "srt",
       "needs_analysis": false,
-      "bundle_id": 20,
-      "bundle_size": 1,
+      "bundle_id": 7,
+      "bundle_size": 2,
       "bundle_scenes": [
+        19,
         20
       ],
-      "bundle_text": "경쟁력으로",
-      "bundle_start_time": "00:00:36,300",
-      "bundle_end_time": "00:00:37,266",
-      "bundle_start_seconds": 36.3,
-      "bundle_end_seconds": 37.266,
-      "bundle_duration": 0.966,
-      "is_bundle_primary": true,
-      "image_prompt_korean_text": "A triumphant figure holding up a trophy, a victory celebration, cheering crowds, bright and celebratory lighting, headline text in Korean reading \"경쟁 우위\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"우리의 경쟁력 확보\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, "
+      "bundle_text": "자, 일단 기본부터 깔고 가야 해요. 하만이 뭐하는 회사인지 아시는 분 계세요?",
+      "bundle_start_time": "00:00:44,439",
+      "bundle_end_time": "00:00:49,118",
+      "bundle_start_seconds": 44.439,
+      "bundle_end_seconds": 49.118,
+      "bundle_duration": 4.679000000000002,
+      "is_bundle_primary": false
     },
     {
       "scene_id": 21,
@@ -10540,2187 +10593,155 @@
       "role": "등장인물",
       "visual_prompt": "Metal gears, interlocking, rotating, clean and efficient, no text, no logos",
       "description": ""
+    },
+    {
+      "name": "삼성전자 임원",
+      "name_ko": "삼성전자 임원",
+      "role": "등장인물",
+      "visual_prompt": "Middle-aged Asian man, CEO, confident expression, business suit, no text, no logos",
+      "description": ""
+    },
+    {
+      "name": "하만 임원",
+      "name_ko": "하만 임원",
+      "role": "등장인물",
+      "visual_prompt": "Middle-aged Caucasian woman, CEO, confident expression, business attire, no text, no logos",
+      "description": ""
+    },
+    {
+      "name": "은행원",
+      "name_ko": "은행원",
+      "role": "등장인물",
+      "visual_prompt": "Middle-aged Caucasian man, banker, serious expression, counting money, no text, no logos",
+      "description": ""
+    },
+    {
+      "name": "혼란스러워하는 사람",
+      "name_ko": "혼란스러워하는 사람",
+      "role": "등장인물",
+      "visual_prompt": "Young Asian woman, confused expression, looking directly at the camera, no text, no logos",
+      "description": ""
+    },
+    {
+      "name": "분석가",
+      "name_ko": "분석가",
+      "role": "등장인물",
+      "visual_prompt": "Male analyst in a suit, looking curious and questioning, short dark hair, clean-shaven, no text, no logos",
+      "description": ""
     }
   ],
   "source": "srt",
   "srt_metadata": {
-    "total_scenes": 215,
-    "total_duration": 382.533,
+    "total_scenes": 318,
+    "total_duration": 730.94,
     "has_time_codes": true
   },
   "bundle_metadata": {
-    "bundle_size": 1,
-    "total_bundles": 215,
+    "bundle_size": 3,
+    "total_bundles": 7,
     "bundles": [
       {
         "bundle_id": 1,
         "scene_ids": [
-          1
+          1,
+          2,
+          3
         ],
-        "duration": 1.966,
-        "char_count": 9,
+        "duration": 9.48,
+        "char_count": 73,
         "start_time": "00:00:00,100",
-        "end_time": "00:00:02,066"
+        "end_time": "00:00:09,580"
       },
       {
         "bundle_id": 2,
         "scene_ids": [
-          2
+          4,
+          5,
+          6
         ],
-        "duration": 2.2,
-        "char_count": 15,
-        "start_time": "00:00:02,166",
-        "end_time": "00:00:04,366"
+        "duration": 6.040000000000001,
+        "char_count": 48,
+        "start_time": "00:00:10,019",
+        "end_time": "00:00:16,059"
       },
       {
         "bundle_id": 3,
         "scene_ids": [
-          3
+          7,
+          8,
+          9
         ],
-        "duration": 1.134,
-        "char_count": 10,
-        "start_time": "00:00:04,566",
-        "end_time": "00:00:05,700"
+        "duration": 8.779,
+        "char_count": 75,
+        "start_time": "00:00:16,059",
+        "end_time": "00:00:24,838"
       },
       {
         "bundle_id": 4,
         "scene_ids": [
-          4
+          10,
+          11,
+          12
         ],
-        "duration": 1.134,
-        "char_count": 10,
-        "start_time": "00:00:05,766",
-        "end_time": "00:00:06,900"
+        "duration": 8.482,
+        "char_count": 76,
+        "start_time": "00:00:24,838",
+        "end_time": "00:00:33,320"
       },
       {
         "bundle_id": 5,
         "scene_ids": [
-          5
+          13,
+          14,
+          15
         ],
-        "duration": 1.9,
-        "char_count": 16,
-        "start_time": "00:00:08,100",
-        "end_time": "00:00:10,000"
+        "duration": 5.780000000000001,
+        "char_count": 58,
+        "start_time": "00:00:33,320",
+        "end_time": "00:00:39,100"
       },
       {
         "bundle_id": 6,
         "scene_ids": [
-          6
+          16,
+          17,
+          18
         ],
-        "duration": 0.8,
-        "char_count": 6,
-        "start_time": "00:00:10,200",
-        "end_time": "00:00:11,000"
+        "duration": 4.518000000000001,
+        "char_count": 41,
+        "start_time": "00:00:39,600",
+        "end_time": "00:00:44,118"
       },
       {
         "bundle_id": 7,
         "scene_ids": [
-          7
-        ],
-        "duration": 2.233,
-        "char_count": 15,
-        "start_time": "00:00:11,100",
-        "end_time": "00:00:13,333"
-      },
-      {
-        "bundle_id": 8,
-        "scene_ids": [
-          8
-        ],
-        "duration": 1.267,
-        "char_count": 10,
-        "start_time": "00:00:13,466",
-        "end_time": "00:00:14,733"
-      },
-      {
-        "bundle_id": 9,
-        "scene_ids": [
-          9
-        ],
-        "duration": 1.6,
-        "char_count": 13,
-        "start_time": "00:00:15,466",
-        "end_time": "00:00:17,066"
-      },
-      {
-        "bundle_id": 10,
-        "scene_ids": [
-          10
-        ],
-        "duration": 1.734,
-        "char_count": 11,
-        "start_time": "00:00:17,166",
-        "end_time": "00:00:18,900"
-      },
-      {
-        "bundle_id": 11,
-        "scene_ids": [
-          11
-        ],
-        "duration": 1.3,
-        "char_count": 11,
-        "start_time": "00:00:18,966",
-        "end_time": "00:00:20,266"
-      },
-      {
-        "bundle_id": 12,
-        "scene_ids": [
-          12
-        ],
-        "duration": 2.0,
-        "char_count": 10,
-        "start_time": "00:00:21,133",
-        "end_time": "00:00:23,133"
-      },
-      {
-        "bundle_id": 13,
-        "scene_ids": [
-          13
-        ],
-        "duration": 0.834,
-        "char_count": 7,
-        "start_time": "00:00:23,266",
-        "end_time": "00:00:24,100"
-      },
-      {
-        "bundle_id": 14,
-        "scene_ids": [
-          14
-        ],
-        "duration": 1.834,
-        "char_count": 15,
-        "start_time": "00:00:24,166",
-        "end_time": "00:00:26,000"
-      },
-      {
-        "bundle_id": 15,
-        "scene_ids": [
-          15
-        ],
-        "duration": 1.367,
-        "char_count": 10,
-        "start_time": "00:00:26,133",
-        "end_time": "00:00:27,500"
-      },
-      {
-        "bundle_id": 16,
-        "scene_ids": [
-          16
-        ],
-        "duration": 2.266,
-        "char_count": 14,
-        "start_time": "00:00:28,300",
-        "end_time": "00:00:30,566"
-      },
-      {
-        "bundle_id": 17,
-        "scene_ids": [
-          17
-        ],
-        "duration": 2.033,
-        "char_count": 16,
-        "start_time": "00:00:30,700",
-        "end_time": "00:00:32,733"
-      },
-      {
-        "bundle_id": 18,
-        "scene_ids": [
-          18
-        ],
-        "duration": 1.734,
-        "char_count": 12,
-        "start_time": "00:00:33,466",
-        "end_time": "00:00:35,200"
-      },
-      {
-        "bundle_id": 19,
-        "scene_ids": [
-          19
-        ],
-        "duration": 0.734,
-        "char_count": 6,
-        "start_time": "00:00:35,566",
-        "end_time": "00:00:36,300"
-      },
-      {
-        "bundle_id": 20,
-        "scene_ids": [
+          19,
           20
         ],
-        "duration": 0.966,
-        "char_count": 5,
-        "start_time": "00:00:36,300",
-        "end_time": "00:00:37,266"
-      },
-      {
-        "bundle_id": 21,
-        "scene_ids": [
-          21
-        ],
-        "duration": 1.867,
-        "char_count": 15,
-        "start_time": "00:00:37,333",
-        "end_time": "00:00:39,200"
-      },
-      {
-        "bundle_id": 22,
-        "scene_ids": [
-          22
-        ],
-        "duration": 2.1,
-        "char_count": 19,
-        "start_time": "00:00:39,366",
-        "end_time": "00:00:41,466"
-      },
-      {
-        "bundle_id": 23,
-        "scene_ids": [
-          23
-        ],
-        "duration": 2.367,
-        "char_count": 15,
-        "start_time": "00:00:42,533",
-        "end_time": "00:00:44,900"
-      },
-      {
-        "bundle_id": 24,
-        "scene_ids": [
-          24
-        ],
-        "duration": 0.8,
-        "char_count": 6,
-        "start_time": "00:00:44,966",
-        "end_time": "00:00:45,766"
-      },
-      {
-        "bundle_id": 25,
-        "scene_ids": [
-          25
-        ],
-        "duration": 0.9,
-        "char_count": 5,
-        "start_time": "00:00:45,900",
-        "end_time": "00:00:46,800"
-      },
-      {
-        "bundle_id": 26,
-        "scene_ids": [
-          26
-        ],
-        "duration": 0.934,
-        "char_count": 7,
-        "start_time": "00:00:47,066",
-        "end_time": "00:00:48,000"
-      },
-      {
-        "bundle_id": 27,
-        "scene_ids": [
-          27
-        ],
-        "duration": 0.967,
-        "char_count": 6,
-        "start_time": "00:00:48,133",
-        "end_time": "00:00:49,100"
-      },
-      {
-        "bundle_id": 28,
-        "scene_ids": [
-          28
-        ],
-        "duration": 0.933,
-        "char_count": 7,
-        "start_time": "00:00:49,133",
-        "end_time": "00:00:50,066"
-      },
-      {
-        "bundle_id": 29,
-        "scene_ids": [
-          29
-        ],
-        "duration": 2.266,
-        "char_count": 17,
-        "start_time": "00:00:50,100",
-        "end_time": "00:00:52,366"
-      },
-      {
-        "bundle_id": 30,
-        "scene_ids": [
-          30
-        ],
-        "duration": 0.833,
-        "char_count": 7,
-        "start_time": "00:00:52,500",
-        "end_time": "00:00:53,333"
-      },
-      {
-        "bundle_id": 31,
-        "scene_ids": [
-          31
-        ],
-        "duration": 2.666,
-        "char_count": 14,
-        "start_time": "00:00:54,000",
-        "end_time": "00:00:56,666"
-      },
-      {
-        "bundle_id": 32,
-        "scene_ids": [
-          32
-        ],
-        "duration": 1.833,
-        "char_count": 16,
-        "start_time": "00:00:57,300",
-        "end_time": "00:00:59,133"
-      },
-      {
-        "bundle_id": 33,
-        "scene_ids": [
-          33
-        ],
-        "duration": 2.234,
-        "char_count": 7,
-        "start_time": "00:00:59,466",
-        "end_time": "00:01:01,700"
-      },
-      {
-        "bundle_id": 34,
-        "scene_ids": [
-          34
-        ],
-        "duration": 0.567,
-        "char_count": 4,
-        "start_time": "00:01:01,766",
-        "end_time": "00:01:02,333"
-      },
-      {
-        "bundle_id": 35,
-        "scene_ids": [
-          35
-        ],
-        "duration": 1.567,
-        "char_count": 12,
-        "start_time": "00:01:02,333",
-        "end_time": "00:01:03,900"
-      },
-      {
-        "bundle_id": 36,
-        "scene_ids": [
-          36
-        ],
-        "duration": 0.8,
-        "char_count": 7,
-        "start_time": "00:01:03,966",
-        "end_time": "00:01:04,766"
-      },
-      {
-        "bundle_id": 37,
-        "scene_ids": [
-          37
-        ],
-        "duration": 2.366,
-        "char_count": 12,
-        "start_time": "00:01:05,400",
-        "end_time": "00:01:07,766"
-      },
-      {
-        "bundle_id": 38,
-        "scene_ids": [
-          38
-        ],
-        "duration": 0.5,
-        "char_count": 2,
-        "start_time": "00:01:08,200",
-        "end_time": "00:01:08,700"
-      },
-      {
-        "bundle_id": 39,
-        "scene_ids": [
-          39
-        ],
-        "duration": 2.066,
-        "char_count": 16,
-        "start_time": "00:01:08,700",
-        "end_time": "00:01:10,766"
-      },
-      {
-        "bundle_id": 40,
-        "scene_ids": [
-          40
-        ],
-        "duration": 0.766,
-        "char_count": 7,
-        "start_time": "00:01:10,900",
-        "end_time": "00:01:11,666"
-      },
-      {
-        "bundle_id": 41,
-        "scene_ids": [
-          41
-        ],
-        "duration": 0.6,
-        "char_count": 4,
-        "start_time": "00:01:11,666",
-        "end_time": "00:01:12,266"
-      },
-      {
-        "bundle_id": 42,
-        "scene_ids": [
-          42
-        ],
-        "duration": 1.267,
-        "char_count": 14,
-        "start_time": "00:01:12,266",
-        "end_time": "00:01:13,533"
-      },
-      {
-        "bundle_id": 43,
-        "scene_ids": [
-          43
-        ],
-        "duration": 2.233,
-        "char_count": 16,
-        "start_time": "00:01:14,133",
-        "end_time": "00:01:16,366"
-      },
-      {
-        "bundle_id": 44,
-        "scene_ids": [
-          44
-        ],
-        "duration": 1.367,
-        "char_count": 9,
-        "start_time": "00:01:17,166",
-        "end_time": "00:01:18,533"
-      },
-      {
-        "bundle_id": 45,
-        "scene_ids": [
-          45
-        ],
-        "duration": 1.6,
-        "char_count": 12,
-        "start_time": "00:01:18,766",
-        "end_time": "00:01:20,366"
-      },
-      {
-        "bundle_id": 46,
-        "scene_ids": [
-          46
-        ],
-        "duration": 1.9,
-        "char_count": 9,
-        "start_time": "00:01:21,066",
-        "end_time": "00:01:22,966"
-      },
-      {
-        "bundle_id": 47,
-        "scene_ids": [
-          47
-        ],
-        "duration": 1.1,
-        "char_count": 10,
-        "start_time": "00:01:23,100",
-        "end_time": "00:01:24,200"
-      },
-      {
-        "bundle_id": 48,
-        "scene_ids": [
-          48
-        ],
-        "duration": 0.9,
-        "char_count": 8,
-        "start_time": "00:01:24,600",
-        "end_time": "00:01:25,500"
-      },
-      {
-        "bundle_id": 49,
-        "scene_ids": [
-          49
-        ],
-        "duration": 2.466,
-        "char_count": 17,
-        "start_time": "00:01:25,600",
-        "end_time": "00:01:28,066"
-      },
-      {
-        "bundle_id": 50,
-        "scene_ids": [
-          50
-        ],
-        "duration": 1.367,
-        "char_count": 9,
-        "start_time": "00:01:28,133",
-        "end_time": "00:01:29,500"
-      },
-      {
-        "bundle_id": 51,
-        "scene_ids": [
-          51
-        ],
-        "duration": 1.6,
-        "char_count": 11,
-        "start_time": "00:01:29,600",
-        "end_time": "00:01:31,200"
-      },
-      {
-        "bundle_id": 52,
-        "scene_ids": [
-          52
-        ],
-        "duration": 1.366,
-        "char_count": 12,
-        "start_time": "00:01:31,300",
-        "end_time": "00:01:32,666"
-      },
-      {
-        "bundle_id": 53,
-        "scene_ids": [
-          53
-        ],
-        "duration": 2.367,
-        "char_count": 14,
-        "start_time": "00:01:33,766",
-        "end_time": "00:01:36,133"
-      },
-      {
-        "bundle_id": 54,
-        "scene_ids": [
-          54
-        ],
-        "duration": 0.834,
-        "char_count": 7,
-        "start_time": "00:01:36,866",
-        "end_time": "00:01:37,700"
-      },
-      {
-        "bundle_id": 55,
-        "scene_ids": [
-          55
-        ],
-        "duration": 1.4,
-        "char_count": 12,
-        "start_time": "00:01:37,866",
-        "end_time": "00:01:39,266"
-      },
-      {
-        "bundle_id": 56,
-        "scene_ids": [
-          56
-        ],
-        "duration": 1.3,
-        "char_count": 10,
-        "start_time": "00:01:39,366",
-        "end_time": "00:01:40,666"
-      },
-      {
-        "bundle_id": 57,
-        "scene_ids": [
-          57
-        ],
-        "duration": 1.134,
-        "char_count": 8,
-        "start_time": "00:01:42,066",
-        "end_time": "00:01:43,200"
-      },
-      {
-        "bundle_id": 58,
-        "scene_ids": [
-          58
-        ],
-        "duration": 2.066,
-        "char_count": 13,
-        "start_time": "00:01:43,300",
-        "end_time": "00:01:45,366"
-      },
-      {
-        "bundle_id": 59,
-        "scene_ids": [
-          59
-        ],
-        "duration": 2.2,
-        "char_count": 16,
-        "start_time": "00:01:45,533",
-        "end_time": "00:01:47,733"
-      },
-      {
-        "bundle_id": 60,
-        "scene_ids": [
-          60
-        ],
-        "duration": 1.8,
-        "char_count": 5,
-        "start_time": "00:01:48,200",
-        "end_time": "00:01:50,000"
-      },
-      {
-        "bundle_id": 61,
-        "scene_ids": [
-          61
-        ],
-        "duration": 0.9,
-        "char_count": 5,
-        "start_time": "00:01:50,766",
-        "end_time": "00:01:51,666"
-      },
-      {
-        "bundle_id": 62,
-        "scene_ids": [
-          62
-        ],
-        "duration": 2.833,
-        "char_count": 19,
-        "start_time": "00:01:51,900",
-        "end_time": "00:01:54,733"
-      },
-      {
-        "bundle_id": 63,
-        "scene_ids": [
-          63
-        ],
-        "duration": 1.066,
-        "char_count": 7,
-        "start_time": "00:01:54,900",
-        "end_time": "00:01:55,966"
-      },
-      {
-        "bundle_id": 64,
-        "scene_ids": [
-          64
-        ],
-        "duration": 0.8,
-        "char_count": 5,
-        "start_time": "00:01:56,200",
-        "end_time": "00:01:57,000"
-      },
-      {
-        "bundle_id": 65,
-        "scene_ids": [
-          65
-        ],
-        "duration": 1.1,
-        "char_count": 3,
-        "start_time": "00:01:57,100",
-        "end_time": "00:01:58,200"
-      },
-      {
-        "bundle_id": 66,
-        "scene_ids": [
-          66
-        ],
-        "duration": 1.133,
-        "char_count": 10,
-        "start_time": "00:01:58,400",
-        "end_time": "00:01:59,533"
-      },
-      {
-        "bundle_id": 67,
-        "scene_ids": [
-          67
-        ],
-        "duration": 1.133,
-        "char_count": 6,
-        "start_time": "00:01:59,533",
-        "end_time": "00:02:00,666"
-      },
-      {
-        "bundle_id": 68,
-        "scene_ids": [
-          68
-        ],
-        "duration": 1.633,
-        "char_count": 7,
-        "start_time": "00:02:00,733",
-        "end_time": "00:02:02,366"
-      },
-      {
-        "bundle_id": 69,
-        "scene_ids": [
-          69
-        ],
-        "duration": 0.834,
-        "char_count": 6,
-        "start_time": "00:02:02,466",
-        "end_time": "00:02:03,300"
-      },
-      {
-        "bundle_id": 70,
-        "scene_ids": [
-          70
-        ],
-        "duration": 2.034,
-        "char_count": 14,
-        "start_time": "00:02:03,666",
-        "end_time": "00:02:05,700"
-      },
-      {
-        "bundle_id": 71,
-        "scene_ids": [
-          71
-        ],
-        "duration": 2.0,
-        "char_count": 14,
-        "start_time": "00:02:05,900",
-        "end_time": "00:02:07,900"
-      },
-      {
-        "bundle_id": 72,
-        "scene_ids": [
-          72
-        ],
-        "duration": 2.6,
-        "char_count": 10,
-        "start_time": "00:02:08,266",
-        "end_time": "00:02:10,866"
-      },
-      {
-        "bundle_id": 73,
-        "scene_ids": [
-          73
-        ],
-        "duration": 2.333,
-        "char_count": 16,
-        "start_time": "00:02:11,400",
-        "end_time": "00:02:13,733"
-      },
-      {
-        "bundle_id": 74,
-        "scene_ids": [
-          74
-        ],
-        "duration": 1.5,
-        "char_count": 12,
-        "start_time": "00:02:13,900",
-        "end_time": "00:02:15,400"
-      },
-      {
-        "bundle_id": 75,
-        "scene_ids": [
-          75
-        ],
-        "duration": 1.833,
-        "char_count": 13,
-        "start_time": "00:02:16,300",
-        "end_time": "00:02:18,133"
-      },
-      {
-        "bundle_id": 76,
-        "scene_ids": [
-          76
-        ],
-        "duration": 0.433,
-        "char_count": 2,
-        "start_time": "00:02:18,300",
-        "end_time": "00:02:18,733"
-      },
-      {
-        "bundle_id": 77,
-        "scene_ids": [
-          77
-        ],
-        "duration": 2.567,
-        "char_count": 17,
-        "start_time": "00:02:18,733",
-        "end_time": "00:02:21,300"
-      },
-      {
-        "bundle_id": 78,
-        "scene_ids": [
-          78
-        ],
-        "duration": 1.9,
-        "char_count": 13,
-        "start_time": "00:02:21,500",
-        "end_time": "00:02:23,400"
-      },
-      {
-        "bundle_id": 79,
-        "scene_ids": [
-          79
-        ],
-        "duration": 2.4,
-        "char_count": 17,
-        "start_time": "00:02:23,733",
-        "end_time": "00:02:26,133"
-      },
-      {
-        "bundle_id": 80,
-        "scene_ids": [
-          80
-        ],
-        "duration": 1.366,
-        "char_count": 5,
-        "start_time": "00:02:27,000",
-        "end_time": "00:02:28,366"
-      },
-      {
-        "bundle_id": 81,
-        "scene_ids": [
-          81
-        ],
-        "duration": 1.8,
-        "char_count": 20,
-        "start_time": "00:02:28,566",
-        "end_time": "00:02:30,366"
-      },
-      {
-        "bundle_id": 82,
-        "scene_ids": [
-          82
-        ],
-        "duration": 2.6,
-        "char_count": 12,
-        "start_time": "00:02:30,700",
-        "end_time": "00:02:33,300"
-      },
-      {
-        "bundle_id": 83,
-        "scene_ids": [
-          83
-        ],
-        "duration": 1.333,
-        "char_count": 8,
-        "start_time": "00:02:33,400",
-        "end_time": "00:02:34,733"
-      },
-      {
-        "bundle_id": 84,
-        "scene_ids": [
-          84
-        ],
-        "duration": 1.5,
-        "char_count": 12,
-        "start_time": "00:02:34,966",
-        "end_time": "00:02:36,466"
-      },
-      {
-        "bundle_id": 85,
-        "scene_ids": [
-          85
-        ],
-        "duration": 1.467,
-        "char_count": 9,
-        "start_time": "00:02:37,133",
-        "end_time": "00:02:38,600"
-      },
-      {
-        "bundle_id": 86,
-        "scene_ids": [
-          86
-        ],
-        "duration": 1.8,
-        "char_count": 17,
-        "start_time": "00:02:38,766",
-        "end_time": "00:02:40,566"
-      },
-      {
-        "bundle_id": 87,
-        "scene_ids": [
-          87
-        ],
-        "duration": 0.8,
-        "char_count": 6,
-        "start_time": "00:02:40,666",
-        "end_time": "00:02:41,466"
-      },
-      {
-        "bundle_id": 88,
-        "scene_ids": [
-          88
-        ],
-        "duration": 2.2,
-        "char_count": 8,
-        "start_time": "00:02:42,466",
-        "end_time": "00:02:44,666"
-      },
-      {
-        "bundle_id": 89,
-        "scene_ids": [
-          89
-        ],
-        "duration": 1.9,
-        "char_count": 14,
-        "start_time": "00:02:44,966",
-        "end_time": "00:02:46,866"
-      },
-      {
-        "bundle_id": 90,
-        "scene_ids": [
-          90
-        ],
-        "duration": 1.366,
-        "char_count": 9,
-        "start_time": "00:02:47,100",
-        "end_time": "00:02:48,466"
-      },
-      {
-        "bundle_id": 91,
-        "scene_ids": [
-          91
-        ],
-        "duration": 1.4,
-        "char_count": 13,
-        "start_time": "00:02:48,600",
-        "end_time": "00:02:50,000"
-      },
-      {
-        "bundle_id": 92,
-        "scene_ids": [
-          92
-        ],
-        "duration": 2.033,
-        "char_count": 5,
-        "start_time": "00:02:50,533",
-        "end_time": "00:02:52,566"
-      },
-      {
-        "bundle_id": 93,
-        "scene_ids": [
-          93
-        ],
-        "duration": 1.2,
-        "char_count": 7,
-        "start_time": "00:02:52,766",
-        "end_time": "00:02:53,966"
-      },
-      {
-        "bundle_id": 94,
-        "scene_ids": [
-          94
-        ],
-        "duration": 1.066,
-        "char_count": 5,
-        "start_time": "00:02:54,200",
-        "end_time": "00:02:55,266"
-      },
-      {
-        "bundle_id": 95,
-        "scene_ids": [
-          95
-        ],
-        "duration": 2.367,
-        "char_count": 14,
-        "start_time": "00:02:55,333",
-        "end_time": "00:02:57,700"
-      },
-      {
-        "bundle_id": 96,
-        "scene_ids": [
-          96
-        ],
-        "duration": 0.934,
-        "char_count": 7,
-        "start_time": "00:02:57,766",
-        "end_time": "00:02:58,700"
-      },
-      {
-        "bundle_id": 97,
-        "scene_ids": [
-          97
-        ],
-        "duration": 2.1,
-        "char_count": 16,
-        "start_time": "00:02:58,800",
-        "end_time": "00:03:00,900"
-      },
-      {
-        "bundle_id": 98,
-        "scene_ids": [
-          98
-        ],
-        "duration": 1.0,
-        "char_count": 5,
-        "start_time": "00:03:00,933",
-        "end_time": "00:03:01,933"
-      },
-      {
-        "bundle_id": 99,
-        "scene_ids": [
-          99
-        ],
-        "duration": 1.4,
-        "char_count": 11,
-        "start_time": "00:03:02,266",
-        "end_time": "00:03:03,666"
-      },
-      {
-        "bundle_id": 100,
-        "scene_ids": [
-          100
-        ],
-        "duration": 0.8,
-        "char_count": 7,
-        "start_time": "00:03:03,700",
-        "end_time": "00:03:04,500"
-      },
-      {
-        "bundle_id": 101,
-        "scene_ids": [
-          101
-        ],
-        "duration": 1.5,
-        "char_count": 11,
-        "start_time": "00:03:04,600",
-        "end_time": "00:03:06,100"
-      },
-      {
-        "bundle_id": 102,
-        "scene_ids": [
-          102
-        ],
-        "duration": 1.0,
-        "char_count": 10,
-        "start_time": "00:03:06,200",
-        "end_time": "00:03:07,200"
-      },
-      {
-        "bundle_id": 103,
-        "scene_ids": [
-          103
-        ],
-        "duration": 0.734,
-        "char_count": 4,
-        "start_time": "00:03:08,666",
-        "end_time": "00:03:09,400"
-      },
-      {
-        "bundle_id": 104,
-        "scene_ids": [
-          104
-        ],
-        "duration": 1.2,
-        "char_count": 9,
-        "start_time": "00:03:09,400",
-        "end_time": "00:03:10,600"
-      },
-      {
-        "bundle_id": 105,
-        "scene_ids": [
-          105
-        ],
-        "duration": 1.533,
-        "char_count": 11,
-        "start_time": "00:03:10,800",
-        "end_time": "00:03:12,333"
-      },
-      {
-        "bundle_id": 106,
-        "scene_ids": [
-          106
-        ],
-        "duration": 0.934,
-        "char_count": 6,
-        "start_time": "00:03:12,466",
-        "end_time": "00:03:13,400"
-      },
-      {
-        "bundle_id": 107,
-        "scene_ids": [
-          107
-        ],
-        "duration": 1.7,
-        "char_count": 12,
-        "start_time": "00:03:13,600",
-        "end_time": "00:03:15,300"
-      },
-      {
-        "bundle_id": 108,
-        "scene_ids": [
-          108
-        ],
-        "duration": 1.2,
-        "char_count": 11,
-        "start_time": "00:03:15,466",
-        "end_time": "00:03:16,666"
-      },
-      {
-        "bundle_id": 109,
-        "scene_ids": [
-          109
-        ],
-        "duration": 0.633,
-        "char_count": 3,
-        "start_time": "00:03:16,933",
-        "end_time": "00:03:17,566"
-      },
-      {
-        "bundle_id": 110,
-        "scene_ids": [
-          110
-        ],
-        "duration": 1.734,
-        "char_count": 16,
-        "start_time": "00:03:17,566",
-        "end_time": "00:03:19,300"
-      },
-      {
-        "bundle_id": 111,
-        "scene_ids": [
-          111
-        ],
-        "duration": 0.4,
-        "char_count": 5,
-        "start_time": "00:03:20,466",
-        "end_time": "00:03:20,866"
-      },
-      {
-        "bundle_id": 112,
-        "scene_ids": [
-          112
-        ],
-        "duration": 2.267,
-        "char_count": 5,
-        "start_time": "00:03:20,866",
-        "end_time": "00:03:23,133"
-      },
-      {
-        "bundle_id": 113,
-        "scene_ids": [
-          113
-        ],
-        "duration": 1.1,
-        "char_count": 12,
-        "start_time": "00:03:23,300",
-        "end_time": "00:03:24,400"
-      },
-      {
-        "bundle_id": 114,
-        "scene_ids": [
-          114
-        ],
-        "duration": 1.4,
-        "char_count": 12,
-        "start_time": "00:03:24,533",
-        "end_time": "00:03:25,933"
-      },
-      {
-        "bundle_id": 115,
-        "scene_ids": [
-          115
-        ],
-        "duration": 1.6,
-        "char_count": 8,
-        "start_time": "00:03:26,566",
-        "end_time": "00:03:28,166"
-      },
-      {
-        "bundle_id": 116,
-        "scene_ids": [
-          116
-        ],
-        "duration": 1.6,
-        "char_count": 11,
-        "start_time": "00:03:28,933",
-        "end_time": "00:03:30,533"
-      },
-      {
-        "bundle_id": 117,
-        "scene_ids": [
-          117
-        ],
-        "duration": 1.434,
-        "char_count": 11,
-        "start_time": "00:03:30,666",
-        "end_time": "00:03:32,100"
-      },
-      {
-        "bundle_id": 118,
-        "scene_ids": [
-          118
-        ],
-        "duration": 1.2,
-        "char_count": 10,
-        "start_time": "00:03:32,200",
-        "end_time": "00:03:33,400"
-      },
-      {
-        "bundle_id": 119,
-        "scene_ids": [
-          119
-        ],
-        "duration": 0.8,
-        "char_count": 6,
-        "start_time": "00:03:33,566",
-        "end_time": "00:03:34,366"
-      },
-      {
-        "bundle_id": 120,
-        "scene_ids": [
-          120
-        ],
-        "duration": 0.934,
-        "char_count": 6,
-        "start_time": "00:03:35,566",
-        "end_time": "00:03:36,500"
-      },
-      {
-        "bundle_id": 121,
-        "scene_ids": [
-          121
-        ],
-        "duration": 2.3,
-        "char_count": 15,
-        "start_time": "00:03:36,566",
-        "end_time": "00:03:38,866"
-      },
-      {
-        "bundle_id": 122,
-        "scene_ids": [
-          122
-        ],
-        "duration": 1.2,
-        "char_count": 10,
-        "start_time": "00:03:38,900",
-        "end_time": "00:03:40,100"
-      },
-      {
-        "bundle_id": 123,
-        "scene_ids": [
-          123
-        ],
-        "duration": 2.367,
-        "char_count": 11,
-        "start_time": "00:03:40,133",
-        "end_time": "00:03:42,500"
-      },
-      {
-        "bundle_id": 124,
-        "scene_ids": [
-          124
-        ],
-        "duration": 0.434,
-        "char_count": 2,
-        "start_time": "00:03:42,666",
-        "end_time": "00:03:43,100"
-      },
-      {
-        "bundle_id": 125,
-        "scene_ids": [
-          125
-        ],
-        "duration": 2.2,
-        "char_count": 13,
-        "start_time": "00:03:43,100",
-        "end_time": "00:03:45,300"
-      },
-      {
-        "bundle_id": 126,
-        "scene_ids": [
-          126
-        ],
-        "duration": 2.467,
-        "char_count": 18,
-        "start_time": "00:03:46,266",
-        "end_time": "00:03:48,733"
-      },
-      {
-        "bundle_id": 127,
-        "scene_ids": [
-          127
-        ],
-        "duration": 0.8,
-        "char_count": 5,
-        "start_time": "00:03:48,900",
-        "end_time": "00:03:49,700"
-      },
-      {
-        "bundle_id": 128,
-        "scene_ids": [
-          128
-        ],
-        "duration": 1.4,
-        "char_count": 9,
-        "start_time": "00:03:50,133",
-        "end_time": "00:03:51,533"
-      },
-      {
-        "bundle_id": 129,
-        "scene_ids": [
-          129
-        ],
-        "duration": 1.5,
-        "char_count": 8,
-        "start_time": "00:03:52,166",
-        "end_time": "00:03:53,666"
-      },
-      {
-        "bundle_id": 130,
-        "scene_ids": [
-          130
-        ],
-        "duration": 0.566,
-        "char_count": 4,
-        "start_time": "00:03:53,800",
-        "end_time": "00:03:54,366"
-      },
-      {
-        "bundle_id": 131,
-        "scene_ids": [
-          131
-        ],
-        "duration": 1.8,
-        "char_count": 14,
-        "start_time": "00:03:54,366",
-        "end_time": "00:03:56,166"
-      },
-      {
-        "bundle_id": 132,
-        "scene_ids": [
-          132
-        ],
-        "duration": 0.733,
-        "char_count": 3,
-        "start_time": "00:03:56,533",
-        "end_time": "00:03:57,266"
-      },
-      {
-        "bundle_id": 133,
-        "scene_ids": [
-          133
-        ],
-        "duration": 2.734,
-        "char_count": 14,
-        "start_time": "00:03:57,266",
-        "end_time": "00:04:00,000"
-      },
-      {
-        "bundle_id": 134,
-        "scene_ids": [
-          134
-        ],
-        "duration": 1.0,
-        "char_count": 10,
-        "start_time": "00:04:00,166",
-        "end_time": "00:04:01,166"
-      },
-      {
-        "bundle_id": 135,
-        "scene_ids": [
-          135
-        ],
-        "duration": 1.034,
-        "char_count": 3,
-        "start_time": "00:04:02,266",
-        "end_time": "00:04:03,300"
-      },
-      {
-        "bundle_id": 136,
-        "scene_ids": [
-          136
-        ],
-        "duration": 1.966,
-        "char_count": 13,
-        "start_time": "00:04:03,400",
-        "end_time": "00:04:05,366"
-      },
-      {
-        "bundle_id": 137,
-        "scene_ids": [
-          137
-        ],
-        "duration": 1.667,
-        "char_count": 13,
-        "start_time": "00:04:05,533",
-        "end_time": "00:04:07,200"
-      },
-      {
-        "bundle_id": 138,
-        "scene_ids": [
-          138
-        ],
-        "duration": 0.8,
-        "char_count": 5,
-        "start_time": "00:04:07,766",
-        "end_time": "00:04:08,566"
-      },
-      {
-        "bundle_id": 139,
-        "scene_ids": [
-          139
-        ],
-        "duration": 2.334,
-        "char_count": 15,
-        "start_time": "00:04:08,566",
-        "end_time": "00:04:10,900"
-      },
-      {
-        "bundle_id": 140,
-        "scene_ids": [
-          140
-        ],
-        "duration": 1.6,
-        "char_count": 9,
-        "start_time": "00:04:11,133",
-        "end_time": "00:04:12,733"
-      },
-      {
-        "bundle_id": 141,
-        "scene_ids": [
-          141
-        ],
-        "duration": 0.666,
-        "char_count": 6,
-        "start_time": "00:04:12,900",
-        "end_time": "00:04:13,566"
-      },
-      {
-        "bundle_id": 142,
-        "scene_ids": [
-          142
-        ],
-        "duration": 1.967,
-        "char_count": 15,
-        "start_time": "00:04:13,566",
-        "end_time": "00:04:15,533"
-      },
-      {
-        "bundle_id": 143,
-        "scene_ids": [
-          143
-        ],
-        "duration": 0.8,
-        "char_count": 2,
-        "start_time": "00:04:16,666",
-        "end_time": "00:04:17,466"
-      },
-      {
-        "bundle_id": 144,
-        "scene_ids": [
-          144
-        ],
-        "duration": 0.5,
-        "char_count": 3,
-        "start_time": "00:04:17,466",
-        "end_time": "00:04:17,966"
-      },
-      {
-        "bundle_id": 145,
-        "scene_ids": [
-          145
-        ],
-        "duration": 1.9,
-        "char_count": 16,
-        "start_time": "00:04:17,966",
-        "end_time": "00:04:19,866"
-      },
-      {
-        "bundle_id": 146,
-        "scene_ids": [
-          146
-        ],
-        "duration": 1.634,
-        "char_count": 15,
-        "start_time": "00:04:20,466",
-        "end_time": "00:04:22,100"
-      },
-      {
-        "bundle_id": 147,
-        "scene_ids": [
-          147
-        ],
-        "duration": 1.834,
-        "char_count": 10,
-        "start_time": "00:04:22,266",
-        "end_time": "00:04:24,100"
-      },
-      {
-        "bundle_id": 148,
-        "scene_ids": [
-          148
-        ],
-        "duration": 1.667,
-        "char_count": 15,
-        "start_time": "00:04:24,266",
-        "end_time": "00:04:25,933"
-      },
-      {
-        "bundle_id": 149,
-        "scene_ids": [
-          149
-        ],
-        "duration": 1.233,
-        "char_count": 9,
-        "start_time": "00:04:26,133",
-        "end_time": "00:04:27,366"
-      },
-      {
-        "bundle_id": 150,
-        "scene_ids": [
-          150
-        ],
-        "duration": 1.466,
-        "char_count": 10,
-        "start_time": "00:04:27,500",
-        "end_time": "00:04:28,966"
-      },
-      {
-        "bundle_id": 151,
-        "scene_ids": [
-          151
-        ],
-        "duration": 1.833,
-        "char_count": 14,
-        "start_time": "00:04:29,100",
-        "end_time": "00:04:30,933"
-      },
-      {
-        "bundle_id": 152,
-        "scene_ids": [
-          152
-        ],
-        "duration": 0.8,
-        "char_count": 4,
-        "start_time": "00:04:31,000",
-        "end_time": "00:04:31,800"
-      },
-      {
-        "bundle_id": 153,
-        "scene_ids": [
-          153
-        ],
-        "duration": 1.567,
-        "char_count": 5,
-        "start_time": "00:04:32,366",
-        "end_time": "00:04:33,933"
-      },
-      {
-        "bundle_id": 154,
-        "scene_ids": [
-          154
-        ],
-        "duration": 1.1,
-        "char_count": 17,
-        "start_time": "00:04:34,100",
-        "end_time": "00:04:35,200"
-      },
-      {
-        "bundle_id": 155,
-        "scene_ids": [
-          155
-        ],
-        "duration": 1.766,
-        "char_count": 17,
-        "start_time": "00:04:35,300",
-        "end_time": "00:04:37,066"
-      },
-      {
-        "bundle_id": 156,
-        "scene_ids": [
-          156
-        ],
-        "duration": 0.8,
-        "char_count": 3,
-        "start_time": "00:04:37,766",
-        "end_time": "00:04:38,566"
-      },
-      {
-        "bundle_id": 157,
-        "scene_ids": [
-          157
-        ],
-        "duration": 2.233,
-        "char_count": 17,
-        "start_time": "00:04:38,700",
-        "end_time": "00:04:40,933"
-      },
-      {
-        "bundle_id": 158,
-        "scene_ids": [
-          158
-        ],
-        "duration": 1.0,
-        "char_count": 7,
-        "start_time": "00:04:41,000",
-        "end_time": "00:04:42,000"
-      },
-      {
-        "bundle_id": 159,
-        "scene_ids": [
-          159
-        ],
-        "duration": 1.334,
-        "char_count": 7,
-        "start_time": "00:04:42,166",
-        "end_time": "00:04:43,500"
-      },
-      {
-        "bundle_id": 160,
-        "scene_ids": [
-          160
-        ],
-        "duration": 1.367,
-        "char_count": 11,
-        "start_time": "00:04:43,533",
-        "end_time": "00:04:44,900"
-      },
-      {
-        "bundle_id": 161,
-        "scene_ids": [
-          161
-        ],
-        "duration": 1.033,
-        "char_count": 5,
-        "start_time": "00:04:45,700",
-        "end_time": "00:04:46,733"
-      },
-      {
-        "bundle_id": 162,
-        "scene_ids": [
-          162
-        ],
-        "duration": 1.2,
-        "char_count": 10,
-        "start_time": "00:04:46,900",
-        "end_time": "00:04:48,100"
-      },
-      {
-        "bundle_id": 163,
-        "scene_ids": [
-          163
-        ],
-        "duration": 1.4,
-        "char_count": 11,
-        "start_time": "00:04:48,266",
-        "end_time": "00:04:49,666"
-      },
-      {
-        "bundle_id": 164,
-        "scene_ids": [
-          164
-        ],
-        "duration": 2.1,
-        "char_count": 15,
-        "start_time": "00:04:49,800",
-        "end_time": "00:04:51,900"
-      },
-      {
-        "bundle_id": 165,
-        "scene_ids": [
-          165
-        ],
-        "duration": 1.966,
-        "char_count": 7,
-        "start_time": "00:04:52,400",
-        "end_time": "00:04:54,366"
-      },
-      {
-        "bundle_id": 166,
-        "scene_ids": [
-          166
-        ],
-        "duration": 1.967,
-        "char_count": 16,
-        "start_time": "00:04:54,566",
-        "end_time": "00:04:56,533"
-      },
-      {
-        "bundle_id": 167,
-        "scene_ids": [
-          167
-        ],
-        "duration": 2.2,
-        "char_count": 17,
-        "start_time": "00:04:57,066",
-        "end_time": "00:04:59,266"
-      },
-      {
-        "bundle_id": 168,
-        "scene_ids": [
-          168
-        ],
-        "duration": 1.6,
-        "char_count": 11,
-        "start_time": "00:04:59,533",
-        "end_time": "00:05:01,133"
-      },
-      {
-        "bundle_id": 169,
-        "scene_ids": [
-          169
-        ],
-        "duration": 1.467,
-        "char_count": 11,
-        "start_time": "00:05:01,266",
-        "end_time": "00:05:02,733"
-      },
-      {
-        "bundle_id": 170,
-        "scene_ids": [
-          170
-        ],
-        "duration": 1.133,
-        "char_count": 9,
-        "start_time": "00:05:04,200",
-        "end_time": "00:05:05,333"
-      },
-      {
-        "bundle_id": 171,
-        "scene_ids": [
-          171
-        ],
-        "duration": 0.8,
-        "char_count": 4,
-        "start_time": "00:05:05,400",
-        "end_time": "00:05:06,200"
-      },
-      {
-        "bundle_id": 172,
-        "scene_ids": [
-          172
-        ],
-        "duration": 1.634,
-        "char_count": 11,
-        "start_time": "00:05:06,466",
-        "end_time": "00:05:08,100"
-      },
-      {
-        "bundle_id": 173,
-        "scene_ids": [
-          173
-        ],
-        "duration": 1.434,
-        "char_count": 9,
-        "start_time": "00:05:08,866",
-        "end_time": "00:05:10,300"
-      },
-      {
-        "bundle_id": 174,
-        "scene_ids": [
-          174
-        ],
-        "duration": 2.4,
-        "char_count": 15,
-        "start_time": "00:05:10,400",
-        "end_time": "00:05:12,800"
-      },
-      {
-        "bundle_id": 175,
-        "scene_ids": [
-          175
-        ],
-        "duration": 1.7,
-        "char_count": 9,
-        "start_time": "00:05:13,000",
-        "end_time": "00:05:14,700"
-      },
-      {
-        "bundle_id": 176,
-        "scene_ids": [
-          176
-        ],
-        "duration": 1.834,
-        "char_count": 16,
-        "start_time": "00:05:14,866",
-        "end_time": "00:05:16,700"
-      },
-      {
-        "bundle_id": 177,
-        "scene_ids": [
-          177
-        ],
-        "duration": 0.767,
-        "char_count": 2,
-        "start_time": "00:05:17,966",
-        "end_time": "00:05:18,733"
-      },
-      {
-        "bundle_id": 178,
-        "scene_ids": [
-          178
-        ],
-        "duration": 2.0,
-        "char_count": 12,
-        "start_time": "00:05:18,733",
-        "end_time": "00:05:20,733"
-      },
-      {
-        "bundle_id": 179,
-        "scene_ids": [
-          179
-        ],
-        "duration": 2.367,
-        "char_count": 15,
-        "start_time": "00:05:20,966",
-        "end_time": "00:05:23,333"
-      },
-      {
-        "bundle_id": 180,
-        "scene_ids": [
-          180
-        ],
-        "duration": 1.267,
-        "char_count": 8,
-        "start_time": "00:05:23,533",
-        "end_time": "00:05:24,800"
-      },
-      {
-        "bundle_id": 181,
-        "scene_ids": [
-          181
-        ],
-        "duration": 2.0,
-        "char_count": 13,
-        "start_time": "00:05:25,200",
-        "end_time": "00:05:27,200"
-      },
-      {
-        "bundle_id": 182,
-        "scene_ids": [
-          182
-        ],
-        "duration": 1.3,
-        "char_count": 9,
-        "start_time": "00:05:27,366",
-        "end_time": "00:05:28,666"
-      },
-      {
-        "bundle_id": 183,
-        "scene_ids": [
-          183
-        ],
-        "duration": 0.8,
-        "char_count": 8,
-        "start_time": "00:05:28,733",
-        "end_time": "00:05:29,533"
-      },
-      {
-        "bundle_id": 184,
-        "scene_ids": [
-          184
-        ],
-        "duration": 1.3,
-        "char_count": 6,
-        "start_time": "00:05:30,566",
-        "end_time": "00:05:31,866"
-      },
-      {
-        "bundle_id": 185,
-        "scene_ids": [
-          185
-        ],
-        "duration": 1.033,
-        "char_count": 5,
-        "start_time": "00:05:32,133",
-        "end_time": "00:05:33,166"
-      },
-      {
-        "bundle_id": 186,
-        "scene_ids": [
-          186
-        ],
-        "duration": 0.9,
-        "char_count": 4,
-        "start_time": "00:05:33,400",
-        "end_time": "00:05:34,300"
-      },
-      {
-        "bundle_id": 187,
-        "scene_ids": [
-          187
-        ],
-        "duration": 1.066,
-        "char_count": 7,
-        "start_time": "00:05:34,700",
-        "end_time": "00:05:35,766"
-      },
-      {
-        "bundle_id": 188,
-        "scene_ids": [
-          188
-        ],
-        "duration": 1.3,
-        "char_count": 10,
-        "start_time": "00:05:35,800",
-        "end_time": "00:05:37,100"
-      },
-      {
-        "bundle_id": 189,
-        "scene_ids": [
-          189
-        ],
-        "duration": 1.2,
-        "char_count": 9,
-        "start_time": "00:05:37,133",
-        "end_time": "00:05:38,333"
-      },
-      {
-        "bundle_id": 190,
-        "scene_ids": [
-          190
-        ],
-        "duration": 2.4,
-        "char_count": 16,
-        "start_time": "00:05:38,466",
-        "end_time": "00:05:40,866"
-      },
-      {
-        "bundle_id": 191,
-        "scene_ids": [
-          191
-        ],
-        "duration": 0.866,
-        "char_count": 9,
-        "start_time": "00:05:41,000",
-        "end_time": "00:05:41,866"
-      },
-      {
-        "bundle_id": 192,
-        "scene_ids": [
-          192
-        ],
-        "duration": 2.067,
-        "char_count": 12,
-        "start_time": "00:05:42,866",
-        "end_time": "00:05:44,933"
-      },
-      {
-        "bundle_id": 193,
-        "scene_ids": [
-          193
-        ],
-        "duration": 0.8,
-        "char_count": 3,
-        "start_time": "00:05:45,066",
-        "end_time": "00:05:45,866"
-      },
-      {
-        "bundle_id": 194,
-        "scene_ids": [
-          194
-        ],
-        "duration": 1.734,
-        "char_count": 12,
-        "start_time": "00:05:45,866",
-        "end_time": "00:05:47,600"
-      },
-      {
-        "bundle_id": 195,
-        "scene_ids": [
-          195
-        ],
-        "duration": 1.467,
-        "char_count": 10,
-        "start_time": "00:05:47,733",
-        "end_time": "00:05:49,200"
-      },
-      {
-        "bundle_id": 196,
-        "scene_ids": [
-          196
-        ],
-        "duration": 1.433,
-        "char_count": 11,
-        "start_time": "00:05:49,533",
-        "end_time": "00:05:50,966"
-      },
-      {
-        "bundle_id": 197,
-        "scene_ids": [
-          197
-        ],
-        "duration": 0.8,
-        "char_count": 5,
-        "start_time": "00:05:51,000",
-        "end_time": "00:05:51,800"
-      },
-      {
-        "bundle_id": 198,
-        "scene_ids": [
-          198
-        ],
-        "duration": 1.9,
-        "char_count": 15,
-        "start_time": "00:05:51,800",
-        "end_time": "00:05:53,700"
-      },
-      {
-        "bundle_id": 199,
-        "scene_ids": [
-          199
-        ],
-        "duration": 1.6,
-        "char_count": 15,
-        "start_time": "00:05:53,733",
-        "end_time": "00:05:55,333"
-      },
-      {
-        "bundle_id": 200,
-        "scene_ids": [
-          200
-        ],
-        "duration": 1.866,
-        "char_count": 11,
-        "start_time": "00:05:56,100",
-        "end_time": "00:05:57,966"
-      },
-      {
-        "bundle_id": 201,
-        "scene_ids": [
-          201
-        ],
-        "duration": 1.2,
-        "char_count": 8,
-        "start_time": "00:05:58,133",
-        "end_time": "00:05:59,333"
-      },
-      {
-        "bundle_id": 202,
-        "scene_ids": [
-          202
-        ],
-        "duration": 1.534,
-        "char_count": 11,
-        "start_time": "00:05:59,466",
-        "end_time": "00:06:01,000"
-      },
-      {
-        "bundle_id": 203,
-        "scene_ids": [
-          203
-        ],
-        "duration": 0.8,
-        "char_count": 8,
-        "start_time": "00:06:01,100",
-        "end_time": "00:06:01,900"
-      },
-      {
-        "bundle_id": 204,
-        "scene_ids": [
-          204
-        ],
-        "duration": 0.866,
-        "char_count": 5,
-        "start_time": "00:06:02,300",
-        "end_time": "00:06:03,166"
-      },
-      {
-        "bundle_id": 205,
-        "scene_ids": [
-          205
-        ],
-        "duration": 1.334,
-        "char_count": 10,
-        "start_time": "00:06:03,366",
-        "end_time": "00:06:04,700"
-      },
-      {
-        "bundle_id": 206,
-        "scene_ids": [
-          206
-        ],
-        "duration": 1.434,
-        "char_count": 4,
-        "start_time": "00:06:04,766",
-        "end_time": "00:06:06,200"
-      },
-      {
-        "bundle_id": 207,
-        "scene_ids": [
-          207
-        ],
-        "duration": 1.633,
-        "char_count": 4,
-        "start_time": "00:06:07,100",
-        "end_time": "00:06:08,733"
-      },
-      {
-        "bundle_id": 208,
-        "scene_ids": [
-          208
-        ],
-        "duration": 1.2,
-        "char_count": 5,
-        "start_time": "00:06:09,066",
-        "end_time": "00:06:10,266"
-      },
-      {
-        "bundle_id": 209,
-        "scene_ids": [
-          209
-        ],
-        "duration": 2.534,
-        "char_count": 30,
-        "start_time": "00:06:10,466",
-        "end_time": "00:06:13,000"
-      },
-      {
-        "bundle_id": 210,
-        "scene_ids": [
-          210
-        ],
-        "duration": 1.133,
-        "char_count": 7,
-        "start_time": "00:06:13,133",
-        "end_time": "00:06:14,266"
-      },
-      {
-        "bundle_id": 211,
-        "scene_ids": [
-          211
-        ],
-        "duration": 0.967,
-        "char_count": 8,
-        "start_time": "00:06:15,333",
-        "end_time": "00:06:16,300"
-      },
-      {
-        "bundle_id": 212,
-        "scene_ids": [
-          212
-        ],
-        "duration": 1.166,
-        "char_count": 8,
-        "start_time": "00:06:16,400",
-        "end_time": "00:06:17,566"
-      },
-      {
-        "bundle_id": 213,
-        "scene_ids": [
-          213
-        ],
-        "duration": 1.033,
-        "char_count": 7,
-        "start_time": "00:06:17,733",
-        "end_time": "00:06:18,766"
-      },
-      {
-        "bundle_id": 214,
-        "scene_ids": [
-          214
-        ],
-        "duration": 1.233,
-        "char_count": 8,
-        "start_time": "00:06:19,533",
-        "end_time": "00:06:20,766"
-      },
-      {
-        "bundle_id": 215,
-        "scene_ids": [
-          215
-        ],
-        "duration": 1.733,
-        "char_count": 15,
-        "start_time": "00:06:20,800",
-        "end_time": "00:06:22,533"
+        "duration": 4.679000000000002,
+        "char_count": 44,
+        "start_time": "00:00:44,439",
+        "end_time": "00:00:49,118"
       }
     ]
   },
   "analysis_metadata": {
-    "timestamp": "2026-01-17T17:03:11.178386",
+    "timestamp": "2026-01-21T21:17:21.360905",
     "processing_mode": "batch",
-    "total_scenes": 215,
+    "total_scenes": 7,
     "model_id": "gemini-2.0-flash-exp",
     "model_name": "Gemini 2.0 Flash",
     "provider": "google",
     "mode": "batch",
-    "template_name": "srt_scene_batch",
-    "template_version": "SRT 배치 씬 분석 프롬프트 v1.0",
-    "prompt_template": "## 🔴🔴🔴 [CRITICAL] 스크립트 원본 보존 절대 규칙 🔴🔴🔴\n### ⚠️ 가장 중요한 규칙: 스크립트 텍스트를 절대 수정하지 마세요!\n**절대 금지 행위:**\n| 금지 행위 | 설명 |\n|-----------|------|\n| 문장 바꾸기 | 원본 문장을 다른 표현으로 변경 ❌ |\n| 문장 추가 | 스크립트에 없는 문장 생성 ❌ |\n| 문장 요약 | 여러 문장을 하나로 합치기 ❌ |\n| 아웃트로 대체 | 마지막을 \"구독과 좋아요\" 등으로 바꾸기 ❌ |\n**✅ 반드시 지킬 규칙:**\n- script_text는 원본 스크립트에서 **한 글자도 바꾸지 않고** 그대로 복사\n- 스크립트에 없는 문장은 절대 생성하지 않음\n- 마지막 씬도 원본 스크립트의 마지막 문장 그대로 사용\n---\n# SRT 배치 씬 분석 프롬프트 (v2.6 - 한글 텍스트 프롬프트 추가)\n다음 씬들을 분석하고 JSON 배열로 응답해주세요.\n## 각 씬에 대해 포함할 필드\n- scene_id: 씬 번호\n- image_prompt: 한국어 이미지 생성 프롬프트 (텍스트/문자 제외)\n- image_prompt_en: 영문 이미지 프롬프트 (FLUX용, 상세하게, 끝에 \"absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\" 필수 포함)\n- image_prompt_korean_text: 한글 텍스트 포함 영문 이미지 프롬프트 (🟢 아래 규칙 참조)\n- character_prompt: 한국어 캐릭터 프롬프트\n- character_prompt_en: 영문 캐릭터 프롬프트 (끝에 \"no text, no logos on clothing, no name tags\" 포함)\n- visual_elements: 시각 요소 리스트\n- direction_guide: 연출 가이드\n- video_prompt_character: Character animation description (ENGLISH)\n- video_prompt_full: Full scene video description (ENGLISH)\n- characters: 등장 캐릭터 리스트 (각 캐릭터에 name, visual_prompt 포함!)\n- location: 배경 장소\n- mood: 분위기\n\n## ⚠️ 중요 규칙\n1. characters 배열의 각 캐릭터에는 반드시 visual_prompt를 영문으로 포함\n   예: {{\"name\": \"자말 카슈크지\", \"visual_prompt\": \"Middle-aged Middle Eastern man, journalist, salt-and-pepper beard, no text, no logos...\"}}\n2. video_prompt_character와 video_prompt_full은 반드시 영어로 작성\n3. 카메라 움직임 포함 (zoom, pan, dolly 등)\n4. **🔴 image_prompt_en에 텍스트/문자 관련 요소 절대 금지:**\n   - ❌ 금지: 'Let's start the lecture' text, Harman logo, question marks, speech bubbles\n   - ❌ 금지: text saying \"...\", sign reading \"...\", banner with \"...\"\n\n## 🟢 image_prompt_korean_text 작성 규칙\n\n**목적**: 외부 AI 이미지 생성기에서 한글 텍스트가 포함된 이미지를 생성하기 위한 프롬프트\n\n**작성 방법**:\n1. image_prompt_en의 시각적 묘사를 기반으로 작성 (영어로 작성)\n2. \"absolutely no text...\" 부분을 **제거**\n3. 해당 씬의 나레이션에서 핵심 메시지를 추출하여 한글 텍스트로 포함\n4. 아래 글씨체 스타일을 **반드시** 적용\n\n**한글 텍스트 추출 규칙**:\n- **헤드라인**: 나레이션의 핵심 키워드/메시지 (5-15자)\n- **서브타이틀**: 부가 설명 또는 맥락 (10-25자)\n\n**글씨체 스타일 (고정 - 반드시 포함)**:\n- headline: `in handwritten pen script style with casual brush strokes`\n- subtitle: `in informal handwritten font style`\n- all text: `all Korean text in natural hand-drawn pen calligraphy style with slight irregularity`\n\n**image_prompt_korean_text 형식**:\n[시각적 묘사], headline text in Korean reading \"[헤드라인 한글]\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"[서브타이틀 한글]\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, [나머지 시각 요소]\n\n=== 분석할 씬들 ===\n{scenes_content}\n\n=== 응답 형식 ===\nJSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하세요.\n```json\n[\n  {{\n    \"scene_id\": 1,\n    \"image_prompt\": \"...\",\n    \"image_prompt_en\": \"... absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\",\n    \"image_prompt_korean_text\": \"... headline text in Korean reading \\\"핵심메시지\\\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \\\"부가설명\\\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, ...\",\n    \"characters\": [\n      {{\"name\": \"캐릭터명\", \"visual_prompt\": \"영문 외모 설명, no text, no logos...\"}}\n    ],\n    \"video_prompt_character\": \"English character animation...\",\n    \"video_prompt_full\": \"English full scene description...\",\n    ...\n  }},\n  ...\n]\n```",
-    "prompt_char_count": 3486,
-    "prompt_example": "## 🔴🔴🔴 [CRITICAL] 스크립트 원본 보존 절대 규칙 🔴🔴🔴\n### ⚠️ 가장 중요한 규칙: 스크립트 텍스트를 절대 수정하지 마세요!\n**절대 금지 행위:**\n| 금지 행위 | 설명 |\n|-----------|------|\n| 문장 바꾸기 | 원본 문장을 다른 표현으로 변경 ❌ |\n| 문장 추가 | 스크립트에 없는 문장 생성 ❌ |\n| 문장 요약 | 여러 문장을 하나로 합치기 ❌ |\n| 아웃트로 대체 | 마지막을 \"구독과 좋아요\" 등으로 바꾸기 ❌ |\n**✅ 반드시 지킬 규칙:**\n- script_text는 원본 스크립트에서 **한 글자도 바꾸지 않고** 그대로 복사\n- 스크립트에 없는 문장은 절대 생성하지 않음\n- 마지막 씬도 원본 스크립트의 마지막 문장 그대로 사용\n---\n# SRT 배치 씬 분석 프롬프트 (v2.6 - 한글 텍스트 프롬프트 추가)\n다음 씬들을 분석하고 JSON 배열로 응답해주세요.\n## 각 씬에 대해 포함할 필드\n- scene_id: 씬 번호\n- image_prompt: 한국어 이미지 생성 프롬프트 (텍스트/문자 제외)\n- image_prompt_en: 영문 이미지 프롬프트 (FLUX용, 상세하게, 끝에 \"absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\" 필수 포함)\n- image_prompt_korean_text: 한글 텍스트 포함 영문 이미지 프롬프트 (🟢 아래 규칙 참조)\n- character_prompt: 한국어 캐릭터 프롬프트\n- character_prompt_en: 영문 캐릭터 프롬프트 (끝에 \"no text, no logos on clothing, no name tags\" 포함)\n- visual_elements: 시각 요소 리스트\n- direction_guide: 연출 가이드\n- video_prompt_character: Character animation description (ENGLISH)\n- video_prompt_full: Full scene video description (ENGLISH)\n- characters: 등장 캐릭터 리스트 (각 캐릭터에 name, visual_prompt 포함!)\n- location: 배경 장소\n- mood: 분위기\n\n## ⚠️ 중요 규칙\n1. characters 배열의 각 캐릭터에는 반드시 visual_prompt를 영문으로 포함\n   예: {\"name\": \"자말 카슈크지\", \"visual_prompt\": \"Middle-aged Middle Eastern man, journalist, salt-and-pepper beard, no text, no logos...\"}\n2. video_prompt_character와 video_prompt_full은 반드시 영어로 작성\n3. 카메라 움직임 포함 (zoom, pan, dolly 등)\n4. **🔴 image_prompt_en에 텍스트/문자 관련 요소 절대 금지:**\n   - ❌ 금지: 'Let's start the lecture' text, Harman logo, question marks, speech bubbles\n   - ❌ 금지: text saying \"...\", sign reading \"...\", banner with \"...\"\n\n## 🟢 image_prompt_korean_text 작성 규칙\n\n**목적**: 외부 AI 이미지 생성기에서 한글 텍스트가 포함된 이미지를 생성하기 위한 프롬프트\n\n**작성 방법**:\n1. image_prompt_en의 시각적 묘사를 기반으로 작성 (영어로 작성)\n2. \"absolutely no text...\" 부분을 **제거**\n3. 해당 씬의 나레이션에서 핵심 메시지를 추출하여 한글 텍스트로 포함\n4. 아래 글씨체 스타일을 **반드시** 적용\n\n**한글 텍스트 추출 규칙**:\n- **헤드라인**: 나레이션의 핵심 키워드/메시지 (5-15자)\n- **서브타이틀**: 부가 설명 또는 맥락 (10-25자)\n\n**글씨체 스타일 (고정 - 반드시 포함)**:\n- headline: `in handwritten pen script style with casual brush strokes`\n- subtitle: `in informal handwritten font style`\n- all text: `all Korean text in natural hand-drawn pen calligraphy style with slight irregularity`\n\n**image_prompt_korean_text 형식**:\n[시각적 묘사], headline text in Korean reading \"[헤드라인 한글]\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"[서브타이틀 한글]\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, [나머지 시각 요소]\n\n=== 분석할 씬들 ===\n\n--- 씬 1 [00:00:00,100 ~ 00:00:02,066] ---\n2021년 우리는\n\n\n--- 씬 2 [00:00:02,166 ~ 00:00:04,366] ---\n국내 최초라는 설레임을 안고\n\n\n--- 씬 3 [00:00:04,566 ~ 00:00:05,700] ---\nwego라는 새로운\n\n\n--- 씬 4 [00:00:05,766 ~ 00:00:06,900] ---\n항해를 시작했습니다\n\n\n--- 씬 5 [00:00:08,100 ~ 00:00:10,000] ---\n아무도 가보지 않은 길이었기에\n\n\n\n=== 응답 형식 ===\nJSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하세요.\n```json\n[\n  {\n    \"scene_id\": 1,\n    \"image_prompt\": \"...\",\n    \"image_prompt_en\": \"... absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\",\n    \"image_prompt_korean_text\": \"... headline text in Korean reading \\\"핵심메시지\\\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \\\"부가설명\\\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, ...\",\n    \"characters\": [\n      {\"name\": \"캐릭터명\", \"visual_prompt\": \"영문 외모 설명, no text, no logos...\"}\n    ],\n    \"video_prompt_character\": \"English character animation...\",\n    \"video_prompt_full\": \"English full scene description...\",\n    ...\n  },\n  ...\n]\n```",
+    "template_name": "srt_scene_analysis_ec62d6cb",
+    "template_version": "🟠 배치 분석용 | SRT 배치 씬 분석 프롬프트 v1.0_숫자날짜 한글프롬프트 추가",
+    "prompt_template": "## 🔴🔴🔴 [CRITICAL] 스크립트 원본 보존 절대 규칙 🔴🔴🔴\n### ⚠️ 가장 중요한 규칙: 스크립트 텍스트를 절대 수정하지 마세요!\n**절대 금지 행위:**\n| 금지 행위 | 설명 |\n|-----------|------|\n| 문장 바꾸기 | 원본 문장을 다른 표현으로 변경 ❌ |\n| 문장 추가 | 스크립트에 없는 문장 생성 ❌ |\n| 문장 요약 | 여러 문장을 하나로 합치기 ❌ |\n| 아웃트로 대체 | 마지막을 \"구독과 좋아요\" 등으로 바꾸기 ❌ |\n**✅ 반드시 지킬 규칙:**\n- script_text는 원본 스크립트에서 **한 글자도 바꾸지 않고** 그대로 복사\n- 스크립트에 없는 문장은 절대 생성하지 않음\n- 마지막 씬도 원본 스크립트의 마지막 문장 그대로 사용\n---\n# SRT 배치 씬 분석 프롬프트 (v2.9.1 - 텍스트 상단~중단 유연 배치)\n다음 씬들을 분석하고 JSON 배열로 응답해주세요.\n## 각 씬에 대해 포함할 필드\n- scene_id: 씬 번호\n- image_prompt: 한국어 이미지 생성 프롬프트 (텍스트/문자 제외)\n- image_prompt_en: 영문 이미지 프롬프트 (FLUX용, 상세하게, 끝에 \"absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\" 필수 포함)\n- image_prompt_korean_text: 한글 텍스트 포함 영문 이미지 프롬프트 (🟢 아래 규칙 참조)\n- character_prompt: 한국어 캐릭터 프롬프트\n- character_prompt_en: 영문 캐릭터 프롬프트 (끝에 \"no text, no logos on clothing, no name tags\" 포함)\n- visual_elements: 시각 요소 리스트\n- direction_guide: 연출 가이드\n- video_prompt_character: Character animation description (ENGLISH)\n- video_prompt_full: Full scene video description (ENGLISH)\n- characters: 등장 캐릭터 리스트 (각 캐릭터에 name, visual_prompt 포함!)\n- location: 배경 장소\n- mood: 분위기\n\n## ⚠️ 중요 규칙\n1. characters 배열의 각 캐릭터에는 반드시 visual_prompt를 영문으로 포함\n   예: {{\"name\": \"자말 카슈크지\", \"visual_prompt\": \"Middle-aged Middle Eastern man, journalist, salt-and-pepper beard, no text, no logos...\"}}\n2. video_prompt_character와 video_prompt_full은 반드시 영어로 작성\n3. 카메라 움직임 포함 (zoom, pan, dolly 등)\n4. **🔴 image_prompt_en에 텍스트/문자 관련 요소 절대 금지:**\n   - ❌ 금지: 'Let's start the lecture' text, Harman logo, question marks, speech bubbles\n   - ❌ 금지: text saying \"...\", sign reading \"...\", banner with \"...\"\n\n## 🟢 image_prompt_korean_text 작성 규칙\n\n**목적**: 외부 AI 이미지 생성기에서 한글 텍스트가 포함된 이미지를 생성하기 위한 프롬프트\n\n**작성 방법**:\n1. image_prompt_en의 시각적 묘사를 기반으로 작성 (영어로 작성)\n2. \"absolutely no text...\" 부분을 **제거**\n3. 해당 씬의 나레이션에서 핵심 메시지를 추출하여 한글 텍스트로 포함\n4. 아래 글씨체 스타일을 **반드시** 적용\n5. 🔴 **[필수] 숫자/날짜 변환 규칙을 반드시 적용** (아래 참조)\n6. 🔴 **[필수] 텍스트 배치 규칙을 반드시 적용** (아래 참조)\n\n**한글 텍스트 추출 규칙**:\n- **헤드라인**: 나레이션의 핵심 키워드/메시지 (5-15자)\n- **서브타이틀**: 부가 설명 또는 맥락 (10-25자)\n\n**글씨체 스타일 (고정 - 반드시 포함)**:\n- headline: `in handwritten pen script style with casual brush strokes`\n- subtitle: `in informal handwritten font style`\n- all text: `all Korean text in natural hand-drawn pen calligraphy style with slight irregularity`\n\n## 🔴🔴🔴 [중요] 텍스트 배치 규칙 - 상단~중단 유연 배치, 하단만 금지 🔴🔴🔴\n\n**⚠️ 핵심 원칙**: \n- **텍스트(글자)는 이미지 상단~중단에 자연스럽게 배치** (이미지와 어울리게)\n- **이미지/비주얼 요소는 전체 영역**에 자연스럽게 채워짐 (하단 포함)\n- **하단 25~30%에만 텍스트 금지** (자막 영역이므로)\n\n**✅ 텍스트 배치 허용 위치**:\n- `at the top` - 이미지 상단\n- `in the upper area` - 상단 영역\n- `in the middle section` - 중단 영역\n- `integrated naturally with the main visual` - 메인 비주얼과 자연스럽게 통합\n- `overlaid harmoniously on the scene` - 장면 위에 조화롭게 오버레이\n- `positioned to complement the composition` - 구도를 보완하는 위치에 배치\n- `floating alongside the main subject` - 주요 피사체 옆에 자연스럽게 배치\n\n**❌ 텍스트 배치 금지 위치 (하단만)**:\n- ~~text at the bottom~~ ❌\n- ~~text in the lower 25%~~ ❌\n- ~~text below the main visual~~ ❌\n\n**텍스트 배치 원칙**:\n1. **헤드라인**: 상단 또는 이미지와 어울리는 중단 위치에 배치\n2. **서브타이틀**: 헤드라인 근처 또는 메인 비주얼과 조화로운 위치에 배치\n3. 텍스트는 **이미지 상단 70% 영역 내**에서 자유롭게 배치 가능\n4. **이미지/비주얼 요소**는 전체 프레임을 자연스럽게 채움 (하단 포함 OK)\n5. 텍스트 위치는 장면의 구도와 시각적 밸런스를 고려하여 결정\n\n## 🔴 숫자/날짜 한국어 변환 규칙 (image_prompt_korean_text 필수 적용)\n\n나레이션에 영어 숫자/날짜가 포함된 경우 **반드시 한국어로 변환**하여 헤드라인/서브타이틀에 사용:\n\n### 📊 금액 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| trillion | 조 | \"$2 trillion\" → \"2조 달러\" |\n| billion | 억 | \"$8 billion\" → \"80억 달러\" |\n| million | 만/백만 | \"$50 million\" → \"5천만 달러\" |\n| $ / dollar | 달러 | \"$100\" → \"100달러\" |\n| won / KRW | 원 | \"2 trillion won\" → \"2조원\" |\n\n### 📅 날짜/연도 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| January~December | 1월~12월 | \"December 2025\" → \"2025년 12월\" |\n| Q1~Q4 | 1분기~4분기 | \"Q3 2024\" → \"2024년 3분기\" |\n| first half | 상반기 | \"first half of 2025\" → \"2025년 상반기\" |\n| second half | 하반기 | \"second half of 2025\" → \"2025년 하반기\" |\n\n### 📈 퍼센트/비율 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| percent / % | % | \"64 percent\" → \"64%\" |\n| growth rate | 성장률 | \"50% growth rate\" → \"50% 성장률\" |\n| market share | 점유율 | \"30% market share\" → \"30% 점유율\" |\n\n### 🏆 순위/수량 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| 1st / first | 1위 | \"ranked 1st\" → \"1위\" |\n| 2nd / second | 2위 | \"ranked 2nd\" → \"2위\" |\n| million units | 만 대 | \"10 million units\" → \"1천만 대\" |\n| people/employees | 명 | \"5,000 employees\" → \"5천 명\" |\n\n**image_prompt_korean_text 형식 (유연 배치 버전)**:\n[시각적 묘사 - 전체 프레임을 채우는 비주얼], headline text in Korean reading \"[헤드라인 한글 - 숫자는 한국어로 변환]\" [배치 위치: at the top / in the upper-middle area / integrated with the main visual 등 장면에 맞게 선택] in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"[서브타이틀 한글 - 숫자는 한국어로 변환]\" [배치 위치: 헤드라인과 조화롭게] in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally, [나머지 시각 요소]\n\n=== 분석할 씬들 ===\n{scenes_content}\n\n=== 응답 형식 ===\nJSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하세요.\n```json\n[\n  {{\n    \"scene_id\": 1,\n    \"image_prompt\": \"...\",\n    \"image_prompt_en\": \"... absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\",\n    \"image_prompt_korean_text\": \"... with full frame composition, headline text in Korean reading \\\"80억 달러 인수\\\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \\\"2024년 3분기 완료\\\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally, ...\",\n    \"characters\": [\n      {{\"name\": \"캐릭터명\", \"visual_prompt\": \"영문 외모 설명, no text, no logos...\"}}\n    ],\n    \"video_prompt_character\": \"English character animation...\",\n    \"video_prompt_full\": \"English full scene description...\",\n    ...\n  }},\n  ...\n]\n```",
+    "prompt_char_count": 6081,
+    "prompt_example": "## 🔴🔴🔴 [CRITICAL] 스크립트 원본 보존 절대 규칙 🔴🔴🔴\n### ⚠️ 가장 중요한 규칙: 스크립트 텍스트를 절대 수정하지 마세요!\n**절대 금지 행위:**\n| 금지 행위 | 설명 |\n|-----------|------|\n| 문장 바꾸기 | 원본 문장을 다른 표현으로 변경 ❌ |\n| 문장 추가 | 스크립트에 없는 문장 생성 ❌ |\n| 문장 요약 | 여러 문장을 하나로 합치기 ❌ |\n| 아웃트로 대체 | 마지막을 \"구독과 좋아요\" 등으로 바꾸기 ❌ |\n**✅ 반드시 지킬 규칙:**\n- script_text는 원본 스크립트에서 **한 글자도 바꾸지 않고** 그대로 복사\n- 스크립트에 없는 문장은 절대 생성하지 않음\n- 마지막 씬도 원본 스크립트의 마지막 문장 그대로 사용\n---\n# SRT 배치 씬 분석 프롬프트 (v2.9.1 - 텍스트 상단~중단 유연 배치)\n다음 씬들을 분석하고 JSON 배열로 응답해주세요.\n## 각 씬에 대해 포함할 필드\n- scene_id: 씬 번호\n- image_prompt: 한국어 이미지 생성 프롬프트 (텍스트/문자 제외)\n- image_prompt_en: 영문 이미지 프롬프트 (FLUX용, 상세하게, 끝에 \"absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\" 필수 포함)\n- image_prompt_korean_text: 한글 텍스트 포함 영문 이미지 프롬프트 (🟢 아래 규칙 참조)\n- character_prompt: 한국어 캐릭터 프롬프트\n- character_prompt_en: 영문 캐릭터 프롬프트 (끝에 \"no text, no logos on clothing, no name tags\" 포함)\n- visual_elements: 시각 요소 리스트\n- direction_guide: 연출 가이드\n- video_prompt_character: Character animation description (ENGLISH)\n- video_prompt_full: Full scene video description (ENGLISH)\n- characters: 등장 캐릭터 리스트 (각 캐릭터에 name, visual_prompt 포함!)\n- location: 배경 장소\n- mood: 분위기\n\n## ⚠️ 중요 규칙\n1. characters 배열의 각 캐릭터에는 반드시 visual_prompt를 영문으로 포함\n   예: {\"name\": \"자말 카슈크지\", \"visual_prompt\": \"Middle-aged Middle Eastern man, journalist, salt-and-pepper beard, no text, no logos...\"}\n2. video_prompt_character와 video_prompt_full은 반드시 영어로 작성\n3. 카메라 움직임 포함 (zoom, pan, dolly 등)\n4. **🔴 image_prompt_en에 텍스트/문자 관련 요소 절대 금지:**\n   - ❌ 금지: 'Let's start the lecture' text, Harman logo, question marks, speech bubbles\n   - ❌ 금지: text saying \"...\", sign reading \"...\", banner with \"...\"\n\n## 🟢 image_prompt_korean_text 작성 규칙\n\n**목적**: 외부 AI 이미지 생성기에서 한글 텍스트가 포함된 이미지를 생성하기 위한 프롬프트\n\n**작성 방법**:\n1. image_prompt_en의 시각적 묘사를 기반으로 작성 (영어로 작성)\n2. \"absolutely no text...\" 부분을 **제거**\n3. 해당 씬의 나레이션에서 핵심 메시지를 추출하여 한글 텍스트로 포함\n4. 아래 글씨체 스타일을 **반드시** 적용\n5. 🔴 **[필수] 숫자/날짜 변환 규칙을 반드시 적용** (아래 참조)\n6. 🔴 **[필수] 텍스트 배치 규칙을 반드시 적용** (아래 참조)\n\n**한글 텍스트 추출 규칙**:\n- **헤드라인**: 나레이션의 핵심 키워드/메시지 (5-15자)\n- **서브타이틀**: 부가 설명 또는 맥락 (10-25자)\n\n**글씨체 스타일 (고정 - 반드시 포함)**:\n- headline: `in handwritten pen script style with casual brush strokes`\n- subtitle: `in informal handwritten font style`\n- all text: `all Korean text in natural hand-drawn pen calligraphy style with slight irregularity`\n\n## 🔴🔴🔴 [중요] 텍스트 배치 규칙 - 상단~중단 유연 배치, 하단만 금지 🔴🔴🔴\n\n**⚠️ 핵심 원칙**: \n- **텍스트(글자)는 이미지 상단~중단에 자연스럽게 배치** (이미지와 어울리게)\n- **이미지/비주얼 요소는 전체 영역**에 자연스럽게 채워짐 (하단 포함)\n- **하단 25~30%에만 텍스트 금지** (자막 영역이므로)\n\n**✅ 텍스트 배치 허용 위치**:\n- `at the top` - 이미지 상단\n- `in the upper area` - 상단 영역\n- `in the middle section` - 중단 영역\n- `integrated naturally with the main visual` - 메인 비주얼과 자연스럽게 통합\n- `overlaid harmoniously on the scene` - 장면 위에 조화롭게 오버레이\n- `positioned to complement the composition` - 구도를 보완하는 위치에 배치\n- `floating alongside the main subject` - 주요 피사체 옆에 자연스럽게 배치\n\n**❌ 텍스트 배치 금지 위치 (하단만)**:\n- ~~text at the bottom~~ ❌\n- ~~text in the lower 25%~~ ❌\n- ~~text below the main visual~~ ❌\n\n**텍스트 배치 원칙**:\n1. **헤드라인**: 상단 또는 이미지와 어울리는 중단 위치에 배치\n2. **서브타이틀**: 헤드라인 근처 또는 메인 비주얼과 조화로운 위치에 배치\n3. 텍스트는 **이미지 상단 70% 영역 내**에서 자유롭게 배치 가능\n4. **이미지/비주얼 요소**는 전체 프레임을 자연스럽게 채움 (하단 포함 OK)\n5. 텍스트 위치는 장면의 구도와 시각적 밸런스를 고려하여 결정\n\n## 🔴 숫자/날짜 한국어 변환 규칙 (image_prompt_korean_text 필수 적용)\n\n나레이션에 영어 숫자/날짜가 포함된 경우 **반드시 한국어로 변환**하여 헤드라인/서브타이틀에 사용:\n\n### 📊 금액 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| trillion | 조 | \"$2 trillion\" → \"2조 달러\" |\n| billion | 억 | \"$8 billion\" → \"80억 달러\" |\n| million | 만/백만 | \"$50 million\" → \"5천만 달러\" |\n| $ / dollar | 달러 | \"$100\" → \"100달러\" |\n| won / KRW | 원 | \"2 trillion won\" → \"2조원\" |\n\n### 📅 날짜/연도 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| January~December | 1월~12월 | \"December 2025\" → \"2025년 12월\" |\n| Q1~Q4 | 1분기~4분기 | \"Q3 2024\" → \"2024년 3분기\" |\n| first half | 상반기 | \"first half of 2025\" → \"2025년 상반기\" |\n| second half | 하반기 | \"second half of 2025\" → \"2025년 하반기\" |\n\n### 📈 퍼센트/비율 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| percent / % | % | \"64 percent\" → \"64%\" |\n| growth rate | 성장률 | \"50% growth rate\" → \"50% 성장률\" |\n| market share | 점유율 | \"30% market share\" → \"30% 점유율\" |\n\n### 🏆 순위/수량 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| 1st / first | 1위 | \"ranked 1st\" → \"1위\" |\n| 2nd / second | 2위 | \"ranked 2nd\" → \"2위\" |\n| million units | 만 대 | \"10 million units\" → \"1천만 대\" |\n| people/employees | 명 | \"5,000 employees\" → \"5천 명\" |\n\n**image_prompt_korean_text 형식 (유연 배치 버전)**:\n[시각적 묘사 - 전체 프레임을 채우는 비주얼], headline text in Korean reading \"[헤드라인 한글 - 숫자는 한국어로 변환]\" [배치 위치: at the top / in the upper-middle area / integrated with the main visual 등 장면에 맞게 선택] in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"[서브타이틀 한글 - 숫자는 한국어로 변환]\" [배치 위치: 헤드라인과 조화롭게] in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally, [나머지 시각 요소]\n\n=== 분석할 씬들 ===\n\n--- 씬 1 [00:00:00,100 ~ 00:00:02,580] ---\n여러분, 삼성전자 하면 뭐가 떠오르세요? 스마트폰? 반도체? TV? 근데요, 지금 삼성이 2조 원을 들여서 사려는 게 뭔지 아세요?\n\n\n--- 씬 4 [00:00:10,019 ~ 00:00:10,800] ---\n자동차 눈이에요. 자동차가 세상을 보는 눈. 2025년 12월, 삼성전자 자회사 하만이\n\n\n--- 씬 7 [00:00:16,059 ~ 00:00:19,460] ---\n독일의 명문 부품사 ZF의 자율주행 사업부를 15억 유로, 우리 돈으로 약 2조 원에 인수한다고 발표했거든요. 근데 이게 왜 중요하냐.\n\n\n--- 씬 10 [00:00:24,838 ~ 00:00:27,300] ---\n지금부터 제가 하는 얘기 끝까지 들으시면요, 삼성이 왜 갑자기 자동차에 미쳤는지, 그리고 이게 테슬라, BMW, 현대차한테 어떤 의미인지\n\n\n--- 씬 13 [00:00:33,320 ~ 00:00:35,039] ---\n완전히 이해하시게 될 거예요. 아, 그리고 솔직히 말씀드리면요, 저도 이거 조사하면서 좀 소름 돋았어요.\n\n\n\n=== 응답 형식 ===\nJSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하세요.\n```json\n[\n  {\n    \"scene_id\": 1,\n    \"image_prompt\": \"...\",\n    \"image_prompt_en\": \"... absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\",\n    \"image_prompt_korean_text\": \"... with full frame composition, headline text in Korean reading \\\"80억 달러 인수\\\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \\\"2024년 3분기 완료\\\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally, ...\",\n    \"characters\": [\n      {\"name\": \"캐릭터명\", \"visual_prompt\": \"영문 외모 설명, no text, no logos...\"}\n    ],\n    \"video_prompt_character\": \"English character animation...\",\n    \"video_prompt_full\": \"English full scene description...\",\n    ...\n  },\n  ...\n]\n```",
     "is_default_template": false,
-    "processing_time_seconds": 538.77
+    "processing_time_seconds": 25.07
   },
-  "prompt_used": "## 🔴🔴🔴 [CRITICAL] 스크립트 원본 보존 절대 규칙 🔴🔴🔴\n### ⚠️ 가장 중요한 규칙: 스크립트 텍스트를 절대 수정하지 마세요!\n**절대 금지 행위:**\n| 금지 행위 | 설명 |\n|-----------|------|\n| 문장 바꾸기 | 원본 문장을 다른 표현으로 변경 ❌ |\n| 문장 추가 | 스크립트에 없는 문장 생성 ❌ |\n| 문장 요약 | 여러 문장을 하나로 합치기 ❌ |\n| 아웃트로 대체 | 마지막을 \"구독과 좋아요\" 등으로 바꾸기 ❌ |\n**✅ 반드시 지킬 규칙:**\n- script_text는 원본 스크립트에서 **한 글자도 바꾸지 않고** 그대로 복사\n- 스크립트에 없는 문장은 절대 생성하지 않음\n- 마지막 씬도 원본 스크립트의 마지막 문장 그대로 사용\n---\n# SRT 배치 씬 분석 프롬프트 (v2.6 - 한글 텍스트 프롬프트 추가)\n다음 씬들을 분석하고 JSON 배열로 응답해주세요.\n## 각 씬에 대해 포함할 필드\n- scene_id: 씬 번호\n- image_prompt: 한국어 이미지 생성 프롬프트 (텍스트/문자 제외)\n- image_prompt_en: 영문 이미지 프롬프트 (FLUX용, 상세하게, 끝에 \"absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\" 필수 포함)\n- image_prompt_korean_text: 한글 텍스트 포함 영문 이미지 프롬프트 (🟢 아래 규칙 참조)\n- character_prompt: 한국어 캐릭터 프롬프트\n- character_prompt_en: 영문 캐릭터 프롬프트 (끝에 \"no text, no logos on clothing, no name tags\" 포함)\n- visual_elements: 시각 요소 리스트\n- direction_guide: 연출 가이드\n- video_prompt_character: Character animation description (ENGLISH)\n- video_prompt_full: Full scene video description (ENGLISH)\n- characters: 등장 캐릭터 리스트 (각 캐릭터에 name, visual_prompt 포함!)\n- location: 배경 장소\n- mood: 분위기\n\n## ⚠️ 중요 규칙\n1. characters 배열의 각 캐릭터에는 반드시 visual_prompt를 영문으로 포함\n   예: {{\"name\": \"자말 카슈크지\", \"visual_prompt\": \"Middle-aged Middle Eastern man, journalist, salt-and-pepper beard, no text, no logos...\"}}\n2. video_prompt_character와 video_prompt_full은 반드시 영어로 작성\n3. 카메라 움직임 포함 (zoom, pan, dolly 등)\n4. **🔴 image_prompt_en에 텍스트/문자 관련 요소 절대 금지:**\n   - ❌ 금지: 'Let's start the lecture' text, Harman logo, question marks, speech bubbles\n   - ❌ 금지: text saying \"...\", sign reading \"...\", banner with \"...\"\n\n## 🟢 image_prompt_korean_text 작성 규칙\n\n**목적**: 외부 AI 이미지 생성기에서 한글 텍스트가 포함된 이미지를 생성하기 위한 프롬프트\n\n**작성 방법**:\n1. image_prompt_en의 시각적 묘사를 기반으로 작성 (영어로 작성)\n2. \"absolutely no text...\" 부분을 **제거**\n3. 해당 씬의 나레이션에서 핵심 메시지를 추출하여 한글 텍스트로 포함\n4. 아래 글씨체 스타일을 **반드시** 적용\n\n**한글 텍스트 추출 규칙**:\n- **헤드라인**: 나레이션의 핵심 키워드/메시지 (5-15자)\n- **서브타이틀**: 부가 설명 또는 맥락 (10-25자)\n\n**글씨체 스타일 (고정 - 반드시 포함)**:\n- headline: `in handwritten pen script style with casual brush strokes`\n- subtitle: `in informal handwritten font style`\n- all text: `all Korean text in natural hand-drawn pen calligraphy style with slight irregularity`\n\n**image_prompt_korean_text 형식**:\n[시각적 묘사], headline text in Korean reading \"[헤드라인 한글]\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"[서브타이틀 한글]\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, [나머지 시각 요소]\n\n=== 분석할 씬들 ===\n{scenes_content}\n\n=== 응답 형식 ===\nJSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하세요.\n```json\n[\n  {{\n    \"scene_id\": 1,\n    \"image_prompt\": \"...\",\n    \"image_prompt_en\": \"... absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\",\n    \"image_prompt_korean_text\": \"... headline text in Korean reading \\\"핵심메시지\\\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \\\"부가설명\\\" at the bottom in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, ...\",\n    \"characters\": [\n      {{\"name\": \"캐릭터명\", \"visual_prompt\": \"영문 외모 설명, no text, no logos...\"}}\n    ],\n    \"video_prompt_character\": \"English character animation...\",\n    \"video_prompt_full\": \"English full scene description...\",\n    ...\n  }},\n  ...\n]\n```",
+  "prompt_used": "## 🔴🔴🔴 [CRITICAL] 스크립트 원본 보존 절대 규칙 🔴🔴🔴\n### ⚠️ 가장 중요한 규칙: 스크립트 텍스트를 절대 수정하지 마세요!\n**절대 금지 행위:**\n| 금지 행위 | 설명 |\n|-----------|------|\n| 문장 바꾸기 | 원본 문장을 다른 표현으로 변경 ❌ |\n| 문장 추가 | 스크립트에 없는 문장 생성 ❌ |\n| 문장 요약 | 여러 문장을 하나로 합치기 ❌ |\n| 아웃트로 대체 | 마지막을 \"구독과 좋아요\" 등으로 바꾸기 ❌ |\n**✅ 반드시 지킬 규칙:**\n- script_text는 원본 스크립트에서 **한 글자도 바꾸지 않고** 그대로 복사\n- 스크립트에 없는 문장은 절대 생성하지 않음\n- 마지막 씬도 원본 스크립트의 마지막 문장 그대로 사용\n---\n# SRT 배치 씬 분석 프롬프트 (v2.9.1 - 텍스트 상단~중단 유연 배치)\n다음 씬들을 분석하고 JSON 배열로 응답해주세요.\n## 각 씬에 대해 포함할 필드\n- scene_id: 씬 번호\n- image_prompt: 한국어 이미지 생성 프롬프트 (텍스트/문자 제외)\n- image_prompt_en: 영문 이미지 프롬프트 (FLUX용, 상세하게, 끝에 \"absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\" 필수 포함)\n- image_prompt_korean_text: 한글 텍스트 포함 영문 이미지 프롬프트 (🟢 아래 규칙 참조)\n- character_prompt: 한국어 캐릭터 프롬프트\n- character_prompt_en: 영문 캐릭터 프롬프트 (끝에 \"no text, no logos on clothing, no name tags\" 포함)\n- visual_elements: 시각 요소 리스트\n- direction_guide: 연출 가이드\n- video_prompt_character: Character animation description (ENGLISH)\n- video_prompt_full: Full scene video description (ENGLISH)\n- characters: 등장 캐릭터 리스트 (각 캐릭터에 name, visual_prompt 포함!)\n- location: 배경 장소\n- mood: 분위기\n\n## ⚠️ 중요 규칙\n1. characters 배열의 각 캐릭터에는 반드시 visual_prompt를 영문으로 포함\n   예: {{\"name\": \"자말 카슈크지\", \"visual_prompt\": \"Middle-aged Middle Eastern man, journalist, salt-and-pepper beard, no text, no logos...\"}}\n2. video_prompt_character와 video_prompt_full은 반드시 영어로 작성\n3. 카메라 움직임 포함 (zoom, pan, dolly 등)\n4. **🔴 image_prompt_en에 텍스트/문자 관련 요소 절대 금지:**\n   - ❌ 금지: 'Let's start the lecture' text, Harman logo, question marks, speech bubbles\n   - ❌ 금지: text saying \"...\", sign reading \"...\", banner with \"...\"\n\n## 🟢 image_prompt_korean_text 작성 규칙\n\n**목적**: 외부 AI 이미지 생성기에서 한글 텍스트가 포함된 이미지를 생성하기 위한 프롬프트\n\n**작성 방법**:\n1. image_prompt_en의 시각적 묘사를 기반으로 작성 (영어로 작성)\n2. \"absolutely no text...\" 부분을 **제거**\n3. 해당 씬의 나레이션에서 핵심 메시지를 추출하여 한글 텍스트로 포함\n4. 아래 글씨체 스타일을 **반드시** 적용\n5. 🔴 **[필수] 숫자/날짜 변환 규칙을 반드시 적용** (아래 참조)\n6. 🔴 **[필수] 텍스트 배치 규칙을 반드시 적용** (아래 참조)\n\n**한글 텍스트 추출 규칙**:\n- **헤드라인**: 나레이션의 핵심 키워드/메시지 (5-15자)\n- **서브타이틀**: 부가 설명 또는 맥락 (10-25자)\n\n**글씨체 스타일 (고정 - 반드시 포함)**:\n- headline: `in handwritten pen script style with casual brush strokes`\n- subtitle: `in informal handwritten font style`\n- all text: `all Korean text in natural hand-drawn pen calligraphy style with slight irregularity`\n\n## 🔴🔴🔴 [중요] 텍스트 배치 규칙 - 상단~중단 유연 배치, 하단만 금지 🔴🔴🔴\n\n**⚠️ 핵심 원칙**: \n- **텍스트(글자)는 이미지 상단~중단에 자연스럽게 배치** (이미지와 어울리게)\n- **이미지/비주얼 요소는 전체 영역**에 자연스럽게 채워짐 (하단 포함)\n- **하단 25~30%에만 텍스트 금지** (자막 영역이므로)\n\n**✅ 텍스트 배치 허용 위치**:\n- `at the top` - 이미지 상단\n- `in the upper area` - 상단 영역\n- `in the middle section` - 중단 영역\n- `integrated naturally with the main visual` - 메인 비주얼과 자연스럽게 통합\n- `overlaid harmoniously on the scene` - 장면 위에 조화롭게 오버레이\n- `positioned to complement the composition` - 구도를 보완하는 위치에 배치\n- `floating alongside the main subject` - 주요 피사체 옆에 자연스럽게 배치\n\n**❌ 텍스트 배치 금지 위치 (하단만)**:\n- ~~text at the bottom~~ ❌\n- ~~text in the lower 25%~~ ❌\n- ~~text below the main visual~~ ❌\n\n**텍스트 배치 원칙**:\n1. **헤드라인**: 상단 또는 이미지와 어울리는 중단 위치에 배치\n2. **서브타이틀**: 헤드라인 근처 또는 메인 비주얼과 조화로운 위치에 배치\n3. 텍스트는 **이미지 상단 70% 영역 내**에서 자유롭게 배치 가능\n4. **이미지/비주얼 요소**는 전체 프레임을 자연스럽게 채움 (하단 포함 OK)\n5. 텍스트 위치는 장면의 구도와 시각적 밸런스를 고려하여 결정\n\n## 🔴 숫자/날짜 한국어 변환 규칙 (image_prompt_korean_text 필수 적용)\n\n나레이션에 영어 숫자/날짜가 포함된 경우 **반드시 한국어로 변환**하여 헤드라인/서브타이틀에 사용:\n\n### 📊 금액 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| trillion | 조 | \"$2 trillion\" → \"2조 달러\" |\n| billion | 억 | \"$8 billion\" → \"80억 달러\" |\n| million | 만/백만 | \"$50 million\" → \"5천만 달러\" |\n| $ / dollar | 달러 | \"$100\" → \"100달러\" |\n| won / KRW | 원 | \"2 trillion won\" → \"2조원\" |\n\n### 📅 날짜/연도 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| January~December | 1월~12월 | \"December 2025\" → \"2025년 12월\" |\n| Q1~Q4 | 1분기~4분기 | \"Q3 2024\" → \"2024년 3분기\" |\n| first half | 상반기 | \"first half of 2025\" → \"2025년 상반기\" |\n| second half | 하반기 | \"second half of 2025\" → \"2025년 하반기\" |\n\n### 📈 퍼센트/비율 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| percent / % | % | \"64 percent\" → \"64%\" |\n| growth rate | 성장률 | \"50% growth rate\" → \"50% 성장률\" |\n| market share | 점유율 | \"30% market share\" → \"30% 점유율\" |\n\n### 🏆 순위/수량 변환\n| 영어 | 한국어 | 예시 |\n|------|--------|------|\n| 1st / first | 1위 | \"ranked 1st\" → \"1위\" |\n| 2nd / second | 2위 | \"ranked 2nd\" → \"2위\" |\n| million units | 만 대 | \"10 million units\" → \"1천만 대\" |\n| people/employees | 명 | \"5,000 employees\" → \"5천 명\" |\n\n**image_prompt_korean_text 형식 (유연 배치 버전)**:\n[시각적 묘사 - 전체 프레임을 채우는 비주얼], headline text in Korean reading \"[헤드라인 한글 - 숫자는 한국어로 변환]\" [배치 위치: at the top / in the upper-middle area / integrated with the main visual 등 장면에 맞게 선택] in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"[서브타이틀 한글 - 숫자는 한국어로 변환]\" [배치 위치: 헤드라인과 조화롭게] in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally, [나머지 시각 요소]\n\n=== 분석할 씬들 ===\n{scenes_content}\n\n=== 응답 형식 ===\nJSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하세요.\n```json\n[\n  {{\n    \"scene_id\": 1,\n    \"image_prompt\": \"...\",\n    \"image_prompt_en\": \"... absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content\",\n    \"image_prompt_korean_text\": \"... with full frame composition, headline text in Korean reading \\\"80억 달러 인수\\\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \\\"2024년 3분기 완료\\\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area, visual elements fill the entire frame naturally, ...\",\n    \"characters\": [\n      {{\"name\": \"캐릭터명\", \"visual_prompt\": \"영문 외모 설명, no text, no logos...\"}}\n    ],\n    \"video_prompt_character\": \"English character animation...\",\n    \"video_prompt_full\": \"English full scene description...\",\n    ...\n  }},\n  ...\n]\n```",
   "analysis_mode": "overwrite",
   "was_merged": true
 }

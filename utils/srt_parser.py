@@ -694,13 +694,22 @@ def apply_bundle_analysis_result(scenes: List[Dict], analyzed_primary: Dict) -> 
         scenes: 전체 씬 리스트
         analyzed_primary: 분석된 대표 씬 데이터
     """
+    primary_scene_id = analyzed_primary.get('scene_id', '?')
     bundle_id = analyzed_primary.get('bundle_id')
+
+    # v3.29: 디버깅 로그 추가
+    print(f"[Bundle 적용] 대표 씬 {primary_scene_id}, bundle_id={bundle_id}")
+    print(f"[Bundle 적용] 대표 씬에 background_prompt_en 있음: {bool(analyzed_primary.get('background_prompt_en'))}")
+
     if bundle_id is None:
+        print(f"[Bundle 적용] ⚠️ bundle_id가 None - 스킵됨 (씬 {primary_scene_id})")
         return
 
-    # 분석 결과 필드들
+    # 분석 결과 필드들 (⭐ v3.28: background_prompt_en 추가!)
     analysis_fields = [
         'image_prompt', 'image_prompt_en',
+        'image_prompt_korean_text',  # ⭐ 한글 텍스트 포함 프롬프트
+        'background_prompt', 'background_prompt_en',  # ⭐ 배경 프롬프트 추가!
         'character_prompt', 'character_prompt_en',
         'visual_elements', 'direction_guide',
         'camera_suggestion', 'video_prompt_character',
@@ -708,12 +717,33 @@ def apply_bundle_analysis_result(scenes: List[Dict], analyzed_primary: Dict) -> 
     ]
 
     # 동일 묶음의 모든 씬에 결과 적용
+    applied_count = 0
+
+    # v3.29: 전체 씬 bundle_id 현황 로깅
+    all_bundle_ids = [s.get('bundle_id') for s in scenes]
+    print(f"[Bundle 적용] 전체 씬의 bundle_id 분포: {all_bundle_ids}")
+    matching_scenes = [s.get('scene_id') for s in scenes if s.get('bundle_id') == bundle_id]
+    print(f"[Bundle 적용] bundle_id={bundle_id}인 씬들: {matching_scenes}")
+
     for scene in scenes:
         if scene.get('bundle_id') == bundle_id:
+            scene_id = scene.get('scene_id', '?')
+            is_primary = scene.get('is_bundle_primary', False)
+            print(f"[Bundle 적용] 씬 {scene_id}에 필드 적용 중 (primary={is_primary})...")
+
             for field in analysis_fields:
                 if field in analyzed_primary:
                     scene[field] = analyzed_primary[field]
             scene['needs_analysis'] = False
+            applied_count += 1
+
+            # ⭐ v3.28: 배경 프롬프트 적용 로깅
+            if scene.get('background_prompt_en'):
+                print(f"[Bundle 병합] ✅ 씬 {scene_id}: background_prompt_en 적용됨 (묶음 {bundle_id})")
+
+    if applied_count > 0:
+        primary_id = analyzed_primary.get('scene_id', '?')
+        print(f"[Bundle 병합] 📦 묶음 {bundle_id} (대표: 씬 {primary_id}) → {applied_count}개 씬에 결과 적용")
 
 
 def get_bundle_summary(scenes: List[Dict]) -> Dict:

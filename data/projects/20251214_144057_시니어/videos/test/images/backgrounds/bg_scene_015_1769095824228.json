@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-23T00:30:24.229428",
+  "image_file": "bg_scene_015_1769095824228.png",
+  "scene_id": 15,
+  "prompts": {
+    "original": "Wide angle full frame shot, entire scene visible from corner to corner, dimly lit room with a glowing computer screen, cyberpunk aesthetic with neon lighting casting colorful reflections, intricate circuit board patterns visible on the walls, cluttered desk with multiple monitors and gadgets, futuristic and technological atmosphere, expansive view filling the complete canvas from top to bottom and left to right, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "animation style background, Wide angle full frame shot, entire scene visible from corner to corner, dimly lit room with a glowing computer screen, cyberpunk aesthetic with neon lighting casting colorful reflections, intricate circuit board patterns visible on the walls, cluttered desk with multiple monitors and gadgets, futuristic and technological atmosphere, expansive view filling the complete canvas from top to bottom and left to right, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot, vibrant colors, cinematic composition, no characters",
+    "negative": "people, characters, realistic"
+  },
+  "style": {
+    "id": "bg_animation",
+    "name": "애니메이션",
+    "prefix": "animation style background,",
+    "suffix": "vibrant colors, cinematic composition, no characters"
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1580012689
+  }
+}

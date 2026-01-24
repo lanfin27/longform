@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-21T22:52:37.155410",
+  "image_file": "bg_scene_011_1769003557154.png",
+  "scene_id": 11,
+  "prompts": {
+    "original": "Intricate view of intertwined automotive parts, Samsung logo subtly integrated, Tesla car, BMW car, Hyundai car, dynamic lighting, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, vibrant saturated color palette, bright primary colors with warm and cheerful tones, simple solid background, Intricate view of intertwined automotive parts, Samsung logo subtly integrated, Tesla car, BMW car, Hyundai car, dynamic lighting, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot",
+    "negative": ""
+  },
+  "style": {
+    "id": "재흙영상툰_밝은배경",
+    "name": "재흙영상툰_밝은배경",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, vibrant saturated color palette, bright primary colors with warm and cheerful tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 420446359
+  }
+}

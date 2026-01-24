@@ -17,6 +17,13 @@ import pandas as pd
 from pathlib import Path
 from typing import Optional, Any, List, Dict
 
+# Streamlit 캐싱 (조건부 import)
+try:
+    import streamlit as st
+    _HAS_STREAMLIT = True
+except ImportError:
+    _HAS_STREAMLIT = False
+
 
 # === 단계별 폴더 매핑 ===
 STEP_FOLDERS = {
@@ -33,6 +40,52 @@ STEP_FOLDERS = {
 }
 
 
+# === 캐싱된 로드 함수 (Streamlit 환경) ===
+
+def _load_json_impl(filepath_str: str) -> Optional[Any]:
+    """JSON 파일 로드 구현 (내부용)"""
+    filepath = Path(filepath_str)
+    if filepath.exists():
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return None
+
+
+def _load_excel_impl(filepath_str: str) -> Optional[pd.DataFrame]:
+    """Excel 파일 로드 구현 (내부용)"""
+    filepath = Path(filepath_str)
+    if filepath.exists():
+        return pd.read_excel(filepath)
+    return None
+
+
+def _load_text_impl(filepath_str: str) -> Optional[str]:
+    """텍스트 파일 로드 구현 (내부용)"""
+    filepath = Path(filepath_str)
+    if filepath.exists():
+        with open(filepath, "r", encoding="utf-8") as f:
+            return f.read()
+    return None
+
+
+# Streamlit 캐싱 적용 (조건부)
+if _HAS_STREAMLIT:
+    @st.cache_data(ttl=300, show_spinner=False, max_entries=100)
+    def _load_json_cached(filepath_str: str, _mtime: float) -> Optional[Any]:
+        """JSON 파일 로드 (캐싱 적용) - mtime으로 자동 무효화"""
+        return _load_json_impl(filepath_str)
+
+    @st.cache_data(ttl=300, show_spinner=False, max_entries=50)
+    def _load_excel_cached(filepath_str: str, _mtime: float) -> Optional[pd.DataFrame]:
+        """Excel 파일 로드 (캐싱 적용) - mtime으로 자동 무효화"""
+        return _load_excel_impl(filepath_str)
+
+    @st.cache_data(ttl=300, show_spinner=False, max_entries=100)
+    def _load_text_cached(filepath_str: str, _mtime: float) -> Optional[str]:
+        """텍스트 파일 로드 (캐싱 적용) - mtime으로 자동 무효화"""
+        return _load_text_impl(filepath_str)
+
+
 # === 기본 유틸리티 함수 ===
 
 def save_json(data: Any, filepath: Path):
@@ -43,11 +96,21 @@ def save_json(data: Any, filepath: Path):
 
 
 def load_json(filepath: Path) -> Optional[Any]:
-    """JSON 파일 로드"""
-    if filepath.exists():
-        with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return None
+    """
+    JSON 파일 로드 (자동 캐싱)
+
+    Streamlit 환경에서는 @st.cache_data로 캐싱됨.
+    파일 수정 시 자동으로 캐시 무효화.
+    """
+    filepath = Path(filepath)
+    if not filepath.exists():
+        return None
+
+    if _HAS_STREAMLIT:
+        mtime = filepath.stat().st_mtime
+        return _load_json_cached(str(filepath), _mtime=mtime)
+    else:
+        return _load_json_impl(str(filepath))
 
 
 def save_excel(df: pd.DataFrame, filepath: Path):
@@ -57,10 +120,21 @@ def save_excel(df: pd.DataFrame, filepath: Path):
 
 
 def load_excel(filepath: Path) -> Optional[pd.DataFrame]:
-    """Excel 파일 로드"""
-    if filepath.exists():
-        return pd.read_excel(filepath)
-    return None
+    """
+    Excel 파일 로드 (자동 캐싱)
+
+    Streamlit 환경에서는 @st.cache_data로 캐싱됨.
+    파일 수정 시 자동으로 캐시 무효화.
+    """
+    filepath = Path(filepath)
+    if not filepath.exists():
+        return None
+
+    if _HAS_STREAMLIT:
+        mtime = filepath.stat().st_mtime
+        return _load_excel_cached(str(filepath), _mtime=mtime)
+    else:
+        return _load_excel_impl(str(filepath))
 
 
 def save_text(text: str, filepath: Path):
@@ -71,11 +145,21 @@ def save_text(text: str, filepath: Path):
 
 
 def load_text(filepath: Path) -> Optional[str]:
-    """텍스트 파일 로드"""
-    if filepath.exists():
-        with open(filepath, "r", encoding="utf-8") as f:
-            return f.read()
-    return None
+    """
+    텍스트 파일 로드 (자동 캐싱)
+
+    Streamlit 환경에서는 @st.cache_data로 캐싱됨.
+    파일 수정 시 자동으로 캐시 무효화.
+    """
+    filepath = Path(filepath)
+    if not filepath.exists():
+        return None
+
+    if _HAS_STREAMLIT:
+        mtime = filepath.stat().st_mtime
+        return _load_text_cached(str(filepath), _mtime=mtime)
+    else:
+        return _load_text_impl(str(filepath))
 
 
 # === 2단계: 영상 리서치 ===

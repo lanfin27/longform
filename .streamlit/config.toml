@@ -1,0 +1,30 @@
+# Streamlit 성능 최적화 설정
+# 생성일: 2026-01-18
+
+[server]
+# 최대 업로드 파일 크기 (MB)
+maxUploadSize = 200
+
+# 최대 메시지 크기 (MB)
+maxMessageSize = 200
+
+# 파일 변경 감지 활성화
+fileWatcherType = "auto"
+
+[browser]
+# 사용 통계 수집 비활성화
+gatherUsageStats = false
+
+[runner]
+# 빠른 리렌더링 활성화
+fastReruns = true
+
+# 매직 명령어 활성화
+magicEnabled = true
+
+[client]
+# 캐싱 활성화
+caching = true
+
+# 도구 모음 표시 모드 (developer, viewer, minimal, auto)
+toolbarMode = "auto"

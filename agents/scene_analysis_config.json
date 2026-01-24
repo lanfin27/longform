@@ -1,0 +1,52 @@
+{
+  "agent_name": "scene_analysis_agent",
+  "version": "1.0.0",
+  "description": "Claude Code 기반 씬 분석 에이전트",
+
+  "input": {
+    "scenes_json_path": "{project_path}/analysis/scenes.json",
+    "prompt_template_path": "agents/templates/scene_analysis_prompt.md"
+  },
+
+  "output": {
+    "update_scenes_json": true,
+    "create_backup": true,
+    "backup_suffix": "_backup_{timestamp}"
+  },
+
+  "analysis_fields": {
+    "required": [
+      "background_prompt_en",
+      "character_prompt_en",
+      "characters",
+      "visual_elements",
+      "scene_mood"
+    ],
+    "optional": [
+      "korean_text_overlay",
+      "direction_guide",
+      "camera_angle"
+    ]
+  },
+
+  "bundle_settings": {
+    "enabled": true,
+    "share_fields": [
+      "background_prompt_en",
+      "character_prompt_en",
+      "characters"
+    ]
+  },
+
+  "style_guidelines": {
+    "image_style": "2D animation, Western animated series aesthetic",
+    "exclude_from_background": ["people", "person", "human", "character"],
+    "language": "english"
+  },
+
+  "execution": {
+    "timeout_seconds": 600,
+    "retry_count": 3,
+    "retry_delay_seconds": 5
+  }
+}

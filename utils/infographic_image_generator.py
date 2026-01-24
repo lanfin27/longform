@@ -304,10 +304,14 @@ class InfographicImageGenerator:
         width: int,
         height: int
     ) -> bool:
-        """Google ImageFX API로 이미지 생성"""
+        """
+        Google ImageFX API로 이미지 생성
+
+        v2.0: 최적화된 Worker Manager 사용
+        """
 
         try:
-            from utils.imagefx_client import ImageFXClient, AspectRatio
+            from utils.imagefx_client import get_optimized_imagefx_client
             from config.settings import load_imagefx_cookie
             import streamlit as st
 
@@ -316,25 +320,32 @@ class InfographicImageGenerator:
                 print("[InfographicGenerator] ImageFX 쿠키 없음")
                 return False
 
-            client = ImageFXClient(cookie=imagefx_cookie)
+            print("[InfographicGenerator v2.0] ⚡ 최적화된 워커 사용")
+
+            # v2.0: 최적화된 클라이언트 사용 (싱글톤 워커 재사용)
+            manager = get_optimized_imagefx_client(imagefx_cookie)
 
             # 비율 결정
             if width > height:
-                aspect_ratio = AspectRatio.LANDSCAPE
+                aspect_ratio = "LANDSCAPE"
             elif height > width:
-                aspect_ratio = AspectRatio.PORTRAIT
+                aspect_ratio = "PORTRAIT"
             else:
-                aspect_ratio = AspectRatio.SQUARE
+                aspect_ratio = "SQUARE"
 
-            img_data = client.generate(
+            # v2.0: 이미지 생성 (워커 재사용)
+            result = manager.generate_image(
                 prompt=prompt,
+                output_path=str(output_path),
                 aspect_ratio=aspect_ratio
             )
 
-            if img_data:
-                with open(output_path, "wb") as f:
-                    f.write(img_data)
+            if result.get("success"):
+                print(f"[InfographicGenerator v2.0] ✅ 이미지 저장: {output_path}")
                 return True
+            else:
+                print(f"[InfographicGenerator v2.0] ❌ 생성 실패: {result.get('error')}")
+                return False
 
         except Exception as e:
             print(f"[InfographicGenerator] ImageFX API 오류: {e}")

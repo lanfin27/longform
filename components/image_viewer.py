@@ -257,9 +257,10 @@ def _get_lightbox_css() -> str:
 
 
 def _get_lightbox_js() -> str:
-    """Lightbox용 JavaScript"""
+    """Lightbox용 JavaScript (v3.28: 이벤트 위임 방식으로 개선)"""
     return """
     <script>
+    // v3.28: 기존 함수 유지 (하위 호환성)
     function openLightbox(imgSrc, info) {
         const overlay = document.getElementById('lightbox-overlay');
         const lightboxImg = document.getElementById('lightbox-img');
@@ -267,8 +268,8 @@ def _get_lightbox_js() -> str:
 
         if (overlay && lightboxImg) {
             lightboxImg.src = imgSrc;
-            if (lightboxInfo && info) {
-                lightboxInfo.textContent = info;
+            if (lightboxInfo) {
+                lightboxInfo.textContent = info || '';
             }
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -287,6 +288,21 @@ def _get_lightbox_js() -> str:
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeLightbox();
+        }
+    });
+
+    // v3.28: 이벤트 위임으로 썸네일 클릭 처리 (대용량 이미지 지원)
+    document.addEventListener('click', function(e) {
+        // 썸네일 컨테이너 또는 그 자식 요소 클릭 시
+        const container = e.target.closest('.thumbnail-container');
+        if (container) {
+            // 컨테이너 내의 이미지 찾기
+            const img = container.querySelector('img');
+            if (img && img.src) {
+                // 이미지 정보 가져오기 (data 속성에서)
+                const info = container.dataset.info || '';
+                openLightbox(img.src, info);
+            }
         }
     });
     </script>
@@ -323,7 +339,7 @@ def render_lightbox_image(
     key: str = ""
 ) -> bool:
     """
-    클릭 시 확대되는 이미지 렌더링
+    클릭 시 확대되는 이미지 렌더링 (v3.28: 이벤트 위임 방식으로 개선)
 
     Args:
         image_path: 이미지 파일 경로
@@ -351,13 +367,17 @@ def render_lightbox_image(
     # 스타일
     width_style = f"width: {width}px;" if width else "width: 100%;"
 
-    # HTML 생성
+    # HTML 생성 (v3.28: onclick 제거, data 속성 사용)
+    # 이벤트 위임 방식으로 클릭 처리 - JavaScript에서 .thumbnail-container 클릭 감지
     unique_id = f"thumb_{key}_{hash(image_path) % 10000}"
+
+    # info_text에서 따옴표 이스케이프 처리
+    safe_info_text = info_text.replace('"', '&quot;').replace("'", "&#39;") if show_info else ""
 
     html = f"""
     <div class="thumbnail-container"
-         onclick="openLightbox('{base64_img}', '{info_text if show_info else ''}')"
-         style="{width_style}">
+         data-info="{safe_info_text}"
+         style="{width_style} cursor: pointer;">
         <img src="{base64_img}" alt="{caption}" style="width: 100%; height: auto;">
         <div class="zoom-icon">🔍</div>
     </div>
@@ -426,9 +446,11 @@ def render_lightbox_grid(
         info_text = f"{info['filename']} | {info['width']}x{info['height']} | {info['size_kb']}KB"
         caption = img["caption"] if show_captions else ""
 
+        # v3.28: 이벤트 위임 방식 적용 (onclick 제거)
+        safe_info_text = info_text.replace('"', '&quot;').replace("'", "&#39;") if show_info else ""
         item_html = f"""
         <div class="thumbnail-container"
-             onclick="openLightbox('{base64_img}', '{info_text if show_info else ''}')">
+             data-info="{safe_info_text}">
             <img src="{base64_img}" alt="{caption}" style="width: 100%; height: auto;">
             <div class="zoom-icon">🔍</div>
         </div>
@@ -576,9 +598,11 @@ def render_pil_image(
         # 스타일
         width_style = f"width: {width}px;" if width else "width: 100%;"
 
+        # v3.28: 이벤트 위임 방식 적용 (onclick 제거)
+        safe_info_text = info_text.replace('"', '&quot;').replace("'", "&#39;")
         html = f"""
         <div class="thumbnail-container"
-             onclick="openLightbox('{base64_img}', '{info_text}')"
+             data-info="{safe_info_text}"
              style="{width_style}">
             <img src="{base64_img}" alt="{caption}" style="width: 100%; height: auto;">
             <div class="zoom-icon">🔍</div>
@@ -908,3 +932,286 @@ def _render_prompt_details(image_path: str, scene_data: Dict, key: str):
 
     if not original and not final:
         st.info("프롬프트 정보가 없습니다. 이미지 재생성 시 저장됩니다.")
+
+
+# ============================================================
+# Streamlit @st.dialog 기반 이미지 확대 뷰어 (v3.0)
+# ============================================================
+
+def _init_image_zoom_state():
+    """이미지 확대 상태 초기화"""
+    if 'image_zoom_path' not in st.session_state:
+        st.session_state.image_zoom_path = None
+    if 'image_zoom_caption' not in st.session_state:
+        st.session_state.image_zoom_caption = ""
+
+
+def open_image_zoom(image_path: str, caption: str = ""):
+    """이미지 확대 모달 열기"""
+    st.session_state.image_zoom_path = image_path
+    st.session_state.image_zoom_caption = caption
+
+
+def close_image_zoom():
+    """이미지 확대 모달 닫기"""
+    st.session_state.image_zoom_path = None
+    st.session_state.image_zoom_caption = ""
+
+
+def render_zoomable_image(
+    image_path: str,
+    caption: str = "",
+    width: Optional[int] = None,
+    key: str = "",
+    show_zoom_button: bool = True,
+    use_container_width: bool = False
+) -> bool:
+    """
+    확대 가능한 이미지 렌더링 (Streamlit 네이티브 - 버튼 클릭 방식)
+
+    JavaScript 의존성 없이 100% Streamlit 기능으로 동작
+
+    Args:
+        image_path: 이미지 파일 경로
+        caption: 이미지 캡션
+        width: 이미지 너비 (픽셀)
+        key: 고유 키
+        show_zoom_button: 확대 버튼 표시 여부
+        use_container_width: 컨테이너 너비에 맞춤
+
+    Returns:
+        이미지 표시 성공 여부
+    """
+    _init_image_zoom_state()
+
+    if not image_path or not os.path.exists(image_path):
+        st.info("🖼️ 이미지 없음")
+        return False
+
+    # 고유 키 생성
+    unique_key = key or f"img_{hash(image_path) % 100000}"
+
+    # 이미지 컨테이너
+    img_container = st.container()
+
+    with img_container:
+        # 썸네일 이미지 표시
+        if width and not use_container_width:
+            st.image(image_path, width=width)
+        else:
+            st.image(image_path, use_container_width=True)
+
+        # 확대 버튼 (이미지 아래에 작은 버튼)
+        if show_zoom_button:
+            if st.button("🔍 확대", key=f"zoom_btn_{unique_key}", use_container_width=True):
+                open_image_zoom(image_path, caption or Path(image_path).name)
+                st.rerun()
+
+        # 캡션 표시
+        if caption:
+            st.caption(caption)
+
+    return True
+
+
+def render_image_zoom_modal():
+    """
+    이미지 확대 모달 렌더링 (페이지 최상단에서 호출)
+
+    Usage:
+        # 페이지 최상단에서 한 번만 호출
+        render_image_zoom_modal()
+
+        # 이후 render_zoomable_image() 사용
+        render_zoomable_image("path/to/image.png", caption="My Image")
+    """
+    _init_image_zoom_state()
+
+    if st.session_state.image_zoom_path and os.path.exists(st.session_state.image_zoom_path):
+        image_path = st.session_state.image_zoom_path
+        caption = st.session_state.image_zoom_caption
+
+        # 모달 대신 expander 또는 컨테이너 사용
+        st.markdown("---")
+        with st.container(border=True):
+            # 헤더
+            header_col1, header_col2 = st.columns([6, 1])
+            with header_col1:
+                st.markdown(f"### 🔍 이미지 확대 보기")
+                if caption:
+                    st.caption(caption)
+            with header_col2:
+                if st.button("✖️ 닫기", key="close_zoom_modal", type="primary"):
+                    close_image_zoom()
+                    st.rerun()
+
+            # 확대된 이미지
+            st.image(image_path, use_container_width=True)
+
+            # 이미지 정보
+            info = get_image_info(image_path)
+            info_col1, info_col2, info_col3 = st.columns(3)
+            with info_col1:
+                st.metric("해상도", f"{info['width']}x{info['height']}")
+            with info_col2:
+                st.metric("파일 크기", f"{info['size_kb']} KB")
+            with info_col3:
+                st.metric("형식", info['format'])
+
+            # 파일 경로
+            st.code(str(Path(image_path).resolve()), language=None)
+
+        st.markdown("---")
+
+
+# @st.dialog 데코레이터 사용 버전 (Streamlit 1.33+)
+try:
+    @st.dialog("🔍 이미지 확대 보기", width="large")
+    def _image_zoom_dialog(image_path: str, caption: str = ""):
+        """이미지 확대 다이얼로그 (Streamlit 1.33+)"""
+        if not image_path or not os.path.exists(image_path):
+            st.error("이미지를 찾을 수 없습니다.")
+            return
+
+        # 확대된 이미지
+        st.image(image_path, use_container_width=True)
+
+        # 캡션
+        if caption:
+            st.markdown(f"**{caption}**")
+
+        # 이미지 정보
+        info = get_image_info(image_path)
+        st.caption(f"📏 {info['width']}x{info['height']} | {info['size_kb']}KB | {info['format']}")
+
+        # 파일 경로
+        with st.expander("📂 파일 경로"):
+            st.code(str(Path(image_path).resolve()), language=None)
+
+    DIALOG_AVAILABLE = True
+
+except Exception:
+    # @st.dialog가 지원되지 않는 버전
+    DIALOG_AVAILABLE = False
+
+    def _image_zoom_dialog(image_path: str, caption: str = ""):
+        """Fallback: 다이얼로그 미지원 시 session_state 방식 사용"""
+        open_image_zoom(image_path, caption)
+
+
+def render_clickable_thumbnail(
+    image_path: str,
+    caption: str = "",
+    width: int = 150,
+    key: str = ""
+) -> bool:
+    """
+    클릭 가능한 썸네일 이미지 (확대 버튼 포함)
+
+    JavaScript 없이 동작하는 확대 기능 제공
+
+    Args:
+        image_path: 이미지 파일 경로
+        caption: 캡션
+        width: 썸네일 너비
+        key: 고유 키
+
+    Returns:
+        이미지 표시 성공 여부
+    """
+    if not image_path or not os.path.exists(image_path):
+        st.markdown(f"""
+        <div style="
+            width: {width}px;
+            height: {width}px;
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 24px;
+        ">🖼️</div>
+        """, unsafe_allow_html=True)
+        if caption:
+            st.caption(caption)
+        return False
+
+    unique_key = key or f"thumb_{hash(image_path) % 100000}"
+
+    # 이미지 + 확대 버튼을 컨테이너에 배치
+    with st.container():
+        # 썸네일 이미지
+        st.image(image_path, width=width)
+
+        # 확대 버튼
+        if st.button("🔍", key=f"zoom_{unique_key}", help="이미지 확대 보기"):
+            if DIALOG_AVAILABLE:
+                _image_zoom_dialog(image_path, caption or Path(image_path).name)
+            else:
+                open_image_zoom(image_path, caption or Path(image_path).name)
+                st.rerun()
+
+        # 캡션
+        if caption:
+            st.caption(caption)
+
+    return True
+
+
+def render_image_grid_with_zoom(
+    images: List[Union[str, Dict]],
+    columns: int = 4,
+    thumbnail_width: int = 150,
+    show_captions: bool = True,
+    key_prefix: str = "grid"
+):
+    """
+    확대 기능이 있는 이미지 그리드 (Streamlit 네이티브)
+
+    Args:
+        images: 이미지 경로 리스트 또는 {"path": "...", "caption": "..."} 딕셔너리 리스트
+        columns: 열 개수
+        thumbnail_width: 썸네일 너비
+        show_captions: 캡션 표시 여부
+        key_prefix: 키 접두사
+    """
+    if not images:
+        st.info("표시할 이미지가 없습니다.")
+        return
+
+    # 이미지 데이터 정규화
+    normalized_images = []
+    for i, img in enumerate(images):
+        if isinstance(img, str):
+            normalized_images.append({
+                "path": img,
+                "caption": Path(img).name if show_captions else ""
+            })
+        elif isinstance(img, dict):
+            normalized_images.append({
+                "path": img.get("path", ""),
+                "caption": img.get("caption", Path(img.get("path", "")).name if show_captions else "")
+            })
+
+    # 유효한 이미지만 필터링
+    valid_images = [
+        img for img in normalized_images
+        if img["path"] and os.path.exists(img["path"])
+    ]
+
+    if not valid_images:
+        st.warning("표시할 유효한 이미지가 없습니다.")
+        return
+
+    # 그리드 렌더링
+    cols = st.columns(columns)
+
+    for idx, img_data in enumerate(valid_images):
+        with cols[idx % columns]:
+            render_clickable_thumbnail(
+                image_path=img_data["path"],
+                caption=img_data["caption"] if show_captions else "",
+                width=thumbnail_width,
+                key=f"{key_prefix}_{idx}"
+            )

@@ -1,0 +1,418 @@
+{
+  "13": {
+    "characters": {
+      "깨달음을 얻은 사람": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_깨달음을_얻은_사람_standing_1769001227405.png",
+            "updated_at": "2026-01-21T22:14:03.832939"
+          }
+        }
+      },
+      "남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_남성_standing_1769081177081.png",
+            "updated_at": "2026-01-22T20:27:39.851684"
+          }
+        }
+      },
+      "젊은 남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_젊은_남성_standing_1769086219635.png",
+            "updated_at": "2026-01-22T21:50:19.722531"
+          }
+        }
+      }
+    }
+  },
+  "14": {
+    "characters": {
+      "깨달음을 얻은 사람": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_깨달음을_얻은_사람_standing_1769001227405.png",
+            "updated_at": "2026-01-21T22:14:03.832949"
+          }
+        }
+      },
+      "남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_남성_standing_1769081177081.png",
+            "updated_at": "2026-01-22T20:27:39.851691"
+          }
+        }
+      },
+      "젊은 남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_젊은_남성_standing_1769086219635.png",
+            "updated_at": "2026-01-22T21:50:19.722539"
+          }
+        }
+      }
+    }
+  },
+  "15": {
+    "characters": {
+      "공포에 질린 사람": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_공포에_질린_사람_standing_1769001233629.png",
+            "updated_at": "2026-01-21T22:14:03.856319"
+          }
+        }
+      },
+      "남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_남성_standing_1769081177081.png",
+            "updated_at": "2026-01-22T20:27:39.851693"
+          }
+        }
+      },
+      "젊은 남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_젊은_남성_standing_1769086219635.png",
+            "updated_at": "2026-01-22T21:50:19.722542"
+          }
+        }
+      },
+      "사람": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_사람_standing_1769089651872.png",
+            "updated_at": "2026-01-22T22:47:50.854696"
+          }
+        }
+      }
+    }
+  },
+  "16": {
+    "characters": {
+      "공포에 질린 사람": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_공포에_질린_사람_standing_1769001233629.png",
+            "updated_at": "2026-01-21T22:14:03.856326"
+          }
+        }
+      },
+      "남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_남성_standing_1769081177081.png",
+            "updated_at": "2026-01-22T20:27:39.851695"
+          }
+        }
+      },
+      "젊은 남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_젊은_남성_standing_1769086219635.png",
+            "updated_at": "2026-01-22T21:50:19.722544"
+          }
+        }
+      },
+      "사람": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_사람_standing_1769089651872.png",
+            "updated_at": "2026-01-22T22:47:50.854705"
+          }
+        }
+      }
+    }
+  },
+  "19": {
+    "characters": {
+      "질문하는 사람": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_질문하는_사람_standing_1769001238673.png",
+            "updated_at": "2026-01-21T22:14:03.883674"
+          }
+        }
+      },
+      "청중": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_청중_standing_1769001243809.png",
+            "updated_at": "2026-01-21T22:14:03.910991"
+          }
+        }
+      },
+      "사람들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_사람들_standing_1769081180517.png",
+            "updated_at": "2026-01-22T20:27:39.877270"
+          }
+        }
+      }
+    }
+  },
+  "20": {
+    "characters": {
+      "질문하는 사람": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_질문하는_사람_standing_1769001238673.png",
+            "updated_at": "2026-01-21T22:14:03.883686"
+          }
+        }
+      },
+      "청중": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_청중_standing_1769001243809.png",
+            "updated_at": "2026-01-21T22:14:03.910997"
+          }
+        }
+      },
+      "사람들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_사람들_standing_1769081180517.png",
+            "updated_at": "2026-01-22T20:27:39.877278"
+          }
+        }
+      }
+    }
+  },
+  "11": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_발표자_standing_1769081131578.png",
+            "updated_at": "2026-01-22T20:27:39.661167"
+          }
+        }
+      },
+      "디자이너 팀": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_디자이너_팀_standing_1769154970917.png",
+            "updated_at": "2026-01-23T16:56:10.969878"
+          }
+        }
+      }
+    }
+  },
+  "12": {
+    "characters": {
+      "발표자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_발표자_standing_1769081131578.png",
+            "updated_at": "2026-01-22T20:27:39.661179"
+          }
+        }
+      },
+      "디자이너 팀": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_디자이너_팀_standing_1769154970917.png",
+            "updated_at": "2026-01-23T16:56:10.969885"
+          }
+        }
+      }
+    }
+  },
+  "1": {
+    "characters": {
+      "강사": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_강사_standing_1769081153031.png",
+            "updated_at": "2026-01-22T20:27:39.751560"
+          }
+        }
+      }
+    }
+  },
+  "3": {
+    "characters": {
+      "강사": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_강사_standing_1769081153031.png",
+            "updated_at": "2026-01-22T20:27:39.751569"
+          }
+        }
+      }
+    }
+  },
+  "10": {
+    "characters": {
+      "나레이터": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_나레이터_standing_1769081167795.png",
+            "updated_at": "2026-01-22T20:27:39.824944"
+          }
+        }
+      }
+    }
+  },
+  "17": {
+    "characters": {
+      "남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_남성_standing_1769081177081.png",
+            "updated_at": "2026-01-22T20:27:39.851697"
+          }
+        }
+      },
+      "젊은 남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_젊은_남성_standing_1769086219635.png",
+            "updated_at": "2026-01-22T21:50:19.722546"
+          }
+        }
+      }
+    }
+  },
+  "18": {
+    "characters": {
+      "남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_남성_standing_1769081177081.png",
+            "updated_at": "2026-01-22T20:27:39.851699"
+          }
+        }
+      },
+      "젊은 남성": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_젊은_남성_standing_1769086219635.png",
+            "updated_at": "2026-01-22T21:50:19.722547"
+          }
+        }
+      }
+    }
+  },
+  "8": {
+    "characters": {
+      "하만 임원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_하만_임원_standing_1769085677440.png",
+            "updated_at": "2026-01-22T21:41:36.504075"
+          }
+        }
+      },
+      "사업가들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_사업가들_standing_1769094668806.png",
+            "updated_at": "2026-01-23T00:11:29.667369"
+          }
+        }
+      }
+    }
+  },
+  "27": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_운전자_standing_1769086214369.png",
+            "updated_at": "2026-01-22T21:50:19.689560"
+          }
+        }
+      }
+    }
+  },
+  "28": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_운전자_standing_1769086214369.png",
+            "updated_at": "2026-01-22T21:50:19.689570"
+          }
+        }
+      }
+    }
+  },
+  "30": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_운전자_standing_1769086214369.png",
+            "updated_at": "2026-01-22T21:50:19.689573"
+          }
+        }
+      }
+    }
+  },
+  "31": {
+    "characters": {
+      "운전자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_운전자_standing_1769086214369.png",
+            "updated_at": "2026-01-22T21:50:19.689575"
+          }
+        }
+      }
+    }
+  },
+  "79": {
+    "characters": {
+      "노동자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_노동자_standing_1769086640421.png",
+            "updated_at": "2026-01-22T21:57:20.444935"
+          }
+        }
+      }
+    }
+  },
+  "80": {
+    "characters": {
+      "노동자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_노동자_standing_1769086640421.png",
+            "updated_at": "2026-01-22T21:57:20.444945"
+          }
+        }
+      }
+    }
+  },
+  "4": {
+    "characters": {
+      "사업가들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_사업가들_standing_1769094668806.png",
+            "updated_at": "2026-01-23T00:11:29.667362"
+          }
+        }
+      }
+    }
+  },
+  "7": {
+    "characters": {
+      "삼성전자 임원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test\\images\\characters\\char_삼성전자_임원_standing_1769154968048.png",
+            "updated_at": "2026-01-23T16:56:10.947768"
+          }
+        }
+      }
+    }
+  }
+}

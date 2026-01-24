@@ -5,6 +5,11 @@ Selenium을 이용한 ImageFX 쿠키 자동 추출 모듈
 브라우저를 자동화하여 ImageFX 사이트에 접속하고 쿠키를 추출합니다.
 기존 Chrome 프로필을 사용하여 로그인 상태를 유지합니다.
 
+v2.0: ChromeDriver 캐시 문제 해결 (WinError 193)
+- 손상된 캐시 자동 감지 및 정리
+- 여러 초기화 방법 순차 시도
+- ChromeDriver 파일 유효성 검사
+
 요구사항:
 - selenium
 - webdriver-manager
@@ -23,11 +28,16 @@ Selenium을 이용한 ImageFX 쿠키 자동 추출 모듈
 import os
 import json
 import time
+import shutil
+import logging
 from typing import Dict, Optional, Tuple
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
+
 # Selenium imports
 SELENIUM_AVAILABLE = False
+WEBDRIVER_MANAGER_AVAILABLE = False
 try:
     from selenium import webdriver
     from selenium.webdriver.chrome.options import Options
@@ -35,16 +45,243 @@ try:
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
-    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.common.exceptions import WebDriverException
     SELENIUM_AVAILABLE = True
+
+    try:
+        from webdriver_manager.chrome import ChromeDriverManager
+        WEBDRIVER_MANAGER_AVAILABLE = True
+    except ImportError:
+        print("[SeleniumCookie] webdriver-manager 미설치 (선택사항)")
 except ImportError:
-    print("[SeleniumCookie] selenium 또는 webdriver-manager 미설치")
+    print("[SeleniumCookie] selenium 미설치")
     print("[SeleniumCookie] 설치: pip install selenium webdriver-manager")
 
 
 # ImageFX URL
 IMAGEFX_URL = "https://labs.google.com/fx/ko/tools/image-fx"
 IMAGEFX_URL_EN = "https://labs.google.com/fx/tools/image-fx"
+
+
+# ============================================================
+# v2.0: ChromeDriver 캐시 관리 및 초기화 개선
+# ============================================================
+
+def clear_webdriver_cache() -> bool:
+    """
+    webdriver-manager 캐시 정리 (손상된 ChromeDriver 파일 삭제)
+
+    Returns:
+        성공 여부
+    """
+    cache_paths = [
+        os.path.expanduser("~/.wdm"),
+        os.path.join(os.environ.get('LOCALAPPDATA', ''), 'webdriver'),
+    ]
+
+    cleared = False
+    for cache_path in cache_paths:
+        if os.path.exists(cache_path):
+            try:
+                shutil.rmtree(cache_path)
+                print(f"[SeleniumCookie] 캐시 삭제됨: {cache_path}")
+                cleared = True
+            except Exception as e:
+                print(f"[SeleniumCookie] 캐시 삭제 실패 ({cache_path}): {e}")
+
+    return cleared
+
+
+def validate_chromedriver_file(driver_path: str) -> bool:
+    """
+    ChromeDriver 파일 유효성 검사
+
+    Args:
+        driver_path: ChromeDriver 경로
+
+    Returns:
+        유효 여부
+    """
+    if not os.path.exists(driver_path):
+        return False
+
+    # 파일 크기 확인 (손상된 파일 감지)
+    try:
+        file_size = os.path.getsize(driver_path)
+        # ChromeDriver는 보통 10MB 이상
+        if file_size < 1000000:  # 1MB 미만이면 손상된 것으로 간주
+            print(f"[SeleniumCookie] ChromeDriver 파일이 너무 작음 ({file_size} bytes), 손상 의심")
+            return False
+        return True
+    except Exception as e:
+        print(f"[SeleniumCookie] 파일 검사 오류: {e}")
+        return False
+
+
+def get_chrome_driver_robust(
+    chrome_options: Options,
+    max_retries: int = 2,
+    auto_clear_cache: bool = True
+) -> Optional[webdriver.Chrome]:
+    """
+    ChromeDriver 인스턴스 생성 (개선된 버전 - 여러 방법 순차 시도)
+
+    Args:
+        chrome_options: Chrome 옵션
+        max_retries: 최대 재시도 횟수
+        auto_clear_cache: 실패 시 자동 캐시 정리
+
+    Returns:
+        WebDriver 인스턴스 또는 None
+    """
+    driver = None
+    last_error = None
+
+    for attempt in range(max_retries):
+        if attempt > 0:
+            print(f"[SeleniumCookie] 재시도 {attempt + 1}/{max_retries}...")
+
+        # 방법 1: webdriver-manager 사용 (권장)
+        if WEBDRIVER_MANAGER_AVAILABLE:
+            try:
+                print("[SeleniumCookie] 방법 1: webdriver-manager로 ChromeDriver 설치...")
+                driver_path = ChromeDriverManager().install()
+                print(f"[SeleniumCookie] ChromeDriver 경로: {driver_path}")
+
+                # 파일 유효성 검사
+                if not validate_chromedriver_file(driver_path):
+                    raise ValueError("ChromeDriver 파일이 손상되었습니다")
+
+                service = Service(executable_path=driver_path)
+                driver = webdriver.Chrome(service=service, options=chrome_options)
+                print("[SeleniumCookie] ✅ webdriver-manager로 초기화 성공")
+                return driver
+
+            except OSError as e:
+                error_msg = str(e)
+                print(f"[SeleniumCookie] webdriver-manager 실패: {e}")
+
+                # WinError 193 처리 - ChromeDriver 파일 손상
+                if "193" in error_msg or "올바른 Win32 응용 프로그램" in error_msg:
+                    print("[SeleniumCookie] ChromeDriver 파일 손상 감지!")
+                    if auto_clear_cache:
+                        print("[SeleniumCookie] 캐시 정리 중...")
+                        clear_webdriver_cache()
+                        continue  # 재시도
+                last_error = e
+
+            except Exception as e:
+                print(f"[SeleniumCookie] webdriver-manager 실패: {e}")
+                last_error = e
+
+        # 방법 2: Selenium 4 자동 드라이버 관리 사용
+        try:
+            print("[SeleniumCookie] 방법 2: Selenium 자동 드라이버 관리...")
+            # Selenium 4.6+에서는 Service 없이도 자동으로 드라이버 관리
+            driver = webdriver.Chrome(options=chrome_options)
+            print("[SeleniumCookie] ✅ Selenium 자동 관리로 초기화 성공")
+            return driver
+
+        except OSError as e:
+            error_msg = str(e)
+            print(f"[SeleniumCookie] Selenium 자동 관리 실패: {e}")
+
+            if "193" in error_msg or "올바른 Win32 응용 프로그램" in error_msg:
+                if auto_clear_cache:
+                    clear_webdriver_cache()
+                    continue
+            last_error = e
+
+        except Exception as e:
+            print(f"[SeleniumCookie] Selenium 자동 관리 실패: {e}")
+            last_error = e
+
+        # 방법 3: 시스템 PATH에서 chromedriver 찾기
+        try:
+            print("[SeleniumCookie] 방법 3: 시스템 PATH에서 ChromeDriver 검색...")
+            service = Service()  # 기본값 사용
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+            print("[SeleniumCookie] ✅ 시스템 PATH의 ChromeDriver로 초기화 성공")
+            return driver
+
+        except Exception as e:
+            print(f"[SeleniumCookie] 시스템 PATH 검색 실패: {e}")
+            last_error = e
+
+        # 방법 4: 수동 경로 지정 시도
+        manual_paths = [
+            r"C:\chromedriver\chromedriver.exe",
+            r"C:\webdrivers\chromedriver.exe",
+            os.path.join(os.getcwd(), "chromedriver.exe"),
+            os.path.join(os.getcwd(), "drivers", "chromedriver.exe"),
+        ]
+
+        for path in manual_paths:
+            if os.path.exists(path) and validate_chromedriver_file(path):
+                try:
+                    print(f"[SeleniumCookie] 방법 4: 수동 경로 시도 - {path}")
+                    service = Service(executable_path=path)
+                    driver = webdriver.Chrome(service=service, options=chrome_options)
+                    print(f"[SeleniumCookie] ✅ 수동 경로로 초기화 성공: {path}")
+                    return driver
+                except Exception as e:
+                    print(f"[SeleniumCookie] 수동 경로 실패 ({path}): {e}")
+                    last_error = e
+
+    # 모든 방법 실패
+    print(f"[SeleniumCookie] ❌ 모든 ChromeDriver 초기화 방법 실패")
+    if last_error:
+        print(f"[SeleniumCookie] 마지막 오류: {last_error}")
+    return None
+
+
+def diagnose_chromedriver() -> Dict:
+    """
+    ChromeDriver 설치 상태 진단
+
+    Returns:
+        진단 결과 딕셔너리
+    """
+    result = {
+        'selenium_available': SELENIUM_AVAILABLE,
+        'webdriver_manager_available': WEBDRIVER_MANAGER_AVAILABLE,
+        'selenium_version': None,
+        'webdriver_manager_version': None,
+        'chromedriver_path': None,
+        'chromedriver_valid': False,
+        'cache_exists': False,
+        'errors': []
+    }
+
+    # Selenium 버전
+    if SELENIUM_AVAILABLE:
+        try:
+            import selenium
+            result['selenium_version'] = selenium.__version__
+        except Exception as e:
+            result['errors'].append(f"Selenium 버전 확인 실패: {e}")
+
+    # webdriver-manager 버전
+    if WEBDRIVER_MANAGER_AVAILABLE:
+        try:
+            import webdriver_manager
+            result['webdriver_manager_version'] = webdriver_manager.__version__
+        except Exception as e:
+            result['errors'].append(f"webdriver-manager 버전 확인 실패: {e}")
+
+        # ChromeDriver 경로 확인
+        try:
+            driver_path = ChromeDriverManager().install()
+            result['chromedriver_path'] = driver_path
+            result['chromedriver_valid'] = validate_chromedriver_file(driver_path)
+        except Exception as e:
+            result['errors'].append(f"ChromeDriver 경로 확인 실패: {e}")
+
+    # 캐시 존재 여부
+    cache_path = os.path.expanduser("~/.wdm")
+    result['cache_exists'] = os.path.exists(cache_path)
+
+    return result
 
 
 def check_selenium_available() -> Tuple[bool, str]:
@@ -148,10 +385,21 @@ def extract_imagefx_cookies_with_selenium(
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )
 
-        # WebDriver 초기화
+        # v2.0: 개선된 WebDriver 초기화 (여러 방법 순차 시도)
         print("[SeleniumCookie] ChromeDriver 초기화 중...")
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = get_chrome_driver_robust(
+            chrome_options=chrome_options,
+            max_retries=2,
+            auto_clear_cache=True
+        )
+
+        if driver is None:
+            print("[SeleniumCookie] ❌ ChromeDriver 초기화 실패")
+            print("[SeleniumCookie] 해결 방법:")
+            print("  1. 캐시 삭제: 사용자 홈 폴더/.wdm 삭제")
+            print("  2. 패키지 재설치: pip install selenium webdriver-manager --upgrade --force-reinstall")
+            print("  3. Chrome 브라우저 업데이트")
+            return None
 
         # 자동화 감지 우회 스크립트
         driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
@@ -326,15 +574,31 @@ def quick_test_selenium() -> Tuple[bool, str]:
         chrome_options = Options()
         chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
 
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        # v2.0: 개선된 초기화 사용
+        driver = get_chrome_driver_robust(
+            chrome_options=chrome_options,
+            max_retries=2,
+            auto_clear_cache=True
+        )
+
+        if driver is None:
+            return False, "ChromeDriver 초기화 실패. 캐시 삭제 후 재시도하세요: ~/.wdm 폴더 삭제"
+
         driver.get("https://www.google.com")
 
         title = driver.title
         driver.quit()
 
         return True, f"Selenium 정상 작동 (Google 페이지 제목: {title})"
+
+    except OSError as e:
+        error_msg = str(e)
+        if "193" in error_msg or "Win32" in error_msg:
+            clear_webdriver_cache()
+            return False, f"ChromeDriver 파일 손상. 캐시를 정리했습니다. 다시 시도하세요."
+        return False, f"Selenium OSError: {e}"
 
     except Exception as e:
         return False, f"Selenium 오류: {e}"
@@ -343,8 +607,20 @@ def quick_test_selenium() -> Tuple[bool, str]:
 # 테스트용
 if __name__ == "__main__":
     print("=" * 60)
-    print("Selenium 쿠키 추출 테스트")
+    print("Selenium 쿠키 추출 테스트 v2.0")
     print("=" * 60)
+
+    # 1. 진단 정보 출력
+    print("\n📋 진단 정보:")
+    diagnosis = diagnose_chromedriver()
+    print(f"  Selenium: {diagnosis.get('selenium_version', '미설치')}")
+    print(f"  webdriver-manager: {diagnosis.get('webdriver_manager_version', '미설치')}")
+    print(f"  ChromeDriver 경로: {diagnosis.get('chromedriver_path', '없음')}")
+    print(f"  ChromeDriver 유효: {'✅' if diagnosis.get('chromedriver_valid') else '❌'}")
+    print(f"  캐시 존재: {'✅' if diagnosis.get('cache_exists') else '❌'}")
+
+    if diagnosis.get('errors'):
+        print(f"  오류: {', '.join(diagnosis['errors'])}")
 
     # Selenium 확인
     available, msg = check_selenium_available()
@@ -355,16 +631,20 @@ if __name__ == "__main__":
         print("  pip install selenium webdriver-manager")
         exit(1)
 
-    # 빠른 테스트
-    print("\n빠른 테스트 중...")
+    # 2. 빠른 테스트
+    print("\n🧪 빠른 테스트 중...")
     ok, msg = quick_test_selenium()
     print(f"결과: {msg}")
 
     if not ok:
+        print("\n💡 해결 방법:")
+        print("  1. 캐시 삭제: 사용자 홈 폴더/.wdm 삭제")
+        print("  2. 패키지 재설치: pip install selenium webdriver-manager --upgrade --force-reinstall")
+        print("  3. Chrome 브라우저 업데이트")
         exit(1)
 
-    # 실제 쿠키 추출 테스트
-    print("\n쿠키 추출 테스트 (브라우저 창이 열립니다)...")
+    # 3. 실제 쿠키 추출 테스트
+    print("\n🍪 쿠키 추출 테스트 (브라우저 창이 열립니다)...")
     print("필요시 Google 계정으로 로그인하세요.")
 
     cookies = extract_imagefx_cookies_with_selenium(
@@ -374,7 +654,7 @@ if __name__ == "__main__":
     )
 
     if cookies:
-        print("\n추출된 쿠키:")
+        print("\n✅ 추출된 쿠키:")
         for name, value in cookies.items():
             print(f"  {name}: {value[:30]}...")
 
@@ -382,4 +662,4 @@ if __name__ == "__main__":
         header = cookies_to_header_string(cookies)
         print(f"  {header[:100]}...")
     else:
-        print("\n쿠키 추출 실패")
+        print("\n❌ 쿠키 추출 실패")

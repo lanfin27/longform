@@ -103,6 +103,19 @@ from utils.scene_selector import (
     get_selection_stats
 )
 
+# v3.35: 묶음 씬 이미지 생성 최적화
+try:
+    from utils.batch_image_optimizer import (
+        BatchImageOptimizer,
+        get_scenes_to_generate_and_copy,
+        print_optimization_summary,
+        get_latest_background_for_scene,
+        get_latest_composited_for_scene
+    )
+    BATCH_OPTIMIZER_AVAILABLE = True
+except ImportError:
+    BATCH_OPTIMIZER_AVAILABLE = False
+
 # v2.0: 메모리 관리 및 프롬프트 정제
 from utils.memory_manager import (
     cleanup_session_images,
@@ -199,11 +212,12 @@ def _count_scenes_with_korean_prompt(scenes: list) -> int:
     return count
 
 
-# 프롬프트 미리보기 및 결과 추적 (v2.0)
+# 프롬프트 미리보기 및 결과 추적 (v2.0, v2.1: 프롬프트 유형별 통계 추가)
 from utils.prompt_builder import (
     PromptBuilder,
     build_scene_previews,
     render_multi_scene_prompt_preview,
+    render_prompt_type_stats,  # v2.1: 프롬프트 유형별 통계
     ScenePromptPreview,
     get_generation_tracker,
     clear_generation_tracker,
@@ -400,7 +414,8 @@ def sync_all_data():
         return
 
     # 씬 데이터 로드 (통합 로더 사용 - Problem 56 수정)
-    scenes = load_scenes_data(str(project_path))
+    # ⭐ v3.41: 캐시된 함수 사용 (성능 최적화)
+    scenes = _cached_load_scenes(str(project_path))
     if scenes:
         st.session_state["scenes"] = scenes
 
@@ -470,6 +485,20 @@ def sync_all_data():
 def _cached_load_scenes(project_path_str: str) -> List[Dict]:
     """씬 데이터 로드 (캐싱 적용)"""
     return load_scenes_data(project_path_str)
+
+
+# ⭐ v3.41 성능 최적화: PromptTemplateManager 싱글톤 캐싱
+@st.cache_resource
+def _get_prompt_template_manager_cached():
+    """
+    PromptTemplateManager Streamlit 싱글톤
+
+    @st.cache_resource를 사용하여 세션 간 재사용
+    앱 재시작 전까지 동일 인스턴스 유지
+    """
+    from core.prompt.prompt_template_manager import PromptTemplateManager
+    print("[PromptTemplateManager] Streamlit 싱글톤 인스턴스 생성됨")
+    return PromptTemplateManager()
 
 
 def get_scenes() -> List[Dict]:
@@ -638,6 +667,89 @@ def _get_scene_preview_text(scene: Dict, max_len: int = 100) -> str:
     if len(text) > max_len:
         return text[:max_len] + "..."
     return text
+
+
+# ===================================================================
+# ⭐ v3.36: 성능 최적화 - 일괄 완료 상태 캐싱
+# ===================================================================
+
+@st.cache_data(ttl=30, show_spinner=False)
+def _get_completed_scene_ids_cached(project_path_str: str, _dir_mtime: float) -> set:
+    """
+    모든 씬의 완료 상태 일괄 확인 (캐싱)
+
+    성능 최적화: PIL 검증 없이 파일 크기만 확인 (10배 빠름)
+    """
+    completed = set()
+    comp_dir = Path(project_path_str) / "images" / "composited"
+
+    if not comp_dir.exists():
+        return completed
+
+    # 모든 scene_XXX 패턴 파일 스캔
+    for file_path in comp_dir.glob("scene_*.*"):
+        try:
+            # 파일 크기 체크만 (PIL 검증 생략 - 속도 향상)
+            if file_path.stat().st_size >= 1024:
+                # 파일명에서 씬 번호 추출
+                import re
+                match = re.search(r'scene_(\d+)', file_path.name)
+                if match:
+                    scene_id = int(match.group(1))
+                    completed.add(scene_id)
+        except Exception:
+            continue
+
+    return completed
+
+
+def get_completed_scene_ids() -> set:
+    """
+    완료된 씬 ID 목록 가져오기 (캐시 활용)
+
+    ⭐ v3.36: 성능 최적화 - 전체 씬 상태를 한 번에 확인
+    """
+    comp_dir = project_path / "images" / "composited"
+
+    # 디렉토리 수정 시간을 캐시 키로 사용
+    dir_mtime = 0
+    if comp_dir.exists():
+        try:
+            dir_mtime = comp_dir.stat().st_mtime
+        except:
+            pass
+
+    return _get_completed_scene_ids_cached(str(project_path), dir_mtime)
+
+
+def is_scene_completed(scene_id: int) -> bool:
+    """
+    씬 완료 여부 확인 (캐시 활용 - 빠름)
+
+    ⭐ v3.36: get_composited_for_scene() 대신 사용 권장
+    """
+    return scene_id in get_completed_scene_ids()
+
+
+def clear_completion_cache():
+    """완료 상태 캐시 클리어 (v2.0: 추가 캐시 포함)"""
+    _get_completed_scene_ids_cached.clear()
+
+    # v2.0: CharacterImageManager 캐시도 함께 클리어
+    try:
+        from utils.character_image_manager import CharacterImageManager
+        CharacterImageManager.clear_all_caches()
+    except Exception:
+        pass
+
+    # v2.0: 씬 이미지 경로 캐시 클리어
+    try:
+        from components.nano_banana_composite import _clear_scene_image_paths_cache
+        _clear_scene_image_paths_cache()
+    except Exception:
+        pass
+
+    print("[성능 최적화] 완료 상태 및 이미지 캐시 클리어됨")
 
 
 def get_composited_for_scene(scene_id: int) -> Optional[str]:
@@ -1282,26 +1394,43 @@ def render_background_step(scene_id: int, scene: Dict):
         col1, col2 = st.columns([3, 1])
 
         with col1:
-            # 프롬프트 우선순위: image_prompt_en > image_prompt_ko > prompts.image_prompt_en > background_prompt > description
+            # ⭐ v3.32: 프롬프트 유형 선택 반영
             prompts_data = scene.get("prompts", {})
-            default_prompt = (
-                scene.get("image_prompt_en", "") or
-                scene.get("image_prompt_ko", "") or
-                prompts_data.get("image_prompt_en", "") or
-                prompts_data.get("image_prompt_ko", "") or
-                scene.get("background_prompt", "") or
-                scene.get("description", "")
-            )
+            selected_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
 
-            # 프롬프트 소스 표시
-            prompt_source = "씬 분석 결과" if scene.get("image_prompt_en") or prompts_data.get("image_prompt_en") else "기본값"
+            if selected_prompt_type == "background_prompt":
+                # 배경 프롬프트 우선
+                default_prompt = (
+                    scene.get("background_prompt_en", "") or
+                    prompts_data.get("background_prompt_en", "") or
+                    scene.get("background_prompt", "") or
+                    prompts_data.get("background_prompt", "") or
+                    scene.get("image_prompt_en", "") or  # 폴백
+                    scene.get("description", "")
+                )
+                prompt_source = "배경 프롬프트" if (scene.get("background_prompt_en") or prompts_data.get("background_prompt_en")) else "폴백"
+            else:
+                # 전체 프롬프트 우선 (기본값)
+                default_prompt = (
+                    scene.get("image_prompt_en", "") or
+                    scene.get("image_prompt_ko", "") or
+                    prompts_data.get("image_prompt_en", "") or
+                    prompts_data.get("image_prompt_ko", "") or
+                    scene.get("background_prompt", "") or
+                    scene.get("description", "")
+                )
+                prompt_source = "전체 프롬프트" if (scene.get("image_prompt_en") or prompts_data.get("image_prompt_en")) else "기본값"
+            # ⭐ v3.32: 프롬프트 유형 표시 개선
+            prompt_type_emoji = "🏞️" if selected_prompt_type == "background_prompt" else "🖼️"
+            prompt_type_label = "배경 프롬프트" if selected_prompt_type == "background_prompt" else "전체 프롬프트"
+
             if default_prompt:
-                st.caption(f"📝 프롬프트 소스: {prompt_source}")
+                st.caption(f"{prompt_type_emoji} 프롬프트 유형: **{prompt_type_label}** | 소스: {prompt_source}")
             else:
                 st.warning("⚠️ 씬 분석에서 이미지 프롬프트가 생성되지 않았습니다. 씬 분석을 다시 실행하거나 직접 입력하세요.")
 
             prompt = st.text_area(
-                "배경 프롬프트 (편집 가능)",
+                f"{prompt_type_emoji} {prompt_type_label} (편집 가능)",
                 value=default_prompt,
                 height=100,
                 key=f"bg_prompt_{scene_id}",
@@ -1336,10 +1465,18 @@ def render_background_step(scene_id: int, scene: Dict):
             # v2.0: 세션에서 선택된 API/모델 가져오기
             selected_api = st.session_state.get("_scene_gen_api")
             selected_model = st.session_state.get("_scene_gen_model")
+
+            # ⭐ v3.28: 참조 프롬프트 수집
+            ref_prompts = {
+                "image_prompt_en": scene.get("image_prompt_en", "") or prompts_data.get("image_prompt_en", ""),
+                "background_prompt_en": scene.get("background_prompt_en", "") or prompts_data.get("background_prompt_en", "")
+            }
+
             generate_background_image(
                 scene_id, prompt, style, width, height,
                 api_provider=selected_api,
-                model=selected_model
+                model=selected_model,
+                reference_prompts=ref_prompts  # ⭐ v3.28: 참조 프롬프트 전달
             )
 
     elif bg_source == "📤 업로드":
@@ -1750,7 +1887,8 @@ def render_composite_step(scene_id: int, scene: Dict):
             if result:
                 st.session_state[f"composite_result_{scene_id}"] = result
                 st.success("✅ 합성 완료!")
-                st.rerun()
+                # v3.40: 즉시 이미지 표시 (rerun 제거)
+                st.image(result, use_container_width=True)
 
     # 합성 결과 표시
     result = st.session_state.get(f"composite_result_{scene_id}")
@@ -1845,8 +1983,9 @@ def render_edit_step(scene_id: int, scene: Dict):
                             new_result = execute_composite(scene_id, scene, remove_bg=True, use_scene_pose=use_scene_pose)
                             if new_result:
                                 st.session_state[f"composite_result_{scene_id}"] = new_result
-                                st.success("재합성 완료!")
-                                st.rerun()
+                                st.success("✅ 재합성 완료!")
+                                # v3.40: 즉시 이미지 표시 (rerun 제거)
+                                st.image(new_result, use_container_width=True)
 
                 with col2:
                     st.info("💡 위치 저장 후 재합성을 클릭하세요.")
@@ -1948,6 +2087,13 @@ def render_batch_generation_tab():
 
     # 현재 선택된 API 정보 배너 표시
     render_api_info_banner(batch_api_provider, batch_model)
+
+    # 캐시 새로고침 버튼
+    refresh_col1, refresh_col2 = st.columns([3, 1])
+    with refresh_col2:
+        if st.button("🔄 상태 새로고침", key="batch_refresh_cache", help="완료 상태 캐시를 갱신합니다"):
+            clear_completion_cache()
+            st.rerun()
 
     # 서브탭 구성
     batch_tabs = st.tabs(["🎨 배경+합성 일괄 생성", "🔄 합성만 일괄 실행"])
@@ -2054,16 +2200,17 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
     # 씬 선택 (범위 선택 기능 추가)
     # ============================================================
     total_scenes = len(scenes)
-    st.markdown(f"### 🎬 생성할 씬 선택 ({total_scenes}개)")
 
-    # 완료된 씬 목록 생성
-    completed_scene_ids = set()
-    scene_id_list = []
-    for scene in scenes:
-        scene_id = scene.get("scene_id")
-        scene_id_list.append(scene_id)
-        if get_composited_for_scene(scene_id) is not None:
-            completed_scene_ids.add(scene_id)
+    # ⭐ v3.27: scene_id 기반 범위 계산 (원본 SRT 씬 번호 사용)
+    scene_ids = [scene.get("scene_id", idx + 1) for idx, scene in enumerate(scenes)]
+    min_scene_id = min(scene_ids) if scene_ids else 1
+    max_scene_id = max(scene_ids) if scene_ids else 1
+
+    st.markdown(f"### 🎬 생성할 씬 선택 ({total_scenes}개, 씬 번호: {min_scene_id}-{max_scene_id})")
+
+    # ⭐ v3.36: 완료된 씬 목록 (캐시 활용 - 성능 최적화)
+    completed_scene_ids = get_completed_scene_ids()
+    scene_id_list = [scene.get("scene_id") for scene in scenes]
 
     # ============================================================
     # 빠른 선택 섹션
@@ -2090,7 +2237,8 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
             if st.button("⬜ 미완료만", key="batch_select_incomplete", use_container_width=True):
                 for scene in scenes:
                     scene_id = scene.get("scene_id")
-                    has_image = get_composited_for_scene(scene_id) is not None
+                    # ⭐ v3.36: 캐시된 완료 상태 사용 (성능 최적화)
+                    has_image = scene_id in completed_scene_ids
                     st.session_state[f"batch_select_{scene_id}"] = not has_image
                 st.rerun()
 
@@ -2110,11 +2258,12 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
         range_col1, range_col2, range_col3, range_col4, range_col5 = st.columns([1.5, 0.5, 1.5, 1.5, 1.5])
 
         with range_col1:
+            # ⭐ v3.27: scene_id 기반 범위 (원본 SRT 씬 번호)
             range_start = st.number_input(
                 "시작",
-                min_value=1,
-                max_value=total_scenes,
-                value=1,
+                min_value=min_scene_id,
+                max_value=max_scene_id,
+                value=min_scene_id,
                 key="batch_range_start",
                 label_visibility="collapsed"
             )
@@ -2123,11 +2272,12 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
             st.markdown("<div style='text-align: center; padding-top: 8px; font-weight: bold;'>~</div>", unsafe_allow_html=True)
 
         with range_col3:
+            # ⭐ v3.27: scene_id 기반 범위 (원본 SRT 씬 번호)
             range_end = st.number_input(
                 "끝",
-                min_value=1,
-                max_value=total_scenes,
-                value=min(10, total_scenes),
+                min_value=min_scene_id,
+                max_value=max_scene_id,
+                value=min(min_scene_id + 9, max_scene_id),
                 key="batch_range_end",
                 label_visibility="collapsed"
             )
@@ -2176,9 +2326,10 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
         input_col1, input_col2 = st.columns([4, 1])
 
         with input_col1:
+            # ⭐ v3.27: 플레이스홀더에 실제 씬 번호 범위 표시
             custom_input = st.text_input(
                 "씬 번호 입력",
-                placeholder="1-10, 15, 20-30, 50 또는 1~10, 15, 20~30",
+                placeholder=f"{min_scene_id}-{max_scene_id} 또는 {min_scene_id}~{min(min_scene_id+5, max_scene_id)}, {max_scene_id}",
                 key="batch_custom_scene_input",
                 label_visibility="collapsed"
             )
@@ -2186,7 +2337,8 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
         with input_col2:
             if st.button("✅ 적용", key="batch_apply_custom", use_container_width=True):
                 if custom_input:
-                    parsed_scenes = parse_scene_range_input(custom_input, total_scenes)
+                    # ⭐ v3.27: scene_id 기반 범위 사용 (원본 SRT 씬 번호)
+                    parsed_scenes = parse_scene_range_input(custom_input, max_scene_id)
 
                     if parsed_scenes:
                         # 모두 해제 후 파싱된 씬만 선택
@@ -2287,7 +2439,7 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
         st.warning("⚠️ 선택된 씬이 없습니다.")
 
     # ============================================================
-    # 개별 체크박스 (기존 UI - Expander로 축소)
+    # 개별 체크박스 (⭐ v3.36: 페이지네이션 및 캐싱 최적화)
     # ============================================================
     with st.expander("📋 개별 씬 선택 (체크박스)", expanded=False):
         # 선택 UI 모드
@@ -2298,18 +2450,56 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
             key="batch_view_mode"
         )
 
+        # ⭐ v3.36: 페이지네이션 설정 (성능 최적화)
+        ITEMS_PER_PAGE = 30  # 한 페이지에 표시할 씬 수
+
+        if len(scenes) > ITEMS_PER_PAGE:
+            total_pages = max(1, (len(scenes) + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE)
+
+            # 현재 페이지 상태
+            if 'batch_checkbox_page' not in st.session_state:
+                st.session_state.batch_checkbox_page = 0
+
+            # 페이지 네비게이션
+            nav_col1, nav_col2, nav_col3 = st.columns([1, 3, 1])
+
+            with nav_col1:
+                if st.button("◀ 이전", key="batch_cb_prev", disabled=st.session_state.batch_checkbox_page == 0):
+                    st.session_state.batch_checkbox_page -= 1
+                    st.rerun()
+
+            with nav_col2:
+                current_page = st.session_state.batch_checkbox_page
+                start_scene = current_page * ITEMS_PER_PAGE + 1
+                end_scene = min((current_page + 1) * ITEMS_PER_PAGE, len(scenes))
+                st.caption(f"📄 페이지 {current_page + 1}/{total_pages} (씬 {start_scene}~{end_scene})")
+
+            with nav_col3:
+                if st.button("다음 ▶", key="batch_cb_next", disabled=st.session_state.batch_checkbox_page >= total_pages - 1):
+                    st.session_state.batch_checkbox_page += 1
+                    st.rerun()
+
+            # 현재 페이지의 씬만 가져오기
+            start_idx = st.session_state.batch_checkbox_page * ITEMS_PER_PAGE
+            end_idx = min(start_idx + ITEMS_PER_PAGE, len(scenes))
+            page_scenes = scenes[start_idx:end_idx]
+        else:
+            page_scenes = scenes
+            start_idx = 0
+
         if view_mode == "컴팩트":
-            # 컴팩트 모드
+            # 컴팩트 모드 (⭐ 캐시된 완료 상태 사용)
             cols_count = 6
-            for row_start in range(0, len(scenes), cols_count):
-                row_scenes = scenes[row_start:row_start + cols_count]
+            for row_start in range(0, len(page_scenes), cols_count):
+                row_scenes = page_scenes[row_start:row_start + cols_count]
                 cols = st.columns(cols_count)
 
                 for col_idx, scene in enumerate(row_scenes):
                     scene_id = scene.get("scene_id")
-                    unique_idx = row_start + col_idx  # 고유 인덱스
+                    unique_idx = start_idx + row_start + col_idx  # 고유 인덱스
                     with cols[col_idx]:
-                        has_image = get_composited_for_scene(scene_id) is not None
+                        # ⭐ v3.36: 캐시된 완료 상태 사용 (성능 최적화)
+                        has_image = scene_id in completed_scene_ids
                         status_icon = "✅" if has_image else "⬜"
 
                         is_selected = st.checkbox(
@@ -2324,10 +2514,11 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                         else:
                             st.session_state[f"batch_select_{scene_id}"] = False
         else:
-            # 텍스트 포함 모드
-            for i, scene in enumerate(scenes):
+            # 텍스트 포함 모드 (⭐ 캐시된 완료 상태 사용)
+            for i, scene in enumerate(page_scenes):
                 scene_id = scene.get("scene_id")
-                has_image = get_composited_for_scene(scene_id) is not None
+                # ⭐ v3.36: 캐시된 완료 상태 사용 (성능 최적화)
+                has_image = scene_id in completed_scene_ids
                 status_icon = "✅" if has_image else "⬜"
 
                 scene_text = (
@@ -2340,10 +2531,11 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                 col1, col2 = st.columns([1, 10])
 
                 with col1:
+                    unique_idx = start_idx + i
                     is_selected = st.checkbox(
                         f"선택",
                         value=st.session_state.get(f"batch_select_{scene_id}", False),
-                        key=f"batch_cb_{scene_id}_text_idx{i}",
+                        key=f"batch_cb_{scene_id}_text_idx{unique_idx}",
                         label_visibility="collapsed"
                     )
 
@@ -2398,6 +2590,35 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
             st.caption("💡 배경 이미지만 생성합니다. 캐릭터는 별도로 합성됩니다.")
         else:
             st.caption("💡 배경과 캐릭터가 함께 포함된 완성 이미지를 생성합니다. (합성 불필요)")
+
+    # ============================================================
+    # 프롬프트 유형 선택 (v1.1)
+    # ============================================================
+    with st.container(border=True):
+        st.markdown("#### 📝 프롬프트 유형 선택")
+
+        prompt_type = persistent_radio(
+            "이미지 생성에 사용할 프롬프트",
+            options=["full_prompt", "background_prompt"],
+            format_func=lambda x: {
+                "full_prompt": "🖼️ 전체 프롬프트 (캐릭터 + 배경)",
+                "background_prompt": "🏞️ 배경 프롬프트만 (배경 전용)"
+            }.get(x, x),
+            page="image_generation",
+            setting_key="prompt_type",
+            horizontal=True
+        )
+
+        # 프롬프트 유형 설명
+        if prompt_type == "background_prompt":
+            st.caption("💡 씬 분석 결과의 **배경 프롬프트**를 사용합니다. 캐릭터 정보가 제외됩니다.")
+            if "씬 합성" in style_mode:
+                st.warning("⚠️ 씬 합성 모드에서는 **전체 프롬프트**를 권장합니다.")
+        else:
+            st.caption("💡 씬 분석 결과의 **전체 이미지 프롬프트**를 사용합니다. (기본값)")
+
+        # 세션 상태에 저장
+        st.session_state["selected_prompt_type"] = prompt_type
 
     st.markdown("")
 
@@ -2538,16 +2759,33 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                     st.markdown("**Negative:**")
                     st.code(composite_style.negative_prompt[:200] + "..." if len(composite_style.negative_prompt) > 200 else composite_style.negative_prompt or "(없음)", language=None)
 
-                # 예시 프롬프트 (씬 1 기준)
+                # 예시 프롬프트 (씬 1 기준) - v3.33: 프롬프트 유형 반영
                 with st.expander("👁️ 완성 프롬프트 예시 (씬 1 기준)", expanded=False):
                     if scenes:
                         scene_1 = scenes[0]
                         prompts_data = scene_1.get("prompts", {})
-                        scene_prompt = (
-                            scene_1.get("image_prompt_en", "") or
-                            prompts_data.get("image_prompt_en", "") or
-                            scene_1.get("background_prompt", "")
-                        )
+
+                        # v3.33: 선택된 프롬프트 유형 반영
+                        preview_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
+                        if preview_prompt_type == "background_prompt":
+                            scene_prompt = (
+                                scene_1.get("background_prompt_en", "") or
+                                prompts_data.get("background_prompt_en", "") or
+                                scene_1.get("background_prompt", "")
+                            )
+                            preview_type_label = "🏞️ 배경 프롬프트"
+                            # v3.34: 배경 프롬프트 모드에서는 캐릭터 제외 태그 추가 (더 강력한 키워드)
+                            if scene_prompt:
+                                scene_prompt = f"{scene_prompt.strip()}, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot"
+                        else:
+                            scene_prompt = (
+                                scene_1.get("image_prompt_en", "") or
+                                prompts_data.get("image_prompt_en", "") or
+                                scene_1.get("background_prompt", "")
+                            )
+                            preview_type_label = "🖼️ 전체 프롬프트"
+
+                        st.info(f"🎯 프롬프트 유형: {preview_type_label}")
 
                         if scene_prompt:
                             example_result = build_scene_composite_prompt(
@@ -2606,15 +2844,30 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
 
             if first_scene:
                 prompts_data = first_scene.get("prompts", {})
-                scene_prompt = (
-                    first_scene.get("image_prompt_en", "") or
-                    prompts_data.get("image_prompt_en", "") or
-                    first_scene.get("image_prompt_ko", "") or
-                    first_scene.get("background_prompt", "") or
-                    first_scene.get("description", "")
-                )
 
-                st.caption(f"씬 {first_scene_id} 프롬프트 구조 예시")
+                # ⭐ v3.32: 프롬프트 유형 선택 반영
+                selected_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
+                if selected_prompt_type == "background_prompt":
+                    scene_prompt = (
+                        first_scene.get("background_prompt_en", "") or
+                        prompts_data.get("background_prompt_en", "") or
+                        first_scene.get("background_prompt", "") or
+                        prompts_data.get("background_prompt", "") or
+                        first_scene.get("image_prompt_en", "") or  # 폴백
+                        first_scene.get("description", "")
+                    )
+                    prompt_type_label = "🏞️ 배경 프롬프트"
+                else:
+                    scene_prompt = (
+                        first_scene.get("image_prompt_en", "") or
+                        prompts_data.get("image_prompt_en", "") or
+                        first_scene.get("image_prompt_ko", "") or
+                        first_scene.get("background_prompt", "") or
+                        first_scene.get("description", "")
+                    )
+                    prompt_type_label = "🖼️ 전체 프롬프트"
+
+                st.caption(f"씬 {first_scene_id} 프롬프트 구조 예시 ({prompt_type_label})")
 
                 builder = PromptBuilder()
 
@@ -2768,6 +3021,20 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
     st.markdown("---")
 
     # ============================================================
+    # 📊 프롬프트 유형별 통계 (v2.1)
+    # ============================================================
+    if selected_scenes and scenes:
+        # 현재 선택된 프롬프트 유형 키
+        preview_prompt_key = "background_prompt_en" if st.session_state.get("selected_prompt_type") == "background_prompt" else "image_prompt_en"
+
+        with st.expander("📊 프롬프트 유형별 현황", expanded=True):
+            render_prompt_type_stats(
+                scenes=scenes,
+                selected_prompt_key=preview_prompt_key,
+                selected_scene_ids=selected_scenes
+            )
+
+    # ============================================================
     # 🔍 선택된 씬 프롬프트 미리보기 (v2.0)
     # ============================================================
     if selected_scenes and scenes:
@@ -2792,7 +3059,8 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                 preview_negative = composite_style.negative_prompt if (composite_style and apply_negative) else ""
                 preview_style_name = composite_style.name_ko if composite_style else "기본"
 
-            # 프롬프트 미리보기 생성
+            # 프롬프트 미리보기 생성 (v1.2: 선택된 프롬프트 유형 반영, 영문 우선)
+            # preview_prompt_key는 위에서 이미 정의됨
             scene_previews = build_scene_previews(
                 scenes=scenes,
                 selected_scene_ids=selected_scenes,
@@ -2800,7 +3068,7 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                 style_suffix=preview_suffix,
                 negative_prompt=preview_negative,
                 style_name=preview_style_name,
-                prompt_key="image_prompt_en"
+                prompt_key=preview_prompt_key
             )
 
             # 미리보기 UI 렌더링
@@ -2812,9 +3080,89 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
 
     st.markdown("---")
 
+    # ============================================================
+    # v3.35: 묶음 최적화 옵션
+    # ============================================================
+    use_batch_optimization = False
+    optimization_plan = None
+    scenes_to_generate = selected_scenes
+    scenes_to_copy = {}
+
+    if BATCH_OPTIMIZER_AVAILABLE and len(selected_scenes) > 1:
+        with st.container(border=True):
+            st.markdown("#### ⚡ 묶음 최적화 (동일 프롬프트 씬 복사)")
+
+            # 프롬프트 필드 결정
+            selected_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
+            if selected_prompt_type == "background_prompt":
+                prompt_field = "background_prompt_en"
+            else:
+                prompt_field = "image_prompt_en"
+
+            # 최적화 미리보기 계산
+            try:
+                optimizer = BatchImageOptimizer(str(project_path))
+                optimization_plan = optimizer.get_optimization_plan(selected_scenes, prompt_field)
+                stats = optimization_plan['stats']
+
+                # 최적화 가능 여부 확인
+                if stats.to_copy > 0:
+                    use_batch_optimization = st.checkbox(
+                        f"🚀 묶음 최적화 사용 (API 호출 {stats.to_copy}회 절약)",
+                        value=True,
+                        help="동일한 프롬프트를 가진 씬들 중 첫 번째만 생성하고 나머지는 복사합니다.",
+                        key="use_batch_optimization"
+                    )
+
+                    if use_batch_optimization:
+                        # 통계 표시
+                        col1, col2, col3, col4 = st.columns(4)
+
+                        with col1:
+                            st.metric("전체 씬", f"{stats.total_scenes}개")
+                        with col2:
+                            st.metric("실제 생성", f"{stats.to_generate}개")
+                        with col3:
+                            st.metric("복사", f"{stats.to_copy}개")
+                        with col4:
+                            st.metric(
+                                "시간 절약",
+                                f"{stats.time_saved_percent:.0f}%",
+                                delta=f"-{stats.time_saved:.0f}초"
+                            )
+
+                        # 묶음 그룹 상세
+                        with st.expander("📦 묶음 그룹 상세", expanded=False):
+                            for group in optimization_plan['groups']:
+                                if group['followers']:
+                                    followers_str = ', '.join(map(str, group['followers']))
+                                    st.caption(
+                                        f"• 씬 **{group['representative']}** (생성) → "
+                                        f"씬 {followers_str} (복사)"
+                                    )
+                                    st.caption(f"  프롬프트: {group['prompt_preview']}")
+
+                        # 생성/복사 씬 분리
+                        scenes_to_generate = optimization_plan['scenes_to_generate']
+                        scenes_to_copy = optimization_plan['scenes_to_copy']
+                else:
+                    st.info("ℹ️ 모든 씬이 고유한 프롬프트를 사용합니다. (최적화 불필요)")
+
+            except Exception as e:
+                st.warning(f"⚠️ 최적화 계획 생성 실패: {e}")
+                use_batch_optimization = False
+
+    st.markdown("---")
+
+    # 생성 버튼 텍스트 업데이트
+    if use_batch_optimization and scenes_to_copy:
+        btn_text = f"🚀 씬 일괄 생성 (생성 {len(scenes_to_generate)}개 + 복사 {len(scenes_to_copy)}개)"
+    else:
+        btn_text = f"씬 일괄 생성 ({len(selected_scenes)}개)"
+
     # 생성 버튼
     if st.button(
-        f"씬 일괄 생성 ({len(selected_scenes)}개)",
+        btn_text,
         type="primary",
         use_container_width=True,
         disabled=len(selected_scenes) == 0
@@ -2822,16 +3170,54 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
         # v2.0: 배치 시작 전 메모리 최적화
         optimize_memory_for_batch()
 
+        # v3.35: 최적화 로그 출력
+        if use_batch_optimization and optimization_plan:
+            optimizer = BatchImageOptimizer(str(project_path))
+            optimizer.print_optimization_plan(optimization_plan)
+
         progress = st.progress(0)
         status = st.empty()
+
+        # v3.35: 생성된 이미지 경로 추적 (복사용)
+        generated_images = {}
 
         success_count = 0
         error_count = 0
         first_image_processed = False  # 첫 이미지 처리 여부 (시드 잠금용)
 
-        for i, scene_id in enumerate(selected_scenes):
-            status.text(f"씬 {scene_id} 처리 중... ({i+1}/{len(selected_scenes)})")
-            progress.progress((i + 1) / len(selected_scenes))
+        # v2.1: 프롬프트 유형별 이모지
+        PROMPT_TYPE_EMOJI = {
+            "full_prompt": "🖼️",
+            "background_prompt": "🏞️"
+        }
+
+        # v3.31: 프롬프트 유형 디버그 로깅
+        batch_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
+        print(f"[일괄생성 시작] 선택된 프롬프트 유형: {batch_prompt_type}", flush=True)
+        print(f"[일괄생성 시작] 선택된 씬 수: {len(selected_scenes)}", flush=True)
+
+        # v3.35: 최적화 모드 로깅
+        if use_batch_optimization and scenes_to_copy:
+            print(f"[일괄생성] 🚀 묶음 최적화 활성화")
+            print(f"[일괄생성]    생성 대상: {len(scenes_to_generate)}개 씬")
+            print(f"[일괄생성]    복사 대상: {len(scenes_to_copy)}개 씬")
+
+        # v3.35: 최적화 모드에서는 scenes_to_generate만 처리
+        actual_scenes_to_process = scenes_to_generate if use_batch_optimization else selected_scenes
+        total_to_process = len(actual_scenes_to_process) + (len(scenes_to_copy) if use_batch_optimization else 0)
+
+        for i, scene_id in enumerate(actual_scenes_to_process):
+            # v2.1: 프롬프트 유형 표시 추가
+            selected_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
+            type_emoji = PROMPT_TYPE_EMOJI.get(selected_prompt_type, "🖼️")
+
+            # v3.35: 최적화 모드 표시
+            if use_batch_optimization:
+                status.text(f"{type_emoji} 씬 {scene_id} 생성 중... ({i+1}/{len(actual_scenes_to_process)} 생성)")
+            else:
+                status.text(f"{type_emoji} 씬 {scene_id} 처리 중... ({i+1}/{len(selected_scenes)})")
+
+            progress.progress((i + 1) / total_to_process)
 
             scene = get_scene_by_id(scene_id)
             if not scene:
@@ -2839,19 +3225,47 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                 continue
 
             try:
-                # 프롬프트 가져오기 (공통)
+                # 프롬프트 가져오기 (v1.1: 선택된 프롬프트 유형에 따라)
                 prompts_data = scene.get("prompts", {})
-                prompt = (
-                    scene.get("image_prompt_en", "") or
-                    prompts_data.get("image_prompt_en", "") or
-                    scene.get("image_prompt_ko", "") or
-                    scene.get("background_prompt", "") or
-                    scene.get("description", "")
-                )
+
+                if selected_prompt_type == "background_prompt":
+                    # v3.31: 배경 프롬프트 전용 - image_prompt_en으로 폴백하지 않음
+                    background_prompt = (
+                        scene.get("background_prompt_en", "") or
+                        prompts_data.get("background_prompt_en", "") or
+                        scene.get("background_prompt", "") or
+                        prompts_data.get("background_prompt", "")
+                    )
+
+                    if background_prompt:
+                        prompt = background_prompt
+                        prompt_type_label = "🏞️ 배경"
+                    else:
+                        # 배경 프롬프트가 없으면 경고 후 스킵 (폴백하지 않음)
+                        st.warning(f"⚠️ 씬 {scene_id}: 배경 프롬프트가 없습니다. (씬 분석에서 생성 필요)")
+                        print(f"[일괄생성] ⚠️ 씬 {scene_id}: background_prompt_en 없음 - 스킵됨")
+                        error_count += 1
+                        continue
+                else:
+                    # 전체 프롬프트 (기본값)
+                    prompt = (
+                        scene.get("image_prompt_en", "") or
+                        prompts_data.get("image_prompt_en", "") or
+                        scene.get("image_prompt_ko", "") or
+                        scene.get("background_prompt", "") or
+                        scene.get("description", "")
+                    )
+                    prompt_type_label = "🖼️ 전체"
 
                 if not prompt:
                     st.warning(f"⚠️ 씬 {scene_id}: 이미지 프롬프트가 없습니다.")
                     continue
+
+                # ⭐ v3.28: 참조 프롬프트 수집 (두 가지 프롬프트 유형 모두)
+                reference_prompts = {
+                    "image_prompt_en": scene.get("image_prompt_en", "") or prompts_data.get("image_prompt_en", ""),
+                    "background_prompt_en": scene.get("background_prompt_en", "") or prompts_data.get("background_prompt_en", "")
+                }
 
                 # 수정된 프롬프트 적용
                 batch_edits = st.session_state.get("batch_prompt_edits", {"mode": "default"})
@@ -2862,8 +3276,15 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                     edited_suffix = batch_edits.get("suffix", "")
                     edited_negative = batch_edits.get("negative", "")
 
+                    # v3.33: 배경 프롬프트 모드에서 캐릭터 제외 태그 추가 (더 강력한 키워드)
+                    if selected_prompt_type == "background_prompt":
+                        prompt_with_bg_tags = f"{prompt.strip()}, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot"
+                        print(f"[일괄생성] 🏞️ 배경 프롬프트 + 수정 스타일: 캐릭터 제외 태그 추가됨")
+                    else:
+                        prompt_with_bg_tags = prompt
+
                     # 최종 프롬프트 조합
-                    final_prompt = ", ".join(filter(None, [edited_prefix, prompt, edited_suffix]))
+                    final_prompt = ", ".join(filter(None, [edited_prefix, prompt_with_bg_tags, edited_suffix]))
                     use_edited_style = True
                 else:
                     final_prompt = prompt  # 기본 스타일 사용
@@ -2892,11 +3313,12 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                                 seed=current_seed  # ⭐ 시드 전달
                             )
                         else:
-                            print(f"[일괄생성-배경] 씬 {scene_id}: {prompt[:100]}...")
+                            print(f"[일괄생성-배경] 씬 {scene_id} ({prompt_type_label} 프롬프트): {prompt[:100]}...")
                             generate_background_image(
                                 scene_id, prompt, style, 1280, 720,
                                 api_provider=batch_api, model=batch_model,
-                                seed=current_seed  # ⭐ 시드 전달
+                                seed=current_seed,  # ⭐ 시드 전달
+                                reference_prompts=reference_prompts  # ⭐ v3.28: 참조 프롬프트 전달
                             )
                         time.sleep(1)  # API 속도 제한
 
@@ -2924,7 +3346,7 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                                 seed=current_seed  # ⭐ 시드 전달
                             )
                         else:
-                            print(f"[일괄생성-씬합성] 씬 {scene_id}: {prompt[:100]}...")
+                            print(f"[일괄생성-씬합성] 씬 {scene_id} ({prompt_type_label} 프롬프트): {prompt[:100]}...")
                             generate_scene_composite_image(
                                 scene_id=scene_id,
                                 scene_prompt=prompt,
@@ -2932,7 +3354,8 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                                 apply_negative=apply_negative,
                                 width=1280,
                                 height=720,
-                                seed=current_seed  # ⭐ 시드 전달
+                                seed=current_seed,  # ⭐ 시드 전달
+                                reference_prompts=reference_prompts  # ⭐ v3.28: 참조 프롬프트 전달
                             )
                         time.sleep(1)  # API 속도 제한
                     else:
@@ -2941,6 +3364,25 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
 
                 success_count += 1
 
+                # v3.35: 최적화 모드에서 생성된 이미지 경로 추적
+                if use_batch_optimization and scene_id in scenes_to_copy.values():
+                    # 이 씬이 다른 씬들의 소스가 되는 경우 경로 저장
+                    pass  # 아래에서 일괄 처리
+
+                # v3.35: 생성된 이미지 경로 추적 (복사용)
+                if use_batch_optimization:
+                    try:
+                        if "배경만" in style_mode:
+                            img_path = get_latest_background_for_scene(str(project_path), scene_id)
+                        else:
+                            img_path = get_latest_composited_for_scene(str(project_path), scene_id)
+
+                        if img_path:
+                            generated_images[scene_id] = img_path
+                            print(f"[일괄생성] ✅ 씬 {scene_id} 이미지 경로 추적: {img_path}")
+                    except Exception as track_err:
+                        print(f"[일괄생성] ⚠️ 씬 {scene_id} 경로 추적 실패: {track_err}")
+
             except Exception as e:
                 st.error(f"씬 {scene_id} 처리 실패: {e}")
                 error_count += 1
@@ -2948,27 +3390,125 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
             # 메모리 정리 (Out of Memory 방지)
             gc.collect()
 
+        # ============================================================
+        # v3.35: 복사 대상 씬 처리 (묶음 최적화)
+        # ============================================================
+        copy_count = 0
+        copy_errors = 0
+
+        if use_batch_optimization and scenes_to_copy:
+            print(f"[일괄생성] 📋 복사 처리 시작: {len(scenes_to_copy)}개 씬")
+            status.text(f"📋 이미지 복사 중... (0/{len(scenes_to_copy)})")
+
+            optimizer = BatchImageOptimizer(str(project_path))
+
+            for idx, (target_scene, source_scene) in enumerate(scenes_to_copy.items()):
+                try:
+                    # 진행 상태 업데이트
+                    progress_val = (len(scenes_to_generate) + idx + 1) / total_to_process
+                    progress.progress(progress_val)
+                    status.text(f"📋 씬 {target_scene} 복사 중... ({idx+1}/{len(scenes_to_copy)})")
+
+                    # 소스 이미지 경로 확인
+                    source_path = generated_images.get(source_scene)
+
+                    if not source_path:
+                        # 직접 파일 시스템에서 찾기
+                        if "배경만" in style_mode:
+                            source_path = get_latest_background_for_scene(str(project_path), source_scene)
+                        else:
+                            source_path = get_latest_composited_for_scene(str(project_path), source_scene)
+
+                    if not source_path or not os.path.exists(source_path):
+                        print(f"[일괄생성] ⚠️ 씬 {target_scene}: 소스 씬 {source_scene}의 이미지를 찾을 수 없음")
+                        copy_errors += 1
+                        continue
+
+                    # 이미지 타입 결정
+                    image_type = "background" if "배경만" in style_mode else "composited"
+
+                    # 이미지 복사
+                    copied_path = optimizer.copy_image_for_scene(
+                        source_scene_num=source_scene,
+                        target_scene_num=target_scene,
+                        source_image_path=source_path,
+                        image_type=image_type
+                    )
+
+                    if copied_path:
+                        copy_count += 1
+                        print(f"[일괄생성] ✅ 씬 {target_scene} 복사 완료: {copied_path}")
+
+                        # 씬 데이터에 경로 업데이트
+                        try:
+                            from core.scene.scene_manager import SceneManager
+                            scene_manager = SceneManager(str(project_path))
+
+                            if image_type == "background":
+                                scene_manager.update_scene(target_scene, {
+                                    "background_image": copied_path,
+                                    "copied_from_scene": source_scene
+                                })
+                            else:
+                                scene_manager.update_scene(target_scene, {
+                                    "composed_scene_image": copied_path,
+                                    "copied_from_scene": source_scene
+                                })
+                        except Exception as update_err:
+                            print(f"[일괄생성] ⚠️ 씬 {target_scene} 데이터 업데이트 실패: {update_err}")
+                    else:
+                        copy_errors += 1
+                        print(f"[일괄생성] ❌ 씬 {target_scene} 복사 실패")
+
+                except Exception as copy_err:
+                    print(f"[일괄생성] ❌ 씬 {target_scene} 복사 중 오류: {copy_err}")
+                    copy_errors += 1
+
+            print(f"[일괄생성] 📋 복사 완료: 성공 {copy_count}개, 실패 {copy_errors}개")
+
         progress.progress(1.0)
         status.empty()
 
         # v2.0: 배치 완료 후 메모리 정리
         cleanup_after_batch()
 
+        # 완료 상태 캐시 갱신
+        clear_completion_cache()
+
         # ============================================================
-        # 📊 생성 결과 요약 (v2.0)
+        # 📊 생성 결과 요약 (v2.0, v3.35 복사 카운트 추가)
         # ============================================================
         st.markdown("## 📊 생성 결과")
 
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("✅ 성공", f"{success_count}개")
-        with col2:
-            st.metric("❌ 실패", f"{error_count}개")
-        with col3:
-            total_time = time.time() - (progress.progress(0) if False else 0)  # 대략적 시간
-            st.metric("📋 총 처리", f"{len(selected_scenes)}개")
+        # v3.35: 최적화 모드에서 복사 카운트 표시
+        if use_batch_optimization and (copy_count > 0 or copy_errors > 0):
+            col1, col2, col3, col4, col5 = st.columns(5)
+            with col1:
+                st.metric("🎨 생성", f"{success_count}개")
+            with col2:
+                st.metric("📋 복사", f"{copy_count}개")
+            with col3:
+                total_errors = error_count + copy_errors
+                st.metric("❌ 실패", f"{total_errors}개")
+            with col4:
+                total_success = success_count + copy_count
+                st.metric("✅ 총 성공", f"{total_success}개")
+            with col5:
+                st.metric("📋 총 처리", f"{len(selected_scenes)}개")
+        else:
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("✅ 성공", f"{success_count}개")
+            with col2:
+                st.metric("❌ 실패", f"{error_count}개")
+            with col3:
+                st.metric("📋 총 처리", f"{len(selected_scenes)}개")
 
-        if success_count > 0:
+        # v3.35: 최적화 결과 메시지
+        if use_batch_optimization and copy_count > 0:
+            st.success(f"🚀 묶음 최적화 완료! 생성 {success_count}개 + 복사 {copy_count}개 = 총 {success_count + copy_count}개 씬 처리")
+            st.info(f"💡 API 호출 {copy_count}회 절약 (복사로 처리)")
+        elif success_count > 0:
             st.success(f"✅ {success_count}개 씬 처리 완료!")
 
             # 프롬프트 확인 안내
@@ -3131,6 +3671,9 @@ def _render_scene_preview_cards(scenes: List[Dict], all_characters: List[Dict]) 
     ext_chars = st.session_state.get("external_characters", [])
     all_chars_combined = all_characters + ext_chars
 
+    # 성능 최적화: 캐싱된 완료 상태 한 번만 조회
+    completed_ids = get_completed_scene_ids()
+
     # 2열 그리드
     cols_per_row = 2
     for row_start in range(0, len(scenes), cols_per_row):
@@ -3140,7 +3683,7 @@ def _render_scene_preview_cards(scenes: List[Dict], all_characters: List[Dict]) 
             scene_id = scene.get("scene_id")
             scene_idx = row_start + col_idx  # 고유 인덱스
             scene_chars = scene.get("characters", [])
-            has_composite = get_composited_for_scene(scene_id) is not None
+            has_composite = scene_id in completed_ids
 
             with cols[col_idx]:
                 # 카드 컨테이너
@@ -3234,10 +3777,13 @@ def _render_scene_list_view(scenes: List[Dict], all_characters: List[Dict]) -> L
     ext_chars = st.session_state.get("external_characters", [])
     all_chars_combined = all_characters + ext_chars
 
+    # 성능 최적화: 캐싱된 완료 상태 한 번만 조회
+    completed_ids = get_completed_scene_ids()
+
     for scene_idx, scene in enumerate(scenes):
         scene_id = scene.get("scene_id")
         scene_chars = scene.get("characters", [])
-        has_composite = get_composited_for_scene(scene_id) is not None
+        has_composite = scene_id in completed_ids
 
         col1, col2, col3 = st.columns([1, 4, 3])
 
@@ -3356,22 +3902,83 @@ def _render_batch_composite_only(scenes: List[Dict]):
             st.rerun()
     with col3:
         if st.button("🔄 미합성만 선택", key="comp_select_uncomposited"):
+            # 성능 최적화: 캐싱된 완료 상태 사용
+            completed_ids = get_completed_scene_ids()
             for scene in scenes_with_bg:
                 scene_id = scene.get("scene_id")
-                has_composite = get_composited_for_scene(scene_id) is not None
-                st.session_state[f"comp_select_{scene_id}"] = not has_composite
+                st.session_state[f"comp_select_{scene_id}"] = scene_id not in completed_ids
             st.rerun()
 
-    # 씬 목록 렌더링
-    selected_scene_ids = []
+    # ⭐ v2.0: 페이지네이션 설정 (성능 최적화)
+    COMP_ITEMS_PER_PAGE = 20
+    total_comp_scenes = len(scenes_with_bg)
+
+    if total_comp_scenes > COMP_ITEMS_PER_PAGE:
+        total_comp_pages = max(1, (total_comp_scenes + COMP_ITEMS_PER_PAGE - 1) // COMP_ITEMS_PER_PAGE)
+
+        # 현재 페이지 상태
+        if 'comp_scenes_page' not in st.session_state:
+            st.session_state.comp_scenes_page = 0
+
+        # 페이지 범위 체크
+        if st.session_state.comp_scenes_page >= total_comp_pages:
+            st.session_state.comp_scenes_page = max(0, total_comp_pages - 1)
+
+        # 페이지 네비게이션
+        nav_col1, nav_col2, nav_col3, nav_col4 = st.columns([1, 2, 2, 1])
+
+        with nav_col1:
+            if st.button("◀ 이전", key="comp_page_prev", disabled=st.session_state.comp_scenes_page == 0):
+                st.session_state.comp_scenes_page -= 1
+                st.rerun()
+
+        with nav_col2:
+            current_comp_page = st.session_state.comp_scenes_page
+            start_scene_idx = current_comp_page * COMP_ITEMS_PER_PAGE + 1
+            end_scene_idx = min((current_comp_page + 1) * COMP_ITEMS_PER_PAGE, total_comp_scenes)
+            st.markdown(f"📄 **페이지 {current_comp_page + 1}/{total_comp_pages}** (씬 {start_scene_idx}~{end_scene_idx} / {total_comp_scenes})")
+
+        with nav_col3:
+            page_jump = st.number_input(
+                "페이지 이동",
+                min_value=1,
+                max_value=total_comp_pages,
+                value=st.session_state.comp_scenes_page + 1,
+                key="comp_page_jump",
+                label_visibility="collapsed"
+            )
+            if page_jump - 1 != st.session_state.comp_scenes_page:
+                st.session_state.comp_scenes_page = page_jump - 1
+                st.rerun()
+
+        with nav_col4:
+            if st.button("다음 ▶", key="comp_page_next", disabled=st.session_state.comp_scenes_page >= total_comp_pages - 1):
+                st.session_state.comp_scenes_page += 1
+                st.rerun()
+
+        # 현재 페이지의 씬만 가져오기
+        start_idx = st.session_state.comp_scenes_page * COMP_ITEMS_PER_PAGE
+        end_idx = min(start_idx + COMP_ITEMS_PER_PAGE, total_comp_scenes)
+        page_scenes_with_bg = scenes_with_bg[start_idx:end_idx]
+    else:
+        page_scenes_with_bg = scenes_with_bg
+
+    # 씬 목록 렌더링 (페이지네이션 적용)
     all_characters = st.session_state.get("characters", [])
 
     if view_mode == "🖼️ 프리뷰 카드":
         # 프리뷰 카드 모드
-        selected_scene_ids = _render_scene_preview_cards(scenes_with_bg, all_characters)
+        page_selected_ids = _render_scene_preview_cards(page_scenes_with_bg, all_characters)
     else:
         # 기존 리스트 모드
-        selected_scene_ids = _render_scene_list_view(scenes_with_bg, all_characters)
+        page_selected_ids = _render_scene_list_view(page_scenes_with_bg, all_characters)
+
+    # 전체 선택된 씬 ID 수집 (모든 페이지에서)
+    selected_scene_ids = []
+    for scene in scenes_with_bg:
+        scene_id = scene.get("scene_id")
+        if st.session_state.get(f"comp_select_{scene_id}", False):
+            selected_scene_ids.append(scene_id)
 
     st.markdown("---")
     st.markdown(f"**선택된 씬:** {len(selected_scene_ids)}개")
@@ -3480,6 +4087,9 @@ def _render_batch_composite_only(scenes: List[Dict]):
 
         # v2.0: 배치 완료 후 메모리 정리
         cleanup_after_batch()
+
+        # 완료 상태 캐시 갱신
+        clear_completion_cache()
 
         # 결과 요약
         st.markdown("### 📊 처리 결과")
@@ -3637,6 +4247,11 @@ def render_gallery_tab():
                 # ========== 다운로드 범위 선택 ==========
                 st.markdown("##### 📊 다운로드 범위 선택")
 
+                # ⭐ v3.27: scene_id 기반 범위 계산 (원본 SRT 씬 번호 사용)
+                dl_scene_ids = [s.get("scene_id", idx + 1) for idx, s in enumerate(scenes)]
+                dl_min_scene_id = min(dl_scene_ids) if dl_scene_ids else 1
+                dl_max_scene_id = max(dl_scene_ids) if dl_scene_ids else 1
+
                 download_mode = st.radio(
                     "범위 선택",
                     options=["전체", "범위 선택", "이미지 있는 씬만", "개별 선택"],
@@ -3648,28 +4263,32 @@ def render_gallery_tab():
                 selected_scenes = []
 
                 if download_mode == "전체":
-                    selected_scenes = list(range(1, len(scenes) + 1))
-                    st.caption(f"전체 {len(scenes)}개 씬 선택됨")
+                    # ⭐ v3.27: 실제 scene_id 목록 사용
+                    selected_scenes = dl_scene_ids
+                    st.caption(f"전체 {len(scenes)}개 씬 선택됨 (씬 번호: {dl_min_scene_id}-{dl_max_scene_id})")
 
                 elif download_mode == "범위 선택":
                     range_col1, range_col2 = st.columns(2)
                     with range_col1:
+                        # ⭐ v3.27: scene_id 기반 범위 (원본 SRT 씬 번호)
                         start_scene = st.number_input(
                             "시작 씬",
-                            min_value=1,
-                            max_value=len(scenes),
-                            value=1,
+                            min_value=dl_min_scene_id,
+                            max_value=dl_max_scene_id,
+                            value=dl_min_scene_id,
                             key="prompt_start_scene"
                         )
                     with range_col2:
+                        # ⭐ v3.27: scene_id 기반 범위 (원본 SRT 씬 번호)
                         end_scene = st.number_input(
                             "종료 씬",
-                            min_value=1,
-                            max_value=len(scenes),
-                            value=min(50, len(scenes)),
+                            min_value=dl_min_scene_id,
+                            max_value=dl_max_scene_id,
+                            value=min(dl_min_scene_id + 49, dl_max_scene_id),
                             key="prompt_end_scene"
                         )
-                    selected_scenes = list(range(int(start_scene), int(end_scene) + 1))
+                    # ⭐ v3.27: 범위 내 실제 scene_id만 선택 (비연속 씬 지원)
+                    selected_scenes = [sid for sid in dl_scene_ids if int(start_scene) <= sid <= int(end_scene)]
                     st.caption(f"씬 {int(start_scene)} ~ {int(end_scene)} ({len(selected_scenes)}개) 선택됨")
 
                 elif download_mode == "이미지 있는 씬만":
@@ -3688,7 +4307,9 @@ def render_gallery_tab():
                     quick_col1, quick_col2, quick_col3, quick_col4 = st.columns(4)
                     with quick_col1:
                         if st.button("처음 50개", key="quick_first_50", use_container_width=True):
-                            st.session_state['selected_scenes_for_download'] = set(range(1, min(51, len(scenes) + 1)))
+                            # ⭐ v3.27: 실제 scene_id 기반 선택 (처음 50개 씬)
+                            first_50_ids = set(sorted(dl_scene_ids)[:50])
+                            st.session_state['selected_scenes_for_download'] = first_50_ids
                             st.rerun()
                     with quick_col2:
                         if st.button("이미지 있는 씬", key="quick_with_image", use_container_width=True):
@@ -3696,7 +4317,8 @@ def render_gallery_tab():
                             st.rerun()
                     with quick_col3:
                         if st.button("전체 선택", key="quick_all", use_container_width=True):
-                            st.session_state['selected_scenes_for_download'] = set(range(1, len(scenes) + 1))
+                            # ⭐ v3.27: 실제 scene_id 기반 전체 선택
+                            st.session_state['selected_scenes_for_download'] = set(dl_scene_ids)
                             st.rerun()
                     with quick_col4:
                         if st.button("선택 해제", key="quick_clear", use_container_width=True):
@@ -5559,7 +6181,8 @@ def generate_background_image(
     height: int,
     api_provider: str = None,
     model: str = None,
-    seed: int = None
+    seed: int = None,
+    reference_prompts: dict = None  # ⭐ v3.28: 참조 프롬프트 추가
 ):
     """
     배경 이미지 생성 - StyleManager의 스타일 프롬프트 적용
@@ -5568,6 +6191,7 @@ def generate_background_image(
         scene_id: 씬 번호
         prompt: 이미지 프롬프트
         style: 스타일 ID 또는 이름
+        reference_prompts: 참조용 프롬프트 dict (image_prompt_en, background_prompt_en)
         width: 이미지 너비
         height: 이미지 높이
         api_provider: API 제공자 (None이면 설정에서 로드)
@@ -5649,8 +6273,8 @@ def generate_background_image(
             style_suffix = style_obj.prompt_suffix.strip() if style_obj.prompt_suffix else ""
             negative_prompt = style_obj.negative_prompt.strip() if style_obj.negative_prompt else ""
 
-            # 원본 프롬프트에 배경 공통 태그 추가
-            scene_prompt = f"{prompt.strip()}, background scene, no characters, wide shot"
+            # 원본 프롬프트에 배경 공통 태그 추가 (v3.33: 더 강력한 사람 제외 키워드)
+            scene_prompt = f"{prompt.strip()}, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot"
 
             # 최종 프롬프트 조합: prefix + scene + suffix
             parts = []
@@ -5671,10 +6295,18 @@ def generate_background_image(
         else:
             # 폴백: 스타일 못 찾으면 기본값 사용
             print(f"[배경 생성] ⚠️ 스타일 '{style}' 없음, 기본값 사용")
-            full_prompt = f"{prompt}, background scene, no characters, wide shot, high quality, detailed"
+            full_prompt = f"{prompt}, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot, high quality, detailed"
             negative_prompt = ""
             style_prefix = ""
             style_suffix = ""
+
+        # v3.34: 배경 생성에서 항상 네거티브 프롬프트에 사람 관련 용어 추가
+        people_negative_terms = "people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+        if negative_prompt:
+            negative_prompt = f"{negative_prompt}, {people_negative_terms}"
+        else:
+            negative_prompt = people_negative_terms
+        print(f"[배경 생성] 🏞️ 네거티브 프롬프트 강화됨: 사람 관련 용어 추가")
 
         # 디버그 로그 출력
         print("=" * 60)
@@ -5694,8 +6326,21 @@ def generate_background_image(
             print(f"[배경 생성] 네거티브: {negative_prompt[:80]}..." if len(negative_prompt) > 80 else f"[배경 생성] 네거티브: {negative_prompt}")
         print("-" * 60)
 
-        # UI에 프롬프트 표시
-        with st.expander("🔍 생성에 사용된 프롬프트", expanded=True):
+        # ⭐ v3.28: 씬 번호 헤더 추가
+        st.markdown(f"### 🎬 씬 {scene_id} - 이미지 생성 결과")
+
+        # UI에 프롬프트 표시 (v2.1: 프롬프트 유형 표시 추가)
+        with st.expander(f"🔍 씬 {scene_id} - 생성에 사용된 프롬프트", expanded=True):
+            # v2.1: 사용된 프롬프트 유형 표시
+            selected_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
+            PROMPT_TYPE_INFO = {
+                "full_prompt": {"name": "전체 프롬프트", "emoji": "🖼️", "field": "image_prompt_en"},
+                "background_prompt": {"name": "배경 프롬프트", "emoji": "🏞️", "field": "background_prompt_en"},
+            }
+            type_info = PROMPT_TYPE_INFO.get(selected_prompt_type, PROMPT_TYPE_INFO["full_prompt"])
+
+            st.info(f"🎯 **사용된 프롬프트 유형**: {type_info['emoji']} {type_info['name']} (`{type_info['field']}`)")
+
             # API/모델 정보 표시
             col1, col2, col3 = st.columns(3)
             with col1:
@@ -5709,7 +6354,7 @@ def generate_background_image(
                     st.metric("예상 비용", "무료")
 
             st.markdown("---")
-            st.markdown("**원본 (씬 분석):**")
+            st.markdown(f"**원본 프롬프트 ({type_info['emoji']} {type_info['name']}):**")
             st.code(prompt, language=None)
 
             st.markdown(f"**스타일:** {style}")
@@ -5730,6 +6375,24 @@ def generate_background_image(
             if negative_prompt:
                 st.markdown("**네거티브 프롬프트:**")
                 st.code(negative_prompt, language=None)
+
+            # ⭐ v3.28: 참조 프롬프트 섹션 추가
+            if reference_prompts:
+                st.markdown("---")
+                st.markdown("##### 📋 참조 프롬프트 (비교용)")
+
+                # 사용하지 않은 다른 프롬프트 타입 표시
+                other_type = "background_prompt" if selected_prompt_type == "full_prompt" else "full_prompt"
+                other_info = PROMPT_TYPE_INFO.get(other_type, PROMPT_TYPE_INFO["full_prompt"])
+
+                # 참조 프롬프트 표시
+                ref_prompt_key = other_info['field']  # image_prompt_en or background_prompt_en
+                ref_prompt = reference_prompts.get(ref_prompt_key, "")
+
+                if ref_prompt:
+                    st.markdown(f"**{other_info['emoji']} {other_info['name']}** (`{ref_prompt_key}`):")
+                    st.code(ref_prompt, language=None)
+                    st.caption("💡 위 프롬프트는 참조용입니다. 실제 생성에는 사용되지 않았습니다.")
 
         # API에 따른 이미지 생성
         used_seed = seed  # 실제 사용된 시드 추적
@@ -5849,7 +6512,7 @@ def generate_background_image(
         # SceneImageManager로 씬 데이터 업데이트
         update_scene_background(scene_id, str(filepath), str(project_path))
 
-        st.success(f"배경 생성 완료: {filename}")
+        st.success(f"✅ 씬 {scene_id} 배경 생성 완료: {filename}")
 
         # v1.1: 시드 정보 표시
         if used_seed:
@@ -5872,7 +6535,7 @@ def generate_background_image(
                 components.html(seed_copy_html, height=45)
             st.caption("💡 동일한 시드를 사용하면 유사한 이미지를 재생성할 수 있습니다.")
 
-        render_lightbox_image(str(filepath), key=f"bg_result_{scene_id}")
+        render_lightbox_image(str(filepath), caption=f"🎬 씬 {scene_id} 배경 이미지", key=f"bg_result_{scene_id}")
 
         return str(filepath)
 
@@ -5913,6 +6576,16 @@ def generate_background_image_with_prompt(
             saved_api, saved_model = get_current_api_settings()
             api_provider = api_provider or saved_api
             model = model or saved_model
+
+        # v3.34: 배경 프롬프트 모드에서 네거티브 프롬프트 강화
+        selected_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
+        if selected_prompt_type == "background_prompt":
+            people_negative_terms = "people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+            if negative_prompt:
+                negative_prompt = f"{negative_prompt}, {people_negative_terms}"
+            else:
+                negative_prompt = people_negative_terms
+            print(f"[배경 생성(수정)] 🏞️ 배경 프롬프트 모드: 네거티브 프롬프트 강화됨")
 
         selected_api = api_provider
 
@@ -6039,6 +6712,16 @@ def generate_scene_composite_image_with_prompt(
         seed: 시드 값 (None이면 랜덤)
     """
     try:
+        # v3.34: 배경 프롬프트 모드에서 네거티브 프롬프트 강화
+        selected_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
+        if selected_prompt_type == "background_prompt":
+            people_negative_terms = "people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+            if negative_prompt:
+                negative_prompt = f"{negative_prompt}, {people_negative_terms}"
+            else:
+                negative_prompt = people_negative_terms
+            print(f"[씬 합성 생성(수정)] 🏞️ 배경 프롬프트 모드: 네거티브 프롬프트 강화됨")
+
         selected_api = st.session_state.get("image_api", "Together.ai FLUX")
 
         if selected_api == "Google ImageFX":
@@ -6158,7 +6841,8 @@ def generate_scene_composite_image(
     apply_negative: bool = True,
     width: int = 1280,
     height: int = 720,
-    seed: int = None
+    seed: int = None,
+    reference_prompts: dict = None  # ⭐ v3.28: 참조 프롬프트 추가
 ):
     """
     씬 합성 이미지 생성 (배경 + 캐릭터 통합 스타일)
@@ -6171,12 +6855,22 @@ def generate_scene_composite_image(
         width: 이미지 너비
         height: 이미지 높이
         seed: 시드 값 (None이면 랜덤)
+        reference_prompts: 참조용 프롬프트 dict (image_prompt_en, background_prompt_en)
 
     Returns:
         생성된 이미지 경로 또는 None
     """
     try:
         from utils.style_manager import build_scene_composite_prompt
+
+        # ==============================
+        # v3.33: 배경 프롬프트 선택 시 캐릭터 제외 태그 추가
+        # ==============================
+        selected_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
+        if selected_prompt_type == "background_prompt":
+            # 배경 프롬프트 모드에서는 캐릭터 제외 태그 추가 (v3.33: 더 강력한 사람 제외 키워드)
+            scene_prompt = f"{scene_prompt.strip()}, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot"
+            print(f"[씬 합성 생성] 🏞️ 배경 프롬프트 모드: 캐릭터 제외 태그 추가됨")
 
         # ==============================
         # 프롬프트 조합
@@ -6189,6 +6883,15 @@ def generate_scene_composite_image(
 
         full_prompt = prompt_result["positive"]
         negative_prompt = prompt_result["negative"]
+
+        # v3.34: 배경 프롬프트 모드에서 네거티브 프롬프트 강화
+        if selected_prompt_type == "background_prompt":
+            people_negative_terms = "people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+            if negative_prompt:
+                negative_prompt = f"{negative_prompt}, {people_negative_terms}"
+            else:
+                negative_prompt = people_negative_terms
+            print(f"[씬 합성 생성] 🏞️ 배경 프롬프트 모드: 네거티브 프롬프트 강화됨")
 
         # ==============================
         # API 선택에 따른 클라이언트 초기화
@@ -6241,8 +6944,20 @@ def generate_scene_composite_image(
             print(f"[씬 합성 생성] 네거티브: {negative_prompt[:80]}..." if len(negative_prompt) > 80 else f"[씬 합성 생성] 네거티브: {negative_prompt}")
         print("-" * 60)
 
-        # UI에 프롬프트 표시
-        with st.expander(f"🔍 씬 {scene_id} - 생성에 사용된 프롬프트", expanded=False):
+        # ⭐ v3.28: 씬 번호 헤더 추가
+        st.markdown(f"### 🎬 씬 {scene_id} - 이미지 생성 결과")
+
+        # UI에 프롬프트 표시 (v2.1: 프롬프트 유형 표시 추가)
+        selected_prompt_type = st.session_state.get("selected_prompt_type", "full_prompt")
+        PROMPT_TYPE_INFO = {
+            "full_prompt": {"name": "전체 프롬프트", "emoji": "🖼️", "field": "image_prompt_en"},
+            "background_prompt": {"name": "배경 프롬프트", "emoji": "🏞️", "field": "background_prompt_en"},
+        }
+        type_info = PROMPT_TYPE_INFO.get(selected_prompt_type, PROMPT_TYPE_INFO["full_prompt"])
+
+        with st.expander(f"🔍 씬 {scene_id} - 생성에 사용된 프롬프트 ({type_info['emoji']} {type_info['name']})", expanded=False):
+            st.info(f"🎯 **사용된 프롬프트 유형**: {type_info['emoji']} {type_info['name']} (`{type_info['field']}`)")
+
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric("API", api_name)
@@ -6252,7 +6967,7 @@ def generate_scene_composite_image(
                 st.metric("스타일", composite_style.name_ko)
 
             st.markdown("---")
-            st.markdown("**원본 씬 프롬프트:**")
+            st.markdown(f"**원본 씬 프롬프트 ({type_info['emoji']} {type_info['name']}):**")
             st.code(scene_prompt, language=None)
 
             st.markdown("**최종 프롬프트:**")
@@ -6261,6 +6976,24 @@ def generate_scene_composite_image(
             if negative_prompt:
                 st.markdown("**네거티브 프롬프트:**")
                 st.code(negative_prompt, language=None)
+
+            # ⭐ v3.28: 참조 프롬프트 섹션 추가
+            if reference_prompts:
+                st.markdown("---")
+                st.markdown("##### 📋 참조 프롬프트 (비교용)")
+
+                # 사용하지 않은 다른 프롬프트 타입 표시
+                other_type = "background_prompt" if selected_prompt_type == "full_prompt" else "full_prompt"
+                other_info = PROMPT_TYPE_INFO.get(other_type, PROMPT_TYPE_INFO["full_prompt"])
+
+                # 참조 프롬프트 표시
+                ref_prompt_key = other_info['field']  # image_prompt_en or background_prompt_en
+                ref_prompt = reference_prompts.get(ref_prompt_key, "")
+
+                if ref_prompt:
+                    st.markdown(f"**{other_info['emoji']} {other_info['name']}** (`{ref_prompt_key}`):")
+                    st.code(ref_prompt, language=None)
+                    st.caption("💡 위 프롬프트는 참조용입니다. 실제 생성에는 사용되지 않았습니다.")
 
         # ==============================
         # 이미지 생성
@@ -6373,7 +7106,7 @@ def generate_scene_composite_image(
         # SceneImageManager로 씬 데이터 업데이트
         update_scene_composite(scene_id, str(filepath), str(project_path))
 
-        st.success(f"씬 합성 이미지 생성 완료: {filename}")
+        st.success(f"✅ 씬 {scene_id} 합성 이미지 생성 완료: {filename}")
 
         # v1.1: 시드 정보 표시
         if used_seed:
@@ -6395,7 +7128,7 @@ def generate_scene_composite_image(
                 components.html(seed_copy_html, height=45)
             st.caption("💡 동일한 시드를 사용하면 유사한 이미지를 재생성할 수 있습니다.")
 
-        render_lightbox_image(str(filepath), key=f"comp_result_{scene_id}")
+        render_lightbox_image(str(filepath), caption=f"🎬 씬 {scene_id} 합성 이미지", key=f"comp_result_{scene_id}")
 
         return str(filepath)
 
@@ -6424,8 +7157,9 @@ def save_uploaded_background(scene_id: int, uploaded_file):
     # ✅ SceneImageManager로 씬 데이터 업데이트
     update_scene_background(scene_id, str(filepath), str(project_path))
 
-    st.success("배경이 저장되었습니다!")
-    st.rerun()
+    st.success("✅ 배경이 저장되었습니다!")
+    # v3.40: 즉시 이미지 표시 (rerun 제거)
+    st.image(str(filepath), use_container_width=True)
 
 
 def set_background_for_scene(scene_id: int, filepath: str):

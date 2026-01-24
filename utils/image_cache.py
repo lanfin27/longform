@@ -70,7 +70,7 @@ class ImageCache:
         cls._cache_time.pop(folder_path, None)
 
     @classmethod
-    @st.cache_data(ttl=300)
+    @st.cache_data(ttl=300, show_spinner=False, max_entries=200)
     def get_thumbnail(_cls, image_path: str, max_size: Tuple[int, int] = (200, 200)) -> Optional[bytes]:
         """
         썸네일 생성 및 캐싱

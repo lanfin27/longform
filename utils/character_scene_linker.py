@@ -39,12 +39,27 @@ class CharacterSceneLinker:
             [1, 2, 5, 8] - 등장 씬 번호 리스트
         """
         characters = self._load_characters()
+        target_name = character_name.strip().lower().replace(" ", "")
 
+        # 1. 정확한 이름 매칭 우선
         for char in characters:
             if char.get("name") == character_name:
                 scenes = char.get("appearance_scenes", [])
-                # 문자열인 경우 정수로 변환
-                return [int(s) if isinstance(s, str) else s for s in scenes]
+                if scenes:
+                    return [int(s) if isinstance(s, str) else s for s in scenes]
+
+        # 2. 유연한 이름 매칭 (Problem 62: 이름 불일치 문제 해결)
+        for char in characters:
+            char_name = char.get("name", "")
+            char_name_normalized = char_name.strip().lower().replace(" ", "")
+
+            if (target_name == char_name_normalized or
+                target_name in char_name_normalized or
+                char_name_normalized in target_name):
+                scenes = char.get("appearance_scenes", [])
+                if scenes:
+                    print(f"[CharacterSceneLinker] 유연한 매칭: '{character_name}' → '{char_name}' (씬: {scenes})")
+                    return [int(s) if isinstance(s, str) else s for s in scenes]
 
         return []
 
@@ -95,10 +110,16 @@ class CharacterSceneLinker:
         # 캐릭터 등장 씬 가져오기
         appearance_scenes = self.get_character_scenes(character_name)
 
+        # Problem 62: appearance_scenes가 없으면 씬 데이터에서 직접 검색
         if not appearance_scenes:
+            print(f"[CharacterSceneLinker] ⚠️ '{character_name}': appearance_scenes 없음, 씬 데이터에서 검색 시도...")
+            appearance_scenes = self.search_character_in_scenes(character_name)
+
+        if not appearance_scenes:
+            print(f"[CharacterSceneLinker] ❌ '{character_name}': 등장 씬 정보를 찾을 수 없음 (characters.json과 scenes.json 모두 확인)")
             return {
                 "success": False,
-                "error": f"캐릭터 '{character_name}'의 등장 씬 정보가 없습니다.",
+                "error": f"캐릭터 '{character_name}'의 등장 씬 정보가 없습니다. (씬 분석에서 등장 씬을 확인하세요)",
                 "linked_scenes": []
             }
 
@@ -285,6 +306,77 @@ class CharacterSceneLinker:
                 return json.load(f)
         except Exception:
             return []
+
+    def _load_scenes(self) -> List[Dict]:
+        """씬 데이터 로드"""
+        if not self.scenes_file.exists():
+            return []
+        try:
+            with open(self.scenes_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                # 리스트 또는 딕셔너리 처리
+                if isinstance(data, list):
+                    return data
+                elif isinstance(data, dict) and "scenes" in data:
+                    return data["scenes"]
+                return []
+        except Exception:
+            return []
+
+    def search_character_in_scenes(self, character_name: str) -> List[int]:
+        """
+        씬 데이터에서 캐릭터 등장 씬 직접 검색 (폴백용)
+
+        Problem 62: appearance_scenes가 없을 때 씬 데이터에서 직접 검색
+
+        Args:
+            character_name: 캐릭터 이름
+
+        Returns:
+            등장 씬 번호 리스트
+        """
+        scenes = self._load_scenes()
+        if not scenes:
+            return []
+
+        target_name = character_name.strip().lower().replace(" ", "")
+        found_scenes = []
+
+        for scene in scenes:
+            scene_id = scene.get("scene_id", scene.get("id", 0))
+            if isinstance(scene_id, str) and scene_id.isdigit():
+                scene_id = int(scene_id)
+
+            # 여러 키에서 캐릭터 목록 찾기
+            for key in ["characters", "character_list", "cast", "persons"]:
+                if key in scene:
+                    chars = scene[key]
+                    if isinstance(chars, list):
+                        for c in chars:
+                            char_name = ""
+                            if isinstance(c, str):
+                                char_name = c
+                            elif isinstance(c, dict):
+                                char_name = c.get("name", c.get("name_ko", ""))
+
+                            if not char_name:
+                                continue
+
+                            char_normalized = char_name.strip().lower().replace(" ", "")
+
+                            # 유연한 매칭
+                            if (target_name == char_normalized or
+                                target_name in char_normalized or
+                                char_normalized in target_name):
+                                if scene_id not in found_scenes:
+                                    found_scenes.append(scene_id)
+                                break
+                    break
+
+        if found_scenes:
+            print(f"[CharacterSceneLinker] 씬 데이터 직접 검색: '{character_name}' → 씬 {found_scenes}")
+
+        return sorted(found_scenes)
 
     def _load_scene_characters(self) -> Dict:
         """씬-캐릭터 매핑 데이터 로드"""

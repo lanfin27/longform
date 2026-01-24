@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-21T22:16:24.620311",
+  "image_file": "bg_scene_007_1769001384619.png",
+  "scene_id": 7,
+  "prompts": {
+    "original": "ZF autonomous driving division logo, Samsung and Harman logos subtly displayed, concept of acquisition and merger, global business setting, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, ZF autonomous driving division logo, Samsung and Harman logos subtly displayed, concept of acquisition and merger, global business setting, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1054726680
+  }
+}

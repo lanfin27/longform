@@ -2,29 +2,26 @@
   "character": {
     "id": "char_001",
     "name": "경제학똑돌이2",
-    "description": "30대남성 경제전문가 안경착용",
-    "base_prompt": "A full body illustration of a professional Korean male character in his early 30s,\nintelligent and approachable financial expert persona,\nwearing sleek rectangular black-framed glasses,\ndressed in a modern navy blue blazer over a white crew neck t-shirt,\nslim-fit navy trousers and clean white sneakers,\nclean-cut short black hair with a neat side part,\nwarm confident expression with a slight knowing smile,\nstanding pose with one hand gesturing as if explaining a concept,\nother hand casually in pocket or on hip,\nfull body visible from head to toe,\n\nKorean webtoon manhwa character illustration,\nclean bold black outlines defining all features,\nflat solid color fills with minimal shading,\nsimplified facial features with small defined eyes,\nconsistent 2-3px black lineart throughout,\ncel-shaded coloring with minimal gradients,\nclean vector-like illustration quality,\nwarm ivory Korean skin tone with subtle value shifts,\nclothing folds indicated by lineart not shading,\nsolid white or light gray background",
-    "style_preset": "char_animation",
+    "description": "",
+    "base_prompt": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, plain white background, full body shot, front facing view, standing pose, business man",
+    "style_preset": "재훍_영상툰",
     "negative_prompt": "no outlines, missing lineart, gradient only no lines, realistic photograph, 3D render, photorealistic, anime big eyes, chibi, super deformed, western cartoon style, disney style, pixar style, painterly watercolor, sketchy rough lines, soft airbrush shading, complex detailed shading, hyper detailed features, bright saturated colors, blurry lines, thick gradients, cropped, cut off feet",
-    "base_images": {
-      "front": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\representative_character\\base_front.png",
-      "smile": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\representative_character\\base_smile.png"
-    },
-    "created_at": "2026-01-01T22:51:06.600888",
-    "updated_at": "2026-01-04T23:34:16.259258",
+    "base_images": {},
+    "created_at": "2026-01-21T21:02:47.233384",
+    "updated_at": "2026-01-21T21:02:47.233405",
     "is_active": true
   },
   "scene_actions": [
     {
       "scene_num": 1,
-      "scene_content": "12월 24일, 크리스마스 이브 아침이었습니다.",
-      "expression": "미소를 지으며",
-      "pose": "창밖을 바라보며 커피를 마시는 모습",
-      "mood": "calm",
+      "scene_content": "여러분, 삼성전자 하면 뭐가 떠오르세요?",
+      "expression": "미소를 지으며 질문하는 표정",
+      "pose": "오른손을 들어 올리며 질문하는 제스처",
+      "mood": "engaging",
       "props": [
-        "coffee cup"
+        "none"
       ],
-      "action_prompt": "Slightly smiling, looking out the window with a calm expression, sipping from a coffee cup on Christmas Eve morning.",
+      "action_prompt": "raising his right hand, smiling inquisitively",
       "full_prompt": "",
       "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_001_character.png",
       "generation_status": "completed",
@@ -32,14 +29,14 @@
     },
     {
       "scene_num": 2,
-      "scene_content": "환율 차트를 보던 저는 눈을 의심했습니다. 1,480원대를 맴돌던 환율이 갑자기 30원 넘게 떨어진 겁니다. 1,450원대까지요.",
-      "expression": "놀란 표정, 눈을 크게 뜨고 입을 약간 벌린",
-      "pose": "손으로 환율 차트를 가리키며 믿을 수 없다는 듯한 제스처",
-      "mood": "shocked",
+      "scene_content": "스마트폰? 반도체? TV?",
+      "expression": "호기심 가득한 표정",
+      "pose": "손을 들어 질문하는 듯한 제스처",
+      "mood": "inquisitive",
       "props": [
-        "chart"
+        "none"
       ],
-      "action_prompt": "Staring at a currency exchange chart with wide eyes, pointing with disbelief",
+      "action_prompt": "curious expression, gesturing with one hand raised, inquisitive",
       "full_prompt": "",
       "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_002_character.png",
       "generation_status": "completed",
@@ -47,14 +44,14 @@
     },
     {
       "scene_num": 3,
-      "scene_content": "여러분, 환율이 하루에 30원 빠지는 일이 얼마나 드문 일인지 아십니까? 국제적인 대형 이벤트가 있었던 것도 아닙니다. 우리나라 경제가 갑자기 좋아진 것도 아니고요.",
-      "expression": "진지하고 확신에 찬 표정",
-      "pose": "손을 들어 강조하며 설명하는 모습",
-      "mood": "analytical",
+      "scene_content": "근데요, 지금 삼성이 2조 원을 들여서 사려는 게 뭔지 아세요?",
+      "expression": "눈을 약간 크게 뜨고 궁금증을 드러내는 표정",
+      "pose": "한 손을 들어올려 질문을 강조하며, 몸은 약간 앞으로 기울임",
+      "mood": "inquisitive",
       "props": [
         "none"
       ],
-      "action_prompt": "raising a hand to emphasize, serious expression, explaining a point",
+      "action_prompt": "leaning forward, raising a hand, eyes widened in curiosity",
       "full_prompt": "",
       "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_003_character.png",
       "generation_status": "completed",
@@ -62,14 +59,14 @@
     },
     {
       "scene_num": 4,
-      "scene_content": "그런데 떨어졌습니다. 갑자기요.",
-      "expression": "당황한 표정, 눈을 약간 크게 뜨고 입술을 살짝 벌림",
-      "pose": "어깨를 살짝 움츠리고 손을 들어올려 설명하는 듯한 제스처",
-      "mood": "disappointed",
+      "scene_content": "자동차 눈이에요.",
+      "expression": "약간 미소짓는, 호기심 어린",
+      "pose": "손을 들어 자동차 전조등을 가리키며 설명하는",
+      "mood": "informative",
       "props": [
         "none"
       ],
-      "action_prompt": "looking surprised, slightly shrugging, raising a hand in explanation",
+      "action_prompt": "pointing at car headlights, slightly smiling, explaining",
       "full_prompt": "",
       "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_004_character.png",
       "generation_status": "completed",
@@ -77,139 +74,19 @@
     },
     {
       "scene_num": 5,
-      "scene_content": "누가 봐도 정부의 개입이 분명했죠.",
-      "expression": "심각한 표정",
-      "pose": "손을 들어올려 강조하며 설명하는 모습",
-      "mood": "tense",
+      "scene_content": "자동차가 세상을 보는 눈.",
+      "expression": "미소를 지으며 생각에 잠긴",
+      "pose": "손을 들어올려 자동차를 가리키며 설명하는",
+      "mood": "informative",
       "props": [
         "none"
       ],
-      "action_prompt": "Speaking seriously, raising a hand for emphasis, wearing glasses and a blazer.",
+      "action_prompt": "smiling thoughtfully, raising a hand gesturing towards an unseen car, explaining the technology",
       "full_prompt": "",
       "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_005_character.png",
       "generation_status": "completed",
       "error_message": ""
-    },
-    {
-      "scene_num": 6,
-      "scene_content": "그런데 여러분, 진짜 중요한 건 이겁니다. 왜 하필 연말이었을까요? 그리고 이렇게 정부가 개입해서 환율을 끌어내렸다면, 1월 달에는 어떻게 될까요?",
-      "expression": "진지한 표정",
-      "pose": "손을 들어 강조하며 설명하는 모습",
-      "mood": "analytical",
-      "props": [
-        "none"
-      ],
-      "action_prompt": "raising a hand, serious expression, explaining",
-      "full_prompt": "",
-      "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_006_character.png",
-      "generation_status": "completed",
-      "error_message": ""
-    },
-    {
-      "scene_num": 7,
-      "scene_content": "오늘 이 영상에서는 정부가 절대 말하지 않는 환율 급락의 3단계 비밀을 낱낱이 파헤쳐 보겠습니다. 정부의 환율 개입을 미리 알 수 있는 방법까지 포함해서요.",
-      "expression": "진지하고 결의에 찬 표정",
-      "pose": "손을 들어 강조하며 설명하는 포즈",
-      "mood": "informative",
-      "props": [
-        "none"
-      ],
-      "action_prompt": "pointing up with one hand, serious expression, explaining",
-      "full_prompt": "",
-      "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_007_character.png",
-      "generation_status": "completed",
-      "error_message": ""
-    },
-    {
-      "scene_num": 8,
-      "scene_content": "끝까지 보셔야 합니다. 여러분의 자산이 달린 이야기입니다.",
-      "expression": "진지하고 확신에 찬 표정",
-      "pose": "손을 들어 강조하며 설명하는 자세",
-      "mood": "authoritative",
-      "props": [
-        "none"
-      ],
-      "action_prompt": "gesturing emphatically with hand, serious expression, confident",
-      "full_prompt": "",
-      "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_008_character.png",
-      "generation_status": "completed",
-      "error_message": ""
-    },
-    {
-      "scene_num": 9,
-      "scene_content": "자, 일단 차트부터 보겠습니다.",
-      "expression": "진지한 표정",
-      "pose": "차트를 가리키며 설명하는 자세",
-      "mood": "Analytical",
-      "props": [
-        "chart"
-      ],
-      "action_prompt": "Pointing at a chart, explaining with a serious expression",
-      "full_prompt": "",
-      "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_009_character.png",
-      "generation_status": "completed",
-      "error_message": ""
-    },
-    {
-      "scene_num": 10,
-      "scene_content": "12월 22일, 23일 환율 차트를 보면 굉장히 이상한 모습이 보입니다. 톱니바퀴처럼 지그재그로 움직이는 거예요. 마치 심장 박동 같이 급등, 급락, 급등, 급락을 반복합니다.",
-      "expression": "심각한 표정",
-      "pose": "손가락으로 환율 차트를 가리키며 설명하는 모습",
-      "mood": "tense",
-      "props": [
-        "chart"
-      ],
-      "action_prompt": "Pointing at a currency exchange chart, explaining with a serious expression",
-      "full_prompt": "",
-      "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_010_character.png",
-      "generation_status": "completed",
-      "error_message": ""
-    },
-    {
-      "scene_num": 11,
-      "scene_content": "이게 뭘 의미하는지 아십니까?",
-      "expression": "설명하는 표정",
-      "pose": "한 손을 들어 설명하는 자세",
-      "mood": "informative",
-      "props": [
-        "none"
-      ],
-      "action_prompt": "explaining expression, one hand raised, explaining gesture, leaning forward slightly, informative mood, looking at viewer",
-      "full_prompt": "",
-      "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_011_character.png",
-      "generation_status": "completed",
-      "error_message": ""
-    },
-    {
-      "scene_num": 12,
-      "scene_content": "정부가 개입하고 있다는 신호입니다.",
-      "expression": "설명하는 표정",
-      "pose": "한 손을 들어 설명하는 자세",
-      "mood": "informative",
-      "props": [
-        "none"
-      ],
-      "action_prompt": "explaining expression, one hand raised, explaining gesture, standing straight, informative mood, looking at viewer",
-      "full_prompt": "",
-      "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_012_character.png",
-      "generation_status": "completed",
-      "error_message": ""
-    },
-    {
-      "scene_num": 13,
-      "scene_content": "여러분, 이걸 기억해 두세요. 환율 차트에서 이런 톱니 모양이 나타나면, 정부의 본격적인 개입이 임박했다는 경고등입니다.",
-      "expression": "진지한 표정",
-      "pose": "손가락으로 가리키는 자세",
-      "mood": "informative",
-      "props": [
-        "none"
-      ],
-      "action_prompt": "serious expression, pointing gesture, relaxed posture, informative mood, looking at viewer",
-      "full_prompt": "",
-      "generated_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\character_scenes\\scene_013_character.png",
-      "generation_status": "completed",
-      "error_message": ""
     }
   ],
-  "saved_at": "2026-01-04T23:34:16.259357"
+  "saved_at": "2026-01-21T21:04:40.066830"
 }

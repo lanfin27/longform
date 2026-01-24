@@ -28,6 +28,7 @@ class GenerationResult:
     image_path: Optional[str] = None
     elapsed_time: float = 0
     error: Optional[str] = None
+    seed: Optional[int] = None  # v1.1: 시드 값 추가
 
 
 # API별 모델 옵션
@@ -42,6 +43,13 @@ API_MODELS = {
         ("IMAGEN_3_5", "Imagen 3.5 (무료)"),
         ("IMAGEN_3_1", "Imagen 3.1 (무료)"),
         ("IMAGEN_3", "Imagen 3.0 (무료)"),
+    ],
+    # Gemini 이미지 생성 모델 (레퍼런스 이미지 지원)
+    "Gemini (Nano Banana)": [
+        ("gemini_nano_banana", "Nano Banana (~15원, 레퍼런스 지원)"),
+    ],
+    "Gemini (Nano Banana Pro)": [
+        ("gemini_nano_banana_pro", "Nano Banana Pro (~25원, 레퍼런스 지원)"),
     ],
     "OpenAI DALL-E": [
         ("dall-e-3", "DALL-E 3 (최신)"),
@@ -61,6 +69,8 @@ API_MODELS = {
 API_GENERATION_TIME = {
     "Together.ai FLUX": 5,
     "Google ImageFX": 15,  # ImageFX는 상대적으로 느림
+    "Gemini (Nano Banana)": 8,
+    "Gemini (Nano Banana Pro)": 10,
     "OpenAI DALL-E": 8,
     "Stability AI": 10,
     "Replicate SDXL": 8,  # Lightning은 3초
@@ -79,6 +89,9 @@ MODEL_PRICING = {
     "IMAGEN_3_5": {"price": 0.0, "name": "Imagen 3.5", "api": "Google ImageFX"},
     "IMAGEN_3_1": {"price": 0.0, "name": "Imagen 3.1", "api": "Google ImageFX"},
     "IMAGEN_3": {"price": 0.0, "name": "Imagen 3.0", "api": "Google ImageFX"},
+    # Gemini 이미지 생성 (레퍼런스 지원)
+    "gemini_nano_banana": {"price": 0.01, "name": "Nano Banana", "api": "Gemini", "supports_reference": True},
+    "gemini_nano_banana_pro": {"price": 0.02, "name": "Nano Banana Pro", "api": "Gemini", "supports_reference": True},
     # OpenAI DALL-E
     "dall-e-3": {"price": 0.04, "name": "DALL-E 3", "api": "OpenAI"},
     "dall-e-2": {"price": 0.02, "name": "DALL-E 2", "api": "OpenAI"},
@@ -150,6 +163,7 @@ class ImageAPIManager:
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
         self.stability_api_key = os.getenv("STABILITY_API_KEY")
         self.replicate_api_token = os.getenv("REPLICATE_API_TOKEN")
+        self.gemini_api_key = os.getenv("GEMINI_API_KEY")  # Gemini API 키
 
         # ImageFX 쿠키: 환경변수 > 파일 순서 (동적 로드)
         self.imagefx_cookie = self._load_imagefx_cookie()
@@ -160,15 +174,160 @@ class ImageAPIManager:
         # ImageFX 클라이언트 (지연 초기화)
         self._imagefx_client = None
 
+        # Gemini 클라이언트 (지연 초기화)
+        self._gemini_client = None
+
         # Rate limit 추적
         self._last_call_time: Dict[str, float] = {}
         self._rate_limits = {
             "Together.ai FLUX": 1.0,       # FLUX.2 유료 모델 기준 1초 간격
             "Google ImageFX": 3.0,         # ImageFX는 3초 간격 권장
+            "Gemini (Nano Banana)": 1.0,   # Gemini 1초 간격
+            "Gemini (Nano Banana Pro)": 1.0,
             "OpenAI DALL-E": 1.0,          # 1초 간격
             "Stability AI": 1.0,           # 1초 간격
             "Replicate SDXL": 0.5,         # 0.5초 간격
         }
+
+    @staticmethod
+    def _sanitize_prompt_for_imagefx(prompt: str) -> str:
+        """
+        ImageFX 안전성 필터를 위한 프롬프트 전처리
+
+        v6.4: PUBLIC_ERROR_UNSAFE_GENERATION 방지
+        v6.5: PUBLIC_ERROR_PROMINENT_PEOPLE_FILTER 방지 (기업명/직책 일반화)
+        - 민족/국적 관련 키워드 대체
+        - 실제 인물로 오인될 수 있는 표현 수정
+        - 실제 기업명을 일반적인 표현으로 대체
+        """
+        import re
+
+        sanitized = prompt
+        changes_made = []
+
+        # ═══════════════════════════════════════════════════════════════
+        # v6.5: 기업명/직책 일반화 (PROMINENT_PEOPLE_FILTER 방지)
+        # ═══════════════════════════════════════════════════════════════
+
+        # 한국 대기업명 → 일반적 표현
+        korean_company_patterns = [
+            (r'삼성전자\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'large electronics company executive'),
+            (r'삼성\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'large tech company executive'),
+            (r'현대자동차\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'automotive company executive'),
+            (r'현대차\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'automotive company executive'),
+            (r'현대\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'large industrial company executive'),
+            (r'LG전자\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'electronics company executive'),
+            (r'LG\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'large conglomerate executive'),
+            (r'SK하이닉스\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'semiconductor company executive'),
+            (r'SK\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'large conglomerate executive'),
+            (r'롯데\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'retail company executive'),
+            (r'카카오\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'tech company executive'),
+            (r'네이버\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'internet company executive'),
+            (r'쿠팡\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'e-commerce company executive'),
+            (r'기아\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'automotive company executive'),
+            (r'포스코\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'steel company executive'),
+            (r'한화\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'industrial company executive'),
+            (r'CJ\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'entertainment company executive'),
+            (r'두산\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'industrial company executive'),
+            (r'신세계\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'retail company executive'),
+            (r'GS\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'energy company executive'),
+        ]
+
+        # 글로벌 기업명 → 일반적 표현
+        global_company_patterns = [
+            (r'\bTesla\s*(CEO|executive|director|manager|employee)?', 'electric vehicle company executive'),
+            (r'\b테슬라\s*(CEO|임원|대표|사장|회장|직원)?', 'electric vehicle company executive'),
+            (r'\bApple\s*(CEO|executive|director|manager|employee)?', 'tech company executive'),
+            (r'\b애플\s*(CEO|임원|대표|사장|회장|직원)?', 'tech company executive'),
+            (r'\bGoogle\s*(CEO|executive|director|manager|employee)?', 'tech company executive'),
+            (r'\b구글\s*(CEO|임원|대표|사장|회장|직원)?', 'tech company executive'),
+            (r'\bMicrosoft\s*(CEO|executive|director|manager|employee)?', 'software company executive'),
+            (r'\bAmazon\s*(CEO|executive|director|manager|employee)?', 'e-commerce company executive'),
+            (r'\bMeta\s*(CEO|executive|director|manager|employee)?', 'social media company executive'),
+            (r'\bFacebook\s*(CEO|executive|director|manager|employee)?', 'social media company executive'),
+            (r'\b페이스북\s*(CEO|임원|대표|사장|회장|직원)?', 'social media company executive'),
+            (r'\bNVIDIA\s*(CEO|executive|director|manager|employee)?', 'chip company executive'),
+            (r'\bIntel\s*(CEO|executive|director|manager|employee)?', 'semiconductor company executive'),
+            (r'\bSamsung\s*(CEO|executive|director|manager|employee)?', 'electronics company executive'),
+            (r'\bHyundai\s*(CEO|executive|director|manager|employee)?', 'automotive company executive'),
+            (r'\bSony\s*(CEO|executive|director|manager|employee)?', 'electronics company executive'),
+            (r'\bToyota\s*(CEO|executive|director|manager|employee)?', 'automotive company executive'),
+            (r'\bBMW\s*(CEO|executive|director|manager|employee)?', 'automotive company executive'),
+            (r'\bMercedes\s*(CEO|executive|director|manager|employee)?', 'automotive company executive'),
+            (r'\bBosch\s*(CEO|executive|director|manager|employee)?', 'automotive parts company executive'),
+            (r'\bZF\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원|CEO|executive)?', 'automotive parts company executive'),
+            (r'\bZF\s+(독일\s*)?(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'German automotive parts company executive'),
+            (r'\bSpaceX\s*(CEO|executive|director|manager|employee)?', 'aerospace company executive'),
+            (r'\bOpenAI\s*(CEO|executive|director|manager|employee)?', 'AI company executive'),
+        ]
+
+        # 기업명만 단독으로 나오는 경우 (직책 없이)
+        company_only_patterns = [
+            (r'\b삼성전자\b', 'large electronics company'),
+            (r'\b삼성\b', 'large tech company'),
+            (r'\b현대자동차\b', 'automotive company'),
+            (r'\b현대차\b', 'automotive company'),
+            (r'\bLG전자\b', 'electronics company'),
+            (r'\bSK하이닉스\b', 'semiconductor company'),
+            (r'\b테슬라\b', 'electric vehicle company'),
+            (r'\bTesla\b', 'electric vehicle company'),
+            (r'\bApple\b(?!\s+(?:pie|juice|tree|fruit|cider))', 'tech company'),
+            (r'\bGoogle\b', 'tech company'),
+            (r'\bZF\b', 'automotive parts company'),
+        ]
+
+        # 한국 기업 + 직책 패턴 적용
+        for pattern, replacement in korean_company_patterns:
+            original_sanitized = sanitized
+            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
+            if sanitized != original_sanitized:
+                changes_made.append(f"기업+직책: {pattern}")
+
+        # 글로벌 기업 + 직책 패턴 적용
+        for pattern, replacement in global_company_patterns:
+            original_sanitized = sanitized
+            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
+            if sanitized != original_sanitized:
+                changes_made.append(f"글로벌 기업: {pattern}")
+
+        # 기업명만 단독으로 나오는 경우 (직책이 없어도 대체)
+        for pattern, replacement in company_only_patterns:
+            original_sanitized = sanitized
+            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
+            if sanitized != original_sanitized:
+                changes_made.append(f"기업명 단독: {pattern}")
+
+        # ═══════════════════════════════════════════════════════════════
+        # 민족/국적 관련 키워드 대체 (안전성 필터 트리거 방지)
+        # ═══════════════════════════════════════════════════════════════
+        nationality_patterns = [
+            (r'\bKorean\s+webtoon\b', 'webtoon'),
+            (r'\bKorean\s+manhwa\b', 'manhwa'),
+            (r'\bKorean\s+style\b', 'Asian-inspired style'),
+            (r'\bKorean\s+', ''),  # 기타 Korean + 명사 조합
+            (r'\bJapanese\s+anime\b', 'anime'),
+            (r'\bChinese\s+', ''),
+        ]
+
+        for pattern, replacement in nationality_patterns:
+            original_sanitized = sanitized
+            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
+            if sanitized != original_sanitized:
+                changes_made.append(f"국적: {pattern}")
+
+        # 연속 공백 정리
+        sanitized = re.sub(r'\s+', ' ', sanitized).strip()
+
+        # 변경 사항 로그
+        if sanitized != prompt:
+            print(f"[ImageFX v6.5] 프롬프트 안전성 전처리 적용됨")
+            print(f"  적용된 패턴: {', '.join(changes_made[:5])}{'...' if len(changes_made) > 5 else ''}")
+            print(f"  변경 전: {prompt[:100]}...")
+            print(f"  변경 후: {sanitized[:100]}...")
+        else:
+            print(f"[ImageFX v6.5] 프롬프트 안전성 전처리: 변경 없음 (안전한 프롬프트)")
+
+        return sanitized
 
     def _load_imagefx_cookie(self) -> str:
         """ImageFX 쿠키 로드 (환경변수 > 파일 순서)"""
@@ -227,6 +386,8 @@ class ImageAPIManager:
         elif api_provider == "Google ImageFX":
             # v6.0: 쿠키만 필요
             return bool(self.imagefx_cookie)
+        elif api_provider in ("Gemini (Nano Banana)", "Gemini (Nano Banana Pro)"):
+            return bool(self.gemini_api_key)
         elif api_provider == "OpenAI DALL-E":
             return bool(self.openai_api_key)
         elif api_provider == "Stability AI":
@@ -279,7 +440,9 @@ class ImageAPIManager:
         width: int = 1024,
         height: int = 1024,
         negative_prompt: str = "",
-        skip_rate_limit: bool = False
+        skip_rate_limit: bool = False,
+        seed: Optional[int] = None,  # v1.1: 시드 지원 추가
+        reference_config: Dict = None  # Gemini 레퍼런스 이미지 설정
     ) -> GenerationResult:
         """
         이미지 생성 (통합 인터페이스)
@@ -292,6 +455,14 @@ class ImageAPIManager:
             height: 이미지 높이
             negative_prompt: 네거티브 프롬프트
             skip_rate_limit: Rate limit 대기 스킵 여부
+            seed: 시드 값 (None이면 랜덤)
+            reference_config: Gemini 레퍼런스 이미지 설정 (Gemini 전용)
+                {
+                    "enabled": bool,
+                    "images": List[bytes],
+                    "reference_type": str,  # "style", "character", "composition"
+                    "reference_strength": float  # 0.0 ~ 1.0
+                }
 
         Returns:
             GenerationResult
@@ -304,15 +475,21 @@ class ImageAPIManager:
 
         try:
             if api_provider == "Together.ai FLUX":
-                result = self._generate_together(prompt, model, width, height)
+                result = self._generate_together(prompt, model, width, height, seed=seed)
             elif api_provider == "Google ImageFX":
-                result = self._generate_imagefx(prompt, model, width, height)
+                # v1.2: 네거티브 프롬프트 전달 추가
+                result = self._generate_imagefx(prompt, model, width, height, seed=seed, negative_prompt=negative_prompt)
+            elif api_provider in ("Gemini (Nano Banana)", "Gemini (Nano Banana Pro)"):
+                result = self._generate_gemini(
+                    prompt, model, width, height, negative_prompt,
+                    reference_config=reference_config
+                )
             elif api_provider == "OpenAI DALL-E":
                 result = self._generate_openai(prompt, model, width, height)
             elif api_provider == "Stability AI":
-                result = self._generate_stability(prompt, model, width, height, negative_prompt)
+                result = self._generate_stability(prompt, model, width, height, negative_prompt, seed=seed)
             elif api_provider == "Replicate SDXL":
-                result = self._generate_replicate(prompt, model, width, height, negative_prompt)
+                result = self._generate_replicate(prompt, model, width, height, negative_prompt, seed=seed)
             else:
                 return GenerationResult(success=False, error=f"Unknown API: {api_provider}")
 
@@ -350,7 +527,8 @@ class ImageAPIManager:
         prompt: str,
         model: str,
         width: int,
-        height: int
+        height: int,
+        seed: Optional[int] = None  # v1.1: 시드 지원 추가
     ) -> GenerationResult:
         """Together.ai FLUX 이미지 생성"""
 
@@ -371,7 +549,8 @@ class ImageAPIManager:
             # FLUX.2 모델은 기본 20 steps
             steps = 20
 
-            response = client.images.generate(
+            # 생성 파라미터
+            gen_params = dict(
                 prompt=prompt,
                 model=model,
                 width=min(1792, max(64, width)),
@@ -381,12 +560,18 @@ class ImageAPIManager:
                 response_format="b64_json"
             )
 
+            # v1.1: 시드가 지정된 경우 추가
+            if seed is not None:
+                gen_params["seed"] = seed
+
+            response = client.images.generate(**gen_params)
+
             if response.data and response.data[0].b64_json:
                 image_data = base64.b64decode(response.data[0].b64_json)
                 # 로그: 성공
                 elapsed = time.time() - start_time
                 log_image_generation_success(elapsed, len(image_data), model)
-                return GenerationResult(success=True, image_data=image_data)
+                return GenerationResult(success=True, image_data=image_data, seed=seed)
 
             # 로그: 실패 (데이터 없음)
             elapsed = time.time() - start_time
@@ -473,7 +658,8 @@ class ImageAPIManager:
         model: str,
         width: int,
         height: int,
-        negative_prompt: str
+        negative_prompt: str,
+        seed: Optional[int] = None  # v1.1: 시드 지원 추가
     ) -> GenerationResult:
         """Stability AI 이미지 생성"""
 
@@ -512,6 +698,10 @@ class ImageAPIManager:
                 "steps": 30
             }
 
+            # v1.1: 시드가 지정된 경우 추가
+            if seed is not None:
+                body["seed"] = seed
+
             if negative_prompt:
                 body["text_prompts"].append({"text": negative_prompt, "weight": -1.0})
 
@@ -521,10 +711,12 @@ class ImageAPIManager:
                 data = response.json()
                 if data.get("artifacts"):
                     image_data = base64.b64decode(data["artifacts"][0]["base64"])
+                    # v1.1: 응답에서 시드 추출 (Stability API는 시드 반환)
+                    result_seed = data["artifacts"][0].get("seed", seed)
                     # 로그: 성공
                     elapsed = time.time() - start_time
                     log_image_generation_success(elapsed, len(image_data), engine_id)
-                    return GenerationResult(success=True, image_data=image_data)
+                    return GenerationResult(success=True, image_data=image_data, seed=result_seed)
 
             # 로그: 실패 (API 에러)
             elapsed = time.time() - start_time
@@ -547,7 +739,8 @@ class ImageAPIManager:
         model: str,
         width: int,
         height: int,
-        negative_prompt: str
+        negative_prompt: str,
+        seed: Optional[int] = None  # v1.1: 시드 지원 추가
     ) -> GenerationResult:
         """Replicate 이미지 생성"""
 
@@ -577,6 +770,10 @@ class ImageAPIManager:
             if negative_prompt:
                 input_params["negative_prompt"] = negative_prompt
 
+            # v1.1: 시드가 지정된 경우 추가
+            if seed is not None:
+                input_params["seed"] = seed
+
             output = replicate.run(model, input=input_params)
 
             if output:
@@ -589,7 +786,7 @@ class ImageAPIManager:
                     # 로그: 성공
                     elapsed = time.time() - start_time
                     log_image_generation_success(elapsed, len(response.content), model)
-                    return GenerationResult(success=True, image_data=response.content, image_url=image_url)
+                    return GenerationResult(success=True, image_data=response.content, image_url=image_url, seed=seed)
 
             # 로그: 실패 (이미지 없음)
             elapsed = time.time() - start_time
@@ -610,7 +807,9 @@ class ImageAPIManager:
         prompt: str,
         model: str,
         width: int,
-        height: int
+        height: int,
+        seed: Optional[int] = None,  # v1.1: 시드 지원 추가
+        negative_prompt: str = ""  # v1.2: 네거티브 프롬프트 지원 추가
     ) -> GenerationResult:
         """Google ImageFX (Imagen) 이미지 생성 (v6.0 - Node.js 래퍼)"""
 
@@ -651,23 +850,34 @@ class ImageAPIManager:
             # 비율 설정 (크기 기반 자동 선택)
             aspect_ratio = get_aspect_ratio_for_size(width, height)
 
+            # v6.4: 프롬프트 안전성 전처리 (UNSAFE_GENERATION 에러 방지)
+            sanitized_prompt = self._sanitize_prompt_for_imagefx(prompt)
+
             print(f"[ImageFX v6.0] Node.js 래퍼 호출 중...")
             print(f"  비율: {aspect_ratio.value}")
+            if seed is not None:
+                print(f"  시드: {seed}")
+            if negative_prompt:
+                print(f"  네거티브: {negative_prompt[:50]}...")
 
-            # 이미지 생성
+            # 이미지 생성 (v1.1: 시드 지원, v1.2: 네거티브 프롬프트 지원, v6.4: 전처리된 프롬프트 사용)
             images = self._imagefx_client.generate_image(
-                prompt=prompt,
+                prompt=sanitized_prompt,
                 model=model_enum,
                 aspect_ratio=aspect_ratio,
-                num_images=1
+                num_images=1,
+                seed=seed,  # v1.1: 시드 전달
+                negative_prompt=negative_prompt  # v1.2: 네거티브 프롬프트 전달
             )
 
             if images and len(images) > 0:
                 image_data = images[0].get_bytes()
+                # v1.1: 응답에서 시드 값 추출
+                result_seed = images[0].seed if hasattr(images[0], 'seed') else seed
                 # 로그: 성공
                 elapsed = time.time() - start_time
                 log_image_generation_success(elapsed, len(image_data), model)
-                return GenerationResult(success=True, image_data=image_data)
+                return GenerationResult(success=True, image_data=image_data, seed=result_seed)
 
             # 로그: 실패 (이미지 없음)
             elapsed = time.time() - start_time
@@ -686,6 +896,92 @@ class ImageAPIManager:
             if "401" in error_msg or "Unauthorized" in error_msg:
                 error_msg += " (Authorization 토큰이 만료되었거나 유효하지 않습니다)"
             log_image_generation_error(elapsed, error_msg, model, api_provider)
+            return GenerationResult(success=False, error=error_msg)
+
+    # ═══════════════════════════════════════════════════════
+    # Gemini 이미지 생성 (레퍼런스 지원)
+    # ═══════════════════════════════════════════════════════
+    def _generate_gemini(
+        self,
+        prompt: str,
+        model: str,
+        width: int,
+        height: int,
+        negative_prompt: str = "",
+        reference_config: Dict = None
+    ) -> GenerationResult:
+        """Gemini 이미지 생성 (레퍼런스 이미지 지원)"""
+
+        if not self.gemini_api_key:
+            return GenerationResult(
+                success=False,
+                error="GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요."
+            )
+
+        # 모델 키 매핑
+        model_key = model or "gemini_nano_banana"
+        api_provider = "Gemini"
+
+        # 로그: 생성 시작
+        log_image_generation_start(api_provider, model_key, width, height, prompt)
+        start_time = time.time()
+
+        try:
+            from utils.gemini_image_generator import GeminiImageGenerator
+
+            # 클라이언트 초기화 (지연 초기화)
+            if self._gemini_client is None:
+                self._gemini_client = GeminiImageGenerator(api_key=self.gemini_api_key)
+
+            # 레퍼런스 이미지 설정
+            reference_images = None
+            reference_type = "style"
+            reference_strength = 0.8
+
+            if reference_config and reference_config.get("enabled"):
+                reference_images = reference_config.get("images", [])
+                reference_type = reference_config.get("reference_type", "style")
+                reference_strength = reference_config.get("reference_strength", 0.8)
+
+                if reference_images:
+                    print(f"[Gemini] 레퍼런스 이미지 {len(reference_images)}개 사용 "
+                          f"(타입: {reference_type}, 강도: {reference_strength*100:.0f}%)")
+
+            # 이미지 생성
+            result = self._gemini_client.generate_image(
+                prompt=prompt,
+                model_key=model_key,
+                reference_images=reference_images,
+                reference_type=reference_type,
+                reference_strength=reference_strength,
+                width=width,
+                height=height,
+                negative_prompt=negative_prompt
+            )
+
+            elapsed = time.time() - start_time
+
+            if result.success and result.image_data:
+                log_image_generation_success(elapsed, len(result.image_data), model_key)
+                return GenerationResult(
+                    success=True,
+                    image_data=result.image_data,
+                    elapsed_time=elapsed
+                )
+            else:
+                error_msg = result.error or "이미지 생성 실패"
+                log_image_generation_error(elapsed, error_msg, model_key, api_provider)
+                return GenerationResult(success=False, error=error_msg, elapsed_time=elapsed)
+
+        except ImportError as e:
+            elapsed = time.time() - start_time
+            error_msg = f"Gemini 클라이언트 모듈을 찾을 수 없습니다: {e}"
+            log_image_generation_error(elapsed, error_msg, model_key, api_provider)
+            return GenerationResult(success=False, error=error_msg)
+        except Exception as e:
+            elapsed = time.time() - start_time
+            error_msg = str(e)
+            log_image_generation_error(elapsed, error_msg, model_key, api_provider)
             return GenerationResult(success=False, error=error_msg)
 
     def save_image(

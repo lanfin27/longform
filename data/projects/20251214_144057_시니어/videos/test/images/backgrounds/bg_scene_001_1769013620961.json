@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-22T01:40:39.701823",
+  "image_file": "bg_scene_001_1769013620961.png",
+  "scene_id": 1,
+  "prompts": {
+    "original": "A professional-looking lecturer on a brightly lit stage, gesturing and asking a question to the audience. Focus on the lecturer's confident and engaging expression. No text.",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A professional-looking lecturer on a brightly lit stage, gesturing and asking a question to the audience. Focus on the lecturer's confident and engaging expression. No text., background scene, no characters, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1691287958
+  }
+}

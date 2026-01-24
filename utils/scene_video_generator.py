@@ -277,7 +277,7 @@ def generate_scene_video(
     negative_prompt: str = None,
 ) -> Dict[str, Any]:
     """
-    씬 이미지에서 AI 비디오 생성
+    씬 이미지에서 AI 비디오 생성 (v3.23: 상세 로깅 추가)
 
     Args:
         image_path: 소스 이미지 경로
@@ -293,7 +293,15 @@ def generate_scene_video(
     Returns:
         생성 결과 딕셔너리
     """
+    print(f"[SceneVideoGen] ========== 비디오 생성 시작 ==========")
+    print(f"[SceneVideoGen] 씬 ID: {scene_id}")
+    print(f"[SceneVideoGen] 플랫폼: {platform}, 모델: {model_key}")
+    print(f"[SceneVideoGen] 길이: {duration}초, 해상도: {resolution}")
+    print(f"[SceneVideoGen] 이미지: {image_path}")
+    print(f"[SceneVideoGen] 프롬프트: {prompt[:100]}..." if len(prompt) > 100 else f"[SceneVideoGen] 프롬프트: {prompt}")
+
     if not VIDEO_API_AVAILABLE:
+        print(f"[SceneVideoGen] ❌ Video API 모듈 없음")
         return {
             "success": False,
             "error": "Video API 모듈이 설치되지 않았습니다."
@@ -301,16 +309,19 @@ def generate_scene_video(
 
     # 이미지 확인
     if not image_path or not Path(image_path).exists():
+        print(f"[SceneVideoGen] ❌ 이미지 없음: {image_path}")
         return {
             "success": False,
             "error": f"이미지를 찾을 수 없습니다: {image_path}"
         }
+    print(f"[SceneVideoGen] ✅ 이미지 확인됨")
 
     # 출력 디렉토리
     if not output_dir:
         output_dir = str(Path(image_path).parent.parent / "videos" / "ai_generated")
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
+    print(f"[SceneVideoGen] 출력 디렉토리: {output_dir}")
 
     # 출력 파일명
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -320,8 +331,10 @@ def generate_scene_video(
         output_filename = f"video_{timestamp}.mp4"
 
     output_path = str(Path(output_dir) / output_filename)
+    print(f"[SceneVideoGen] 출력 파일: {output_path}")
 
     try:
+        print(f"[SceneVideoGen] Video API 호출 중...")
         # Video API 호출
         result = generate_video_sync(
             prompt=prompt,
@@ -335,13 +348,24 @@ def generate_scene_video(
             negative_prompt=negative_prompt,
         )
 
+        print(f"[SceneVideoGen] API 응답 수신")
+        print(f"[SceneVideoGen] 성공 여부: {result.success}")
+
         if result.success:
+            local_path = result.local_path or output_path
+            print(f"[SceneVideoGen] ✅ 비디오 생성 성공!")
+            print(f"[SceneVideoGen] 비디오 URL: {result.video_url}")
+            print(f"[SceneVideoGen] 로컬 경로: {local_path}")
+            print(f"[SceneVideoGen] 파일 존재: {Path(local_path).exists() if local_path else False}")
+            print(f"[SceneVideoGen] 비용: ${result.cost_usd:.3f}")
+            print(f"[SceneVideoGen] 생성 시간: {result.generation_time:.1f}초")
+
             # ⭐ v2.4: 최종 프롬프트 정보 추가
             metadata = result.metadata or {}
             return {
                 "success": True,
                 "video_url": result.video_url,
-                "video_path": result.local_path or output_path,
+                "video_path": local_path,
                 "cost_usd": result.cost_usd,
                 "credits_used": result.credits_used,
                 "platform": result.platform_used,
@@ -354,12 +378,17 @@ def generate_scene_video(
                 "prompt_expanded": metadata.get("prompt_expanded", False),
             }
         else:
+            error_msg = result.error_message or "비디오 생성 실패"
+            print(f"[SceneVideoGen] ❌ 생성 실패: {error_msg}")
             return {
                 "success": False,
-                "error": result.error_message or "비디오 생성 실패"
+                "error": error_msg
             }
 
     except Exception as e:
+        import traceback
+        print(f"[SceneVideoGen] ❌ 예외 발생: {e}")
+        print(f"[SceneVideoGen] 스택 트레이스:\n{traceback.format_exc()}")
         return {
             "success": False,
             "error": str(e)

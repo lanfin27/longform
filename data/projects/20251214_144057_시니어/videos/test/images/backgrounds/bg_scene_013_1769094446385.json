@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-23T00:07:26.386118",
+  "image_file": "bg_scene_013_1769094446385.png",
+  "scene_id": 13,
+  "prompts": {
+    "original": "16:9 widescreen format, edge-to-edge composition, full bleed image filling entire frame without any borders or letterboxing, modern corporate boardroom with long glass table extending across the frame, leather executive chairs on both sides, expansive city skyline view through floor-to-ceiling panoramic windows, large presentation screen mounted on wall, minimalist corporate decor with clean lines, cool blue and gray color palette, professional atmosphere with dramatic natural lighting, wide establishing shot capturing entire room, scene fills entire 16:9 frame from edge to edge with no black bars or empty space, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, 16:9 widescreen format, edge-to-edge composition, full bleed image filling entire frame without any borders or letterboxing, modern corporate boardroom with long glass table extending across the frame, leather executive chairs on both sides, expansive city skyline view through floor-to-ceiling panoramic windows, large presentation screen mounted on wall, minimalist corporate decor with clean lines, cool blue and gray color palette, professional atmosphere with dramatic natural lighting, wide establishing shot capturing entire room, scene fills entire 16:9 frame from edge to edge with no black bars or empty space, absolutely no text, no letters, no words, no signs, no writing, no numbers, no speech bubbles, no readable content, background scene, no characters, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1151744541
+  }
+}

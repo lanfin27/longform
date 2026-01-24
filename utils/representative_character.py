@@ -36,6 +36,7 @@ class RepresentativeCharacter:
     # 프롬프트
     base_prompt: str  # 기본 캐릭터 프롬프트 (외모, 스타일 등)
     style_preset: str = "animation"  # 스타일 프리셋
+    style_suffix: str = ""  # v1.1: 스타일 suffix 추가 (라이브러리 동기화용)
     negative_prompt: str = "text, watermark, low quality, blurry, deformed"
 
     # 생성된 기본 이미지

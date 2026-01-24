@@ -339,7 +339,8 @@ def auto_refresh_cookies(use_selenium_fallback: bool = True) -> tuple:
                 extract_imagefx_cookies_with_selenium,
                 cookies_to_header_string as selenium_to_header,
                 check_selenium_available,
-                SELENIUM_AVAILABLE
+                SELENIUM_AVAILABLE,
+                clear_webdriver_cache  # v2.0: 캐시 정리 함수 추가
             )
 
             if SELENIUM_AVAILABLE:
@@ -375,6 +376,17 @@ def auto_refresh_cookies(use_selenium_fallback: bool = True) -> tuple:
 
         except ImportError as e:
             print(f"[CookieManager] Selenium 모듈 import 실패: {e}")
+        except OSError as e:
+            error_msg = str(e)
+            print(f"[CookieManager] Selenium OSError: {e}")
+            # v2.0: WinError 193 처리 (ChromeDriver 손상)
+            if "193" in error_msg or "올바른 Win32 응용 프로그램" in error_msg:
+                print("[CookieManager] ChromeDriver 파일 손상 감지. 캐시 정리 시도...")
+                try:
+                    clear_webdriver_cache()
+                    print("[CookieManager] 캐시 정리 완료. 다시 시도해 주세요.")
+                except Exception as cache_e:
+                    print(f"[CookieManager] 캐시 정리 실패: {cache_e}")
         except Exception as e:
             print(f"[CookieManager] Selenium 추출 실패: {e}")
 

@@ -1,0 +1,135 @@
+[
+  {
+    "name": "비즈니스 사람들",
+    "name_ko": "비즈니스 사람들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse group of business people exhibiting surprised and questioning expressions, wearing business attire, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "이재용",
+    "name_ko": "이재용",
+    "role": "등장인물",
+    "visual_prompt": "Lee Jae-yong sitting at polished conference table, thoughtful expression, relaxed posture, wearing a modern business suit, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "기술 전문가",
+    "name_ko": "기술 전문가",
+    "role": "등장인물",
+    "visual_prompt": "Technology specialist remotely monitoring system on large screen, focused expression, wearing glasses, professional attire, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "비즈니스 분석가",
+    "name_ko": "비즈니스 분석가",
+    "role": "등장인물",
+    "visual_prompt": "Business analyst standing and presenting data, pointing to charts on screen, confident and successful expression, wearing professional attire, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "CEO",
+    "name_ko": "CEO",
+    "role": "등장인물",
+    "visual_prompt": "CEO in professional business attire presenting acquisition proposal with confident expression, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "role": "등장인물",
+    "visual_prompt": "Tired-looking driver with slightly blurred face, fatigued expression, focused on the road, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "디자이너",
+    "name_ko": "디자이너",
+    "role": "등장인물",
+    "visual_prompt": "Young automotive designer in stylish clothing, focused expression while examining holographic display, creative professional, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "임원들",
+    "name_ko": "임원들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse executives arguing heatedly, wearing formal business attire, tense expressions, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "자동차 디자이너",
+    "name_ko": "자동차 디자이너",
+    "role": "등장인물",
+    "visual_prompt": "Automotive designer in modern casual attire, focused expression, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "엔지니어",
+    "name_ko": "엔지니어",
+    "role": "등장인물",
+    "visual_prompt": "Engineer in cleanroom suit, monitoring control panels, focused expression, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "경영진",
+    "name_ko": "경영진",
+    "role": "등장인물",
+    "visual_prompt": "Diverse group of executives in business attire, serious expressions, professional demeanor, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "사업가",
+    "name_ko": "사업가",
+    "role": "등장인물",
+    "visual_prompt": "Businessman in dark suit, serious expression, focused and concerned, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "작업자",
+    "name_ko": "작업자",
+    "role": "등장인물",
+    "visual_prompt": "Workers in clean blue uniforms monitoring the automated process, wearing safety glasses, focused expressions, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "임원진",
+    "name_ko": "임원진",
+    "role": "등장인물",
+    "visual_prompt": "Executives in business attire sitting around a sleek glass table, confident expressions, professional demeanor, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "과학자들",
+    "name_ko": "과학자들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse team of scientists in lab coats, collaborating and discussing data, focused and enthusiastic expressions, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "비즈니스 전문가",
+    "name_ko": "비즈니스 전문가",
+    "role": "등장인물",
+    "visual_prompt": "Diverse business professionals in formal attire, serious and focused expressions, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "비즈니스 전문가 1",
+    "name_ko": "비즈니스 전문가 1",
+    "role": "등장인물",
+    "visual_prompt": "Business professional, tense expression, business attire, symbolic separation, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "비즈니스 전문가 2",
+    "name_ko": "비즈니스 전문가 2",
+    "role": "등장인물",
+    "visual_prompt": "Business professional, tense expression, business attire, symbolic separation, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "엔지니어들",
+    "name_ko": "엔지니어들",
+    "role": "등장인물",
+    "visual_prompt": "Engineers collaborating at desks, discussing code and data with focused expressions, modern office attire, no text, no logos on clothing, no name tags",
+    "description": ""
+  }
+]

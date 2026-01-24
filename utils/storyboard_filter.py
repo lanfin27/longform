@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 """
 utils/storyboard_filter.py
-스토리보드 필터링 유틸리티 (v2.0)
+스토리보드 필터링 유틸리티 (v2.1)
 
 주요 기능:
 1. 묶음 대표 씬 필터링
-2. 한글 텍스트 씬 필터링
+2. 한글 텍스트 씬 필터링 (묶음 단위)
 3. 복합 필터 지원 (합집합/교집합)
 4. 씬 태그 생성
 5. 빠른 프리셋 필터
+
+v2.1 추가:
+- 한글 텍스트 씬 선택 시 묶음 단위 선택
+- get_korean_text_scene_ids_individual() 개별 씬 선택 함수 추가
+- 묶음 내 하나라도 한글 있으면 전체 묶음 선택
 
 v2.0 추가:
 - 복합 필터 체크박스 지원
@@ -92,6 +97,11 @@ FILTER_INFO = {
         "name": "미생성",
         "icon": "⬜",
         "description": "이미지, 비디오 모두 없는 씬"
+    },
+    "has_characters": {
+        "name": "캐릭터 있음",
+        "icon": "👤",
+        "description": "등장 캐릭터가 있는 씬"
     }
 }
 
@@ -175,12 +185,62 @@ def has_korean_text(scene: Dict) -> bool:
     return bool(korean_prompt and korean_prompt.strip())
 
 
-def get_korean_text_scene_ids(scenes: List[Dict]) -> Set[int]:
-    """한글 텍스트 씬 ID 목록 반환"""
+def get_korean_text_scene_ids_individual(scenes: List[Dict]) -> Set[int]:
+    """
+    한글 텍스트 씬 ID 목록 반환 (개별 씬 단위)
+
+    Args:
+        scenes: 씬 데이터 리스트
+
+    Returns:
+        한글 텍스트가 있는 개별 씬 ID set
+    """
     korean_ids = set()
 
     for scene in scenes:
         if has_korean_text(scene):
+            scene_id = scene.get("scene_id") or scene.get("id", 0)
+            if scene_id:
+                korean_ids.add(scene_id)
+
+    return korean_ids
+
+
+def get_korean_text_scene_ids(scenes: List[Dict]) -> Set[int]:
+    """
+    한글 텍스트 씬 ID 목록 반환 (묶음 단위)
+
+    묶음 내 어느 씬이라도 한글 텍스트가 있으면
+    해당 묶음의 모든 씬 ID를 반환합니다.
+
+    예시:
+    - 묶음 1 (씬 1,2,3) 중 씬 1이 한글 → 씬 1,2,3 모두 반환
+    - 묶음 2 (씬 4,5,6) 중 한글 없음 → 반환 안함
+
+    Args:
+        scenes: 씬 데이터 리스트
+
+    Returns:
+        한글 텍스트가 있는 묶음의 모든 씬 ID set
+    """
+    if not scenes:
+        return set()
+
+    # 묶음 맵 생성
+    bundle_map = get_bundle_map(scenes)
+
+    # 묶음 내 한글 텍스트 씬이 있는 묶음 찾기
+    korean_bundle_ids = set()
+    for bundle_id, bundle_scenes in bundle_map.items():
+        for scene in bundle_scenes:
+            if has_korean_text(scene):
+                korean_bundle_ids.add(bundle_id)
+                break  # 묶음 내 하나라도 있으면 해당 묶음 선택
+
+    # 해당 묶음의 모든 씬 ID 반환
+    korean_ids = set()
+    for bundle_id in korean_bundle_ids:
+        for scene in bundle_map[bundle_id]:
             scene_id = scene.get("scene_id") or scene.get("id", 0)
             if scene_id:
                 korean_ids.add(scene_id)
@@ -433,6 +493,52 @@ def get_not_generated_scene_ids(scenes: List[Dict]) -> Set[int]:
     return all_ids - generated_ids
 
 
+def get_has_characters_scene_ids(scenes: List[Dict]) -> Set[int]:
+    """등장 캐릭터가 있는 씬 ID 반환 (v2.1)"""
+    char_ids = set()
+
+    for scene in scenes:
+        characters = scene.get("characters", [])
+        # characters가 비어있지 않은 경우
+        if characters and len(characters) > 0:
+            scene_id = scene.get("scene_id") or scene.get("id", 0)
+            if scene_id:
+                char_ids.add(scene_id)
+
+    return char_ids
+
+
+def get_has_composite_scene_ids(scenes: List[Dict]) -> Set[int]:
+    """합성 이미지가 있는 씬 ID 반환 (v2.2)"""
+    composite_ids = set()
+
+    for scene in scenes:
+        has_composite = (
+            scene.get("composite_image_path") or
+            scene.get("nano_composite_image") or
+            scene.get("composite_path")
+        )
+        if has_composite:
+            scene_id = scene.get("scene_id") or scene.get("id", 0)
+            if scene_id:
+                composite_ids.add(scene_id)
+
+    return composite_ids
+
+
+def get_no_composite_scene_ids(scenes: List[Dict]) -> Set[int]:
+    """합성 이미지가 없는 씬 ID 반환 (v2.2)"""
+    composite_ids = get_has_composite_scene_ids(scenes)
+
+    all_ids = set()
+    for scene in scenes:
+        scene_id = scene.get("scene_id") or scene.get("id", 0)
+        if scene_id:
+            all_ids.add(scene_id)
+
+    return all_ids - composite_ids
+
+
 def apply_complex_filters(
     scenes: List[Dict],
     active_filters: Dict[str, bool],
@@ -484,6 +590,17 @@ def apply_complex_filters(
     if active_filters.get("not_generated"):
         filter_results["not_generated"] = get_not_generated_scene_ids(scenes)
 
+    # v2.1: 등장 캐릭터 있는 씬 필터
+    if active_filters.get("has_characters"):
+        filter_results["has_characters"] = get_has_characters_scene_ids(scenes)
+
+    # v2.2: 합성 이미지 필터
+    if active_filters.get("has_composite"):
+        filter_results["has_composite"] = get_has_composite_scene_ids(scenes)
+
+    if active_filters.get("no_composite"):
+        filter_results["no_composite"] = get_no_composite_scene_ids(scenes)
+
     # 필터가 하나도 선택되지 않은 경우 전체 반환
     if not filter_results:
         return all_scene_ids, {}
@@ -532,7 +649,8 @@ def get_extended_filter_summary(
             "korean_text": True,
             "no_image": False,
             "no_video": False,
-            "not_generated": False
+            "not_generated": False,
+            "has_characters": False  # v2.1: 캐릭터 필터 추가
         }
 
     bundle_size = scenes[0].get("bundle_size", 1) if scenes else 1
@@ -544,6 +662,9 @@ def get_extended_filter_summary(
     no_image_ids = get_no_image_scene_ids(scenes)
     no_video_ids = get_no_video_scene_ids(scenes)
     not_generated_ids = get_not_generated_scene_ids(scenes)
+    has_characters_ids = get_has_characters_scene_ids(scenes)  # v2.1: 캐릭터 필터
+    has_composite_ids = get_has_composite_scene_ids(scenes)  # v2.2: 합성 이미지 필터
+    no_composite_ids = get_no_composite_scene_ids(scenes)  # v2.2: 합성 미완료 필터
 
     # 교집합 (묶음대표 ∩ 한글텍스트)
     bundle_korean_overlap = bundle_rep_ids.intersection(korean_ids) if has_bundles else set()
@@ -559,6 +680,9 @@ def get_extended_filter_summary(
         "no_image": len(no_image_ids),
         "no_video": len(no_video_ids),
         "not_generated": len(not_generated_ids),
+        "has_characters": len(has_characters_ids),  # v2.1: 캐릭터 필터
+        "has_composite": len(has_composite_ids),  # v2.2: 합성 완료
+        "no_composite": len(no_composite_ids),  # v2.2: 합성 미완료
         "bundle_korean_overlap": len(bundle_korean_overlap),
         "union_result": len(union_ids),
         "intersection_result": len(intersection_ids),
@@ -567,7 +691,10 @@ def get_extended_filter_summary(
         # 개별 ID sets (필요시 사용)
         "_bundle_rep_ids": bundle_rep_ids,
         "_korean_ids": korean_ids,
-        "_overlap_ids": bundle_korean_overlap
+        "_overlap_ids": bundle_korean_overlap,
+        "_has_characters_ids": has_characters_ids,  # v2.1: 캐릭터 필터
+        "_has_composite_ids": has_composite_ids,  # v2.2: 합성 완료
+        "_no_composite_ids": no_composite_ids  # v2.2: 합성 미완료
     }
 
 
@@ -628,6 +755,239 @@ def get_active_filter_labels(active_filters: Dict[str, bool], combine_mode: str)
             icon = info.get("icon", "")
             name = info.get("name", filter_key)
             labels.append(f"{icon}{name}")
+
+    if not labels:
+        return "전체"
+
+    separator = " + " if combine_mode == "union" else " ∩ "
+    return separator.join(labels)
+
+
+# ========================================
+# v3.0: 씬 타입 필터 통합
+# ========================================
+
+try:
+    from utils.scene_types import SceneType, SCENE_TYPE_CONFIG
+    from utils.scene_type_state import (
+        get_scene_type_manager,
+        get_filtered_scene_ids_by_type,
+        get_character_filter_scene_ids
+    )
+    SCENE_TYPE_AVAILABLE = True
+except ImportError:
+    SCENE_TYPE_AVAILABLE = False
+
+
+# 씬 타입 필터 프리셋 추가
+SCENE_TYPE_FILTER_PRESETS = {
+    "korean_text_only": {
+        "name": "🔤 한글텍스트 씬만",
+        "description": "한글 텍스트 오버레이가 포함된 씬",
+        "scene_types": ["korean_text"]
+    },
+    "infographic_only": {
+        "name": "📊 인포그래픽 씬만",
+        "description": "인포그래픽으로 대체된 씬",
+        "scene_types": ["infographic"]
+    },
+    "video_only": {
+        "name": "🎬 비디오 씬만",
+        "description": "비디오로 변환된 씬",
+        "scene_types": ["video"]
+    },
+    "real_image_only": {
+        "name": "📷 실사이미지 씬만",
+        "description": "실사 이미지로 대체된 씬",
+        "scene_types": ["real_image"]
+    },
+    "normal_only": {
+        "name": "🖼️ 일반이미지 씬만",
+        "description": "기본 AI 생성 이미지 씬",
+        "scene_types": ["normal"]
+    },
+    "replaceable": {
+        "name": "🔄 대체 가능 씬",
+        "description": "실사/비디오/인포그래픽으로 대체 가능한 씬",
+        "scene_types": ["normal", "korean_text"]
+    },
+    "replaced": {
+        "name": "✅ 대체 완료 씬",
+        "description": "이미 대체가 완료된 씬",
+        "scene_types": ["infographic", "video", "real_image"]
+    },
+    "character_composited": {
+        "name": "🎭 캐릭터 합성 완료",
+        "description": "캐릭터가 합성된 씬",
+        "character_filter": "with_character"
+    },
+    "character_pending": {
+        "name": "⏳ 캐릭터 합성 대기",
+        "description": "캐릭터 합성 대기 중인 씬",
+        "character_filter": "without_character"
+    }
+}
+
+
+def get_scene_type_filter_presets() -> Dict[str, dict]:
+    """씬 타입 필터 프리셋 반환"""
+    return SCENE_TYPE_FILTER_PRESETS.copy()
+
+
+def apply_scene_type_filter(
+    scenes: List[Dict],
+    scene_types: List[str] = None,
+    character_filter: str = "all"
+) -> Set[int]:
+    """
+    씬 타입 기반 필터 적용
+
+    Args:
+        scenes: 씬 데이터 리스트
+        scene_types: 필터할 씬 타입 리스트 (None이면 전체)
+            예: ["korean_text", "normal"]
+        character_filter: 캐릭터 필터 ("all", "with_character", "without_character")
+
+    Returns:
+        필터된 씬 ID 집합
+    """
+    if not SCENE_TYPE_AVAILABLE:
+        # 씬 타입 모듈 없으면 전체 반환
+        return {s.get("scene_id") or s.get("id", i+1) for i, s in enumerate(scenes)}
+
+    all_scene_ids = {s.get("scene_id") or s.get("id", i+1) for i, s in enumerate(scenes)}
+
+    # 씬 타입 필터
+    if scene_types:
+        type_enums = [SceneType(t) for t in scene_types if t in [e.value for e in SceneType]]
+        filtered_ids = get_filtered_scene_ids_by_type(type_enums, all_scene_ids)
+    else:
+        filtered_ids = all_scene_ids
+
+    # 캐릭터 필터
+    if character_filter != "all":
+        char_ids = get_character_filter_scene_ids(character_filter, all_scene_ids)
+        filtered_ids = filtered_ids.intersection(char_ids)
+
+    return filtered_ids
+
+
+def apply_scene_type_preset(
+    scenes: List[Dict],
+    preset_id: str
+) -> Tuple[Set[int], str]:
+    """
+    씬 타입 프리셋 적용
+
+    Args:
+        scenes: 씬 데이터 리스트
+        preset_id: 프리셋 ID
+
+    Returns:
+        (필터된 씬 ID 집합, 프리셋 이름)
+    """
+    preset = SCENE_TYPE_FILTER_PRESETS.get(preset_id)
+
+    if not preset:
+        all_ids = {s.get("scene_id") or s.get("id", i+1) for i, s in enumerate(scenes)}
+        return all_ids, "전체"
+
+    scene_types = preset.get("scene_types")
+    character_filter = preset.get("character_filter", "all")
+
+    filtered_ids = apply_scene_type_filter(scenes, scene_types, character_filter)
+
+    return filtered_ids, preset.get("name", preset_id)
+
+
+def get_scene_type_summary(scenes: List[Dict]) -> Dict:
+    """
+    씬 타입별 요약 정보 반환
+
+    Returns:
+        {
+            "total": int,
+            "by_type": {
+                "korean_text": {"count": int, "percentage": float, "emoji": str, ...},
+                ...
+            },
+            "character": {"composited": int, "pending": int}
+        }
+    """
+    if not SCENE_TYPE_AVAILABLE:
+        return {
+            "total": len(scenes),
+            "by_type": {},
+            "character": {"composited": 0, "pending": 0}
+        }
+
+    from utils.scene_type_state import get_type_statistics_for_ui
+
+    total = len(scenes)
+    stats = get_type_statistics_for_ui(total)
+
+    return {
+        "total": total,
+        "by_type": {
+            st.value: {
+                "count": info["count"],
+                "percentage": info["percentage"],
+                "emoji": info["emoji"],
+                "label": info["label"]
+            }
+            for st, info in stats["by_type"].items()
+        },
+        "character": stats["character_stats"]
+    }
+
+
+def get_combined_filter_labels(
+    basic_filters: Dict[str, bool],
+    scene_types: List[str] = None,
+    character_filter: str = "all",
+    combine_mode: str = "union"
+) -> str:
+    """
+    기본 필터 + 씬 타입 필터 통합 라벨 생성
+
+    Args:
+        basic_filters: 기본 필터 (bundle_representative, korean_text 등)
+        scene_types: 선택된 씬 타입
+        character_filter: 캐릭터 필터
+        combine_mode: 조합 모드
+
+    Returns:
+        라벨 문자열
+    """
+    labels = []
+
+    # 기본 필터 라벨
+    for filter_key, is_active in basic_filters.items():
+        if is_active:
+            info = FILTER_INFO.get(filter_key, {})
+            icon = info.get("icon", "")
+            name = info.get("name", filter_key)
+            labels.append(f"{icon}{name}")
+
+    # 씬 타입 라벨
+    if scene_types and SCENE_TYPE_AVAILABLE:
+        type_labels = []
+        for type_str in scene_types:
+            try:
+                st = SceneType(type_str)
+                config = SCENE_TYPE_CONFIG[st]
+                type_labels.append(f"{config['emoji']}{config['label']}")
+            except ValueError:
+                pass
+
+        if type_labels:
+            labels.extend(type_labels)
+
+    # 캐릭터 필터 라벨
+    if character_filter == "with_character":
+        labels.append("🎭캐릭터합성")
+    elif character_filter == "without_character":
+        labels.append("⏳캐릭터대기")
 
     if not labels:
         return "전체"

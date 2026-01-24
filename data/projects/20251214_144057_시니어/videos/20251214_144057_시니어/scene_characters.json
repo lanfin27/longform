@@ -108,6 +108,14 @@
             "updated_at": "2025-12-27T21:30:50.388377"
           }
         }
+      },
+      "삼성전자 임원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\20251214_144057_시니어\\images\\characters\\char_삼성전자_임원_standing_1768995356967.png",
+            "updated_at": "2026-01-21T20:36:07.818591"
+          }
+        }
       }
     }
   },

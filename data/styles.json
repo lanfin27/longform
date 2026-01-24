@@ -75,13 +75,13 @@
       "name": "재훍 영상툰",
       "name_ko": "재훍 영상툰",
       "segment": "character",
-      "prompt_prefix": "Korean webtoon manhwa style illustration, clean bold black outlines on all elements,\nflat solid color fills with minimal shading, simplified shapes with clear silhouettes,\n2D digital illustration style, consistent 2-3px black lineart throughout,\nmale character by default, man, masculine features unless specified otherwise.",
-      "prompt_suffix": "Muted desaturated color palette, clean cel-shaded look with minimal gradients,\nteal-gray and warm beige neutral tones, muted accent colors for focal points,\nsimple solid light gray background, clean background without text or watermarks,\nno speech bubbles, no dialogue boxes, no thought bubbles, no caption boxes,\nno signature, no watermark, no corner text, clean corners, empty corners,\npristine image edges, no artist marks, unsigned artwork,\nno text of any kind, no logos, no brand names, no labels on products,\nblank screens on devices, generic unbranded products, text-free design.",
-      "negative_prompt": "any text, any letters, any words, any numbers, any symbols, any labels,\nany watermarks, any logos, any signs, any writing of any kind,\nKorean text, Chinese text, Japanese text, English text, all text,\ntext overlay, text in image, visible text, readable text, no outlines, missing lineart, gradient only no lines,\nrealistic photograph, 3D render,\npainterly watercolor, sketchy rough lines,\ncomplex cluttered details, bright saturated colors,\nKorean text, Hangul, Korean characters, Korean letters, Korean writing, Korean labels,\nChinese text, Chinese characters, Hanzi, simplified Chinese, traditional Chinese,\nJapanese text, Hiragana, Katakana, Kanji, Japanese characters,\nAsian text, Asian characters, Asian writing, non-English text,\ncorrupted text, garbled text, distorted text, unreadable Asian text,\nphotorealistic, soft shading, blurry line,\nspeech bubble, speech balloon, dialogue bubble, word balloon, text balloon,\nthought bubble, caption box, narration box, comic speech, manga speech,\ntalk bubble, speaking bubble, conversation bubble,\nonomatopoeia, sound effects text, sfx text,\nsubtitles, captions, title text, credits,\nsignature, artist signature, corner signature, handwritten signature,\ncopyright symbol, © mark, artist name, creator mark,\nbrand name, brand logo, product label, clothing text, text on objects",
+      "prompt_prefix": "Full body character, centered composition, Western 2D animated series style, clean commercial animation aesthetic\nBold black outlines 2-3px thick on all elements, flat cel-shaded coloring with no gradients, solid color fills without any texture, crisp vector-like lineart, clean sharp edges\n\nBody proportions: approximately 6-7 heads tall, slim athletic build, elongated torso, long proportional limbs, simplified hands with basic finger shapes, feet as simple rounded shapes\nHead shape: elongated oval head, prominent angular chin and jawline, large simplified ears positioned mid-head level, smooth curved skull\nFace style: simple dot eyes with small black pupils, thin minimal eyebrows as simple curved lines, small subtle nose as single curved bump, mouth as clean curved line, completely smooth flat skin with single solid color, no shading on face, no wrinkles or details\nFlat solid color blocking, muted desaturated color palette, warm beige skin tones, no shadows no highlights no gradients anywhere on character, plain white or light neutral background, no environmental details",
+      "prompt_suffix": "",
+      "negative_prompt": "",
       "description": "한국 웹툰 스타일 배경. 명확한 검은 외곽선과 플랫 컬러 채색. \n채도 낮은 차분한 색감. 대기 원근법으로 깊이 표현. \n단순화된 형태와 깔끔한 실루엣. 모든 장면에 적용 가능한 범용 스타일.",
       "preview_image": "",
       "created_at": "2025-12-27T21:30:04.419878",
-      "updated_at": "2026-01-06T17:21:21.190993",
+      "updated_at": "2026-01-22T21:32:09.374383",
       "is_default": false
     }
   ],
@@ -168,6 +168,20 @@
       "preview_image": "",
       "created_at": "2025-12-27T21:26:35.388733",
       "updated_at": "2026-01-10T10:13:33.383237",
+      "is_default": false
+    },
+    {
+      "id": "재흙영상툰_밝은배경",
+      "name": "재흙영상툰_밝은배경",
+      "name_ko": "재흙영상툰_밝은배경",
+      "segment": "background",
+      "prompt_prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, vibrant saturated color palette, bright primary colors with warm and cheerful tones, simple solid background",
+      "prompt_suffix": "",
+      "negative_prompt": "realistic photograph, photorealistic, 3D render, people, characters, complex textures, dark, gloomy, muted colors",
+      "description": "",
+      "preview_image": "",
+      "created_at": "2026-01-21T22:30:45.124561",
+      "updated_at": "2026-01-21T22:32:26.848984",
       "is_default": false
     }
   ],

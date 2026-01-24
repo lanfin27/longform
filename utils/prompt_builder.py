@@ -461,7 +461,7 @@ def build_composite_prompt(
 
 @dataclass
 class ScenePromptPreview:
-    """씬별 프롬프트 미리보기 데이터"""
+    """씬별 프롬프트 미리보기 데이터 (v1.1: 프롬프트 유형별 비교 지원)"""
     scene_id: int
     original_prompt: str
     final_prompt: str
@@ -470,6 +470,12 @@ class ScenePromptPreview:
     style_suffix: str = ""
     style_name: str = ""
     final_length: int = 0
+    # v1.1: 프롬프트 유형별 데이터 추가
+    prompt_key: str = "image_prompt_en"  # 현재 선택된 프롬프트 키
+    full_prompt: str = ""  # image_prompt_en
+    background_prompt: str = ""  # background_prompt_en
+    character_prompt: str = ""  # character_prompt_en
+    korean_text_prompt: str = ""  # image_prompt_korean_text
 
 
 def render_multi_scene_prompt_preview(
@@ -510,16 +516,108 @@ def render_multi_scene_prompt_preview(
     # 씬별 상세 미리보기
     display_previews = scene_previews[:max_display]
 
+    # v1.1: 프롬프트 유형 정보
+    PROMPT_TYPE_INFO = {
+        "image_prompt_en": {"name": "전체", "emoji": "🖼️", "desc": "배경+캐릭터+액션"},
+        "background_prompt_en": {"name": "배경", "emoji": "🏞️", "desc": "환경/배경만"},
+        "character_prompt_en": {"name": "캐릭터", "emoji": "👤", "desc": "인물/캐릭터만"},
+        "image_prompt_korean_text": {"name": "한글텍스트", "emoji": "🇰🇷", "desc": "한글 포함"}
+    }
+
     for i, preview in enumerate(display_previews):
-        with st.expander(f"📝 씬 {preview.scene_id} 프롬프트 ({preview.final_length:,}자)", expanded=(i == 0)):
-            # 탭으로 구분
-            tabs = st.tabs(["📝 원본", "🎨 스타일", "🔗 최종", "🚫 Negative"])
+        # v1.1: 현재 선택된 프롬프트 유형 표시
+        current_type = PROMPT_TYPE_INFO.get(preview.prompt_key, PROMPT_TYPE_INFO["image_prompt_en"])
+
+        with st.expander(
+            f"{current_type['emoji']} 씬 {preview.scene_id} 프롬프트 ({preview.final_length:,}자) - {current_type['name']}",
+            expanded=(i == 0)
+        ):
+            # 탭으로 구분 (v1.1: 프롬프트 비교 탭 추가)
+            tabs = st.tabs(["📝 원본", "🔄 프롬프트 비교", "🎨 스타일", "🔗 최종", "🚫 Negative"])
 
             with tabs[0]:  # 원본 프롬프트
-                st.markdown("**씬 분석 결과 프롬프트:**")
+                st.info(f"🎯 **현재 선택된 프롬프트 유형**: {current_type['emoji']} {current_type['name']} ({current_type['desc']})")
+                st.markdown(f"**씬 분석 결과 프롬프트 (`{preview.prompt_key}`):**")
                 st.code(preview.original_prompt if preview.original_prompt else "(없음)", language=None)
 
-            with tabs[1]:  # 스타일 (Prefix + Suffix)
+            with tabs[1]:  # v1.1: 프롬프트 비교 탭
+                st.markdown("**📊 프롬프트 유형별 비교**")
+                st.caption("각 프롬프트 유형의 내용을 비교합니다. 현재 선택된 유형은 하이라이트됩니다.")
+
+                # 2열씩 표시
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    # 전체 프롬프트
+                    is_selected = preview.prompt_key == "image_prompt_en"
+                    if is_selected:
+                        st.success("✅ **🖼️ 전체 프롬프트** (선택됨)")
+                    else:
+                        st.markdown("**🖼️ 전체 프롬프트**")
+                    full_display = preview.full_prompt[:200] + "..." if len(preview.full_prompt) > 200 else preview.full_prompt
+                    st.text_area(
+                        "full",
+                        value=full_display if full_display else "(없음)",
+                        height=80,
+                        disabled=True,
+                        key=f"{key_prefix}_cmp_full_{preview.scene_id}",
+                        label_visibility="collapsed"
+                    )
+                    st.caption(f"📏 {len(preview.full_prompt)}자")
+
+                    # 캐릭터 프롬프트
+                    is_selected = preview.prompt_key == "character_prompt_en"
+                    if is_selected:
+                        st.success("✅ **👤 캐릭터 프롬프트** (선택됨)")
+                    else:
+                        st.markdown("**👤 캐릭터 프롬프트**")
+                    char_display = preview.character_prompt[:200] + "..." if len(preview.character_prompt) > 200 else preview.character_prompt
+                    st.text_area(
+                        "char",
+                        value=char_display if char_display else "(없음)",
+                        height=80,
+                        disabled=True,
+                        key=f"{key_prefix}_cmp_char_{preview.scene_id}",
+                        label_visibility="collapsed"
+                    )
+                    st.caption(f"📏 {len(preview.character_prompt)}자")
+
+                with col2:
+                    # 배경 프롬프트
+                    is_selected = preview.prompt_key == "background_prompt_en"
+                    if is_selected:
+                        st.success("✅ **🏞️ 배경 프롬프트** (선택됨)")
+                    else:
+                        st.markdown("**🏞️ 배경 프롬프트**")
+                    bg_display = preview.background_prompt[:200] + "..." if len(preview.background_prompt) > 200 else preview.background_prompt
+                    st.text_area(
+                        "bg",
+                        value=bg_display if bg_display else "(없음 - 씬 재분석 필요)",
+                        height=80,
+                        disabled=True,
+                        key=f"{key_prefix}_cmp_bg_{preview.scene_id}",
+                        label_visibility="collapsed"
+                    )
+                    st.caption(f"📏 {len(preview.background_prompt)}자")
+
+                    # 한글텍스트 프롬프트
+                    is_selected = preview.prompt_key == "image_prompt_korean_text"
+                    if is_selected:
+                        st.success("✅ **🇰🇷 한글텍스트 프롬프트** (선택됨)")
+                    else:
+                        st.markdown("**🇰🇷 한글텍스트 프롬프트**")
+                    kr_display = preview.korean_text_prompt[:200] + "..." if len(preview.korean_text_prompt) > 200 else preview.korean_text_prompt
+                    st.text_area(
+                        "kr",
+                        value=kr_display if kr_display else "(없음)",
+                        height=80,
+                        disabled=True,
+                        key=f"{key_prefix}_cmp_kr_{preview.scene_id}",
+                        label_visibility="collapsed"
+                    )
+                    st.caption(f"📏 {len(preview.korean_text_prompt)}자")
+
+            with tabs[2]:  # 스타일 (Prefix + Suffix)
                 col1, col2 = st.columns(2)
                 with col1:
                     st.markdown("**Prefix:**")
@@ -530,12 +628,12 @@ def render_multi_scene_prompt_preview(
                     suffix_display = preview.style_suffix[:300] + "..." if len(preview.style_suffix) > 300 else preview.style_suffix
                     st.code(suffix_display if suffix_display else "(없음)", language=None)
 
-            with tabs[2]:  # 최종 프롬프트
+            with tabs[3]:  # 최종 프롬프트
                 st.markdown("**최종 프롬프트 (API에 전달됨):**")
                 st.code(preview.final_prompt, language=None)
                 st.caption(f"📏 {preview.final_length:,}자 | ~{preview.final_length // 4} 토큰")
 
-            with tabs[3]:  # Negative Prompt
+            with tabs[4]:  # Negative Prompt
                 st.markdown("**네거티브 프롬프트:**")
                 negative_display = preview.negative_prompt[:500] + "..." if len(preview.negative_prompt) > 500 else preview.negative_prompt
                 st.code(negative_display if negative_display else "(없음)", language=None)
@@ -591,15 +689,45 @@ def build_scene_previews(
         if not scene:
             continue
 
-        # 원본 프롬프트 가져오기
+        # v1.1: 모든 프롬프트 유형 수집
         prompts_data = scene.get("prompts", {})
-        original_prompt = (
-            scene.get(prompt_key, "") or
-            prompts_data.get(prompt_key, "") or
-            scene.get("image_prompt_ko", "") or
-            scene.get("background_prompt", "") or
-            scene.get("description", "")
+
+        # 각 프롬프트 유형별 데이터
+        full_prompt = (
+            scene.get("image_prompt_en", "") or
+            prompts_data.get("image_prompt_en", "") or ""
         )
+        background_prompt = (
+            scene.get("background_prompt_en", "") or
+            prompts_data.get("background_prompt_en", "") or ""
+        )
+        character_prompt = (
+            scene.get("character_prompt_en", "") or
+            prompts_data.get("character_prompt_en", "") or ""
+        )
+        korean_text_prompt = (
+            scene.get("image_prompt_korean_text", "") or
+            prompts_data.get("image_prompt_korean_text", "") or ""
+        )
+
+        # 선택된 프롬프트 키에 따른 원본 프롬프트
+        prompt_type_map = {
+            "image_prompt_en": full_prompt,
+            "background_prompt_en": background_prompt,
+            "character_prompt_en": character_prompt,
+            "image_prompt_korean_text": korean_text_prompt,
+        }
+
+        original_prompt = prompt_type_map.get(prompt_key, "") or full_prompt
+
+        # 폴백: 선택된 유형이 비어있으면 다른 유형에서 가져오기
+        if not original_prompt:
+            original_prompt = (
+                full_prompt or
+                background_prompt or
+                scene.get("image_prompt_ko", "") or
+                scene.get("description", "")
+            )
 
         # 최종 프롬프트 조합
         parts = []
@@ -620,10 +748,116 @@ def build_scene_previews(
             style_prefix=style_prefix,
             style_suffix=style_suffix,
             style_name=style_name,
-            final_length=len(final_prompt)
+            final_length=len(final_prompt),
+            # v1.1: 프롬프트 유형별 데이터
+            prompt_key=prompt_key,
+            full_prompt=full_prompt,
+            background_prompt=background_prompt,
+            character_prompt=character_prompt,
+            korean_text_prompt=korean_text_prompt
         ))
 
     return previews
+
+
+def render_prompt_type_stats(
+    scenes: List[Dict],
+    selected_prompt_key: str,
+    selected_scene_ids: List[int] = None
+) -> Dict[str, int]:
+    """
+    프롬프트 유형별 통계 표시 (v1.1)
+
+    Args:
+        scenes: 전체 씬 리스트
+        selected_prompt_key: 현재 선택된 프롬프트 키
+        selected_scene_ids: 선택된 씬 ID 리스트 (없으면 전체)
+
+    Returns:
+        프롬프트 유형별 씬 수 딕셔너리
+    """
+    # 씬 필터링
+    if selected_scene_ids:
+        scene_map = {}
+        for scene in scenes:
+            sid = scene.get("scene_id") or scene.get("id")
+            if sid and sid in selected_scene_ids:
+                scene_map[sid] = scene
+        filtered_scenes = list(scene_map.values())
+    else:
+        filtered_scenes = scenes
+
+    total = len(filtered_scenes)
+
+    # 각 프롬프트 유형별 존재하는 씬 수 계산
+    stats = {
+        "image_prompt_en": 0,
+        "background_prompt_en": 0,
+        "character_prompt_en": 0,
+        "image_prompt_korean_text": 0
+    }
+
+    for scene in filtered_scenes:
+        prompts_data = scene.get("prompts", {})
+
+        if (scene.get("image_prompt_en") or prompts_data.get("image_prompt_en") or "").strip():
+            stats["image_prompt_en"] += 1
+        if (scene.get("background_prompt_en") or prompts_data.get("background_prompt_en") or "").strip():
+            stats["background_prompt_en"] += 1
+        if (scene.get("character_prompt_en") or prompts_data.get("character_prompt_en") or "").strip():
+            stats["character_prompt_en"] += 1
+        if (scene.get("image_prompt_korean_text") or prompts_data.get("image_prompt_korean_text") or "").strip():
+            stats["image_prompt_korean_text"] += 1
+
+    # UI 표시
+    st.markdown("### 📊 프롬프트 유형별 현황")
+
+    type_info = [
+        ("image_prompt_en", "🖼️ 전체", stats["image_prompt_en"]),
+        ("background_prompt_en", "🏞️ 배경", stats["background_prompt_en"]),
+        ("character_prompt_en", "👤 캐릭터", stats["character_prompt_en"]),
+        ("image_prompt_korean_text", "🇰🇷 한글", stats["image_prompt_korean_text"]),
+    ]
+
+    cols = st.columns(4)
+
+    for i, (field, name, count) in enumerate(type_info):
+        with cols[i]:
+            is_selected = field == selected_prompt_key
+            pct = f"{count/total*100:.0f}%" if total > 0 else "0%"
+
+            if is_selected:
+                st.success(f"**{name}**\n\n✅ 선택됨")
+            else:
+                st.info(f"**{name}**")
+
+            st.metric(
+                label="사용 가능",
+                value=f"{count}/{total}",
+                delta=pct if count > 0 else None
+            )
+
+    # 경고: 선택된 유형의 프롬프트가 부족한 경우
+    selected_count = stats.get(selected_prompt_key, 0)
+    if selected_count < total:
+        missing = total - selected_count
+
+        # v3.31: 배경 프롬프트 선택 시 더 명확한 경고
+        if selected_prompt_key == "background_prompt_en":
+            st.warning(
+                f"⚠️ **배경 프롬프트**가 **{missing}개 씬**에서 없습니다. "
+                f"해당 씬은 **건너뛰기** 됩니다 (전체 프롬프트로 폴백하지 않음). "
+                f"씬 분석 페이지에서 배경 프롬프트를 생성해주세요."
+            )
+        else:
+            st.warning(
+                f"⚠️ 선택된 프롬프트 유형(`{selected_prompt_key}`)이 **{missing}개 씬**에서 없습니다. "
+                f"해당 씬은 대체 프롬프트를 사용합니다."
+            )
+    else:
+        st.success(f"✅ 모든 씬({total}개)에 선택된 프롬프트 유형이 있습니다.")
+
+    return stats
 
 
 # ===================================================================

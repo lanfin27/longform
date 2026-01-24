@@ -28,6 +28,29 @@ from utils.prompt_sanitizer import (
     get_text_blocking_negative
 )
 
+# ⭐ 성능 최적화: 조건부 Streamlit 캐싱
+try:
+    import streamlit as st
+    _HAS_STREAMLIT = True
+except ImportError:
+    _HAS_STREAMLIT = False
+
+
+def _load_scenes_impl(scenes_path_str: str) -> List[Dict]:
+    """씬 데이터 로드 구현 (내부용)"""
+    scenes_path = Path(scenes_path_str)
+    if scenes_path.exists():
+        with open(scenes_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+
+if _HAS_STREAMLIT:
+    @st.cache_data(ttl=300, show_spinner=False, max_entries=50)
+    def _load_scenes_cached(scenes_path_str: str, _mtime: float) -> List[Dict]:
+        """씬 데이터 로드 (캐싱 적용) - mtime으로 자동 무효화"""
+        return _load_scenes_impl(scenes_path_str)
+
 
 @dataclass
 class SceneImageConfig:
@@ -65,11 +88,14 @@ class SceneImageGenerator:
         self.scenes = self._load_scenes()
 
     def _load_scenes(self) -> List[Dict]:
-        """씬 분석 결과 로드"""
+        """씬 분석 결과 로드 (캐싱 적용)"""
         scenes_path = self.project_path / "analysis" / "scenes.json"
         if scenes_path.exists():
-            with open(scenes_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+            if _HAS_STREAMLIT:
+                mtime = scenes_path.stat().st_mtime
+                return _load_scenes_cached(str(scenes_path), _mtime=mtime)
+            else:
+                return _load_scenes_impl(str(scenes_path))
         return []
 
     def _get_character_prompt(self, character_names: List[str]) -> str:

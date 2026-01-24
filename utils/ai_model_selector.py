@@ -176,7 +176,13 @@ def _create_model_options(models: dict) -> dict:
     for model_id, model in models.items():
         provider_icon = PROVIDER_INFO.get(model.provider, {}).get("icon", "")
         speed_icon = {"fast": "⚡", "medium": "⚖️", "slow": "🎯"}.get(model.speed, "")
-        label = f"{provider_icon} {model.name} {speed_icon}"
+
+        # Claude Code 특별 처리 (무료 표시)
+        if model_id == "claude_code":
+            label = f"{provider_icon} {model.name} 🆓"
+        else:
+            label = f"{provider_icon} {model.name} {speed_icon}"
+
         options[label] = model_id
     return options
 
@@ -214,12 +220,13 @@ def render_api_key_status():
 
     st.markdown("##### 🔑 API 키 상태")
 
-    cols = st.columns(3)
+    cols = st.columns(4)
 
     providers = [
         (AIProvider.ANTHROPIC, "ANTHROPIC_API_KEY", "Claude"),
         (AIProvider.GOOGLE, "GOOGLE_API_KEY", "Gemini"),
-        (AIProvider.OPENAI, "OPENAI_API_KEY", "GPT")
+        (AIProvider.OPENAI, "OPENAI_API_KEY", "GPT"),
+        (AIProvider.LOCAL, "", "Claude Code")  # CLI 설치 확인
     ]
 
     for i, (provider, env_var, name) in enumerate(providers):
@@ -231,7 +238,10 @@ def render_api_key_status():
                 st.success(f"{icon} {name} ✅")
             else:
                 st.error(f"{icon} {name} ❌")
-                st.caption(f"`{env_var}` 필요")
+                if provider == AIProvider.LOCAL:
+                    st.caption("CLI 설치 필요")
+                else:
+                    st.caption(f"`{env_var}` 필요")
 
 
 def render_model_badge(model_id: str):
@@ -292,3 +302,84 @@ def get_selected_model(key: str = "ai_model") -> Optional[str]:
 def set_selected_model(key: str, model_id: str):
     """세션 상태에 모델 ID 설정"""
     st.session_state[f"{key}_model"] = model_id
+
+
+def render_claude_code_settings(key: str = "claude_code") -> dict:
+    """
+    Claude Code 설정 UI 렌더링
+
+    Args:
+        key: 세션 상태 키 접두사
+
+    Returns:
+        설정 딕셔너리 {timeout, bundle_mode, custom_instructions}
+    """
+
+    # Claude Code 설치 상태 확인
+    try:
+        from utils.claude_code_runner import check_claude_code_installation
+        status = check_claude_code_installation()
+    except ImportError:
+        st.error("❌ claude_code_runner 모듈을 불러올 수 없습니다")
+        return None
+
+    if status.get('installed'):
+        st.success(f"✅ Claude Code 설치됨: {status.get('version', 'unknown')}")
+    else:
+        st.error(f"❌ Claude Code 미설치: {status.get('error', '')}")
+        st.code("npm i -g @anthropic-ai/claude-code", language="bash")
+        return None
+
+    # 설정 UI
+    with st.expander("⚙️ Claude Code 설정", expanded=True):
+        col1, col2 = st.columns(2)
+
+        with col1:
+            timeout = st.number_input(
+                "타임아웃 (초)",
+                min_value=60,
+                max_value=1800,
+                value=st.session_state.get(f"{key}_timeout", 600),
+                step=60,
+                key=f"{key}_timeout_input",
+                help="분석 작업의 최대 실행 시간"
+            )
+            st.session_state[f"{key}_timeout"] = timeout
+
+        with col2:
+            bundle_mode = st.checkbox(
+                "묶음 모드 사용",
+                value=st.session_state.get(f"{key}_bundle_mode", True),
+                key=f"{key}_bundle_input",
+                help="동일한 bundle_id를 가진 씬들은 같은 프롬프트 공유"
+            )
+            st.session_state[f"{key}_bundle_mode"] = bundle_mode
+
+        custom_instructions = st.text_area(
+            "추가 지시사항 (선택)",
+            value=st.session_state.get(f"{key}_custom_instructions", ""),
+            placeholder="예: 배경 프롬프트에 '네온 조명' 스타일 강조",
+            height=60,
+            key=f"{key}_instructions_input"
+        )
+        st.session_state[f"{key}_custom_instructions"] = custom_instructions
+
+        # 장점 안내
+        st.info("""
+        **✨ Claude Code 장점:**
+        - 🆓 **Max Plan 사용 시 API 비용 무료**
+        - 🧠 Claude Opus 4 수준의 고품질 분석
+        - 📁 파일 직접 수정으로 빠른 처리
+        """)
+
+    return {
+        "timeout": timeout,
+        "bundle_mode": bundle_mode,
+        "custom_instructions": custom_instructions
+    }
+
+
+def is_claude_code_selected(key: str = "ai_model") -> bool:
+    """현재 Claude Code가 선택되어 있는지 확인"""
+    selected = st.session_state.get(f"{key}_model", "")
+    return selected == "claude_code"

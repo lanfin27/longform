@@ -45,6 +45,11 @@ class CharacterImageConfig:
     api_provider: str = "Together.ai FLUX"  # API 제공자
     parallel_count: int = 1  # 동시 생성 수 (1-5)
 
+    # v2.0: 시드 잠금 및 네거티브 프롬프트 지원
+    seed: Optional[int] = None  # 시드 값 (None이면 랜덤)
+    negative_prompt: str = ""  # 네거티브 프롬프트
+    seed_lock_enabled: bool = False  # 시드 잠금 활성화 (배치 생성 시 첫 이미지 시드 자동 잠금)
+
 
 class CharacterImageGenerator:
     """캐릭터 이미지 생성기 (합성용) - 병렬 처리 지원"""
@@ -69,11 +74,11 @@ class CharacterImageGenerator:
         "portrait": "upper body portrait, shoulders up"
     }
 
-    # 배경 옵션
+    # 배경 옵션 (v3.33: HEX 코드 제거 - 이미지에 텍스트 표시 방지)
     BACKGROUND_OPTIONS = {
-        "solid_gray": "simple solid light gray background (#E0E0E0), no shadows on background",
+        "solid_gray": "simple solid light gray background, no shadows on background",
         "solid_white": "simple solid pure white background, no shadows",
-        "solid_blue": "simple solid light blue background (#87CEEB), no shadows",
+        "solid_blue": "simple solid light blue background, no shadows",
         "gradient": "simple gradient background from light gray to white"
     }
 
@@ -143,7 +148,8 @@ class CharacterImageGenerator:
         self,
         character: Dict,
         config: CharacterImageConfig = None,
-        output_dir: Path = None
+        output_dir: Path = None,
+        seed: Optional[int] = None  # v2.0: 시드 파라미터 추가
     ) -> Dict:
         """
         캐릭터 이미지 생성 (통합 API 지원)
@@ -152,6 +158,7 @@ class CharacterImageGenerator:
             character: 캐릭터 정보 (name, visual_prompt 또는 character_prompt 등)
             config: 생성 설정
             output_dir: 출력 디렉토리 (미지정 시 project_path/images/characters)
+            seed: 시드 값 (None이면 config.seed 또는 랜덤)
 
         Returns:
             {
@@ -163,13 +170,15 @@ class CharacterImageGenerator:
                 "background": str,
                 "generation_time": float,
                 "api_provider": str,
+                "seed": int (생성에 사용된 시드),
                 "error": str (실패 시)
             }
         """
         if config is None:
             config = CharacterImageConfig()
 
-        char_name = character.get("name", "unknown")
+        # v3.32: 익명화 필터 적용 시 원본 이름 우선 사용 (결과 데이터/로깅용)
+        char_name = character.get("_original_name") or character.get("name", "unknown")
 
         # visual_prompt 또는 character_prompt 가져오기
         visual_prompt = (
@@ -221,8 +230,8 @@ class CharacterImageGenerator:
                 # 기존 Together 클라이언트 사용 (하위 호환성)
                 result = self._generate_with_together(prompt, config, output_dir, char_name)
             else:
-                # 새 통합 API 매니저 사용
-                result = self._generate_with_api_manager(prompt, config, output_dir, char_name)
+                # 새 통합 API 매니저 사용 (v2.0: 시드 전달)
+                result = self._generate_with_api_manager(prompt, config, output_dir, char_name, seed=seed)
 
             gen_time = time.time() - start_time
             result["generation_time"] = gen_time
@@ -296,16 +305,31 @@ class CharacterImageGenerator:
         prompt: str,
         config: CharacterImageConfig,
         output_dir: Path,
-        char_name: str
+        char_name: str,
+        seed: Optional[int] = None  # v2.0: 시드 파라미터 추가
     ) -> Dict:
         """통합 API 매니저로 생성"""
+
+        # v2.0: 시드 결정 - 명시적 전달 > config.seed
+        use_seed = seed if seed is not None else config.seed
+
+        # v2.0: 시드 및 네거티브 프롬프트 로깅
+        if use_seed is not None:
+            print(f"  [CharacterImageGenerator] 🔒 시드 전달: {use_seed}")
+        else:
+            print(f"  [CharacterImageGenerator] 🎲 랜덤 시드 사용")
+
+        if config.negative_prompt:
+            print(f"  [CharacterImageGenerator] ✅ 네거티브 프롬프트: {len(config.negative_prompt)}자")
 
         result = self.api_manager.generate_image(
             prompt=prompt,
             api_provider=config.api_provider,
             model=config.model,
             width=config.width,
-            height=config.height
+            height=config.height,
+            seed=use_seed,  # v2.0: 시드 전달
+            negative_prompt=config.negative_prompt  # v2.0: 네거티브 프롬프트 전달
         )
 
         if not result.success:
@@ -325,6 +349,9 @@ class CharacterImageGenerator:
         # 저장
         self.api_manager.save_image(result, str(filepath))
 
+        # v2.0: 결과 시드 추출
+        result_seed = getattr(result, 'seed', None) or use_seed
+
         return {
             "success": True,
             "character_name": char_name,
@@ -332,7 +359,8 @@ class CharacterImageGenerator:
             "image_url": str(filepath),
             "prompt": prompt,
             "pose": config.pose,
-            "background": config.background
+            "background": config.background,
+            "seed": result_seed  # v2.0: 시드 반환
         }
 
     def generate_batch(
@@ -342,7 +370,8 @@ class CharacterImageGenerator:
         output_dir: Path = None,
         on_progress: Callable[[int, int, Dict], None] = None,
         on_start: Callable[[str], None] = None,
-        on_complete: Callable[[str, float, bool, Optional[str]], None] = None
+        on_complete: Callable[[str, float, bool, Optional[str]], None] = None,
+        on_seed_locked: Callable[[int], None] = None  # v2.0: 시드 잠금 콜백
     ) -> List[Dict]:
         """
         여러 캐릭터 이미지 배치 생성 (병렬 처리 지원)
@@ -354,6 +383,7 @@ class CharacterImageGenerator:
             on_progress: 진행 콜백 (current, total, result)
             on_start: 캐릭터 생성 시작 콜백 (char_name)
             on_complete: 캐릭터 생성 완료 콜백 (char_name, elapsed, success, error)
+            on_seed_locked: 시드 잠금 콜백 (seed) - 첫 이미지 시드 자동 잠금 시 호출
 
         Returns:
             결과 목록
@@ -364,27 +394,49 @@ class CharacterImageGenerator:
         parallel_count = max(1, min(5, config.parallel_count))
         total = len(characters)
 
+        # v2.0: 시드 잠금 상태 관리
+        locked_seed = config.seed  # 초기 시드 (config에서 가져옴)
+        seed_lock_enabled = config.seed_lock_enabled
+
         print(f"\n{'='*50}")
         print(f"캐릭터 이미지 배치 생성: {total}명")
         print(f"API: {config.api_provider}")
         print(f"동시 생성: {parallel_count}개")
+        # v2.0: 시드 잠금 상태 로깅
+        if seed_lock_enabled:
+            print(f"🔒 시드 잠금: 활성화 (초기 시드: {locked_seed if locked_seed else '자동'})")
+        if config.negative_prompt:
+            print(f"✅ 네거티브 프롬프트: {len(config.negative_prompt)}자")
         print(f"{'='*50}\n")
 
         start_time = time.time()
         results = []
 
         if parallel_count <= 1:
-            # ── 순차 처리 ──
+            # ── 순차 처리 (시드 잠금 지원) ──
             for i, char in enumerate(characters):
-                char_name = char.get("name", "unknown")
+                # v3.32: 익명화 필터 적용 시 원본 이름 사용 (콜백용)
+                # _original_name이 있으면 원본 이름, 없으면 name 사용
+                char_name = char.get("_original_name") or char.get("name", "unknown")
 
                 # 시작 콜백
                 if on_start:
                     on_start(char_name)
 
                 char_start = time.time()
-                result = self.generate_character_image(char, config, output_dir)
+
+                # v2.0: 시드 잠금 시 잠긴 시드 전달
+                current_seed = locked_seed if seed_lock_enabled else config.seed
+
+                result = self.generate_character_image(char, config, output_dir, seed=current_seed)
                 char_elapsed = time.time() - char_start
+
+                # v2.0: 첫 번째 성공 시 시드 자동 잠금
+                if seed_lock_enabled and locked_seed is None and result.get("success") and result.get("seed"):
+                    locked_seed = result["seed"]
+                    print(f"[시드 잠금] 🔒 첫 이미지 시드 자동 잠금: {locked_seed}")
+                    if on_seed_locked:
+                        on_seed_locked(locked_seed)
 
                 results.append(result)
 
@@ -401,22 +453,30 @@ class CharacterImageGenerator:
                     on_progress(i + 1, total, result)
         else:
             # ── 병렬 처리 ──
+            # v2.0: 병렬 처리 시 시드 잠금 경고
+            if seed_lock_enabled:
+                print(f"⚠️ [시드 잠금] 병렬 처리({parallel_count}개)에서는 '첫 이미지 자동 잠금' 기능이 지원되지 않습니다.")
+                print(f"   모든 이미지에 동일한 시드({locked_seed})가 적용됩니다.")
+
             with ThreadPoolExecutor(max_workers=parallel_count) as executor:
                 # 작업 제출
                 future_to_char = {}
                 for i, char in enumerate(characters):
-                    char_name = char.get("name", "unknown")
+                    # v3.32: 익명화 필터 적용 시 원본 이름 사용 (콜백용)
+                    char_name = char.get("_original_name") or char.get("name", "unknown")
 
                     # 시작 콜백 (제출 시점)
                     if on_start:
                         on_start(char_name)
 
+                    # v2.0: 시드 전달 (병렬 처리에서는 config.seed 또는 locked_seed 사용)
                     future = executor.submit(
                         self._generate_single_for_batch_with_timing,
                         char,
                         config,
                         output_dir,
-                        i
+                        i,
+                        seed=locked_seed if seed_lock_enabled else config.seed  # v2.0: 시드 전달
                     )
                     future_to_char[future] = (i, char_name)
 
@@ -471,21 +531,24 @@ class CharacterImageGenerator:
         character: Dict,
         config: CharacterImageConfig,
         output_dir: Path,
-        index: int
+        index: int,
+        seed: Optional[int] = None  # v2.0: 시드 파라미터 추가
     ) -> Dict:
         """배치 생성용 단일 캐릭터 생성 (스레드에서 호출)"""
 
         # 병렬 처리 시 약간의 지연 추가 (동시 호출 방지)
         time.sleep(index * 0.5)
 
-        return self.generate_character_image(character, config, output_dir)
+        # v2.0: 시드 전달 (병렬 처리에서는 config.seed 사용)
+        return self.generate_character_image(character, config, output_dir, seed=seed or config.seed)
 
     def _generate_single_for_batch_with_timing(
         self,
         character: Dict,
         config: CharacterImageConfig,
         output_dir: Path,
-        index: int
+        index: int,
+        seed: Optional[int] = None  # v2.0: 시드 파라미터 추가
     ) -> tuple:
         """배치 생성용 단일 캐릭터 생성 (타이밍 포함)"""
 
@@ -493,7 +556,8 @@ class CharacterImageGenerator:
         time.sleep(index * 0.5)
 
         start_time = time.time()
-        result = self.generate_character_image(character, config, output_dir)
+        # v2.0: 시드 전달
+        result = self.generate_character_image(character, config, output_dir, seed=seed or config.seed)
         elapsed = time.time() - start_time
 
         return result, elapsed

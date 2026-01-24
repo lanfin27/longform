@@ -35,10 +35,12 @@ class CanvasObject:
     opacity: float = 1.0  # 투명도
 
 
-def _image_to_data_uri(image_path: str) -> str:
-    """이미지 경로를 Data URI로 변환"""
+# ⭐ 성능 최적화: 이미지 Data URI 변환 캐싱
+@st.cache_data(ttl=600, show_spinner=False, max_entries=100)
+def _image_to_data_uri_cached(image_path_str: str, _mtime: float) -> str:
+    """이미지 경로를 Data URI로 변환 (캐싱 적용) - mtime으로 자동 무효화"""
     try:
-        path = Path(image_path)
+        path = Path(image_path_str)
         if path.exists():
             with open(path, "rb") as f:
                 data = f.read()
@@ -48,6 +50,18 @@ def _image_to_data_uri(image_path: str) -> str:
             return f"data:image/{ext};base64,{base64.b64encode(data).decode()}"
     except Exception as e:
         print(f"[Canvas] 이미지 로드 실패: {e}")
+    return image_path_str  # fallback
+
+
+def _image_to_data_uri(image_path: str) -> str:
+    """이미지 경로를 Data URI로 변환 (자동 캐싱)"""
+    try:
+        path = Path(image_path)
+        if path.exists():
+            mtime = path.stat().st_mtime
+            return _image_to_data_uri_cached(str(path), _mtime=mtime)
+    except Exception as e:
+        print(f"[Canvas] 이미지 캐싱 실패: {e}")
     return image_path  # fallback
 
 

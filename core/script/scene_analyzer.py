@@ -1422,7 +1422,9 @@ JSON 형식으로 응답하세요:
       "persons": [],
       "characters": [],
       "mood": "분위기",
-      "image_prompt_en": "..., no text, no letters"
+      "image_prompt_en": "..., no text, no letters",
+      "background_prompt": "배경만 묘사 (캐릭터/인물 제외)",
+      "background_prompt_en": "Background only, NO characters, NO people, environment description..., no text, no letters"
     }}
   ],
   "persons": [],
@@ -1747,14 +1749,46 @@ JSON 형식으로만 응답해주세요."""
         return prompt_parts[0] if prompt_parts else "Person in appropriate attire"
 
     def _call_anthropic(self, prompt: str) -> str:
-        """Anthropic API 호출"""
+        """
+        Anthropic API 호출 (v3.35: 개선된 에러 처리)
+
+        에러 발생 시 원본 예외를 그대로 raise하여
+        호출자가 api_error_handler로 처리할 수 있게 함
+        """
         debug_log("  Anthropic API 호출 중...")
-        response = self.client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=8000,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return response.content[0].text
+
+        try:
+            response = self.client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=8000,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            return response.content[0].text
+
+        except Exception as e:
+            # 에러 메시지 파싱하여 상세 로그
+            error_str = str(e)
+
+            # 크레딧 부족 감지
+            if 'credit balance is too low' in error_str.lower():
+                debug_log("  ❌ Anthropic API 크레딧 부족!")
+                debug_log("  💡 해결: Anthropic 콘솔에서 크레딧 충전 또는 Gemini로 전환")
+
+            # 속도 제한 감지
+            elif 'rate_limit' in error_str.lower() or 'rate limit' in error_str.lower():
+                debug_log("  ⏱️ Anthropic API 속도 제한!")
+                debug_log("  💡 잠시 후 재시도 또는 Gemini로 전환")
+
+            # 인증 오류 감지
+            elif 'authentication' in error_str.lower() or 'api key' in error_str.lower():
+                debug_log("  🔑 Anthropic API 인증 실패!")
+                debug_log("  💡 .env 파일의 ANTHROPIC_API_KEY 확인")
+
+            else:
+                debug_log(f"  ❌ Anthropic API 오류: {error_str[:200]}")
+
+            # 원본 예외 그대로 raise (호출자가 api_error_handler로 처리)
+            raise
 
     def _call_gemini(self, prompt: str) -> str:
         """Google Gemini API 호출 (하위 호환용 래퍼)"""

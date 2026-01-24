@@ -41,7 +41,10 @@ class RepCharacterLibrary:
         self._ensure_library_dir()
         self._load_index()
         self._initialized = True
-        print(f"[RepCharLibrary] 초기화 완료: {len(self._index.get('characters', []))}개 캐릭터")
+        # v1.1: 로그 최초 1회만 출력
+        if not hasattr(RepCharacterLibrary, '_logged_init'):
+            print(f"[RepCharLibrary] 초기화 완료: {len(self._index.get('characters', []))}개 캐릭터")
+            RepCharacterLibrary._logged_init = True
 
     def _ensure_library_dir(self):
         """라이브러리 디렉토리 생성"""
@@ -53,7 +56,7 @@ class RepCharacterLibrary:
             try:
                 with open(INDEX_FILE, 'r', encoding='utf-8') as f:
                     self._index = json.load(f)
-                print(f"[RepCharLibrary] 인덱스 로드 완료")
+                # v1.1: 반복 로그 제거 (초기화 완료 로그로 대체)
             except Exception as e:
                 print(f"[RepCharLibrary] 인덱스 로드 실패: {e}")
                 self._index = self._create_default_index()

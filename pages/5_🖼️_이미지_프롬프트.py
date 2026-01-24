@@ -47,6 +47,38 @@ def _cached_load_scenes(project_path_str):
     return load_scenes(Path(project_path_str))
 
 
+@st.cache_data(ttl=120, show_spinner=False, max_entries=50)
+def _cached_load_segment_groups(project_path_str: str, _mtime: float):
+    """세그먼트 그룹 로드 (캐싱 적용) - mtime으로 자동 무효화"""
+    from pathlib import Path
+    return load_segment_groups(Path(project_path_str))
+
+
+@st.cache_data(ttl=120, show_spinner=False, max_entries=50)
+def _cached_load_image_prompts(project_path_str: str, _mtime: float):
+    """이미지 프롬프트 로드 (캐싱 적용) - mtime으로 자동 무효화"""
+    from pathlib import Path
+    return load_image_prompts(Path(project_path_str))
+
+
+def get_cached_segment_groups(project_path: Path):
+    """세그먼트 그룹 로드 (캐싱 + mtime 체크)"""
+    json_path = project_path / "segment_groups.json"
+    if json_path.exists():
+        mtime = json_path.stat().st_mtime
+        return _cached_load_segment_groups(str(project_path), _mtime=mtime)
+    return None
+
+
+def get_cached_image_prompts(project_path: Path):
+    """이미지 프롬프트 로드 (캐싱 + mtime 체크)"""
+    json_path = project_path / "image_prompts.json"
+    if json_path.exists():
+        mtime = json_path.stat().st_mtime
+        return _cached_load_image_prompts(str(project_path), _mtime=mtime)
+    return None
+
+
 # 페이지 설정
 st.set_page_config(
     page_title="이미지 프롬프트",
@@ -347,8 +379,8 @@ with tab_segment:
             except Exception as e:
                 st.error(f"그룹화 실패: {str(e)}")
 
-    # 그룹 미리보기
-    groups = st.session_state.get("segment_groups") or load_segment_groups(project_path)
+    # 그룹 미리보기 (캐싱 적용)
+    groups = st.session_state.get("segment_groups") or get_cached_segment_groups(project_path)
 
     if groups:
         st.subheader(f"그룹 미리보기 ({len(groups)}개)")
@@ -683,7 +715,7 @@ with tab_thumbnail:
 with tab_content:
     st.subheader("🎨 본문 이미지 프롬프트")
 
-    groups = load_segment_groups(project_path)
+    groups = get_cached_segment_groups(project_path)  # 캐싱 적용
 
     if not groups:
         st.warning("세그먼트 그룹이 없습니다. '세그먼트 그룹' 탭에서 먼저 그룹화를 실행하세요.")
@@ -830,8 +862,8 @@ with tab_content:
                 st.success(f"✅ {len(prompts)}개 프롬프트 생성 완료!")
                 update_project_step(5)
 
-    # 프롬프트 목록
-    prompts = st.session_state.get("image_prompts") or load_image_prompts(project_path)
+    # 프롬프트 목록 (캐싱 적용)
+    prompts = st.session_state.get("image_prompts") or get_cached_image_prompts(project_path)
 
     if prompts:
         st.dataframe(
@@ -848,8 +880,8 @@ with tab_content:
 with tab_preview:
     st.subheader("👁️ 전체 미리보기")
 
-    groups = load_segment_groups(project_path)
-    prompts = load_image_prompts(project_path)
+    groups = get_cached_segment_groups(project_path)  # 캐싱 적용
+    prompts = get_cached_image_prompts(project_path)  # 캐싱 적용
     thumbnail = load_thumbnail_prompts(project_path)
 
     col1, col2, col3 = st.columns(3)

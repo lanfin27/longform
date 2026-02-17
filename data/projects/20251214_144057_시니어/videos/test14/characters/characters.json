@@ -1,0 +1,46 @@
+[
+  {
+    "id": "char_0",
+    "name": "삼성 임원들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Samsung Electronics senior executives in formal dark business suits, serious skeptical expressions, sitting around conference table, professional corporate demeanor",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test14\\images\\characters\\char_삼성_임원들_standing_1769429369793.png"
+    ],
+    "appearance_scenes": [
+      45,
+      46
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test14\\images\\characters\\char_삼성_임원들_standing_1769429369793.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T21:04:10.458109",
+    "updated_at": "2026-01-26T21:10:10.889273"
+  },
+  {
+    "id": "char_1",
+    "name": "이재용",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Lee Jae-yong as Vice Chairman in formal dark suit, serious contemplative expression, reviewing strategic documents, professional executive demeanor, circa 2016 appearance",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      47,
+      48
+    ],
+    "selected_image_path": "",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T21:04:10.459999",
+    "updated_at": "2026-01-26T21:10:10.889391"
+  }
+]

@@ -1,0 +1,200 @@
+[
+  {
+    "id": "char_0",
+    "name": "젊은 투자자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "young Asian investor, modern attire, focused on a laptop or smartphone screen, symbolizing active foreign stock investment, thoughtful and engaged expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_젊은_투자자_standing_1769930490289.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_젊은_투자자_standing_1769930490289.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:18:35.386010",
+    "updated_at": "2026-02-01T16:22:09.396572"
+  },
+  {
+    "id": "char_1",
+    "name": "투자자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "modern Asian investor, holding an NVIDIA GPU card, with a curious and questioning expression, engaged in financial thought",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_투자자_standing_1769930493418.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_투자자_standing_1769930493418.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:18:35.387765",
+    "updated_at": "2026-02-01T16:22:09.412334"
+  },
+  {
+    "id": "char_2",
+    "name": "뉴스 앵커",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "serious expression, seated in a modern news studio, professional attire",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_뉴스_앵커_standing_1769930493577.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_뉴스_앵커_standing_1769930493577.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:18:35.388705",
+    "updated_at": "2026-02-01T16:22:09.451483"
+  },
+  {
+    "id": "char_3",
+    "name": "도널드 트럼프",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "powerful and enigmatic figure, under a dramatic spotlight, with shadows emphasizing his impactful presence",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_도널드_트럼프_standing_1769930494375.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_도널드_트럼프_standing_1769930494375.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:18:35.389988",
+    "updated_at": "2026-02-01T16:22:09.484166"
+  },
+  {
+    "id": "char_4",
+    "name": "도널드 트럼프 대통령",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "powerful and determined former president, wearing a dark suit, walking purposefully",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_도널드_트럼프_대통령_standing_1769930499007.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_도널드_트럼프_대통령_standing_1769930499007.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:18:35.391088",
+    "updated_at": "2026-02-01T16:22:09.520990"
+  },
+  {
+    "id": "char_5",
+    "name": "사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "anxious people with worried expressions, looking overwhelmed by economic pressure, dressed in everyday clothes",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_사람들_standing_1769930502414.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_사람들_standing_1769930502414.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:18:35.392198",
+    "updated_at": "2026-02-01T16:22:09.559529"
+  },
+  {
+    "id": "char_6",
+    "name": "도널드 트럼프 전 대통령",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "powerful and imposing silhouette, holding a colossal 'Tariff' stamp, conveying authority",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_도널드_트럼프_전_대통령_standing_1769930504044.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_도널드_트럼프_전_대통령_standing_1769930504044.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:18:35.393210",
+    "updated_at": "2026-02-01T16:22:09.592577"
+  },
+  {
+    "id": "char_7",
+    "name": "오건영 단장",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A professional Asian financial expert, middle-aged, wearing a sharp business suit, presenting confidently with an authoritative expression",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "selected_image_path": "",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:18:35.394467",
+    "updated_at": "2026-02-01T16:20:20.836616"
+  },
+  {
+    "id": "char_8",
+    "name": "한국인 비즈니스맨",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "exhausted Korean businessman, middle-aged, dark suit, deeply troubled and pensive expression, symbolizing the struggling economy",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_한국인_비즈니스맨_standing_1769930510162.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_한국인_비즈니스맨_standing_1769930510162.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:18:35.395805",
+    "updated_at": "2026-02-01T16:22:09.635138"
+  },
+  {
+    "id": "char_9",
+    "name": "한 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "seen from the back, standing on a winding road, contemplating the unknown, dressed in modern, understated attire, conveying a sense of exploration and uncertainty",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_한_사람_standing_1769930515052.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율\\images\\characters\\char_한_사람_standing_1769930515052.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:18:35.397005",
+    "updated_at": "2026-02-01T16:22:09.662342"
+  }
+]

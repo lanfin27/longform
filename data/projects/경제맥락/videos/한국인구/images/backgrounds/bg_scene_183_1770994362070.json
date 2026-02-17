@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-13T23:50:40.648411",
+  "image_file": "bg_scene_181_1770994240647.png",
+  "scene_id": 181,
+  "prompts": {
+    "original": "A conceptual visualization representing a societal survey, showing a pie chart or bar graph (represented by abstract shapes and colors, no readable text) indicating over 30% negative sentiment among Koreans towards multicultural expansion. The scene combines images of diverse people interacting, subtly highlighting the challenges of social integration and the presence of invisible barriers between cultural groups. A modern Korean city skyline in the background, with a thoughtful and serious mood. The data visualization is abstract, focusing on shapes and proportional colors without any numbers or words, illustrating the complex social issue of immigration and integration, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A conceptual visualization representing a societal survey, showing a pie chart or bar graph (represented by abstract shapes and colors, no readable text) indicating over 30% negative sentiment among Koreans towards multicultural expansion. The scene combines images of diverse people interacting, subtly highlighting the challenges of social integration and the presence of invisible barriers between cultural groups. A modern Korean city skyline in the background, with a thoughtful and serious mood. The data visualization is abstract, focusing on shapes and proportional colors without any numbers or words, illustrating the complex social issue of immigration and integration, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 668654997
+  },
+  "scene_number": 183,
+  "copied_from": {
+    "scene_number": 181,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\backgrounds\\bg_scene_181_1770994240647.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-13T23:52:42.072675"
+}

@@ -56,7 +56,12 @@ INVALID_CHARACTER_WORDS = {
 
 def is_valid_character_name(name: str) -> bool:
     """
-    유효한 캐릭터(사람) 이름인지 검증
+    유효한 캐릭터(사람) 이름인지 검증 (v2.1 - 관대한 버전)
+
+    v2.1: 긴 한글 이름 허용
+      - 기존: len(name) > 10 필터링 → "역경을 딛고 일어서는 사람" 제외됨
+      - 수정: len(name) > 50 으로 변경 (사실상 무제한)
+      - 한글+공백 조합 허용 확대
 
     Args:
         name: 검증할 이름
@@ -64,15 +69,40 @@ def is_valid_character_name(name: str) -> bool:
     Returns:
         유효하면 True, 무효하면 False
     """
-    if not name or len(name) < 2 or len(name) > 10:
+    if not name:
         return False
 
     name_clean = name.strip()
+
+    # 🔴 v2.1: 길이 제한 완화 (10 → 50)
+    # "역경을 딛고 일어서는 사람" (12자) 허용
+    if len(name_clean) < 2 or len(name_clean) > 50:
+        return False
+
     name_lower = name_clean.lower()
 
     # 금지 단어 체크
     if name_lower in INVALID_CHARACTER_WORDS:
         return False
+
+    # 숫자만 있는지 체크
+    if name_clean.isdigit():
+        return False
+
+    # 한글 자음/모음만 있는지 체크
+    if re.match(r'^[ㄱ-ㅎㅏ-ㅣ]+$', name_clean):
+        return False
+
+    # 🔴 v2.1: 한글+공백 조합은 먼저 허용 (긴 역할명 대응)
+    # "역경을 딛고 일어서는 사람", "자동차 회사 임원" 등
+    if re.match(r'^[가-힣]+(\s+[가-힣]+)+$', name_clean):
+        # 공백 포함 한글 구문은 거의 모두 허용
+        # 단, 명백한 문장 어미로 끝나는 경우만 제외
+        obvious_sentence_endings = ['습니다', '입니다', '네요', '군요', '해요', '하죠']
+        for ending in obvious_sentence_endings:
+            if name_clean.endswith(ending):
+                return False
+        return True  # 🔴 긴 한글 역할명 허용!
 
     # 문장 어미 패턴 감지
     sentence_endings = [
@@ -88,8 +118,8 @@ def is_valid_character_name(name: str) -> bool:
             if name_clean.endswith(ending):
                 return False
 
-    # 동사/형용사 패턴 감지 (5글자 이상)
-    if len(name_clean) >= 5:
+    # 동사/형용사 패턴 감지 (5글자 이상, 공백 없는 경우만)
+    if len(name_clean) >= 5 and ' ' not in name_clean:
         verb_patterns = [
             r'[가-힣]+(하|되|이|지|시|았|었|겠|는|ㄴ|을|를|한|된|인)$',
             r'[가-힣]+(해서|해야|하면|하고|하는|했다|했음|하여)$',
@@ -99,37 +129,32 @@ def is_valid_character_name(name: str) -> bool:
             if re.search(pattern, name_clean):
                 return False
 
-    # 조사로 끝나는지 체크
-    particle_endings = ['의', '이', '가', '은', '는', '를', '을', '에', '로', '과', '와', '도']
-    for particle in particle_endings:
-        if name_clean.endswith(particle) and len(name_clean) > 2:
-            # 예외: "손정의" 같은 실제 이름
-            if particle == '의' and len(name_clean) == 3 and re.match(r'^[가-힣]{3}$', name_clean):
-                continue
-            return False
-
-    # 숫자만 있는지 체크
-    if name_clean.isdigit():
-        return False
-
-    # 한글 자음/모음만 있는지 체크
-    if re.match(r'^[ㄱ-ㅎㅏ-ㅣ]+$', name_clean):
-        return False
+    # 조사로 끝나는지 체크 (공백 없는 경우만)
+    if ' ' not in name_clean:
+        particle_endings = ['의', '이', '가', '은', '는', '를', '을', '에', '로', '과', '와', '도']
+        for particle in particle_endings:
+            if name_clean.endswith(particle) and len(name_clean) > 2:
+                # 예외: "손정의" 같은 실제 이름
+                if particle == '의' and len(name_clean) == 3 and re.match(r'^[가-힣]{3}$', name_clean):
+                    continue
+                # 🔴 '가'로 끝나는 2-4글자 한글 직업명 허용 (예: 사업가, 작가)
+                if particle == '가' and len(name_clean) >= 2 and re.match(r'^[가-힣]{2,4}$', name_clean):
+                    continue
+                return False
 
     # 한글 이름 패턴 (2-4자)
     if re.match(r'^[가-힣]{2,4}$', name_clean):
         return True
 
-    # 영문 이름 패턴
-    if re.match(r'^[A-Z][a-z]+(\s+[A-Z][a-z]+)+$', name_clean):
+    # 🔴 v2.2: 영문 이름 패턴 확장 - 숫자 포함 허용
+    # 기존: r'^[A-Z][a-z]+(\s+[A-Z][a-z]+)+$' → "Executive 1" 실패
+    # 수정: 숫자, 단일 단어, 다양한 조합 허용
+    # 예: "Executive 1", "Executive 2", "John", "Main Character", "Person 3"
+    if re.match(r'^[A-Za-z][A-Za-z0-9]*(\s+[A-Za-z0-9]+)*$', name_clean):
         return True
 
-    # 아랍/외래 이름 패턴 (공백 포함 한글)
-    if re.match(r'^[가-힣]+(\s+[가-힣]+)+$', name_clean):
-        return True
-
-    # 그 외 한글 포함 패턴 (5자 이하)
-    if len(name_clean) <= 5 and re.search(r'[가-힣]', name_clean):
+    # 🔴 v2.1: 한글이 포함된 짧은 이름 허용 범위 확대 (5 → 20자)
+    if len(name_clean) <= 20 and re.search(r'[가-힣]', name_clean):
         return True
 
     return False

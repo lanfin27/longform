@@ -1,0 +1,299 @@
+[
+  {
+    "id": "char_0",
+    "name": "한국 사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "silhouettes of diverse individuals, eyes reflecting intense desire for overseas investment, mysterious and obsessed expressions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국_사람들_standing_1769931723047.png"
+    ],
+    "appearance_scenes": [
+      61,
+      62,
+      63
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국_사람들_standing_1769931723047.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.711620",
+    "updated_at": "2026-02-01T16:43:07.693874"
+  },
+  {
+    "id": "char_1",
+    "name": "투자자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "silhouette of an investor's hand, contemplating a choice between two financial options, reaching towards one side",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_투자자_standing_1769931720045.png"
+    ],
+    "appearance_scenes": [
+      70,
+      71,
+      72
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_투자자_standing_1769931720045.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.713294",
+    "updated_at": "2026-02-01T16:43:07.724765"
+  },
+  {
+    "id": "char_2",
+    "name": "불안해하는 사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "silhouettes of anxious people, slightly blurred, conveying widespread distress",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_불안해하는_사람들_standing_1769931719856.png"
+    ],
+    "appearance_scenes": [
+      85,
+      86,
+      87
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_불안해하는_사람들_standing_1769931719856.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.714241",
+    "updated_at": "2026-02-01T16:43:07.762730"
+  },
+  {
+    "id": "char_3",
+    "name": "대통령",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A solemn Asian male president, middle-aged, wearing a dark suit, with a grave and serious expression, delivering an address from a formal podium",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_대통령_standing_1769931331394.png"
+    ],
+    "appearance_scenes": [
+      88,
+      89,
+      90,
+      109,
+      110,
+      111
+    ],
+    "selected_image_path": "",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.715260",
+    "updated_at": "2026-02-01T16:40:44.669174"
+  },
+  {
+    "id": "char_4",
+    "name": "도널드 트럼프",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "prominent political figure, middle-aged, determined and impactful expression, looking directly at the viewer, wearing a dark suit",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_도널드_트럼프_standing_1769931340279.png"
+    ],
+    "appearance_scenes": [
+      106,
+      107,
+      108,
+      121,
+      122,
+      123
+    ],
+    "selected_image_path": "",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.716756",
+    "updated_at": "2026-02-01T16:40:44.669179"
+  },
+  {
+    "id": "char_5",
+    "name": "정치 지도자 (실루엣)",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A shadowy silhouette of a powerful figure, appearing to impose tariffs on the world with a commanding gesture",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_정치_지도자__실루엣__standing_1769931731361.png"
+    ],
+    "appearance_scenes": [
+      112,
+      113,
+      114
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_정치_지도자__실루엣__standing_1769931731361.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.717479",
+    "updated_at": "2026-02-01T16:43:07.819042"
+  },
+  {
+    "id": "char_6",
+    "name": "도널드 트럼프 전 대통령",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "former president, powerful silhouette, authoritative posture, standing against dramatic light",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_도널드_트럼프_전_대통령_standing_1769931758058.png"
+    ],
+    "appearance_scenes": [
+      88,
+      89,
+      90,
+      109,
+      110,
+      111
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_도널드_트럼프_전_대통령_standing_1769931758058.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.718347",
+    "updated_at": "2026-02-01T16:43:07.853315"
+  },
+  {
+    "id": "char_7",
+    "name": "한국 정부를 상징하는 인물",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "seen from behind or as a silhouette, contemplating two diverging paths",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국_정부를_상징하는_인물_standing_1769931742090.png"
+    ],
+    "appearance_scenes": [
+      178,
+      179,
+      180
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국_정부를_상징하는_인물_standing_1769931742090.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.719410",
+    "updated_at": "2026-02-01T16:43:07.885919"
+  },
+  {
+    "id": "char_8",
+    "name": "사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "worried and anxious expressions, holding empty or partially filled shopping carts, diverse ages and backgrounds, dressed in casual clothing",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_사람들_standing_1769931753341.png"
+    ],
+    "appearance_scenes": [
+      61,
+      62,
+      63
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_사람들_standing_1769931753341.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.720535",
+    "updated_at": "2026-02-01T16:43:07.916704"
+  },
+  {
+    "id": "char_9",
+    "name": "금융 분석가들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "serious and focused expressions, monitoring multiple computer screens, wearing business attire, diverse ages and ethnicities",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_금융_분석가들_standing_1769931756742.png"
+    ],
+    "appearance_scenes": [
+      187,
+      188,
+      189
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_금융_분석가들_standing_1769931756742.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.721249",
+    "updated_at": "2026-02-01T16:43:07.940287"
+  },
+  {
+    "id": "char_10",
+    "name": "오건영 단장",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Head of Shinhan Bank, an authoritative Asian financial expert, middle-aged, wearing a dark business suit, presenting confidently at a podium with a microphone, gesturing towards the audience",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_오건영_단장_standing_1769931360109.png"
+    ],
+    "appearance_scenes": [
+      193,
+      194,
+      195
+    ],
+    "selected_image_path": "",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.722080",
+    "updated_at": "2026-02-01T16:40:44.669206"
+  },
+  {
+    "id": "a_solitary_silhouette_of_a_person",
+    "name": "미래를 고민하는 한 사람의 실루엣.",
+    "name_en": "A solitary silhouette of a person",
+    "description": "standing thoughtfully, contemplating future directions",
+    "role": "주연",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "standing thoughtfully, contemplating future directions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_미래를_고민하는_한_사람의_실루엣__standing_1769931766543.png"
+    ],
+    "appearance_scenes": [
+      229,
+      230,
+      231
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_미래를_고민하는_한_사람의_실루엣__standing_1769931766543.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T16:40:29.723323",
+    "updated_at": "2026-02-01T16:43:07.975582"
+  }
+]

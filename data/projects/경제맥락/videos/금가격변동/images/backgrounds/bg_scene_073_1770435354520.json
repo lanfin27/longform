@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-07T12:35:54.520852",
+  "image_file": "bg_scene_073_1770435354520.png",
+  "scene_id": 73,
+  "prompts": {
+    "original": "Dynamic visual representation of gold price surging on a financial chart, overlaid with a bustling Wall Street cityscape in the background. The iconic JP Morgan building is prominently featured, with golden-hued data visualizations symbolizing the rising gold value. The scene evokes a sense of financial market activity and anticipation, with dramatic upward arrows on the chart. High-angle shot capturing the scale of the financial district, vibrant and energetic atmosphere, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Dynamic visual representation of gold price surging on a financial chart, overlaid with a bustling Wall Street cityscape in the background. The iconic JP Morgan building is prominently featured, with golden-hued data visualizations symbolizing the rising gold value. The scene evokes a sense of financial market activity and anticipation, with dramatic upward arrows on the chart. High-angle shot capturing the scale of the financial district, vibrant and energetic atmosphere, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 955250884
+  }
+}

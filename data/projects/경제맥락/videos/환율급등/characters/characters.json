@@ -1,0 +1,282 @@
+[
+  {
+    "id": "char_0",
+    "name": "한국인 투자자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A Korean investor's hand, gently scrolling through multiple smartphone screens",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국인_투자자_standing_1769935324685.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국인_투자자_standing_1769935324685.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.237310",
+    "updated_at": "2026-02-01T17:42:57.291878"
+  },
+  {
+    "id": "char_1",
+    "name": "한국 사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "silhouettes of people reaching out as if mesmerized by glowing investment opportunities, generic human figures",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국_사람들_standing_1769935327478.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국_사람들_standing_1769935327478.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.238366",
+    "updated_at": "2026-02-01T17:42:57.311991"
+  },
+  {
+    "id": "char_2",
+    "name": "대통령",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "solemn Asian leader, middle-aged, wearing a dark suit, delivering an urgent national address with a serious expression at a podium",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_대통령_standing_1769935330598.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_대통령_standing_1769935330598.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.240339",
+    "updated_at": "2026-02-01T17:42:57.342997"
+  },
+  {
+    "id": "char_3",
+    "name": "도널드 트럼프",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Former President Donald Trump, powerful and determined expression, commanding presence, wearing a dark suit",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_도널드_트럼프_standing_1769935347301.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_도널드_트럼프_standing_1769935347301.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.241806",
+    "updated_at": "2026-02-01T17:42:57.369497"
+  },
+  {
+    "id": "char_4",
+    "name": "소비자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "middle-aged consumer with a surprised and worried expression, looking at an inflated price tag, wearing casual clothes",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_소비자_standing_1769935332114.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_소비자_standing_1769935332114.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.243314",
+    "updated_at": "2026-02-01T17:42:57.406585"
+  },
+  {
+    "id": "char_5",
+    "name": "트럼프 특징 인물",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "figure with the distinctive features of former President Donald Trump, middle-aged, wearing a dark suit and red tie, with a calculating expression, looking at documents",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_트럼프_특징_인물_standing_1769935335560.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_트럼프_특징_인물_standing_1769935335560.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.244874",
+    "updated_at": "2026-02-01T17:42:57.441463"
+  },
+  {
+    "id": "char_6",
+    "name": "도널드 트럼프 전 대통령",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "a stern and determined expression, his hand in the act of signing a document",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_도널드_트럼프_전_대통령_standing_1769935340866.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_도널드_트럼프_전_대통령_standing_1769935340866.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.245822",
+    "updated_at": "2026-02-01T17:42:57.472182"
+  },
+  {
+    "id": "char_7",
+    "name": "한국 정부 (상징)",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "a symbolic figure representing the government, standing at a crossroads, with a thoughtful and conflicted expression, conveying a sense of heavy responsibility and difficult decision-making, in a pose of contemplation",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국_정부__상징__standing_1769935344596.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국_정부__상징__standing_1769935344596.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.247894",
+    "updated_at": "2026-02-01T17:42:57.503724"
+  },
+  {
+    "id": "char_8",
+    "name": "경제 전문가들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "diverse group of professional businesspeople in formal attire, engaged in serious discussion, focused expressions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_경제_전문가들_standing_1769935345932.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_경제_전문가들_standing_1769935345932.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.249132",
+    "updated_at": "2026-02-01T17:42:57.537382"
+  },
+  {
+    "id": "char_9",
+    "name": "신한은행 오건영 단장",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "confident Asian financial expert, middle-aged, sharp business suit, focused and serious expression, presenting an economic briefing",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_신한은행_오건영_단장_standing_1769935350541.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_신한은행_오건영_단장_standing_1769935350541.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.250243",
+    "updated_at": "2026-02-01T17:42:57.565104"
+  },
+  {
+    "id": "char_10",
+    "name": "한국 정부 관계자들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "professional Asian government officials in formal business attire, serious and focused expressions, seated around a large conference table",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국_정부_관계자들_standing_1769935356199.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_한국_정부_관계자들_standing_1769935356199.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.251219",
+    "updated_at": "2026-02-01T17:42:57.599161"
+  },
+  {
+    "id": "char_11",
+    "name": "미국 정부 관계자들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "professional Caucasian government officials in formal business attire, serious and focused expressions, seated around a large conference table",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_미국_정부_관계자들_standing_1769935377245.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_미국_정부_관계자들_standing_1769935377245.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.252362",
+    "updated_at": "2026-02-01T17:42:57.627919"
+  },
+  {
+    "id": "char_12",
+    "name": "대표의 손",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "two hands, one holding a pen poised to sign a contract, professional and decisive gesture, symbolizing a major agreement",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_대표의_손_standing_1769935362257.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_대표의_손_standing_1769935362257.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.254352",
+    "updated_at": "2026-02-01T17:42:57.658456"
+  },
+  {
+    "id": "char_13",
+    "name": "인물 실루엣",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A weakened, almost translucent silhouette of a human figure, slumped on the ground, conveying a sense of exhaustion and fragility",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_인물_실루엣_standing_1769935365039.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\characters\\char_인물_실루엣_standing_1769935365039.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-01T17:39:59.255414",
+    "updated_at": "2026-02-01T17:42:57.689804"
+  }
+]

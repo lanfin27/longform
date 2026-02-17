@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-08T14:38:14.291542",
+  "image_file": "bg_scene_058_1770529094291.png",
+  "scene_id": 58,
+  "prompts": {
+    "original": "A sophisticated conceptual visualization of an HBM4 stack, focusing on the integration of a distinct 4nm logic chip into the base die. The logic chip area glows subtly, with abstract light patterns or neural network-like connections emanating from it, symbolizing 'memory thinking for itself' and active processing beyond mere data transfer. Emphasize advanced nanotechnology and intelligence. Dramatic, futuristic lighting with blue and purple hues. Cinematic macro shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A sophisticated conceptual visualization of an HBM4 stack, focusing on the integration of a distinct 4nm logic chip into the base die. The logic chip area glows subtly, with abstract light patterns or neural network-like connections emanating from it, symbolizing 'memory thinking for itself' and active processing beyond mere data transfer. Emphasize advanced nanotechnology and intelligence. Dramatic, futuristic lighting with blue and purple hues. Cinematic macro shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 305553515
+  }
+}

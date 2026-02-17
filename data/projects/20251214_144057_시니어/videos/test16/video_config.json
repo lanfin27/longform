@@ -1,0 +1,15 @@
+{
+  "title": "test16",
+  "description": "",
+  "created_at": "2026-01-26T22:32:31.348896",
+  "updated_at": "2026-01-26T22:42:19.519914",
+  "status": "created",
+  "current_step": 3,
+  "settings": {},
+  "statistics": {
+    "total_scenes": 0,
+    "total_characters": 0,
+    "generated_images": 0,
+    "generated_audio": 0
+  }
+}

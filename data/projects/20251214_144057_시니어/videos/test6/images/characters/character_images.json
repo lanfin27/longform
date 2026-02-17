@@ -1,0 +1,14 @@
+{
+  "이재용": {
+    "success": true,
+    "character_name": "이재용",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test6\\images\\characters\\char_이재용_standing_1769320150628.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test6\\images\\characters\\char_이재용_standing_1769320150628.png",
+    "prompt": "Full body character, centered composition, Western 2D animated series style, clean commercial animation aesthetic\nBold black outlines 2-3px thick on all elements, flat cel-shaded coloring with no gradients, solid color fills without any texture, crisp vector-like lineart, clean sharp edges\n\nBody proportions: approximately 6-7 heads tall, slim athletic build, elongated torso, long proportional limbs, simplified hands with basic finger shapes, feet as simple rounded shapes\nHead shape: elongated oval head, prominent angular chin and jawline, large simplified ears positioned mid-head level, smooth curved skull\nFace style: simple dot eyes with small black pupils, thin minimal eyebrows as simple curved lines, small subtle nose as single curved bump, mouth as clean curved line, completely smooth flat skin with single solid color, no shading on face, no wrinkles or details\nFlat solid color blocking, muted desaturated color palette, warm beige skin tones, no shadows no highlights no gradients anywhere on character, plain white or light neutral background, no environmental details, middle-aged Korean man in formal business attire, with a thoughtful expression, looking insightful and forward-thinking, no text, no logos on clothing, no name tags, full body character, standing pose, front view, neutral expression, simple solid light gray background, no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "seed": 659517311,
+    "generation_time": 8.788214445114136,
+    "api_provider": "Google ImageFX"
+  }
+}

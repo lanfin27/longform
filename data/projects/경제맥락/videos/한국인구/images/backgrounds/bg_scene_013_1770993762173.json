@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-13T23:42:42.174996",
+  "image_file": "bg_scene_013_1770993762173.png",
+  "scene_id": 13,
+  "prompts": {
+    "original": "An abstract visualization of the South Korean map slowly fading away or crumbling into fragments, with colossal digital numbers and stark statistics overwhelmingly displayed in the background, a desolate and grim atmosphere, cold, harsh lighting emphasizing the undeniable reality, conveying the oppressive weight of irrefutable data, dramatic wide shot with a sense of loss and inevitability, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, An abstract visualization of the South Korean map slowly fading away or crumbling into fragments, with colossal digital numbers and stark statistics overwhelmingly displayed in the background, a desolate and grim atmosphere, cold, harsh lighting emphasizing the undeniable reality, conveying the oppressive weight of irrefutable data, dramatic wide shot with a sense of loss and inevitability, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1035691984
+  }
+}

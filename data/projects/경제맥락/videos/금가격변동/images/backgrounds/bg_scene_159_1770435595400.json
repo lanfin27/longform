@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-07T12:39:26.118191",
+  "image_file": "bg_scene_157_1770435566116.png",
+  "scene_id": 157,
+  "prompts": {
+    "original": "Dynamic chart illustrating extreme volatility in the gold market, simultaneously depicting a soaring rally and a sharp crash, with dollar symbols representing US fiscal expansion and crisis zones on a world map symbolizing geopolitical risks, a prominent gold bar with a \"$5600\" price tag, dramatic and tense atmosphere, sharp contrasts in lighting, evoking market chaos and significant events, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Dynamic chart illustrating extreme volatility in the gold market, simultaneously depicting a soaring rally and a sharp crash, with dollar symbols representing US fiscal expansion and crisis zones on a world map symbolizing geopolitical risks, a prominent gold bar with a \"$5600\" price tag, dramatic and tense atmosphere, sharp contrasts in lighting, evoking market chaos and significant events, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1058587133
+  },
+  "scene_number": 159,
+  "copied_from": {
+    "scene_number": 157,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\backgrounds\\bg_scene_157_1770435566116.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-07T12:39:55.402099"
+}

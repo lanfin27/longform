@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-11T20:10:03.080072",
+  "image_file": "bg_scene_106_1770808203079.png",
+  "scene_id": 106,
+  "prompts": {
+    "original": "Sixteen Chunmoo K-239 Multiple Launch Rocket Systems (MLRS) of the Republic of Korea Army, majestically lined up on a vast training ground, showcasing military precision and power. Initial ammunition crates are stacked next to the launchers, with a graphic overlay symbolizing '1 trillion KRW' (without actual numbers). In the background, a larger, abstract graphic representing '1.8 trillion KRW' (without actual numbers) hints at additional financial flows. The composition emphasizes strategic information and military might, with a clear blue sky overhead, medium wide shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Sixteen Chunmoo K-239 Multiple Launch Rocket Systems (MLRS) of the Republic of Korea Army, majestically lined up on a vast training ground, showcasing military precision and power. Initial ammunition crates are stacked next to the launchers, with a graphic overlay symbolizing '1 trillion KRW' (without actual numbers). In the background, a larger, abstract graphic representing '1.8 trillion KRW' (without actual numbers) hints at additional financial flows. The composition emphasizes strategic information and military might, with a clear blue sky overhead, medium wide shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 204488582
+  },
+  "scene_number": 107,
+  "copied_from": {
+    "scene_number": 106,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\backgrounds\\bg_scene_106_1770808203079.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-11T20:14:38.451816"
+}

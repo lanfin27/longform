@@ -1,0 +1,1469 @@
+[
+  {
+    "scene_id": 1,
+    "text": "여러분은 반도치하면 뭐가 떠오르세요?",
+    "start_time": 0.0,
+    "end_time": 1.82,
+    "duration": 1.82,
+    "timecode": "00:00:00,000 --> 00:00:01,820",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 2,
+    "text": "삼성, SK, 아니면 엔비디아",
+    "start_time": 2.259,
+    "end_time": 4.98,
+    "duration": 2.7210000000000005,
+    "timecode": "00:00:02,258 --> 00:00:04,980",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 3,
+    "text": "근데요, 지금 이 회사들이 목숨 걸고 싸우는게 뭔지 아세요?",
+    "start_time": 4.98,
+    "end_time": 8.519,
+    "duration": 3.5389999999999997,
+    "timecode": "00:00:04,980 --> 00:00:08,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 4,
+    "text": "메모리에요",
+    "start_time": 8.96,
+    "end_time": 9.58,
+    "duration": 0.6199999999999992,
+    "timecode": "00:00:08,960 --> 00:00:09,580",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 5,
+    "text": "근데 그냥 메모리가 아니에요",
+    "start_time": 9.58,
+    "end_time": 10.9,
+    "duration": 1.3200000000000003,
+    "timecode": "00:00:09,580 --> 00:00:10,900",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 6,
+    "text": "HBM이라고 AI의 심장에 들어가는 초고속 메모리에요",
+    "start_time": 12.16,
+    "end_time": 15.9,
+    "duration": 3.74,
+    "timecode": "00:00:12,160 --> 00:00:15,900",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 7,
+    "text": "2016년, 이 시장 규모가 얼마냐면요?",
+    "start_time": 15.9,
+    "end_time": 19.179,
+    "duration": 3.278999999999998,
+    "timecode": "00:00:15,900 --> 00:00:19,178",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 8,
+    "text": "무려 78조 원이에요",
+    "start_time": 19.3,
+    "end_time": 20.46,
+    "duration": 1.1600000000000001,
+    "timecode": "00:00:19,300 --> 00:00:20,460",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 9,
+    "text": "근데 이게 왜 중요하냐?",
+    "start_time": 20.46,
+    "end_time": 21.98,
+    "duration": 1.5199999999999996,
+    "timecode": "00:00:20,460 --> 00:00:21,980",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 10,
+    "text": "지금부터 제가 하는 얘기 끝까지 들으시면요",
+    "start_time": 22.019,
+    "end_time": 24.719,
+    "duration": 2.700000000000003,
+    "timecode": "00:00:22,018 --> 00:00:24,719",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 11,
+    "text": "삼성이랑 SK하이닉스가 왜 이 시장에서 피터지게 싸우는지",
+    "start_time": 24.719,
+    "end_time": 28.62,
+    "duration": 3.901,
+    "timecode": "00:00:24,719 --> 00:00:28,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 12,
+    "text": "그리고 이게 여러분 투자의 어떤 의미인지 완전히 이해하시게 될 거예요",
+    "start_time": 28.62,
+    "end_time": 32.52,
+    "duration": 3.900000000000002,
+    "timecode": "00:00:28,620 --> 00:00:32,520",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 13,
+    "text": "자, 시작해 볼게요",
+    "start_time": 32.52,
+    "end_time": 34.079,
+    "duration": 1.5589999999999975,
+    "timecode": "00:00:32,520 --> 00:00:34,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 14,
+    "text": "HBM이 뭔지 아시는 분 계세요?",
+    "start_time": 34.079,
+    "end_time": 36.38,
+    "duration": 2.301000000000002,
+    "timecode": "00:00:34,079 --> 00:00:36,380",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 15,
+    "text": "하이밴드위트 메모리의 약자에요",
+    "start_time": 36.84,
+    "end_time": 38.579,
+    "duration": 1.7389999999999972,
+    "timecode": "00:00:36,840 --> 00:00:38,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 16,
+    "text": "우리말로 하면 고대역폭 메모리인데요",
+    "start_time": 38.579,
+    "end_time": 40.7,
+    "duration": 2.121000000000002,
+    "timecode": "00:00:38,579 --> 00:00:40,700",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 17,
+    "text": "쉽게 말해서 엄청 빠른 메모리에요",
+    "start_time": 40.7,
+    "end_time": 43.039,
+    "duration": 2.3389999999999986,
+    "timecode": "00:00:40,700 --> 00:00:43,039",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 18,
+    "text": "근데 왜 이게 필요하냐?",
+    "start_time": 43.039,
+    "end_time": 44.42,
+    "duration": 1.3810000000000002,
+    "timecode": "00:00:43,039 --> 00:00:44,420",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 19,
+    "text": "여러분 채찌 PT 써보셨죠?",
+    "start_time": 44.539,
+    "end_time": 46.159,
+    "duration": 1.6199999999999974,
+    "timecode": "00:00:44,539 --> 00:00:46,158",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 20,
+    "text": "이거 돌리려면 엔비디아 GPU가 필요한데요",
+    "start_time": 46.42,
+    "end_time": 48.659,
+    "duration": 2.238999999999997,
+    "timecode": "00:00:46,420 --> 00:00:48,658",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 21,
+    "text": "이 GPU가 아무리 빨라봤자",
+    "start_time": 48.659,
+    "end_time": 50.539,
+    "duration": 1.8800000000000026,
+    "timecode": "00:00:48,658 --> 00:00:50,539",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 22,
+    "text": "메모리가 느리면 소용없어요",
+    "start_time": 50.539,
+    "end_time": 52.82,
+    "duration": 2.280999999999999,
+    "timecode": "00:00:50,539 --> 00:00:52,820",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 23,
+    "text": "이걸 전문용어로 메모리 벽이라고 하거든요",
+    "start_time": 52.82,
+    "end_time": 54.96,
+    "duration": 2.1400000000000006,
+    "timecode": "00:00:52,820 --> 00:00:54,960",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 24,
+    "text": "아무리 빠른 두뇌가 있어도",
+    "start_time": 54.96,
+    "end_time": 56.759,
+    "duration": 1.7989999999999995,
+    "timecode": "00:00:54,960 --> 00:00:56,759",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 25,
+    "text": "근데 정보가 제때 안 들어오면 멍 때리는 거예요",
+    "start_time": 56.759,
+    "end_time": 59.32,
+    "duration": 2.561,
+    "timecode": "00:00:56,759 --> 00:00:59,320",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 26,
+    "text": "그래서 2013년에 업계가 뭘 했었냐면요",
+    "start_time": 59.32,
+    "end_time": 63.06,
+    "duration": 3.740000000000002,
+    "timecode": "00:00:59,320 --> 00:01:03,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 27,
+    "text": "DRAM 칩을 옆으로 늘리지 말고 위로 쌓자",
+    "start_time": 63.06,
+    "end_time": 65.9,
+    "duration": 2.8400000000000034,
+    "timecode": "00:01:03,060 --> 00:01:05,900",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 28,
+    "text": "이렇게 해서 나온 게 HBM이에요",
+    "start_time": 65.9,
+    "end_time": 68.92,
+    "duration": 3.019999999999996,
+    "timecode": "00:01:05,900 --> 00:01:08,920",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 29,
+    "text": "칩을 8개, 12개, 16개씩 수직으로 쌓아서",
+    "start_time": 69.42,
+    "end_time": 72.64,
+    "duration": 3.219999999999999,
+    "timecode": "00:01:09,420 --> 00:01:12,640",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 30,
+    "text": "한 번에 엄청난 데이터를 주고 받는 거죠",
+    "start_time": 72.64,
+    "end_time": 74.819,
+    "duration": 2.179000000000002,
+    "timecode": "00:01:12,640 --> 00:01:14,819",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 31,
+    "text": "근데요",
+    "start_time": 75.4,
+    "end_time": 75.859,
+    "duration": 0.458999999999989,
+    "timecode": "00:01:15,400 --> 00:01:15,858",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 32,
+    "text": "2020년에 채찌 PT가 터지면서 상황이 완전 달라졌어요",
+    "start_time": 76.939,
+    "end_time": 80.48,
+    "duration": 3.541000000000011,
+    "timecode": "00:01:16,938 --> 00:01:20,480",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 33,
+    "text": "AI 수요가 폭발하니까",
+    "start_time": 80.48,
+    "end_time": 82.15899999999999,
+    "duration": 1.6789999999999878,
+    "timecode": "00:01:20,480 --> 00:01:22,158",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 34,
+    "text": "HBM 시장도 미친 듯이 커진 거예요",
+    "start_time": 82.15899999999999,
+    "end_time": 84.78,
+    "duration": 2.6210000000000093,
+    "timecode": "00:01:22,158 --> 00:01:24,780",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 35,
+    "text": "불과 3년 만에 10배 이상 성장했어요",
+    "start_time": 85.28999999999999,
+    "end_time": 87.519,
+    "duration": 2.2290000000000134,
+    "timecode": "00:01:25,289 --> 00:01:27,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 36,
+    "text": "바로 이게 지금 전쟁의 시작점이에요",
+    "start_time": 87.519,
+    "end_time": 89.85900000000001,
+    "duration": 2.3400000000000034,
+    "timecode": "00:01:27,519 --> 00:01:29,859",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 37,
+    "text": "여기서 끝이 아니에요",
+    "start_time": 90.35900000000001,
+    "end_time": 91.42,
+    "duration": 1.0609999999999928,
+    "timecode": "00:01:30,359 --> 00:01:31,420",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 38,
+    "text": "HBM 4가 나오면서 게임의 룰이 완전히 바뀌었거든요",
+    "start_time": 91.42,
+    "end_time": 95.34,
+    "duration": 3.9200000000000017,
+    "timecode": "00:01:31,420 --> 00:01:35,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 39,
+    "text": "자 HBM 4가 뭐가 다른지 설명해 드릴게요",
+    "start_time": 95.34,
+    "end_time": 98.799,
+    "duration": 3.459000000000003,
+    "timecode": "00:01:35,340 --> 00:01:38,799",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 40,
+    "text": "이게 진짜 핵심이에요",
+    "start_time": 98.799,
+    "end_time": 100.28,
+    "duration": 1.4809999999999945,
+    "timecode": "00:01:38,799 --> 00:01:40,280",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 41,
+    "text": "집중하셔야 해요",
+    "start_time": 100.28,
+    "end_time": 101.47999999999999,
+    "duration": 1.1999999999999886,
+    "timecode": "00:01:40,280 --> 00:01:41,479",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 42,
+    "text": "기존 HBM 3 이까지는 인터페이스 폭이 1214 비트였어요",
+    "start_time": 101.47999999999999,
+    "end_time": 105.07900000000001,
+    "duration": 3.599000000000018,
+    "timecode": "00:01:41,479 --> 00:01:45,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 43,
+    "text": "근데 HBM 4는요",
+    "start_time": 105.07900000000001,
+    "end_time": 106.92,
+    "duration": 1.840999999999994,
+    "timecode": "00:01:45,079 --> 00:01:46,920",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 44,
+    "text": "2048 비트예요",
+    "start_time": 106.92,
+    "end_time": 108.34,
+    "duration": 1.4200000000000017,
+    "timecode": "00:01:46,920 --> 00:01:48,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 45,
+    "text": "두 배로 늘린 거예요",
+    "start_time": 108.34,
+    "end_time": 109.15899999999999,
+    "duration": 0.8189999999999884,
+    "timecode": "00:01:48,340 --> 00:01:49,158",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 46,
+    "text": "이게 뭔 소리냐면요",
+    "start_time": 109.15899999999999,
+    "end_time": 110.62,
+    "duration": 1.4610000000000127,
+    "timecode": "00:01:49,158 --> 00:01:50,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 47,
+    "text": "고속도로 차선을 4차선 해서 8차선으로 늘린 거랑 같아요",
+    "start_time": 110.62,
+    "end_time": 114.06,
+    "duration": 3.4399999999999977,
+    "timecode": "00:01:50,620 --> 00:01:54,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 48,
+    "text": "같은 시간에 두 배 많은 차가 지나갈 수 있는 거죠",
+    "start_time": 114.06,
+    "end_time": 116.84,
+    "duration": 2.780000000000001,
+    "timecode": "00:01:54,060 --> 00:01:56,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 49,
+    "text": "숫자로 보면 더 명확해요",
+    "start_time": 117.37899999999999,
+    "end_time": 118.959,
+    "duration": 1.5800000000000125,
+    "timecode": "00:01:57,378 --> 00:01:58,959",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 50,
+    "text": "HBM 3",
+    "start_time": 118.959,
+    "end_time": 120.019,
+    "duration": 1.0600000000000023,
+    "timecode": "00:01:58,959 --> 00:02:00,019",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 51,
+    "text": "이 최대 대역 폭이 1점",
+    "start_time": 120.019,
+    "end_time": 121.659,
+    "duration": 1.6400000000000006,
+    "timecode": "00:02:00,019 --> 00:02:01,659",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 52,
+    "text": "이 테라바이트였거든요",
+    "start_time": 121.659,
+    "end_time": 122.739,
+    "duration": 1.0799999999999983,
+    "timecode": "00:02:01,659 --> 00:02:02,739",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 53,
+    "text": "무려 쌈 테라바이트까지 가요",
+    "start_time": 124.76,
+    "end_time": 126.739,
+    "duration": 1.9789999999999992,
+    "timecode": "00:02:04,760 --> 00:02:06,739",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 54,
+    "text": "2.5배나 빨라지는 거예요",
+    "start_time": 126.739,
+    "end_time": 128.099,
+    "duration": 1.3599999999999852,
+    "timecode": "00:02:06,739 --> 00:02:08,098",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 55,
+    "text": "진짜 대박은 따로 있어요",
+    "start_time": 128.699,
+    "end_time": 130.25900000000001,
+    "duration": 1.5600000000000023,
+    "timecode": "00:02:08,699 --> 00:02:10,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 56,
+    "text": "베이스다이라는 게 있는데요",
+    "start_time": 130.86,
+    "end_time": 131.919,
+    "duration": 1.0589999999999975,
+    "timecode": "00:02:10,860 --> 00:02:11,919",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 57,
+    "text": "이전까지는 그냥 칩들 연결해주는 통로였어요",
+    "start_time": 132.419,
+    "end_time": 134.919,
+    "duration": 2.5,
+    "timecode": "00:02:12,419 --> 00:02:14,919",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 58,
+    "text": "근데 HBM 4부터는 여기에 산 안호 공정 로직 칩이 들어가요",
+    "start_time": 134.919,
+    "end_time": 139.0,
+    "duration": 4.080999999999989,
+    "timecode": "00:02:14,919 --> 00:02:19,000",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 59,
+    "text": "메모리가 스스로 생각하기 시작한다라는 거예요",
+    "start_time": 140.319,
+    "end_time": 142.62,
+    "duration": 2.301000000000016,
+    "timecode": "00:02:20,318 --> 00:02:22,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 60,
+    "text": "단순히 데이터 저장하고 전달하는 게 아니라",
+    "start_time": 143.219,
+    "end_time": 145.199,
+    "duration": 1.9800000000000182,
+    "timecode": "00:02:23,218 --> 00:02:25,199",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 61,
+    "text": "간단한 연산도 직접 해버리는 거죠",
+    "start_time": 145.699,
+    "end_time": 147.46,
+    "duration": 1.7609999999999957,
+    "timecode": "00:02:25,699 --> 00:02:27,460",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 62,
+    "text": "결국 HBM 4는 그냥 빨라진 메모리가 아니에요",
+    "start_time": 147.46,
+    "end_time": 150.539,
+    "duration": 3.0789999999999793,
+    "timecode": "00:02:27,460 --> 00:02:30,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 63,
+    "text": "메모리의 개념 자체가 바뀌는 거예요",
+    "start_time": 151.099,
+    "end_time": 152.86,
+    "duration": 1.761000000000024,
+    "timecode": "00:02:31,098 --> 00:02:32,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 64,
+    "text": "자 그러면 이 시장에서 누가 이기고 있냐",
+    "start_time": 153.07999999999998,
+    "end_time": 155.3,
+    "duration": 2.2200000000000273,
+    "timecode": "00:02:33,079 --> 00:02:35,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 65,
+    "text": "여기서부터 진짜 재미있어져요",
+    "start_time": 155.3,
+    "end_time": 157.3,
+    "duration": 2.0,
+    "timecode": "00:02:35,300 --> 00:02:37,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 66,
+    "text": "2024년 기준으로 HBM 시장 점유율 아세요",
+    "start_time": 157.3,
+    "end_time": 160.84,
+    "duration": 3.539999999999992,
+    "timecode": "00:02:37,300 --> 00:02:40,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 67,
+    "text": "SK하이닉스가 54%예요",
+    "start_time": 160.84,
+    "end_time": 163.4,
+    "duration": 2.5600000000000023,
+    "timecode": "00:02:40,840 --> 00:02:43,400",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 68,
+    "text": "삼성은요",
+    "start_time": 163.4,
+    "end_time": 164.099,
+    "duration": 0.6989999999999839,
+    "timecode": "00:02:43,400 --> 00:02:44,098",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 69,
+    "text": "28%밖에 안 돼요",
+    "start_time": 164.099,
+    "end_time": 165.84,
+    "duration": 1.7410000000000139,
+    "timecode": "00:02:44,098 --> 00:02:45,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 70,
+    "text": "거의 두 배 차이 나는 거예요",
+    "start_time": 165.84,
+    "end_time": 167.379,
+    "duration": 1.5389999999999873,
+    "timecode": "00:02:45,840 --> 00:02:47,378",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 71,
+    "text": "SK하이닉스가 왜 이렇게 잘하냐면요",
+    "start_time": 167.97899999999998,
+    "end_time": 170.219,
+    "duration": 2.240000000000009,
+    "timecode": "00:02:47,978 --> 00:02:50,218",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 72,
+    "text": "MR 대시 MUF라는 기술 때문이에요",
+    "start_time": 170.219,
+    "end_time": 172.56,
+    "duration": 2.341000000000008,
+    "timecode": "00:02:50,218 --> 00:02:52,560",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 73,
+    "text": "이게 뭐냐면요",
+    "start_time": 172.56,
+    "end_time": 173.86,
+    "duration": 1.3000000000000114,
+    "timecode": "00:02:52,560 --> 00:02:53,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 74,
+    "text": "칩을 쌓을 때 사이사이에 특수한 보호재를 넣어서 열을 확 빼주는 거예요",
+    "start_time": 173.86,
+    "end_time": 177.879,
+    "duration": 4.018999999999977,
+    "timecode": "00:02:53,860 --> 00:02:57,878",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 75,
+    "text": "칩을 많이 쌓으면 열이 엄청 나거든요",
+    "start_time": 177.879,
+    "end_time": 180.479,
+    "duration": 2.6000000000000227,
+    "timecode": "00:02:57,878 --> 00:03:00,479",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 76,
+    "text": "그걸 잡아주는 기술이에요",
+    "start_time": 180.479,
+    "end_time": 182.099,
+    "duration": 1.6199999999999761,
+    "timecode": "00:03:00,479 --> 00:03:02,098",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 77,
+    "text": "이것 덕분에 SK하이닉스가 수율도 좋고 품질도 좋은 거예요",
+    "start_time": 182.099,
+    "end_time": 186.5,
+    "duration": 4.4010000000000105,
+    "timecode": "00:03:02,098 --> 00:03:06,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 78,
+    "text": "그래서 엔비디아가 SK하이닉스를 엄청 좋아해요",
+    "start_time": 186.5,
+    "end_time": 189.919,
+    "duration": 3.419000000000011,
+    "timecode": "00:03:06,500 --> 00:03:09,919",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 79,
+    "text": "엔비디아 차세대 AI 플랫폼 베라 루빈 아세요",
+    "start_time": 189.919,
+    "end_time": 193.819,
+    "duration": 3.8999999999999773,
+    "timecode": "00:03:09,919 --> 00:03:13,818",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 80,
+    "text": "여기 들어갈 HBM 4 초도 물량의 70%를 SK하이닉스가 가져갔어요",
+    "start_time": 194.099,
+    "end_time": 199.07999999999998,
+    "duration": 4.9809999999999945,
+    "timecode": "00:03:14,098 --> 00:03:19,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 81,
+    "text": "그리고 SK하이닉스는 TSMC랑도 손잡았어요",
+    "start_time": 199.07999999999998,
+    "end_time": 202.639,
+    "duration": 3.559000000000026,
+    "timecode": "00:03:19,079 --> 00:03:22,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 82,
+    "text": "베이스타일을 TSMC에서 만드는 거죠",
+    "start_time": 203.199,
+    "end_time": 205.659,
+    "duration": 2.4599999999999795,
+    "timecode": "00:03:23,199 --> 00:03:25,658",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 83,
+    "text": "세계 1위 메모리 회사랑 세계 1위 파운드리가 뭉친 거예요",
+    "start_time": 205.9,
+    "end_time": 209.36,
+    "duration": 3.460000000000008,
+    "timecode": "00:03:25,900 --> 00:03:29,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 84,
+    "text": "그 결과가 어떻게 됐냐면요",
+    "start_time": 209.62,
+    "end_time": 211.86,
+    "duration": 2.240000000000009,
+    "timecode": "00:03:29,620 --> 00:03:31,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 85,
+    "text": "2025년 SK하이닉스 영업이익이 47조 2000억 원이에요",
+    "start_time": 211.86,
+    "end_time": 215.78,
+    "duration": 3.9199999999999875,
+    "timecode": "00:03:31,860 --> 00:03:35,780",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 86,
+    "text": "사상 처음으로 삼성전자 반도체 부문을 추월해버린 거예요",
+    "start_time": 215.78,
+    "end_time": 219.62,
+    "duration": 3.8400000000000034,
+    "timecode": "00:03:35,780 --> 00:03:39,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 87,
+    "text": "자 그러면 삼성은 당하고만 있냐?",
+    "start_time": 219.78,
+    "end_time": 221.91899999999998,
+    "duration": 2.1389999999999816,
+    "timecode": "00:03:39,780 --> 00:03:41,918",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 88,
+    "text": "아니에요",
+    "start_time": 222.199,
+    "end_time": 222.57999999999998,
+    "duration": 0.3809999999999718,
+    "timecode": "00:03:42,199 --> 00:03:42,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 89,
+    "text": "삼성이 방역을 시작했어요",
+    "start_time": 222.57999999999998,
+    "end_time": 224.25900000000001,
+    "duration": 1.6790000000000305,
+    "timecode": "00:03:42,579 --> 00:03:44,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 90,
+    "text": "삼성이 뭘 들고 나왔냐면요",
+    "start_time": 224.25900000000001,
+    "end_time": 226.36,
+    "duration": 2.100999999999999,
+    "timecode": "00:03:44,259 --> 00:03:46,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 91,
+    "text": "일단 원시 공정이에요",
+    "start_time": 226.36,
+    "end_time": 227.62,
+    "duration": 1.259999999999991,
+    "timecode": "00:03:46,360 --> 00:03:47,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 92,
+    "text": "SK하이닉스가 1B 공정 쓸 때",
+    "start_time": 227.62,
+    "end_time": 230.659,
+    "duration": 3.0389999999999873,
+    "timecode": "00:03:47,620 --> 00:03:50,658",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 93,
+    "text": "삼성은 한 세대 더 앞선 원시 공정을 HBM 세 적용했어요",
+    "start_time": 230.659,
+    "end_time": 235.46,
+    "duration": 4.801000000000016,
+    "timecode": "00:03:50,658 --> 00:03:55,460",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 94,
+    "text": "그 결과 핀당 전송 속도가 11.7GBP 초예요",
+    "start_time": 235.699,
+    "end_time": 240.24,
+    "duration": 4.540999999999997,
+    "timecode": "00:03:55,699 --> 00:04:00,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 95,
+    "text": "업계 표준이 8GBP 초거든요",
+    "start_time": 240.24,
+    "end_time": 242.62,
+    "duration": 2.3799999999999955,
+    "timecode": "00:04:00,240 --> 00:04:02,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 96,
+    "text": "훨씬 빠른 거예요",
+    "start_time": 242.62,
+    "end_time": 243.86,
+    "duration": 1.240000000000009,
+    "timecode": "00:04:02,620 --> 00:04:03,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 97,
+    "text": "근데 삼성의 진짜 무기는 따로 있어요",
+    "start_time": 243.86,
+    "end_time": 246.419,
+    "duration": 2.5589999999999975,
+    "timecode": "00:04:03,860 --> 00:04:06,419",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 98,
+    "text": "수직 계열화예요",
+    "start_time": 246.419,
+    "end_time": 247.4,
+    "duration": 0.9809999999999945,
+    "timecode": "00:04:06,419 --> 00:04:07,400",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 99,
+    "text": "SK하이닉스는 베이스타일을 TSMC한테 맡기잖아요",
+    "start_time": 248.419,
+    "end_time": 252.379,
+    "duration": 3.9599999999999795,
+    "timecode": "00:04:08,419 --> 00:04:12,378",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 100,
+    "text": "근데 삼성은요 자체 파운드리가 있어요",
+    "start_time": 252.379,
+    "end_time": 254.879,
+    "duration": 2.5,
+    "timecode": "00:04:12,378 --> 00:04:14,878",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 101,
+    "text": "메모리 설계도 삼성",
+    "start_time": 254.879,
+    "end_time": 256.48,
+    "duration": 1.6010000000000275,
+    "timecode": "00:04:14,878 --> 00:04:16,480",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 102,
+    "text": "로직 칩 제조도 삼성",
+    "start_time": 256.48,
+    "end_time": 258.18,
+    "duration": 1.6999999999999886,
+    "timecode": "00:04:16,480 --> 00:04:18,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 103,
+    "text": "패키징도 삼성",
+    "start_time": 258.18,
+    "end_time": 259.399,
+    "duration": 1.218999999999994,
+    "timecode": "00:04:18,180 --> 00:04:19,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 104,
+    "text": "전부 다 자기가 하는 거예요",
+    "start_time": 259.399,
+    "end_time": 260.48,
+    "duration": 1.0810000000000173,
+    "timecode": "00:04:19,399 --> 00:04:20,480",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 105,
+    "text": "이러면 뭐가 좋으냐",
+    "start_time": 260.48,
+    "end_time": 261.56,
+    "duration": 1.079999999999984,
+    "timecode": "00:04:20,480 --> 00:04:21,560",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 106,
+    "text": "외부 의존도가 없어요",
+    "start_time": 261.56,
+    "end_time": 263.18,
+    "duration": 1.6200000000000045,
+    "timecode": "00:04:21,560 --> 00:04:23,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 107,
+    "text": "설계 최적화도 빠르고요",
+    "start_time": 263.579,
+    "end_time": 264.899,
+    "duration": 1.3199999999999932,
+    "timecode": "00:04:23,579 --> 00:04:24,899",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 108,
+    "text": "비용도 줄일 수 있어요",
+    "start_time": 265.42,
+    "end_time": 266.74,
+    "duration": 1.3199999999999932,
+    "timecode": "00:04:25,420 --> 00:04:26,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 109,
+    "text": "그리고요",
+    "start_time": 266.74,
+    "end_time": 267.579,
+    "duration": 0.8389999999999986,
+    "timecode": "00:04:26,740 --> 00:04:27,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 110,
+    "text": "삼성은 하이브리드 본딩이라는 신기술도 밀고 있어요",
+    "start_time": 267.579,
+    "end_time": 270.36,
+    "duration": 2.781000000000006,
+    "timecode": "00:04:27,579 --> 00:04:30,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 111,
+    "text": "기존에는 칩사이의 솔더 범프라고 땜납 같은 걸 넣었거든요",
+    "start_time": 270.959,
+    "end_time": 274.1,
+    "duration": 3.1410000000000196,
+    "timecode": "00:04:30,959 --> 00:04:34,100",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 112,
+    "text": "근데 하이브리드 본딩은요",
+    "start_time": 274.1,
+    "end_time": 275.639,
+    "duration": 1.5389999999999873,
+    "timecode": "00:04:34,100 --> 00:04:35,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 113,
+    "text": "구리끼리 직접 붙여버려요",
+    "start_time": 275.639,
+    "end_time": 277.22,
+    "duration": 1.5810000000000173,
+    "timecode": "00:04:35,639 --> 00:04:37,220",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 114,
+    "text": "이러면 칩사이 간격이 확 줄어들어서",
+    "start_time": 277.22,
+    "end_time": 279.74,
+    "duration": 2.519999999999982,
+    "timecode": "00:04:37,220 --> 00:04:39,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 115,
+    "text": "전체 높이가 낮아지고",
+    "start_time": 279.74,
+    "end_time": 280.839,
+    "duration": 1.0989999999999895,
+    "timecode": "00:04:39,740 --> 00:04:40,838",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 116,
+    "text": "전력 소모도 줄어요",
+    "start_time": 280.839,
+    "end_time": 282.259,
+    "duration": 1.420000000000016,
+    "timecode": "00:04:40,838 --> 00:04:42,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 117,
+    "text": "삼성이 이 기술로 16단 적층에 성공했어요",
+    "start_time": 282.259,
+    "end_time": 285.339,
+    "duration": 3.079999999999984,
+    "timecode": "00:04:42,259 --> 00:04:45,338",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 118,
+    "text": "775 마이크로미터 안에 칩 17개를 넣은 거예요",
+    "start_time": 285.339,
+    "end_time": 289.579,
+    "duration": 4.240000000000009,
+    "timecode": "00:04:45,338 --> 00:04:49,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 119,
+    "text": "이건 진짜 대단한 거거든요",
+    "start_time": 289.579,
+    "end_time": 291.06,
+    "duration": 1.4809999999999945,
+    "timecode": "00:04:49,579 --> 00:04:51,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 120,
+    "text": "삼성이 더 무서운 게 있어요",
+    "start_time": 291.8,
+    "end_time": 293.48,
+    "duration": 1.6800000000000068,
+    "timecode": "00:04:51,800 --> 00:04:53,480",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 121,
+    "text": "구글 TPU 아세요?",
+    "start_time": 293.949,
+    "end_time": 295.22,
+    "duration": 1.271000000000015,
+    "timecode": "00:04:53,949 --> 00:04:55,220",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 122,
+    "text": "구글이 자체 개발하는 AI 칩인데요",
+    "start_time": 295.699,
+    "end_time": 297.8,
+    "duration": 2.100999999999999,
+    "timecode": "00:04:55,699 --> 00:04:57,800",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 123,
+    "text": "8세대 TPU에 들어갈 H, BM사를 삼성이 따냈어요",
+    "start_time": 297.8,
+    "end_time": 302.199,
+    "duration": 4.399000000000001,
+    "timecode": "00:04:57,800 --> 00:05:02,199",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 124,
+    "text": "구글이 원하는 특수 기능을 베이스타일에 직접 넣어줄 수 있으니까요",
+    "start_time": 302.199,
+    "end_time": 306.3,
+    "duration": 4.100999999999999,
+    "timecode": "00:05:02,199 --> 00:05:06,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 125,
+    "text": "이게 바로 커스텀 HBM이에요",
+    "start_time": 306.3,
+    "end_time": 308.339,
+    "duration": 2.0389999999999873,
+    "timecode": "00:05:06,300 --> 00:05:08,338",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 126,
+    "text": "단순히 표준품 찍어내는 게 아니라",
+    "start_time": 308.339,
+    "end_time": 310.399,
+    "duration": 2.0600000000000023,
+    "timecode": "00:05:08,338 --> 00:05:10,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 127,
+    "text": "고객 맞춤형으로 만들어주는 거죠",
+    "start_time": 310.399,
+    "end_time": 312.48,
+    "duration": 2.0810000000000173,
+    "timecode": "00:05:10,399 --> 00:05:12,480",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 128,
+    "text": "SK하이닉스는 TSMC 통해야 하니까 이게 어려운데",
+    "start_time": 313.279,
+    "end_time": 316.54,
+    "duration": 3.261000000000024,
+    "timecode": "00:05:13,278 --> 00:05:16,540",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 129,
+    "text": "삼성은 다 자기가 하니까 가능한 거예요",
+    "start_time": 316.54,
+    "end_time": 318.819,
+    "duration": 2.2789999999999964,
+    "timecode": "00:05:16,540 --> 00:05:18,819",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 130,
+    "text": "자 그러면 앞으로 어떻게 될까요?",
+    "start_time": 318.97,
+    "end_time": 320.66,
+    "duration": 1.6899999999999977,
+    "timecode": "00:05:18,970 --> 00:05:20,660",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 131,
+    "text": "솔직히 말씀드리면요",
+    "start_time": 321.139,
+    "end_time": 322.319,
+    "duration": 1.1800000000000068,
+    "timecode": "00:05:21,139 --> 00:05:22,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 132,
+    "text": "아직 모릅니다",
+    "start_time": 322.319,
+    "end_time": 323.22,
+    "duration": 0.9010000000000105,
+    "timecode": "00:05:22,319 --> 00:05:23,220",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 133,
+    "text": "SK하이닉스가 NVIDIA랑 너무 찰떡이에요",
+    "start_time": 323.22,
+    "end_time": 325.879,
+    "duration": 2.658999999999992,
+    "timecode": "00:05:23,220 --> 00:05:25,879",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 134,
+    "text": "검증된 기술로 안정적으로 공급하고 있거든요",
+    "start_time": 326.43,
+    "end_time": 328.639,
+    "duration": 2.209000000000003,
+    "timecode": "00:05:26,430 --> 00:05:28,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 135,
+    "text": "근데 삼성도 만만치 않아요",
+    "start_time": 328.829,
+    "end_time": 330.319,
+    "duration": 1.490000000000009,
+    "timecode": "00:05:28,829 --> 00:05:30,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 136,
+    "text": "수직 계열화무기가",
+    "start_time": 330.75,
+    "end_time": 331.92,
+    "duration": 1.170000000000016,
+    "timecode": "00:05:30,750 --> 00:05:31,920",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 137,
+    "text": "장기전에서는 엄청난 강점이거든요",
+    "start_time": 331.92,
+    "end_time": 334.279,
+    "duration": 2.3589999999999804,
+    "timecode": "00:05:31,920 --> 00:05:34,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 138,
+    "text": "그리고 리스크도 있어요",
+    "start_time": 334.279,
+    "end_time": 335.6,
+    "duration": 1.3210000000000264,
+    "timecode": "00:05:34,278 --> 00:05:35,600",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 139,
+    "text": "미중 반도체 전쟁이요",
+    "start_time": 335.87,
+    "end_time": 337.279,
+    "duration": 1.4089999999999918,
+    "timecode": "00:05:35,870 --> 00:05:37,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 140,
+    "text": "중국이 자체 HBM 개발에 엄청 투자하고 있어요",
+    "start_time": 337.279,
+    "end_time": 341.15999999999997,
+    "duration": 3.880999999999972,
+    "timecode": "00:05:37,278 --> 00:05:41,159",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 141,
+    "text": "창신메모리, 푸젠진화 이런 회사들이요",
+    "start_time": 341.15999999999997,
+    "end_time": 343.839,
+    "duration": 2.6790000000000305,
+    "timecode": "00:05:41,159 --> 00:05:43,838",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 142,
+    "text": "아직은 기술 격차가 크지만",
+    "start_time": 343.839,
+    "end_time": 345.68,
+    "duration": 1.8410000000000082,
+    "timecode": "00:05:43,838 --> 00:05:45,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 143,
+    "text": "5년 뒤에는 모르는 거예요",
+    "start_time": 345.68,
+    "end_time": 347.339,
+    "duration": 1.6589999999999918,
+    "timecode": "00:05:45,680 --> 00:05:47,338",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 144,
+    "text": "또 하나, 전력 문제에요",
+    "start_time": 347.68,
+    "end_time": 349.819,
+    "duration": 2.13900000000001,
+    "timecode": "00:05:47,680 --> 00:05:49,819",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 145,
+    "text": "NVIDIA 루빈 서버 한 대가 소모하는 전력이",
+    "start_time": 349.819,
+    "end_time": 352.519,
+    "duration": 2.6999999999999886,
+    "timecode": "00:05:49,819 --> 00:05:52,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 146,
+    "text": "수십 킬로와트에요",
+    "start_time": 352.519,
+    "end_time": 353.98,
+    "duration": 1.4610000000000127,
+    "timecode": "00:05:52,519 --> 00:05:53,980",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 147,
+    "text": "데이터센터들이 이거 감당이 안 되기 시작했거든요",
+    "start_time": 354.6,
+    "end_time": 356.879,
+    "duration": 2.2789999999999964,
+    "timecode": "00:05:54,600 --> 00:05:56,879",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 148,
+    "text": "이게 결국 HBM 수요에도 영향을 줄 수 있어요",
+    "start_time": 357.22,
+    "end_time": 360.68,
+    "duration": 3.4599999999999795,
+    "timecode": "00:05:57,220 --> 00:06:00,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 149,
+    "text": "자 오늘 얘기 정리해 볼게요",
+    "start_time": 360.68,
+    "end_time": 362.16,
+    "duration": 1.4800000000000182,
+    "timecode": "00:06:00,680 --> 00:06:02,160",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 150,
+    "text": "HBM사는요 그냥 빠른 메모리가 아니에요",
+    "start_time": 363.18,
+    "end_time": 365.319,
+    "duration": 2.13900000000001,
+    "timecode": "00:06:03,180 --> 00:06:05,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 151,
+    "text": "AI 시대의 핵심 인프라에요",
+    "start_time": 365.72,
+    "end_time": 367.879,
+    "duration": 2.158999999999992,
+    "timecode": "00:06:05,720 --> 00:06:07,879",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 152,
+    "text": "78조 원짜리 시장을 놓고",
+    "start_time": 367.879,
+    "end_time": 370.18,
+    "duration": 2.3009999999999877,
+    "timecode": "00:06:07,879 --> 00:06:10,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 153,
+    "text": "삼성이랑 SK하이닉스가",
+    "start_time": 370.18,
+    "end_time": 372.24,
+    "duration": 2.0600000000000023,
+    "timecode": "00:06:10,180 --> 00:06:12,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 154,
+    "text": "총력전을 벌이고 있는 거고요",
+    "start_time": 372.24,
+    "end_time": 374.12,
+    "duration": 1.8799999999999955,
+    "timecode": "00:06:12,240 --> 00:06:14,120",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 155,
+    "text": "SK하이닉스는 NVIDIA TSMC 동맹으로",
+    "start_time": 374.12,
+    "end_time": 377.62,
+    "duration": 3.5,
+    "timecode": "00:06:14,120 --> 00:06:17,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 156,
+    "text": "현재 1위를 지키고 있어요",
+    "start_time": 377.62,
+    "end_time": 379.379,
+    "duration": 1.7590000000000146,
+    "timecode": "00:06:17,620 --> 00:06:19,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 157,
+    "text": "삼성은 수직 계열화랑",
+    "start_time": 379.379,
+    "end_time": 381.16,
+    "duration": 1.781000000000006,
+    "timecode": "00:06:19,379 --> 00:06:21,160",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 158,
+    "text": "커스텀 HBM으로 방역 중이고요",
+    "start_time": 381.16,
+    "end_time": 383.3,
+    "duration": 2.1399999999999864,
+    "timecode": "00:06:21,160 --> 00:06:23,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 159,
+    "text": "결국 이 싸움은요",
+    "start_time": 383.3,
+    "end_time": 384.879,
+    "duration": 1.5790000000000077,
+    "timecode": "00:06:23,300 --> 00:06:24,879",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 160,
+    "text": "누가 더 좋은 기술을 가졌냐의 문제가 아니에요",
+    "start_time": 384.879,
+    "end_time": 387.519,
+    "duration": 2.6399999999999864,
+    "timecode": "00:06:24,879 --> 00:06:27,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 161,
+    "text": "누가 시스템 전체를 장악하느냐의 싸움이에요",
+    "start_time": 387.759,
+    "end_time": 390.56,
+    "duration": 2.8009999999999877,
+    "timecode": "00:06:27,759 --> 00:06:30,560",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 162,
+    "text": "여러분은 어떻게 생각하세요?",
+    "start_time": 390.56,
+    "end_time": 392.12,
+    "duration": 1.5600000000000023,
+    "timecode": "00:06:30,560 --> 00:06:32,120",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 163,
+    "text": "이 전쟁에서 누가 이길 것 같으세요?",
+    "start_time": 392.6,
+    "end_time": 394.3,
+    "duration": 1.6999999999999886,
+    "timecode": "00:06:32,600 --> 00:06:34,300",
+    "is_recovered": false
+  }
+]

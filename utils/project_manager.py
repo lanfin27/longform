@@ -1,5 +1,5 @@
 """
-프로젝트-영상 계층 구조 관리 모듈 v2.2
+프로젝트-영상 계층 구조 관리 모듈 v2.4
 
 ⚠️ 핵심: 2단계 계층 구조
 - 프로젝트(채널): data/projects/{project_name}/
@@ -8,6 +8,15 @@
 ⚠️ 하위 호환성:
 - st.session_state.current_project_path는 영상 경로를 가리킴
 - 기존 코드에서 project_path를 사용하던 것이 그대로 작동
+
+v2.4 업데이트:
+- LAST_SESSION_FILE 경로 수정: 상대 경로 → 절대 경로 (DATA_DIR 기반)
+- 마지막 세션 복원 안정성 개선
+
+v2.3 업데이트:
+- 마지막 작업 채널/영상 자동 저장 및 복원
+- save_last_session() / load_last_session() 함수 추가
+- 앱 시작 시 마지막 세션 자동 복원
 
 v2.2 업데이트:
 - 영상 변경 시 영상별 세션 데이터 자동 초기화
@@ -24,6 +33,8 @@ v2.2 업데이트:
         get_current_video,
         check_video_changed,          # v2.2
         clear_video_session_data,     # v2.2
+        save_last_session,            # v2.3
+        load_last_session,            # v2.3
     )
 
     # 페이지 시작 시
@@ -48,8 +59,86 @@ from typing import Optional, Dict, List, Tuple
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from config.settings import PROJECTS_DIR
+from config.settings import PROJECTS_DIR, DATA_DIR
 from config.constants import PROJECT_STATUS, WORKFLOW_STEPS
+
+
+# ============================================================
+# 마지막 세션 저장/복원 (v2.3)
+# ============================================================
+
+LAST_SESSION_FILE = DATA_DIR / ".last_session.json"
+
+
+def save_last_session(channel: str, video: str) -> bool:
+    """
+    마지막 작업 세션 정보 저장
+
+    Args:
+        channel: 채널명 (예: "경제맥락")
+        video: 영상명 (예: "환율급등")
+
+    Returns:
+        저장 성공 여부
+    """
+    if not channel or not video:
+        return False
+
+    try:
+        LAST_SESSION_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+        session_data = {
+            "last_channel": channel,
+            "last_video": video,
+            "last_updated": datetime.now().isoformat()
+        }
+
+        with open(LAST_SESSION_FILE, 'w', encoding='utf-8') as f:
+            json.dump(session_data, f, ensure_ascii=False, indent=2)
+
+        print(f"[ProjectManager] 💾 마지막 세션 저장: {channel}/{video}")
+        return True
+
+    except Exception as e:
+        print(f"[ProjectManager] ⚠️ 마지막 세션 저장 실패: {e}")
+        return False
+
+
+def load_last_session() -> Tuple[Optional[str], Optional[str]]:
+    """
+    마지막 작업 세션 정보 로드
+
+    Returns:
+        (channel, video) 튜플. 없거나 오류 시 (None, None)
+    """
+    if not LAST_SESSION_FILE.exists():
+        return None, None
+
+    try:
+        with open(LAST_SESSION_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        channel = data.get("last_channel")
+        video = data.get("last_video")
+
+        if channel and video:
+            print(f"[ProjectManager] 📂 마지막 세션 로드: {channel}/{video}")
+            return channel, video
+
+        return None, None
+
+    except Exception as e:
+        print(f"[ProjectManager] ⚠️ 마지막 세션 로드 실패: {e}")
+        return None, None
+
+
+def _validate_project_exists(channel: str, video: str) -> bool:
+    """프로젝트(채널/영상)가 실제로 존재하는지 확인"""
+    if not channel or not video:
+        return False
+
+    video_path = PROJECTS_DIR / channel / "videos" / video
+    return video_path.exists()
 
 
 # ============================================================
@@ -142,7 +231,15 @@ def init_session_state():
     - current_project_path: 현재 작업 경로 (영상 경로) - 하위 호환
     - current_project_id: 하위 호환용
     - current_project_name: 하위 호환용
+
+    v2.3: 마지막 세션 자동 복원 추가
     """
+    # ⭐ v2.3: 마지막 세션 복원 (최초 1회만)
+    _restore_last_session = False
+    if "_last_session_restored" not in st.session_state:
+        st.session_state._last_session_restored = False
+        _restore_last_session = True
+
     if "current_channel" not in st.session_state:
         st.session_state.current_channel = None
     if "current_video" not in st.session_state:
@@ -159,6 +256,26 @@ def init_session_state():
         st.session_state.show_delete_channel_dialog = False
     if "show_delete_video_dialog" not in st.session_state:
         st.session_state.show_delete_video_dialog = False
+
+    # ⭐ v2.3: 마지막 세션 복원 수행
+    if _restore_last_session and not st.session_state._last_session_restored:
+        last_channel, last_video = load_last_session()
+
+        if last_channel and last_video:
+            if _validate_project_exists(last_channel, last_video):
+                st.session_state.current_channel = last_channel
+                st.session_state.current_video = last_video
+                st.session_state.current_project_id = f"{last_channel}/{last_video}"
+
+                video_path = PROJECTS_DIR / last_channel / "videos" / last_video
+                st.session_state.current_project_path = str(video_path)
+                st.session_state.current_project_name = last_video
+
+                print(f"[ProjectManager] ✅ 마지막 세션 복원 완료: {last_channel}/{last_video}")
+            else:
+                print(f"[ProjectManager] ⚠️ 마지막 세션 프로젝트 없음, 복원 스킵: {last_channel}/{last_video}")
+
+        st.session_state._last_session_restored = True
 
 
 # ============================================================
@@ -471,6 +588,7 @@ def set_current_selection(channel_name: str, video_name: str):
 
     ⚠️ 핵심: current_project_path를 영상 경로로 설정하여 하위 호환성 유지
     ⚠️ v2.2: 영상 변경 시 영상별 세션 데이터 자동 초기화
+    ⚠️ v2.3: 마지막 세션 자동 저장 추가
     """
     # 영상 변경 감지
     old_video = st.session_state.get("current_video")
@@ -498,6 +616,10 @@ def set_current_selection(channel_name: str, video_name: str):
     if video_changed:
         st.session_state._video_just_changed = True
 
+    # ⭐ v2.3: 마지막 세션 저장 (변경되었을 때만)
+    if video_changed or not LAST_SESSION_FILE.exists():
+        save_last_session(channel_name, video_name)
+
 
 def _clear_video_specific_session_data():
     """
@@ -515,6 +637,14 @@ def _clear_video_specific_session_data():
         pass
     except Exception as e:
         print(f"[ProjectManager] 씬 캐시 클리어 실패: {e}")
+
+    # v2.3: 갤러리 이미지 캐시 클리어 (영상별 이미지 분리)
+    try:
+        # st.cache_data 캐시 무효화를 위해 플래그 설정
+        st.session_state._gallery_cache_needs_clear = True
+        print("[ProjectManager] 갤러리 캐시 클리어 플래그 설정")
+    except Exception as e:
+        print(f"[ProjectManager] 갤러리 캐시 클리어 플래그 설정 실패: {e}")
 
     # 영상별 데이터 키 목록 (직접 매칭)
     VIDEO_SPECIFIC_KEYS = [

@@ -1,0 +1,94 @@
+[
+  {
+    "name": "이재용 회장",
+    "name_ko": "이재용 회장",
+    "role": "등장인물",
+    "visual_prompt": "visionary Asian businessman, middle-aged, wearing a sharp dark suit, with a thoughtful and focused expression, looking intently into the distance",
+    "description": "",
+    "scenes": [
+      46,
+      47,
+      48
+    ],
+    "appearance_scenes": [
+      46,
+      47,
+      48
+    ]
+  },
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "role": "등장인물",
+    "visual_prompt": "middle-aged Asian man, looking at the digital cockpit, hands on steering wheel, focused expression",
+    "description": "",
+    "scenes": [
+      64,
+      65,
+      66,
+      103,
+      104,
+      105,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      244,
+      245,
+      246
+    ],
+    "appearance_scenes": [
+      64,
+      65,
+      66,
+      103,
+      104,
+      105,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      244,
+      245,
+      246
+    ]
+  },
+  {
+    "name": "비즈니스 임원",
+    "name_ko": "비즈니스 임원",
+    "role": "등장인물",
+    "visual_prompt": "Two confident business executives, one Asian male, one Caucasian male, shaking hands firmly, professional attire, conveying a sense of mutual success and agreement",
+    "description": "",
+    "scenes": [
+      271,
+      272,
+      273
+    ],
+    "appearance_scenes": [
+      271,
+      272,
+      273
+    ]
+  },
+  {
+    "name": "핵심 인력들",
+    "name_ko": "핵심 인력들",
+    "role": "등장인물",
+    "visual_prompt": "blurred silhouettes of individuals, professional attire, walking away through an open door or exit",
+    "description": "",
+    "scenes": [
+      286,
+      287,
+      288
+    ],
+    "appearance_scenes": [
+      286,
+      287,
+      288
+    ]
+  }
+]

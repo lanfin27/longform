@@ -17,6 +17,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from config.settings import ANTHROPIC_API_KEY, GOOGLE_API_KEY, GEMINI_API_KEY
 from core.prompt.prompt_template_manager import get_template_manager
 
+# 씬 검증 유틸리티
+try:
+    from utils.scene_validator import validate_scenes_before_save
+    SCENE_VALIDATOR_AVAILABLE = True
+except ImportError:
+    SCENE_VALIDATOR_AVAILABLE = False
+    def validate_scenes_before_save(scenes, verbose=True):
+        return scenes
+
 # 디버그 모드 (True로 설정하면 상세 로그 출력)
 DEBUG = True
 
@@ -312,7 +321,7 @@ class SceneAnalyzer:
         """
         Args:
             provider: AI 제공자 ("anthropic", "google", "gemini", "openai")
-            model_name: 정확한 모델 ID (예: "gemini-2.0-flash-exp")
+            model_name: 정확한 모델 ID (예: "gemini-2.5-flash")
             max_output_tokens: 최대 출력 토큰 수 (None이면 모델 기본값)
         """
         debug_log(f"초기화 시작 (provider={provider}, model={model_name}, max_tokens={max_output_tokens})")
@@ -376,8 +385,8 @@ class SceneAnalyzer:
             else:
                 # 우선순위대로 모델 시도 (API 버전 변경에 대응)
                 model_candidates = [
-                    "gemini-2.0-flash-exp",     # 최신 2.0 (무료, 빠름, 64K 출력)
-                    "gemini-2.0-flash",         # 2.0 안정
+                    "gemini-2.5-flash",         # 최신 2.5 (무료, 빠름)
+                    "gemini-2.5-flash-lite",    # 2.5 초고속
                     "gemini-1.5-flash",         # 1.5 기본
                     "gemini-pro",               # Pro 기본
                 ]
@@ -1273,6 +1282,10 @@ JSON 형식으로만 응답해주세요. 다른 텍스트는 포함하지 마세
         scene_id_offset = 0
 
         for i, chunk in enumerate(chunks):
+            if i > 0:
+                import time as _time
+                _time.sleep(3.0)  # 청크 간 최소 3초 대기 (Rate limit 방지)
+                debug_log(f"  청크 {i+1}/{len(chunks)} 처리 시작 (3초 대기 완료)")
             debug_log(f"  🔄 청크 {i+1}/{len(chunks)} 분석 중... ({len(chunk)}자)")
 
             # 청크 분석
@@ -1810,6 +1823,8 @@ JSON 형식으로만 응답해주세요."""
         debug_log(f"  📌 최대 출력 토큰: {max_tokens:,}")
         debug_log(f"  프롬프트 길이: {len(prompt)} 문자")
 
+        max_retries = 2
+
         if not self.gemini_available or self.gemini_model is None:
             raise RuntimeError("""
 Gemini를 사용할 수 없습니다.
@@ -1819,92 +1834,107 @@ Gemini를 사용할 수 없습니다.
 2. GOOGLE_API_KEY 또는 GEMINI_API_KEY 환경변수 설정
 """)
 
-        try:
-            # ⭐ 선택된 모델의 max_output_tokens 사용
-            response = self.gemini_model.generate_content(
-                prompt,
-                generation_config={
-                    "temperature": 0.2,
-                    "max_output_tokens": max_tokens,  # ⭐ 모델별 설정 적용
-                    "top_p": 0.95,
+        for attempt in range(max_retries + 1):
+            try:
+                # ⭐ 선택된 모델의 max_output_tokens 사용
+                response = self.gemini_model.generate_content(
+                    prompt,
+                    generation_config={
+                        "temperature": 0.2,
+                        "max_output_tokens": max_tokens,  # ⭐ 모델별 설정 적용
+                        "top_p": 0.95,
+                    }
+                )
+
+                # 응답 확인 - 여러 방법으로 텍스트 추출 시도
+                if response is None:
+                    debug_log("❌ Gemini 응답 None")
+                    return "", 0
+
+                # ⭐ 응답 종료 이유 확인 (숫자로 반환)
+                finish_reason = 1  # 기본값: STOP (정상)
+                finish_reason_names = {
+                    0: "FINISH_REASON_UNSPECIFIED",
+                    1: "STOP (정상)",
+                    2: "MAX_TOKENS (잘림!)",
+                    3: "SAFETY",
+                    4: "RECITATION",
+                    5: "OTHER"
                 }
-            )
 
-            # 응답 확인 - 여러 방법으로 텍스트 추출 시도
-            if response is None:
-                debug_log("❌ Gemini 응답 None")
-                return "", 0
+                if hasattr(response, 'candidates') and response.candidates:
+                    candidate = response.candidates[0]
+                    if hasattr(candidate, 'finish_reason'):
+                        raw_reason = candidate.finish_reason
+                        # Enum이면 값 추출, 아니면 그대로
+                        if hasattr(raw_reason, 'value'):
+                            finish_reason = raw_reason.value
+                        elif isinstance(raw_reason, int):
+                            finish_reason = raw_reason
+                        else:
+                            # 문자열인 경우 파싱
+                            reason_str = str(raw_reason)
+                            if "MAX_TOKENS" in reason_str or "2" in reason_str:
+                                finish_reason = 2
+                            elif "STOP" in reason_str or "1" in reason_str:
+                                finish_reason = 1
 
-            # ⭐ 응답 종료 이유 확인 (숫자로 반환)
-            finish_reason = 1  # 기본값: STOP (정상)
-            finish_reason_names = {
-                0: "FINISH_REASON_UNSPECIFIED",
-                1: "STOP (정상)",
-                2: "MAX_TOKENS (잘림!)",
-                3: "SAFETY",
-                4: "RECITATION",
-                5: "OTHER"
-            }
+                        reason_name = finish_reason_names.get(finish_reason, f"UNKNOWN({finish_reason})")
+                        debug_log(f"  종료 이유: {finish_reason} ({reason_name})")
 
-            if hasattr(response, 'candidates') and response.candidates:
-                candidate = response.candidates[0]
-                if hasattr(candidate, 'finish_reason'):
-                    raw_reason = candidate.finish_reason
-                    # Enum이면 값 추출, 아니면 그대로
-                    if hasattr(raw_reason, 'value'):
-                        finish_reason = raw_reason.value
-                    elif isinstance(raw_reason, int):
-                        finish_reason = raw_reason
-                    else:
-                        # 문자열인 경우 파싱
-                        reason_str = str(raw_reason)
-                        if "MAX_TOKENS" in reason_str or "2" in reason_str:
-                            finish_reason = 2
-                        elif "STOP" in reason_str or "1" in reason_str:
-                            finish_reason = 1
+                        if finish_reason == 2:
+                            debug_log("  ⚠️ 출력 토큰 제한으로 응답이 잘렸습니다!")
 
-                    reason_name = finish_reason_names.get(finish_reason, f"UNKNOWN({finish_reason})")
-                    debug_log(f"  종료 이유: {finish_reason} ({reason_name})")
+                # 방법 1: response.text 직접 접근
+                if hasattr(response, 'text') and response.text:
+                    result = response.text
+                    debug_log(f"  응답 길이: {len(result)} 문자")
+                    return result, finish_reason
 
-                    if finish_reason == 2:
-                        debug_log("  ⚠️ 출력 토큰 제한으로 응답이 잘렸습니다!")
+                # 방법 2: candidates에서 추출
+                if hasattr(response, 'candidates') and response.candidates:
+                    candidate = response.candidates[0]
+                    if hasattr(candidate, 'content') and candidate.content:
+                        parts = candidate.content.parts
+                        if parts:
+                            result = parts[0].text
+                            debug_log(f"  응답 길이 (candidates): {len(result)} 문자")
+                            return result, finish_reason
 
-            # 방법 1: response.text 직접 접근
-            if hasattr(response, 'text') and response.text:
-                result = response.text
-                debug_log(f"  응답 길이: {len(result)} 문자")
-                return result, finish_reason
+                # 방법 3: 프롬프트 피드백 확인 (차단된 경우)
+                if hasattr(response, 'prompt_feedback'):
+                    feedback = response.prompt_feedback
+                    debug_log(f"⚠️ 프롬프트 피드백: {feedback}")
+                    if hasattr(feedback, 'block_reason') and feedback.block_reason:
+                        debug_log(f"❌ 차단 이유: {feedback.block_reason}")
 
-            # 방법 2: candidates에서 추출
-            if hasattr(response, 'candidates') and response.candidates:
-                candidate = response.candidates[0]
-                if hasattr(candidate, 'content') and candidate.content:
-                    parts = candidate.content.parts
-                    if parts:
-                        result = parts[0].text
-                        debug_log(f"  응답 길이 (candidates): {len(result)} 문자")
-                        return result, finish_reason
+                debug_log("❌ Gemini 빈 응답 받음")
+                return "", finish_reason
 
-            # 방법 3: 프롬프트 피드백 확인 (차단된 경우)
-            if hasattr(response, 'prompt_feedback'):
-                feedback = response.prompt_feedback
-                debug_log(f"⚠️ 프롬프트 피드백: {feedback}")
-                if hasattr(feedback, 'block_reason') and feedback.block_reason:
-                    debug_log(f"❌ 차단 이유: {feedback.block_reason}")
+            except Exception as e:
+                error_msg = str(e)
+                debug_log(f"Gemini API 호출 오류: {error_msg}")
 
-            debug_log("❌ Gemini 빈 응답 받음")
-            return "", finish_reason
+                # Rate limit 감지 및 재시도
+                error_str = str(e).lower()
+                is_rate_limit = any(k in error_str for k in [
+                    '429', 'rate_limit', 'rate limit', 'resource exhausted',
+                    'quota', 'too many requests'
+                ])
 
-        except Exception as e:
-            error_msg = str(e)
-            debug_log(f"Gemini API 호출 오류: {error_msg}")
+                if is_rate_limit and attempt < max_retries:
+                    wait = 30 * (attempt + 1)
+                    debug_log(f"  ⏱️ Rate limit! {wait}초 대기 후 재시도 ({attempt+1}/{max_retries+1})...")
+                    import time as _time
+                    _time.sleep(wait)
+                    continue
 
-            # 404 오류 시 더 자세한 안내
-            if "404" in error_msg:
-                debug_log(f"⚠️ 모델 '{model_name}'을(를) 찾을 수 없습니다.")
-                debug_log("   앱을 재시작하여 다른 모델을 시도하세요.")
+                # 404 오류 시 더 자세한 안내
+                if "404" in error_msg:
+                    debug_log(f"⚠️ 모델 '{model_name}'을(를) 찾을 수 없습니다.")
+                    debug_log("   앱을 재시작하여 다른 모델을 시도하세요.")
 
-            raise
+                raise
 
     def _continue_gemini_generation(self, partial_response: str, original_script: str) -> str:
         """
@@ -2347,6 +2377,13 @@ def analyze_and_save(script_path: str, output_dir: str, language: str = "ko") ->
     # 분석
     analyzer = SceneAnalyzer()
     result = analyzer.analyze_script(script, language)
+
+    # 🔴 저장 전 검증 및 자동 수정 (background_prompt_en 불일치 해결)
+    scenes = result.get("scenes", [])
+    if scenes and SCENE_VALIDATOR_AVAILABLE:
+        debug_log("씬 데이터 검증 시작...")
+        scenes = validate_scenes_before_save(scenes, verbose=DEBUG)
+        result["scenes"] = scenes
 
     # 저장
     scenes_path = output_dir / "scenes.json"

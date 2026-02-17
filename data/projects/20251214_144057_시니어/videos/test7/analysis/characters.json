@@ -1,0 +1,16 @@
+[
+  {
+    "name": "회의 참석자들",
+    "name_ko": "회의 참석자들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse people displaying confused and perplexed expressions, showcasing a range of puzzled faces, conveying a sense of uncertainty and bewilderment",
+    "description": ""
+  },
+  {
+    "name": "이재용",
+    "name_ko": "이재용",
+    "role": "등장인물",
+    "visual_prompt": "Lee Jae-yong presenting a future vision with a determined expression, confident and forward-thinking, showcasing leadership and innovation",
+    "description": ""
+  }
+]

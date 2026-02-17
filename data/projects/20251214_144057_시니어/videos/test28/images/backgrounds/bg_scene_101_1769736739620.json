@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-30T10:32:19.620762",
+  "image_file": "bg_scene_101_1769736739620.png",
+  "scene_id": 101,
+  "prompts": {
+    "original": "Futuristic car interior with Harman logo subtly integrated into the dashboard, a close-up of a driver monitoring system camera pointed towards the driver, digital overlays on the driver's eyes and face conceptually indicating detection of drowsiness, concentration levels, and stress, showcasing advanced technology understanding the driver's state, warm interior lighting, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Futuristic car interior with Harman logo subtly integrated into the dashboard, a close-up of a driver monitoring system camera pointed towards the driver, digital overlays on the driver's eyes and face conceptually indicating detection of drowsiness, concentration levels, and stress, showcasing advanced technology understanding the driver's state, warm interior lighting, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 105799088
+  }
+}

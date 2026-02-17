@@ -25,13 +25,17 @@ def get_latest_scene_image(scene: Dict, project_path: str) -> Optional[str]:
     """
     씬의 최신 이미지 경로 반환 (카드뷰와 동기화)
 
-    검색 우선순위:
-    1. 합성 이미지 (composite_image_path, nano_composite_image, composite_path)
-    2. 실사 합성 이미지 (composite_realshot)
-    3. 실사 이미지 (realshot)
-    4. 씬 이미지 (scenes/scene_XXX.png)
-    5. 배경 이미지 (backgrounds)
-    6. 패턴 매칭
+    검색 우선순위 (v2.2: 인포그래픽 이미지 추가):
+    0. 인포그래픽 이미지 (infographic_image_path - Step5에서 설정, 최우선)
+    1. 실사 대체 이미지 (real_image_path - Step3에서 설정)
+    2. 합성 이미지 (composited_image_path - Step3에서 설정)
+    3. 기존 합성 이미지 (composite_image_path, nano_composite_image, composite_path)
+    4. 실사 합성 이미지 (composite_realshot)
+    5. 실사 이미지 (realshot)
+    6. 비디오 배경 썸네일 (video_thumbnails)
+    7. 인포그래픽 디렉토리 이미지 (infographics/images/)
+    8. 씬 이미지 (scenes/scene_XXX.png)
+    9. 배경 이미지 (backgrounds)
 
     Args:
         scene: 씬 딕셔너리
@@ -43,8 +47,12 @@ def get_latest_scene_image(scene: Dict, project_path: str) -> Optional[str]:
     scene_id = scene.get('scene_id') or scene.get('scene_number') or scene.get('id', 0)
     scene_num_str = f"{scene_id:03d}"
 
-    # 1. 씬 데이터에서 직접 경로 확인
+    # 1. 씬 데이터에서 직접 경로 확인 (v2.3: 타임라인 대체 최우선)
     direct_paths = [
+        scene.get('replaced_image_path'),      # v2.3: 타임라인 드래그앤드롭 대체 (최우선)
+        scene.get('infographic_image_path'),   # v2.2: Step5 인포그래픽 이미지
+        scene.get('real_image_path'),          # v2.0: Step3 실사 대체 이미지
+        scene.get('composited_image_path'),    # v2.0: Step3 합성 이미지
         scene.get('composite_image_path'),
         scene.get('nano_composite_image'),
         scene.get('composite_path'),
@@ -60,13 +68,25 @@ def get_latest_scene_image(scene: Dict, project_path: str) -> Optional[str]:
     project = Path(project_path) if isinstance(project_path, str) else project_path
 
     search_patterns = [
-        # 합성 이미지 (최우선)
+        # v2.3: 타임라인 대체 이미지 (최우선)
+        f"images/replaced/scene_{scene_num_str}_replaced.*",
+        # v2.2: 인포그래픽 이미지
+        f"infographics/images/infographic_scene_{scene_num_str}*.png",
+        # v2.0: 실사 대체 이미지 (Step3에서 생성, 타임스탬프 포함)
+        f"images/composited/composited_{scene_num_str}_*.png",
+        f"images/composited/composited_{scene_num_str}_*.jpg",
+        # 합성 이미지
         f"images/composite_realshot/scene_{scene_num_str}_composite.png",
+        f"images/nano_composite/composite_scene_{scene_num_str}_*.png",
         f"images/nano_composite/composite_scene_{scene_num_str}.png",
         f"images/composites/composite_{scene_num_str}.png",
         # 실사 이미지
         f"images/realshot/scene_{scene_num_str}_realshot.*",
         f"images/realshot/scene_{scene_num_str}.*",
+        # 비디오 배경 썸네일 (v2.1)
+        f"images/video_thumbnails/scene_{scene_num_str}_video_thumb.*",
+        # 한글 텍스트 이미지 (Step 1에서 생성)
+        f"images/korean_text/korean_text_scene_{scene_num_str}_*.png",
         # 씬 이미지
         f"images/scenes/scene_{scene_num_str}.png",
         f"images/scenes/scene_{scene_num_str}.*",
@@ -480,6 +500,487 @@ def extract_video_thumbnail(video_source: Union[str, 'UploadedFile'], scene_num:
                 pass
 
 
+def get_video_info_from_file(video_source: Union[str, 'UploadedFile']) -> Dict:
+    """
+    비디오 파일 정보 가져오기 (FFprobe 사용)
+
+    character_compositor.py의 get_video_info 패턴을 재사용합니다.
+
+    Args:
+        video_source: 비디오 파일 경로 또는 UploadedFile
+
+    Returns:
+        {"width": int, "height": int, "duration": float, "fps": float, "temp_path": str or None}
+    """
+    import subprocess
+    import json as json_module
+
+    temp_path = None
+
+    try:
+        # UploadedFile인 경우 임시 파일로 저장
+        if hasattr(video_source, 'read'):
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                tmp.write(video_source.read())
+                temp_path = tmp.name
+                video_source.seek(0)  # 파일 포인터 리셋
+            video_path = temp_path
+        else:
+            video_path = str(video_source)
+
+        cmd = [
+            "ffprobe",
+            "-v", "quiet",
+            "-print_format", "json",
+            "-show_format",
+            "-show_streams",
+            video_path
+        ]
+
+        creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            errors='ignore',
+            timeout=30,
+            creationflags=creationflags
+        )
+
+        if result.returncode != 0:
+            print(f"[TimelineComposite] ffprobe 실패: {result.stderr[:200]}")
+            return {"width": 1920, "height": 1080, "duration": 0, "fps": 30, "temp_path": temp_path}
+
+        data = json_module.loads(result.stdout)
+
+        # 비디오 스트림 찾기
+        video_stream = None
+        for stream in data.get("streams", []):
+            if stream.get("codec_type") == "video":
+                video_stream = stream
+                break
+
+        if not video_stream:
+            return {"width": 1920, "height": 1080, "duration": 0, "fps": 30, "temp_path": temp_path}
+
+        # FPS 파싱
+        fps_str = video_stream.get("r_frame_rate", "30/1")
+        try:
+            if "/" in fps_str:
+                num, den = map(int, fps_str.split("/"))
+                fps = num / den if den > 0 else 30
+            else:
+                fps = float(fps_str)
+        except (ValueError, ZeroDivisionError):
+            fps = 30
+
+        return {
+            "width": int(video_stream.get("width", 1920)),
+            "height": int(video_stream.get("height", 1080)),
+            "duration": float(data.get("format", {}).get("duration", 0)),
+            "fps": fps,
+            "temp_path": temp_path
+        }
+
+    except Exception as e:
+        print(f"[TimelineComposite] 비디오 정보 추출 오류: {e}")
+        return {"width": 1920, "height": 1080, "duration": 0, "fps": 30, "temp_path": temp_path}
+
+
+def prepare_background_video(
+    video_path: str,
+    target_duration: float,
+    output_path: str,
+    loop: bool = False
+) -> Optional[str]:
+    """
+    배경 비디오를 씬 duration에 맞게 트림/루프 처리
+
+    Args:
+        video_path: 원본 비디오 경로
+        target_duration: 목표 길이 (초)
+        output_path: 출력 경로
+        loop: True면 비디오가 짧을 때 루프
+
+    Returns:
+        출력 파일 경로 또는 None
+    """
+    import subprocess
+
+    creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+
+    # 원본 비디오 길이 확인
+    video_info = get_video_info_from_file(video_path)
+    video_duration = video_info.get("duration", 0)
+
+    # 임시 파일 정리
+    if video_info.get("temp_path"):
+        try:
+            os.unlink(video_info["temp_path"])
+        except OSError:
+            pass
+
+    try:
+        if video_duration >= target_duration:
+            # 비디오가 씬보다 길면 → 트림 (스트림 복사로 빠르게)
+            print(f"[TimelineComposite] 비디오 트림: {video_duration:.2f}초 → {target_duration:.2f}초")
+            cmd = [
+                "ffmpeg", "-y",
+                "-i", video_path,
+                "-t", str(target_duration),
+                "-c", "copy",
+                "-an",  # 오디오 제거 (배경이므로)
+                output_path
+            ]
+        elif loop:
+            # 비디오가 짧고 루프 요청 → 루프 후 트림
+            print(f"[TimelineComposite] 비디오 루프: {video_duration:.2f}초 → {target_duration:.2f}초")
+            cmd = [
+                "ffmpeg", "-y",
+                "-stream_loop", "-1",
+                "-i", video_path,
+                "-t", str(target_duration),
+                "-c:v", "libx264",
+                "-preset", "fast",
+                "-crf", "18",
+                "-pix_fmt", "yuv420p",
+                "-an",
+                output_path
+            ]
+        else:
+            # 비디오가 짧고 루프 안 함 → 그대로 복사
+            print(f"[TimelineComposite] 비디오 복사: {video_duration:.2f}초 (씬 {target_duration:.2f}초)")
+            cmd = [
+                "ffmpeg", "-y",
+                "-i", video_path,
+                "-c", "copy",
+                "-an",
+                output_path
+            ]
+
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            errors='ignore',
+            timeout=300,
+            creationflags=creationflags
+        )
+
+        if result.returncode == 0 and os.path.exists(output_path):
+            print(f"[TimelineComposite] 배경 비디오 준비 완료: {output_path}")
+            return output_path
+        else:
+            print(f"[TimelineComposite] 배경 비디오 준비 실패: {result.stderr[:300]}")
+            return None
+
+    except subprocess.TimeoutExpired:
+        print(f"[TimelineComposite] 배경 비디오 준비 타임아웃")
+        return None
+    except Exception as e:
+        print(f"[TimelineComposite] 배경 비디오 준비 오류: {e}")
+        return None
+
+
+def composite_realshot_on_video(
+    realshot_source: Union[str, bytes, 'UploadedFile'],
+    bg_video_path: str,
+    scene_num: int,
+    project_path: str,
+    settings: Dict
+) -> Optional[str]:
+    """
+    실사이미지를 배경 비디오 위에 합성 → MP4 출력
+
+    Args:
+        realshot_source: 실사 이미지 (파일 경로, 바이트, 또는 UploadedFile)
+        bg_video_path: 배경 비디오 경로 (이미 트림/루프 처리됨)
+        scene_num: 씬 번호
+        project_path: 프로젝트 경로
+        settings: 합성 설정 dict
+
+    Returns:
+        저장된 MP4 경로 또는 None
+    """
+    import subprocess
+    import time as time_module
+    import io as io_module
+
+    OUTPUT_WIDTH = settings.get('output_width', 1920)
+    OUTPUT_HEIGHT = settings.get('output_height', 1080)
+    creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+
+    temp_realshot_path = None
+
+    try:
+        # 1. 실사 이미지 로드
+        if isinstance(realshot_source, str):
+            realshot_img = Image.open(realshot_source).convert('RGBA')
+        elif hasattr(realshot_source, 'read'):
+            realshot_img = Image.open(realshot_source).convert('RGBA')
+            realshot_source.seek(0)
+        else:
+            realshot_img = Image.open(io_module.BytesIO(realshot_source)).convert('RGBA')
+
+        # 2. 리사이즈
+        width_pct = settings.get('realshot_width_pct', 60)
+        height_pct = settings.get('realshot_height_pct', 60)
+        target_w = int(OUTPUT_WIDTH * width_pct / 100)
+        target_h = int(OUTPUT_HEIGHT * height_pct / 100)
+        realshot_img = resize_with_aspect(realshot_img, target_w, target_h)
+
+        # 3. 임시 PNG 파일로 저장 (FFmpeg 입력용)
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp:
+            # RGBA → RGB 변환 (투명 영역은 흰색 배경 위에 합성)
+            if realshot_img.mode == 'RGBA':
+                bg = Image.new('RGBA', realshot_img.size, (0, 0, 0, 0))
+                bg.paste(realshot_img, (0, 0), realshot_img)
+                bg.save(tmp.name, 'PNG')
+            else:
+                realshot_img.save(tmp.name, 'PNG')
+            temp_realshot_path = tmp.name
+
+        # 4. 위치 계산
+        position = settings.get('position', 'center')
+        paste_x, paste_y = calculate_paste_position(
+            canvas_size=(OUTPUT_WIDTH, OUTPUT_HEIGHT),
+            image_size=realshot_img.size,
+            position=position
+        )
+
+        # 5. 배경 투명도 (밝기 조절)
+        bg_opacity = settings.get('bg_opacity', 0.3)
+
+        # FFmpeg filter_complex 구성
+        # 배경 비디오 밝기 조절 + 실사이미지 오버레이
+        # eq 필터: brightness 범위 -1.0 ~ 1.0 (0 = 원본)
+        brightness_adj = bg_opacity - 1.0  # opacity 0.3 → brightness -0.7
+
+        overlay_w = realshot_img.size[0]
+        overlay_h = realshot_img.size[1]
+
+        filter_complex = (
+            f"[0:v]scale={OUTPUT_WIDTH}:{OUTPUT_HEIGHT},"
+            f"eq=brightness={brightness_adj:.2f}[bg];"
+            f"[1:v]scale={overlay_w}:{overlay_h}[fg];"
+            f"[bg][fg]overlay={paste_x}:{paste_y}:format=auto[out]"
+        )
+
+        # 6. 출력 경로
+        project = Path(project_path) if isinstance(project_path, str) else project_path
+        output_dir = project / 'images' / 'composite_realshot'
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        timestamp = int(time_module.time() * 1000)
+        output_path = str(output_dir / f'scene_{scene_num:03d}_bg_video_{timestamp}.mp4')
+
+        # 7. FFmpeg 실행
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", bg_video_path,
+            "-i", temp_realshot_path,
+            "-filter_complex", filter_complex,
+            "-map", "[out]",
+            "-c:v", "libx264",
+            "-preset", "fast",
+            "-crf", "18",
+            "-pix_fmt", "yuv420p",
+            "-an",
+            output_path
+        ]
+
+        print(f"[TimelineComposite] 씬 {scene_num}: 비디오 배경 합성 시작")
+
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            errors='ignore',
+            timeout=600,
+            creationflags=creationflags
+        )
+
+        if result.returncode == 0 and os.path.exists(output_path):
+            print(f"[TimelineComposite] 씬 {scene_num}: 비디오 배경 합성 완료")
+            return output_path
+        else:
+            print(f"[TimelineComposite] 씬 {scene_num}: FFmpeg 오류 - {result.stderr[:300]}")
+            return None
+
+    except subprocess.TimeoutExpired:
+        print(f"[TimelineComposite] 씬 {scene_num}: 비디오 합성 타임아웃")
+        return None
+    except Exception as e:
+        print(f"[TimelineComposite] 씬 {scene_num}: 비디오 합성 오류 - {e}")
+        return None
+    finally:
+        # 임시 파일 정리
+        if temp_realshot_path and os.path.exists(temp_realshot_path):
+            try:
+                os.unlink(temp_realshot_path)
+            except OSError:
+                pass
+
+
+def composite_infographic_on_video(
+    infographic_png_path: str,
+    bg_video_source: Union[str, 'UploadedFile'],
+    scene_num: int,
+    project_path: str,
+    settings: Dict
+) -> Optional[str]:
+    """
+    인포그래픽 PNG를 배경 비디오 위에 합성하여 MP4 출력
+
+    Args:
+        infographic_png_path: 캡쳐된 인포그래픽 PNG 경로
+        bg_video_source: 배경 비디오 경로 또는 UploadedFile
+        scene_num: 씬 번호
+        project_path: 프로젝트 경로
+        settings: 합성 설정 dict
+            - output_width/height: 출력 해상도
+            - width_pct/height_pct: 인포그래픽 크기 비율
+            - position: 위치
+            - bg_opacity_pct: 배경 투명도 0-100
+            - target_duration: 씬 duration (트림/루프용)
+            - loop_video: 짧은 비디오 루프 여부
+
+    Returns:
+        저장된 MP4 경로 또는 None
+    """
+    import subprocess
+    import time as time_module
+
+    OUTPUT_WIDTH = settings.get('output_width', 1920)
+    OUTPUT_HEIGHT = settings.get('output_height', 1080)
+    creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+
+    temp_video_path = None
+    temp_overlay_path = None
+    prepared_video_path = None
+
+    try:
+        # 1. UploadedFile → 임시 파일 저장
+        if hasattr(bg_video_source, 'read'):
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                bg_video_source.seek(0)
+                tmp.write(bg_video_source.read())
+                temp_video_path = tmp.name
+            bg_video_source.seek(0)
+            video_path = temp_video_path
+        else:
+            video_path = str(bg_video_source)
+
+        # 2. 배경 비디오 트림/루프 (씬 duration에 맞게)
+        target_duration = settings.get('target_duration')
+        if target_duration and target_duration > 0:
+            project = Path(project_path) if isinstance(project_path, str) else project_path
+            prep_dir = project / 'infographics' / 'temp'
+            prep_dir.mkdir(parents=True, exist_ok=True)
+            prep_output = str(prep_dir / f'bg_prep_scene_{scene_num:03d}.mp4')
+            prepared = prepare_background_video(
+                video_path, target_duration, prep_output,
+                loop=settings.get('loop_video', True)
+            )
+            if prepared:
+                video_path = prepared
+                prepared_video_path = prepared
+
+        # 3. 인포그래픽 PNG 로드 및 크기 조정
+        infographic_img = Image.open(infographic_png_path).convert('RGBA')
+
+        width_pct = settings.get('width_pct', 60)
+        height_pct = settings.get('height_pct', 60)
+        target_w = int(OUTPUT_WIDTH * width_pct / 100)
+        target_h = int(OUTPUT_HEIGHT * height_pct / 100)
+        infographic_img = resize_with_aspect(infographic_img, target_w, target_h)
+
+        # 4. 임시 PNG 저장 (FFmpeg 입력용)
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp:
+            infographic_img.save(tmp.name, 'PNG')
+            temp_overlay_path = tmp.name
+
+        # 5. 위치 계산
+        position = settings.get('position', 'center')
+        paste_x, paste_y = calculate_paste_position(
+            canvas_size=(OUTPUT_WIDTH, OUTPUT_HEIGHT),
+            image_size=infographic_img.size,
+            position=position
+        )
+
+        # 6. FFmpeg filter_complex 구성
+        bg_opacity_pct = settings.get('bg_opacity_pct', 30)
+        brightness_adj = (bg_opacity_pct / 100.0) - 1.0
+
+        overlay_w = infographic_img.size[0]
+        overlay_h = infographic_img.size[1]
+
+        filter_complex = (
+            f"[0:v]scale={OUTPUT_WIDTH}:{OUTPUT_HEIGHT},"
+            f"eq=brightness={brightness_adj:.2f}[bg];"
+            f"[1:v]scale={overlay_w}:{overlay_h}[fg];"
+            f"[bg][fg]overlay={paste_x}:{paste_y}:format=auto[out]"
+        )
+
+        # 7. 출력 경로
+        project = Path(project_path) if isinstance(project_path, str) else project_path
+        output_dir = project / 'infographics' / 'videos'
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        output_path = str(output_dir / f'infographic_scene_{scene_num:03d}.mp4')
+
+        # 8. FFmpeg 실행
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", video_path,
+            "-i", temp_overlay_path,
+            "-filter_complex", filter_complex,
+            "-map", "[out]",
+            "-c:v", "libx264",
+            "-preset", "fast",
+            "-crf", "18",
+            "-pix_fmt", "yuv420p",
+            "-an",
+            output_path
+        ]
+
+        print(f"[TimelineComposite] 씬 {scene_num}: 인포그래픽 비디오 합성 시작")
+
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            errors='ignore',
+            timeout=600,
+            creationflags=creationflags
+        )
+
+        if result.returncode == 0 and os.path.exists(output_path):
+            print(f"[TimelineComposite] 씬 {scene_num}: 인포그래픽 비디오 합성 완료")
+            return output_path
+        else:
+            print(f"[TimelineComposite] 씬 {scene_num}: FFmpeg 오류 - {result.stderr[:300]}")
+            return None
+
+    except subprocess.TimeoutExpired:
+        print(f"[TimelineComposite] 씬 {scene_num}: 인포그래픽 비디오 합성 타임아웃")
+        return None
+    except Exception as e:
+        print(f"[TimelineComposite] 씬 {scene_num}: 인포그래픽 비디오 합성 오류 - {e}")
+        return None
+    finally:
+        for p in [temp_video_path, temp_overlay_path, prepared_video_path]:
+            if p and os.path.exists(p):
+                try:
+                    os.unlink(p)
+                except OSError:
+                    pass
+
+
 def save_realshot_file(
     uploaded_file: 'UploadedFile',
     scene_num: int,
@@ -546,4 +1047,5 @@ BG_SOURCE_OPTIONS = [
     ("blur", "실사 이미지 블러"),
     ("color", "단색 배경"),
     ("upload", "업로드 이미지"),
+    ("video", "업로드 비디오"),
 ]

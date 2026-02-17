@@ -240,6 +240,17 @@ class InfographicImageGenerator:
         print(f"[InfographicGenerator] 프롬프트: {positive_prompt[:150]}...")
         print(f"[InfographicGenerator] 네거티브: {negative_prompt[:100]}...")
 
+        # 기존 인포그래픽 이미지 삭제 (씬당 1개만 유지)
+        import glob as _glob_module
+        for _pattern in [f"infographic_scene_{scene_id:03d}_*.*", f"infographic_{scene_id:03d}_*.*"]:
+            for _old_file in _glob_module.glob(str(self.output_dir / _pattern)):
+                try:
+                    import os as _os
+                    _os.remove(_old_file)
+                    print(f"[InfographicGenerator] 기존 파일 삭제: {Path(_old_file).name}")
+                except OSError:
+                    pass
+
         # 파일명
         timestamp = int(datetime.now().timestamp() * 1000)
         filename = f"infographic_scene_{scene_id:03d}_{layout.value}_{timestamp}.png"

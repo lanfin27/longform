@@ -418,7 +418,7 @@ class PoseAnalyzer:
     MAX_RETRIES = 3  # 최대 재시도 횟수
     RETRY_DELAY = 2.0  # 재시도 간 대기 시간(초)
 
-    def __init__(self, model_id: str = "gemini-2.0-flash-exp"):
+    def __init__(self, model_id: str = "gemini-2.5-flash"):
         """
         Args:
             model_id: 사용할 AI 모델 ID
@@ -810,7 +810,7 @@ class PoseAnalyzer:
 def analyze_character_poses(
     scenes: List[Dict],
     characters: List[str],
-    model_id: str = "gemini-2.0-flash-exp",
+    model_id: str = "gemini-2.5-flash",
     progress_callback: Optional[Callable[[float], None]] = None,
     status_callback: Optional[Callable[[str], None]] = None
 ) -> Dict:

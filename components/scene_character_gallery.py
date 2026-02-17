@@ -1,8 +1,21 @@
 """
-씬별 캐릭터 이미지 갤러리 UI 컴포넌트 v1.0
+씬별 캐릭터 이미지 갤러리 UI 컴포넌트 v1.2
 
 씬 번호순으로 캐릭터 이미지를 표시하고,
 개별/일괄 재생성을 지원합니다.
+
+v1.2: 컴팩트 3열 레이아웃
+- 가로에 3개 씬 표시 (이전: 1개)
+- 버튼 아이콘화 (🔄, 🗑️)
+- 캐릭터 이미지 크게 (use_container_width=True)
+- CSS 컴팩트 스타일링
+- 전체적으로 더 많은 씬을 한 화면에 표시
+
+v1.1: 카드 스타일 갤러리 UI
+- 씬별 캐릭터가 펼치지 않아도 바로 보이는 카드 스타일
+- 모두 펼치기 기본값 True로 변경
+- 이미지 없는 캐릭터에 생성 버튼 추가
+- 이미지 경로 해상도 개선
 
 작성: 2026-01
 """
@@ -24,32 +37,37 @@ def render_scene_character_gallery(
     project_path: str,
     on_regenerate: Callable[[str, str, int], None] = None,
     on_delete: Callable[[str, str], None] = None,
-    columns_per_row: int = 4,
-    thumbnail_size: int = 150
+    columns_per_row: int = 2,  # v1.2: 씬 내 캐릭터 열 수 (컴팩트)
+    thumbnail_size: int = 150,
+    scenes_per_row: int = 3  # v1.2: 가로당 씬 개수 (기본 3)
 ):
     """
-    씬별 캐릭터 갤러리 렌더링
+    씬별 캐릭터 갤러리 렌더링 v1.2
 
     Args:
         scenes: SceneCharacters 목록
         project_path: 프로젝트 경로
         on_regenerate: 재생성 콜백 함수 (char_name, pose, scene_num)
         on_delete: 삭제 콜백 함수 (char_name, pose)
-        columns_per_row: 한 줄당 캐릭터 수
+        columns_per_row: 씬 내 캐릭터 열 수
         thumbnail_size: 썸네일 크기 (px)
+        scenes_per_row: 가로당 씬 개수 (v1.2)
     """
     if not scenes:
         st.info("표시할 캐릭터가 있는 씬이 없습니다.")
         st.caption("캐릭터 관리에서 캐릭터 이미지를 생성하면 여기에 표시됩니다.")
         return
 
+    # v1.2: 컴팩트 CSS 스타일 적용
+    _apply_compact_gallery_css()
+
     # 통계 표시
     _render_gallery_stats(scenes)
 
     st.divider()
 
-    # 필터 옵션
-    filter_col1, filter_col2, filter_col3, filter_col4 = st.columns([1, 1, 1, 1])
+    # 필터 옵션 (v1.2: 더 컴팩트하게)
+    filter_col1, filter_col2, filter_col3, filter_col4, filter_col5 = st.columns([1, 1, 1, 1, 1])
 
     with filter_col1:
         show_only_with_chars = st.checkbox(
@@ -75,8 +93,17 @@ def render_scene_character_gallery(
     with filter_col4:
         auto_expand = st.checkbox(
             "모두 펼치기",
-            value=False,
+            value=True,
             key="gallery_auto_expand"
+        )
+
+    with filter_col5:
+        # v1.2: 행당 씬 수 조절 슬라이더
+        scenes_per_row = st.selectbox(
+            "행당 씬",
+            options=[2, 3, 4, 5],
+            index=1,  # 기본값 3
+            key="gallery_scenes_per_row"
         )
 
     # 필터 적용
@@ -108,17 +135,68 @@ def render_scene_character_gallery(
 
     st.divider()
 
-    # 씬별로 렌더링
-    for scene in filtered_scenes:
-        _render_scene_card(
-            scene=scene,
-            project_path=project_path,
-            on_regenerate=on_regenerate,
-            on_delete=on_delete,
-            columns_per_row=columns_per_row,
-            thumbnail_size=thumbnail_size,
-            auto_expand=auto_expand
-        )
+    # v1.2: 씬을 가로로 여러 개 배치 (3열 또는 사용자 선택)
+    for row_start in range(0, len(filtered_scenes), scenes_per_row):
+        row_scenes = filtered_scenes[row_start:row_start + scenes_per_row]
+        cols = st.columns(scenes_per_row)
+
+        for col_idx, scene in enumerate(row_scenes):
+            with cols[col_idx]:
+                _render_scene_card_compact(
+                    scene=scene,
+                    project_path=project_path,
+                    on_regenerate=on_regenerate,
+                    on_delete=on_delete,
+                    columns_per_row=columns_per_row,
+                    thumbnail_size=thumbnail_size,
+                    auto_expand=auto_expand
+                )
+
+
+def _apply_compact_gallery_css():
+    """v1.2: 컴팩트 갤러리 CSS 스타일"""
+    st.markdown("""
+    <style>
+    /* 컬럼 간격 줄이기 */
+    [data-testid="column"] {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+    }
+
+    /* 버튼 패딩 줄이기 */
+    .compact-gallery .stButton > button {
+        padding: 2px 6px !important;
+        min-height: 28px !important;
+        font-size: 14px !important;
+    }
+
+    /* 캡션 크기 줄이기 */
+    .compact-gallery .stCaption {
+        font-size: 11px !important;
+        margin-top: 2px !important;
+        margin-bottom: 2px !important;
+    }
+
+    /* 구분선 여백 줄이기 */
+    .compact-gallery hr {
+        margin: 6px 0 !important;
+    }
+
+    /* 헤더 크기 조정 */
+    .compact-gallery h5 {
+        font-size: 13px !important;
+        margin-bottom: 4px !important;
+    }
+
+    /* 메트릭 컴팩트 */
+    [data-testid="stMetricValue"] {
+        font-size: 18px !important;
+    }
+    [data-testid="stMetricLabel"] {
+        font-size: 11px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 
 def _render_gallery_stats(scenes: List):
@@ -188,6 +266,73 @@ def _render_batch_regeneration_section(scenes: List, on_regenerate: Callable):
             st.info("배치 생성 탭에서 재생성하세요.")
 
 
+def _render_scene_card_compact(
+    scene,  # SceneCharacters
+    project_path: str,
+    on_regenerate: Callable,
+    on_delete: Callable,
+    columns_per_row: int,
+    thumbnail_size: int,
+    auto_expand: bool
+):
+    """
+    개별 씬 카드 렌더링 v1.2 - 컴팩트 버전
+
+    v1.2 변경사항:
+    - 헤더 간소화 (씬 번호 + 상태 아이콘만)
+    - 이미지 크게 (use_container_width=True)
+    - 버튼 아이콘화 (🔄, 🗑️)
+    - 공간 최소화
+    """
+    scene_num = scene.scene_number
+    characters = scene.characters
+
+    # 상태 아이콘
+    if scene.is_complete:
+        status_icon = "✅"
+    elif characters:
+        status_icon = "👤"
+    else:
+        status_icon = "⚪"
+
+    # 재생성 필요 여부
+    needs_regen_count = sum(1 for c in characters if c.needs_regeneration)
+
+    # v1.2: 컴팩트 카드 컨테이너
+    with st.container():
+        # 헤더: 씬 번호 + 상태 (작게)
+        header_text = f"##### {status_icon} 씬 {scene_num}"
+        if needs_regen_count > 0:
+            header_text += f" ⚠️"
+        st.markdown(header_text)
+
+        # 배경 있음 표시 (있는 경우만)
+        if scene.has_background:
+            st.caption("🖼️ 배경")
+
+        # 캐릭터 이미지들
+        if not characters:
+            st.caption("캐릭터 없음")
+        else:
+            # v1.2: 캐릭터 이미지를 크게 표시
+            num_chars = len(characters)
+            char_cols = st.columns(min(num_chars, 2))  # 최대 2열
+
+            for i, char in enumerate(characters):
+                col_idx = i % len(char_cols)
+
+                with char_cols[col_idx]:
+                    _render_character_thumbnail_compact(
+                        char=char,
+                        scene_num=scene_num,
+                        on_regenerate=on_regenerate,
+                        on_delete=on_delete
+                    )
+
+        # v1.2: 구분선 (작게)
+        st.markdown("---")
+
+
 def _render_scene_card(
     scene,  # SceneCharacters
     project_path: str,
@@ -197,57 +342,81 @@ def _render_scene_card(
     thumbnail_size: int,
     auto_expand: bool
 ):
-    """개별 씬 카드 렌더링"""
+    """
+    개별 씬 카드 렌더링 v1.1 (레거시 - 호환성 유지)
+
+    카드 스타일: 펼치지 않아도 캐릭터 이미지가 바로 보이는 UI
+    """
     scene_num = scene.scene_number
     characters = scene.characters
 
-    # 상태 아이콘
+    # 상태 아이콘 및 색상
     if scene.is_complete:
-        status_icon = "+"
+        status_icon = "✅"
+        status_color = "#28a745"
         status_text = "완성"
     elif characters:
-        status_icon = "~"
+        status_icon = "👤"
+        status_color = "#ffc107"
         status_text = f"캐릭터 {len(characters)}개"
     else:
-        status_icon = "-"
+        status_icon = "⚪"
+        status_color = "#6c757d"
         status_text = "캐릭터 없음"
 
     # 재생성 필요 여부
     needs_regen_count = sum(1 for c in characters if c.needs_regeneration)
 
-    # 헤더 텍스트
-    header = f"씬 {scene_num} [{status_icon}] | {status_text}"
-    if needs_regen_count > 0:
-        header += f" | {needs_regen_count}개 재생성 권장"
+    # ═══════════════════════════════════════════════════════════════
+    # v1.1: 카드 스타일 컨테이너 (expander 대신 container 사용)
+    # ═══════════════════════════════════════════════════════════════
 
-    # 씬 카드 헤더
-    should_expand = auto_expand or needs_regen_count > 0
+    # 씬 카드 컨테이너
+    with st.container():
+        # 카드 헤더 (항상 표시)
+        header_col1, header_col2, header_col3 = st.columns([1, 3, 1])
 
-    with st.expander(header, expanded=should_expand):
+        with header_col1:
+            st.markdown(f"### {status_icon} 씬 {scene_num}")
+
+        with header_col2:
+            status_parts = [status_text]
+            if needs_regen_count > 0:
+                status_parts.append(f"⚠️ {needs_regen_count}개 재생성 권장")
+            st.caption(" | ".join(status_parts))
+
+        with header_col3:
+            if scene.has_background:
+                st.caption("🖼️ 배경 있음")
+
+        # ═══════════════════════════════════════════════════════════════
+        # 캐릭터 그리드 (항상 표시 - expander 없음)
+        # ═══════════════════════════════════════════════════════════════
         if not characters:
-            st.warning("이 씬에 연결된 캐릭터 이미지가 없습니다.")
-
+            st.info("이 씬에 연결된 캐릭터 이미지가 없습니다.")
             # 씬의 캐릭터 프롬프트 표시 (있는 경우)
             _show_scene_character_info(scene_num, project_path)
-            return
+        else:
+            # 캐릭터 그리드
+            num_chars = len(characters)
+            cols_to_use = min(num_chars, columns_per_row)
 
-        # 캐릭터 그리드
-        num_chars = len(characters)
-        cols_to_use = min(num_chars, columns_per_row)
+            cols = st.columns(cols_to_use)
 
-        cols = st.columns(cols_to_use)
+            for i, char in enumerate(characters):
+                col_idx = i % cols_to_use
 
-        for i, char in enumerate(characters):
-            col_idx = i % cols_to_use
+                with cols[col_idx]:
+                    _render_character_thumbnail(
+                        char=char,
+                        scene_num=scene_num,
+                        thumbnail_size=thumbnail_size,
+                        on_regenerate=on_regenerate,
+                        on_delete=on_delete
+                    )
 
-            with cols[col_idx]:
-                _render_character_thumbnail(
-                    char=char,
-                    scene_num=scene_num,
-                    thumbnail_size=thumbnail_size,
-                    on_regenerate=on_regenerate,
-                    on_delete=on_delete
-                )
+        # 카드 구분선
+        st.divider()
 
 
 def _show_scene_character_info(scene_num: int, project_path: str):
@@ -273,6 +442,102 @@ def _show_scene_character_info(scene_num: int, project_path: str):
         pass
 
 
+def _render_character_thumbnail_compact(
+    char,  # CharacterImage
+    scene_num: int,
+    on_regenerate: Callable,
+    on_delete: Callable
+):
+    """
+    개별 캐릭터 썸네일 렌더링 v1.2 - 컴팩트 버전
+
+    v1.2 변경사항:
+    - 이미지 크게 (use_container_width=True)
+    - 버튼 아이콘화 (🔄, 🗑️)
+    - 캐릭터 이름만 표시 (포즈, 크기 생략)
+    - 공간 최소화
+    """
+    from PIL import Image
+
+    # 고유 키 생성
+    safe_name = char.character_name.replace(' ', '_').replace('/', '_').replace('\\', '_')
+
+    # 이미지 존재 여부
+    has_image = char.image_path and os.path.exists(char.image_path)
+
+    # v1.2: 이미지 크게 표시 (컨테이너 너비에 맞춤)
+    if has_image:
+        try:
+            img = Image.open(char.image_path)
+            st.image(img, use_container_width=True)
+        except Exception:
+            has_image = False
+            _render_placeholder_compact(char.character_name)
+    else:
+        _render_placeholder_compact(char.character_name)
+
+    # v1.2: 캐릭터 이름만 (간결하게)
+    st.caption(f"**{char.character_name}**")
+
+    # v1.2: 아이콘 버튼 (작게, 한 줄에)
+    if has_image:
+        btn_col1, btn_col2 = st.columns(2)
+
+        with btn_col1:
+            if on_regenerate:
+                if st.button(
+                    "🔄",
+                    key=f"regen_c_{safe_name}_{scene_num}",
+                    help="재생성",
+                    use_container_width=True
+                ):
+                    on_regenerate(char.character_name, char.pose, scene_num)
+
+        with btn_col2:
+            if on_delete:
+                if st.button(
+                    "🗑️",
+                    key=f"del_c_{safe_name}_{scene_num}",
+                    help="삭제",
+                    use_container_width=True
+                ):
+                    on_delete(char.character_name, char.pose)
+    else:
+        # 이미지 없을 때: 생성 버튼
+        if on_regenerate:
+            if st.button(
+                "🎨",
+                key=f"gen_c_{safe_name}_{scene_num}",
+                help="이미지 생성",
+                use_container_width=True,
+                type="primary"
+            ):
+                on_regenerate(char.character_name, char.pose, scene_num)
+
+
+def _render_placeholder_compact(char_name: str = ""):
+    """v1.2: 컴팩트 플레이스홀더"""
+    initial = char_name[0].upper() if char_name else "?"
+
+    st.markdown(
+        f"""
+        <div style="
+            width: 100%;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #7986cb;
+            border-radius: 8px;
+        ">
+            <span style="color: #3f51b5; font-size: 28px; font-weight: bold;">{initial}</span>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 def _render_character_thumbnail(
     char,  # CharacterImage
     scene_num: int,
@@ -280,21 +545,32 @@ def _render_character_thumbnail(
     on_regenerate: Callable,
     on_delete: Callable
 ):
-    """개별 캐릭터 썸네일 렌더링"""
+    """
+    개별 캐릭터 썸네일 렌더링 v1.1 (레거시 - 호환성 유지)
+
+    v1.1: 이미지 없는 경우 생성 버튼 포함 플레이스홀더
+    """
     from PIL import Image
 
     # 컨테이너
     with st.container():
+        # 고유 키 생성 (이름 정규화)
+        safe_name = char.character_name.replace(' ', '_').replace('/', '_').replace('\\', '_')
+
+        # 이미지 존재 여부 확인
+        has_image = char.image_path and os.path.exists(char.image_path)
+
         # 이미지 표시
-        if char.image_path and os.path.exists(char.image_path):
+        if has_image:
             try:
                 img = Image.open(char.image_path)
                 st.image(img, width=thumbnail_size, caption=None)
             except Exception as e:
-                st.error(f"로드 실패")
-                _render_placeholder_image(thumbnail_size)
+                has_image = False
+                _render_placeholder_image(thumbnail_size, char.character_name)
         else:
-            _render_placeholder_image(thumbnail_size)
+            # v1.1: 이미지 없을 때 생성 버튼 포함 플레이스홀더
+            _render_placeholder_image(thumbnail_size, char.character_name)
 
         # 캐릭터 정보
         st.markdown(f"**{char.character_name}**")
@@ -307,53 +583,73 @@ def _render_character_thumbnail(
         if char.needs_regeneration:
             st.warning(f"{char.regeneration_reason}")
 
-        # 버튼들
-        btn_col1, btn_col2 = st.columns(2)
+        # v1.1: 버튼 레이아웃 개선
+        if has_image:
+            # 이미지 있는 경우: 재생성 + 삭제
+            btn_col1, btn_col2 = st.columns(2)
 
-        with btn_col1:
+            with btn_col1:
+                if on_regenerate:
+                    btn_key = f"regen_{safe_name}_{char.pose}_{scene_num}"
+
+                    if st.button(
+                        "재생성",
+                        key=btn_key,
+                        use_container_width=True
+                    ):
+                        on_regenerate(char.character_name, char.pose, scene_num)
+
+            with btn_col2:
+                if on_delete:
+                    del_key = f"del_{safe_name}_{char.pose}_{scene_num}"
+
+                    if st.button(
+                        "삭제",
+                        key=del_key,
+                        use_container_width=True
+                    ):
+                        on_delete(char.character_name, char.pose)
+        else:
+            # v1.1: 이미지 없는 경우: 생성 버튼만 (강조)
             if on_regenerate:
-                # 고유 키 생성 (이름 정규화)
-                safe_name = char.character_name.replace(' ', '_').replace('/', '_')
-                btn_key = f"regen_{safe_name}_{char.pose}_{scene_num}"
+                gen_key = f"gen_{safe_name}_{char.pose}_{scene_num}"
 
                 if st.button(
-                    "재생성",
-                    key=btn_key,
-                    use_container_width=True
+                    "🎨 이미지 생성",
+                    key=gen_key,
+                    use_container_width=True,
+                    type="primary"
                 ):
                     on_regenerate(char.character_name, char.pose, scene_num)
-
-        with btn_col2:
-            if on_delete:
-                safe_name = char.character_name.replace(' ', '_').replace('/', '_')
-                del_key = f"del_{safe_name}_{char.pose}_{scene_num}"
-
-                if st.button(
-                    "삭제",
-                    key=del_key,
-                    use_container_width=True
-                ):
-                    on_delete(char.character_name, char.pose)
 
         st.markdown("---")
 
 
-def _render_placeholder_image(size: int):
-    """플레이스홀더 이미지"""
+def _render_placeholder_image(size: int, char_name: str = ""):
+    """
+    플레이스홀더 이미지 v1.1
+
+    v1.1: 캐릭터 이름 표시 및 시각적 개선
+    """
+    # 캐릭터 이름의 첫 글자 추출 (한글/영문 모두 지원)
+    initial = char_name[0].upper() if char_name else "?"
+
     st.markdown(
         f"""
         <div style="
             width: {size}px;
             height: {size}px;
-            background-color: #f0f0f0;
+            background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
+            border: 2px dashed #7986cb;
+            border-radius: 12px;
             margin: 0 auto;
         ">
-            <span style="color: #999; font-size: 24px;">?</span>
+            <span style="color: #3f51b5; font-size: 36px; font-weight: bold;">{initial}</span>
+            <span style="color: #7986cb; font-size: 11px; margin-top: 4px;">이미지 없음</span>
         </div>
         """,
         unsafe_allow_html=True

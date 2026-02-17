@@ -1,0 +1,38 @@
+{
+  "이재용 회장을 연상시키는 인물": {
+    "success": true,
+    "character_name": "이재용 회장을 연상시키는 인물",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test28\\images\\characters\\char_이재용_회장을_연상시키는_인물_standing_1769736503515.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test28\\images\\characters\\char_이재용_회장을_연상시키는_인물_standing_1769736503515.png",
+    "prompt": "Full body character, centered composition, Western 2D animated series style, clean commercial animation aesthetic\nBold black outlines 2-3px thick on all elements, flat cel-shaded coloring with no gradients, solid color fills without any texture, crisp vector-like lineart, clean sharp edges\n\nBody proportions: approximately 6-7 heads tall, slim athletic build, elongated torso, long proportional limbs, simplified hands with basic finger shapes, feet as simple rounded shapes\nHead shape: elongated oval head, prominent angular chin and jawline, large simplified ears positioned mid-head level, smooth curved skull\nFace style: simple dot eyes with small black pupils, thin minimal eyebrows as simple curved lines, small subtle nose as single curved bump, mouth as clean curved line, completely smooth flat skin with single solid color, no shading on face, no wrinkles or details\nFlat solid color blocking, muted desaturated color palette, warm beige skin tones, no shadows no highlights no gradients anywhere on character, plain white or light neutral background, no environmental details, A male figure, a middle-aged East Asian male, with short dark hair, with a contemplative and visionary expression, dressed in smart business attire, full body character, standing pose, front view, neutral expression, simple solid light gray background, no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "seed": 2036670783,
+    "generation_time": 6.764194011688232,
+    "api_provider": "Google ImageFX"
+  },
+  "운전자": {
+    "success": true,
+    "character_name": "운전자",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test28\\images\\characters\\char_운전자_standing_1769736506339.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test28\\images\\characters\\char_운전자_standing_1769736506339.png",
+    "prompt": "Full body character, centered composition, Western 2D animated series style, clean commercial animation aesthetic\nBold black outlines 2-3px thick on all elements, flat cel-shaded coloring with no gradients, solid color fills without any texture, crisp vector-like lineart, clean sharp edges\n\nBody proportions: approximately 6-7 heads tall, slim athletic build, elongated torso, long proportional limbs, simplified hands with basic finger shapes, feet as simple rounded shapes\nHead shape: elongated oval head, prominent angular chin and jawline, large simplified ears positioned mid-head level, smooth curved skull\nFace style: simple dot eyes with small black pupils, thin minimal eyebrows as simple curved lines, small subtle nose as single curved bump, mouth as clean curved line, completely smooth flat skin with single solid color, no shading on face, no wrinkles or details\nFlat solid color blocking, muted desaturated color palette, warm beige skin tones, no shadows no highlights no gradients anywhere on character, plain white or light neutral background, no environmental details, A generic driver focused on the road, with conceptual digital overlays on their face indicating detection of drowsiness, concentration, and stress. Neutral expression, hands on steering wheel. No specific gender or ethnicity., full body character, standing pose, front view, neutral expression, simple solid light gray background, no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "seed": 453628646,
+    "generation_time": 9.08690094947815,
+    "api_provider": "Google ImageFX"
+  },
+  "삼성 및 ZF 대표팀": {
+    "success": true,
+    "character_name": "삼성 및 ZF 대표팀",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test28\\images\\characters\\char_삼성_및_ZF_대표팀_standing_1769736508343.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test28\\images\\characters\\char_삼성_및_ZF_대표팀_standing_1769736508343.png",
+    "prompt": "Full body character, centered composition, Western 2D animated series style, clean commercial animation aesthetic\nBold black outlines 2-3px thick on all elements, flat cel-shaded coloring with no gradients, solid color fills without any texture, crisp vector-like lineart, clean sharp edges\n\nBody proportions: approximately 6-7 heads tall, slim athletic build, elongated torso, long proportional limbs, simplified hands with basic finger shapes, feet as simple rounded shapes\nHead shape: elongated oval head, prominent angular chin and jawline, large simplified ears positioned mid-head level, smooth curved skull\nFace style: simple dot eyes with small black pupils, thin minimal eyebrows as simple curved lines, small subtle nose as single curved bump, mouth as clean curved line, completely smooth flat skin with single solid color, no shading on face, no wrinkles or details\nFlat solid color blocking, muted desaturated color palette, warm beige skin tones, no shadows no highlights no gradients anywhere on character, plain white or light neutral background, no environmental details, Two groups of business professionals, one group subtly associated with a large electronics manufacturer and the other with a large automotive parts manufacturer, facing away from each other in a tense posture, formal business attire, diverse ethnicities, serious expressions, full body character, standing pose, front view, neutral expression, simple solid light gray background, no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "seed": 1156582448,
+    "generation_time": 10.591796636581421,
+    "api_provider": "Google ImageFX"
+  }
+}

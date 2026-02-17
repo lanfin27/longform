@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 utils/gemini_image_generator.py
-Gemini 이미지 생성 API 클라이언트 v2.1
+Gemini 이미지 생성 API 클라이언트 v3.1
 
 지원 모델 (2026-01 업데이트):
 - gemini-2.5-flash-image (Nano Banana) ← 이전: gemini-2.0-flash-exp-image-generation
@@ -17,17 +17,34 @@ v2.1 변경사항:
 - SDK 버전 호환성 처리 (새 SDK 1.0+ / 이전 SDK 0.x 모두 지원)
 - ImportError 방지를 위한 동적 import 로직
 
+v3.0 변경사항 (2026-01-25):
+- 싱글톤 패턴 적용 (SDK 재초기화 방지)
+- 레퍼런스 이미지 캐시 연동 (ReferenceImageCache)
+- as_image() 오류 수정 (format 파라미터 호환성)
+- 병렬 처리 지원 (generate_images_parallel)
+- ThreadPoolExecutor 기반 비동기 처리
+
+v3.1 변경사항 (2026-01-26):
+- 병렬 처리 타이밍 측정 로그 추가
+- 스레드별 시작/종료 시간 기록
+- Gantt 차트 형태 시각화
+- 병렬 효율 분석 (speedup, efficiency %)
+
 작성: 2025-01
 업데이트: 2026-01 - 새로운 모델명 및 API 방식 적용
+업데이트: 2026-01-25 - 성능 최적화 (싱글톤, 캐시, 병렬처리)
+업데이트: 2026-01-26 - 병렬 처리 검증 및 타이밍 분석 추가
 """
 
 import os
 import io
 import base64
+import threading
 from pathlib import Path
 from typing import List, Optional, Dict, Union
 from dataclasses import dataclass
 from PIL import Image
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # dotenv 로드
 try:
@@ -79,15 +96,35 @@ class GeminiGenerationResult:
 
 
 class GeminiImageGenerator:
-    """Gemini 이미지 생성 클라이언트"""
+    """
+    Gemini 이미지 생성 클라이언트 (v3.0 - 싱글톤)
+
+    싱글톤 패턴으로 SDK 재초기화 방지
+    """
+
+    _instance = None
+    _lock = threading.Lock()
+    _initialized = False
+
+    def __new__(cls, api_key: str = None):
+        """싱글톤 패턴 - SDK 재초기화 방지"""
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+        return cls._instance
 
     def __init__(self, api_key: str = None):
         """
-        초기화
+        초기화 (이미 초기화된 경우 스킵)
 
         Args:
             api_key: Gemini API 키 (None이면 환경변수에서 로드)
         """
+        # 이미 초기화된 경우 스킵
+        if GeminiImageGenerator._initialized:
+            return
+
         self.api_key = api_key or self._load_api_key()
 
         if not self.api_key:
@@ -98,6 +135,8 @@ class GeminiImageGenerator:
 
         # google-generativeai 라이브러리 초기화
         self._init_genai()
+        GeminiImageGenerator._initialized = True
+        print("[GeminiImage] ✅ 싱글톤 초기화 완료 (SDK 재사용 가능)")
 
     def _load_api_key(self) -> str:
         """환경변수에서 API 키 로드"""
@@ -290,11 +329,14 @@ class GeminiImageGenerator:
 
                     elif part.inline_data is not None:
                         # 새로운 API: part.as_image()로 이미지 추출
+                        # v3.0: format 파라미터 호환성 수정
                         try:
                             pil_image = part.as_image()
                             # PIL Image를 bytes로 변환
                             buffer = io.BytesIO()
-                            pil_image.save(buffer, format="PNG")
+                            # 일부 PIL 버전에서 format= 키워드 인자 오류 발생
+                            # 위치 인자로 변경하여 호환성 확보
+                            pil_image.save(buffer, "PNG")
                             image_data = buffer.getvalue()
                             print(f"[GeminiImage] ✅ 이미지 추출 성공 (part.as_image())")
                         except Exception as img_err:
@@ -409,13 +451,26 @@ class GeminiImageGenerator:
         return " ".join(parts)
 
     def _load_image_as_pil(self, image_source: Union[str, bytes, Image.Image]) -> Optional[Image.Image]:
-        """이미지를 PIL Image로 로드 (새로운 API용)"""
+        """
+        이미지를 PIL Image로 로드 (새로운 API용)
+
+        v3.0: ReferenceImageCache 연동으로 캐시 활용
+        """
 
         try:
             pil_image = None
 
-            # 파일 경로인 경우
+            # 파일 경로인 경우 - 캐시 활용
             if isinstance(image_source, str):
+                try:
+                    from utils.image_cache import load_reference_as_pil
+                    pil_image = load_reference_as_pil(image_source, max_size=1024)
+                    if pil_image:
+                        return pil_image
+                except ImportError:
+                    pass
+
+                # 캐시 폴백: 직접 로드
                 path = Path(image_source)
                 if path.exists():
                     pil_image = Image.open(path)
@@ -507,13 +562,15 @@ class GeminiImageGenerator:
             if hasattr(response, 'parts'):
                 for part in response.parts:
                     # 새로운 방식: as_image() 메서드 사용
+                    # v3.0: format 파라미터 호환성 수정
                     if hasattr(part, 'as_image'):
                         try:
                             pil_image = part.as_image()
                             buffer = io.BytesIO()
-                            pil_image.save(buffer, format="PNG")
+                            pil_image.save(buffer, "PNG")  # 위치 인자 사용
                             return buffer.getvalue()
-                        except:
+                        except Exception as img_err:
+                            print(f"[GeminiImage] as_image() 추출 실패: {img_err}")
                             pass
 
                     # 폴백: inline_data에서 직접 추출
@@ -549,6 +606,290 @@ def check_gemini_api_key() -> bool:
 def get_gemini_models() -> Dict:
     """사용 가능한 Gemini 모델 목록 반환"""
     return GEMINI_IMAGE_MODELS.copy()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 병렬 처리 함수 (v3.1: 타이밍 분석 추가)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def generate_images_parallel(
+    requests: List[Dict],
+    max_concurrent: int = 4,
+    model_key: str = "gemini_nano_banana",
+    on_complete: callable = None,
+    on_error: callable = None
+) -> List[Dict]:
+    """
+    여러 이미지를 병렬로 생성 (v3.1: 타이밍 분석 포함)
+
+    Args:
+        requests: 요청 목록 [{"scene_id": 1, "prompt": "...", "reference_images": [...], ...}, ...]
+        max_concurrent: 최대 동시 실행 수 (기본: 4)
+        model_key: 사용할 모델 키
+        on_complete: 완료 시 콜백 (scene_id, result)
+        on_error: 에러 시 콜백 (scene_id, error)
+
+    Returns:
+        결과 리스트 [{"scene_id": 1, "success": True, "image_data": bytes, ...}, ...]
+
+    Usage:
+        results = generate_images_parallel([
+            {"scene_id": 45, "prompt": "...", "reference_images": ["/path/to/bg.png"]},
+            {"scene_id": 47, "prompt": "...", "reference_images": ["/path/to/bg.png"]},
+        ], max_concurrent=4)
+    """
+    import time
+    import threading
+
+    if not requests:
+        return []
+
+    # 싱글톤 인스턴스 가져오기
+    generator = GeminiImageGenerator()
+
+    results = []
+    completed = 0
+    total = len(requests)
+
+    # v3.1: 타이밍 측정용 데이터
+    timing_data = []
+    timing_lock = threading.Lock()
+
+    print(f"\n[GeminiImage] ═══════════════════════════════════════════════════")
+    print(f"[GeminiImage] 🚀 병렬 이미지 생성 시작")
+    print(f"[GeminiImage]    총 요청: {total}개")
+    print(f"[GeminiImage]    동시 실행: {max_concurrent}개")
+    print(f"[GeminiImage]    모델: {model_key}")
+    print(f"[GeminiImage]    메인 스레드: {threading.current_thread().name}")
+    print(f"[GeminiImage] ═══════════════════════════════════════════════════\n")
+
+    start_time = time.time()
+
+    # 레퍼런스 이미지 프리로드 (캐시 최적화)
+    try:
+        from utils.image_cache import preload_references
+        all_refs = []
+        for req in requests:
+            refs = req.get("reference_images", [])
+            if refs:
+                all_refs.extend(refs)
+        if all_refs:
+            preload_references(all_refs)
+    except ImportError:
+        pass
+
+    def process_single(req: Dict) -> Dict:
+        """단일 이미지 생성 (v3.1: 타이밍 측정 추가)"""
+        scene_id = req.get("scene_id", 0)
+        prompt = req.get("prompt", "")
+        reference_images = req.get("reference_images", [])
+        reference_type = req.get("reference_type", "style")
+        reference_strength = req.get("reference_strength", 0.7)
+        aspect_ratio = req.get("aspect_ratio", "16:9")
+
+        # v3.1: 시작 시간 및 스레드 정보 기록
+        thread_name = threading.current_thread().name
+        task_start = time.time()
+        relative_start = task_start - start_time
+
+        print(f"[GeminiImage] ▶ 씬 {scene_id} API 호출 시작 [{thread_name}] @ {relative_start:.2f}s")
+
+        try:
+            result = generator.generate_image(
+                prompt=prompt,
+                model_key=model_key,
+                reference_images=reference_images,
+                reference_type=reference_type,
+                reference_strength=reference_strength,
+                aspect_ratio=aspect_ratio
+            )
+
+            task_end = time.time()
+            elapsed = task_end - task_start
+            relative_end = task_end - start_time
+
+            # v3.1: 타이밍 데이터 저장
+            with timing_lock:
+                timing_data.append({
+                    "scene_id": scene_id,
+                    "thread": thread_name,
+                    "start": relative_start,
+                    "end": relative_end,
+                    "elapsed": elapsed,
+                    "success": result.success
+                })
+
+            return {
+                "scene_id": scene_id,
+                "success": result.success,
+                "image_data": result.image_data,
+                "error": result.error,
+                "elapsed_time": result.elapsed_time,
+                "prompt": prompt,
+                # v3.1: 타이밍 정보 추가
+                "timing": {
+                    "thread": thread_name,
+                    "start": relative_start,
+                    "end": relative_end,
+                    "elapsed": elapsed
+                }
+            }
+
+        except Exception as e:
+            task_end = time.time()
+            elapsed = task_end - task_start
+            relative_end = task_end - start_time
+
+            with timing_lock:
+                timing_data.append({
+                    "scene_id": scene_id,
+                    "thread": thread_name,
+                    "start": relative_start,
+                    "end": relative_end,
+                    "elapsed": elapsed,
+                    "success": False
+                })
+
+            return {
+                "scene_id": scene_id,
+                "success": False,
+                "image_data": None,
+                "error": str(e),
+                "elapsed_time": 0,
+                "prompt": prompt
+            }
+
+    # ThreadPoolExecutor로 병렬 실행
+    with ThreadPoolExecutor(max_workers=max_concurrent, thread_name_prefix="GeminiWorker") as executor:
+        # 작업 제출 (모든 작업 동시에!)
+        future_to_req = {
+            executor.submit(process_single, req): req
+            for req in requests
+        }
+
+        # 완료되는 순서대로 처리
+        for future in as_completed(future_to_req):
+            req = future_to_req[future]
+            scene_id = req.get("scene_id", 0)
+            completed += 1
+
+            try:
+                result = future.result()
+                results.append(result)
+
+                timing_info = result.get("timing", {})
+                thread_name = timing_info.get("thread", "?")
+                elapsed = timing_info.get("elapsed", result.get("elapsed_time", 0))
+
+                if result["success"]:
+                    print(f"[GeminiImage] ✅ 씬 {scene_id} 완료 [{thread_name}] ({elapsed:.1f}초) [{completed}/{total}]")
+                    if on_complete:
+                        on_complete(scene_id, result)
+                else:
+                    print(f"[GeminiImage] ❌ 씬 {scene_id} 실패 [{thread_name}]: {result['error']} [{completed}/{total}]")
+                    if on_error:
+                        on_error(scene_id, result["error"])
+
+            except Exception as e:
+                error_result = {
+                    "scene_id": scene_id,
+                    "success": False,
+                    "image_data": None,
+                    "error": str(e),
+                    "elapsed_time": 0,
+                    "prompt": req.get("prompt", "")
+                }
+                results.append(error_result)
+                print(f"[GeminiImage] ❌ 씬 {scene_id} 예외: {e} [{completed}/{total}]")
+                if on_error:
+                    on_error(scene_id, str(e))
+
+    total_time = time.time() - start_time
+    success_count = sum(1 for r in results if r["success"])
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # v3.1: 병렬 처리 타이밍 분석 및 Gantt 차트
+    # ═══════════════════════════════════════════════════════════════════════════
+    print(f"\n[GeminiImage] ═══════════════════════════════════════════════════")
+    print(f"[GeminiImage] 📊 병렬 처리 타이밍 분석 (Gantt Chart)")
+    print(f"[GeminiImage] ───────────────────────────────────────────────────")
+
+    # 시작 시간순 정렬
+    sorted_timing = sorted(timing_data, key=lambda x: x["start"])
+
+    for info in sorted_timing:
+        # Gantt 차트 바 생성 (40칸)
+        bar_width = 40
+        if total_time > 0:
+            start_pos = int((info["start"] / total_time) * bar_width)
+            end_pos = int((info["end"] / total_time) * bar_width)
+        else:
+            start_pos = 0
+            end_pos = bar_width
+
+        bar = "·" * start_pos + "█" * max(1, end_pos - start_pos) + "·" * (bar_width - end_pos)
+        status = "✓" if info.get("success", True) else "✗"
+
+        print(f"[GeminiImage]   씬{info['scene_id']:3d}: |{bar}| {info['elapsed']:.1f}s {status}")
+
+    print(f"[GeminiImage] ───────────────────────────────────────────────────")
+
+    # 병렬 효율 계산
+    if timing_data:
+        sequential_total = sum(d["elapsed"] for d in timing_data)
+        actual_parallel = total_time
+        speedup = sequential_total / actual_parallel if actual_parallel > 0 else 1
+        efficiency = (speedup / len(timing_data)) * 100 if timing_data else 0
+
+        print(f"[GeminiImage]   순차 예상 시간: {sequential_total:.1f}초")
+        print(f"[GeminiImage]   실제 소요 시간: {actual_parallel:.1f}초")
+        print(f"[GeminiImage]   속도 향상: {speedup:.2f}x")
+        print(f"[GeminiImage]   병렬 효율: {efficiency:.1f}%")
+
+        # 병렬 여부 판단
+        if speedup > 1.5:
+            print(f"[GeminiImage]   ✅ 병렬 처리 효과 확인됨!")
+        elif speedup > 1.1:
+            print(f"[GeminiImage]   ⚠️ 부분적 병렬 처리 (API Rate Limit 가능성)")
+        else:
+            print(f"[GeminiImage]   ❌ 병렬 처리 미작동 (순차 실행 의심)")
+
+        # 동시 시작 검증
+        if len(timing_data) >= 2:
+            starts = [d["start"] for d in sorted_timing]
+            start_diff = max(starts) - min(starts)
+            if start_diff < 1.0:
+                print(f"[GeminiImage]   ✅ 동시 시작 확인 (시작 간격: {start_diff:.2f}초)")
+            else:
+                print(f"[GeminiImage]   ⚠️ 시작 간격이 큼: {start_diff:.2f}초 (순차 의심)")
+
+    print(f"[GeminiImage] ═══════════════════════════════════════════════════")
+    print(f"[GeminiImage] ✅ 병렬 이미지 생성 완료")
+    print(f"[GeminiImage]    성공: {success_count}/{total}개")
+    print(f"[GeminiImage]    총 소요 시간: {total_time:.1f}초")
+    print(f"[GeminiImage]    평균 시간/이미지: {total_time/total:.1f}초")
+    print(f"[GeminiImage] ═══════════════════════════════════════════════════\n")
+
+    # 캐시 통계 출력
+    try:
+        from utils.image_cache import get_reference_cache_stats
+        stats = get_reference_cache_stats()
+        print(f"[GeminiImage] 📊 캐시 통계: {stats}")
+    except ImportError:
+        pass
+
+    return results
+
+
+def reset_generator_singleton():
+    """
+    싱글톤 인스턴스 리셋 (테스트/디버깅용)
+
+    주의: 일반적인 사용에서는 호출하지 마세요.
+    """
+    GeminiImageGenerator._instance = None
+    GeminiImageGenerator._initialized = False
+    print("[GeminiImage] ⚠️ 싱글톤 리셋됨")
 
 
 # 테스트 코드

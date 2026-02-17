@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Google ImageFX (Imagen) API 클라이언트 v6.3
+Google ImageFX (Imagen) API 클라이언트 v6.5
 
 rohitaryal/imageFX-api Node.js 라이브러리 직접 사용
 Python에서 Node.js 스크립트를 subprocess로 호출
+
+v6.5 변경사항:
+- 유명인 필터 오류(PROMINENT_PEOPLE_FILTER_FAILED) 자동 대응
+- 점진적 프롬프트 정제 (Level 0→1→2)
+- imagefx_prompt_sanitizer 모듈 통합
 
 v6.3 변경사항:
 - IMAGEN_4 모델 매핑 버그 수정 (IMAGEN_3 → IMAGEN_4)
@@ -47,6 +52,12 @@ from utils.imagefx_cookie_manager import (
     is_auth_error,
     mark_cookie_expired,
     mark_cookie_valid
+)
+
+# v6.5: 유명인 필터 오류 처리용 프롬프트 정제
+from utils.imagefx_prompt_sanitizer import (
+    aggressive_sanitize,
+    is_prominent_people_error
 )
 
 
@@ -216,10 +227,11 @@ class ImageFXClient:
         # Node.js 설치 확인
         self._check_node_installation()
 
-        print(f"[ImageFX v6.3] 초기화 완료 (Node.js 래퍼 사용)")
-        print(f"[ImageFX v6.3] 쿠키 길이: {len(self.cookie)}")
-        print(f"[ImageFX v6.3] Node 스크립트: {self.node_script}")
-        print(f"[ImageFX v6.3] ✅ 네거티브 프롬프트 지원 활성화")
+        print(f"[ImageFX v6.5] 초기화 완료 (Node.js 래퍼 사용)")
+        print(f"[ImageFX v6.5] 쿠키 길이: {len(self.cookie)}")
+        print(f"[ImageFX v6.5] Node 스크립트: {self.node_script}")
+        print(f"[ImageFX v6.5] ✅ 네거티브 프롬프트 지원 활성화")
+        print(f"[ImageFX v6.5] ✅ 유명인 필터 자동 대응 활성화")
 
     def _check_node_installation(self):
         """Node.js 설치 확인"""
@@ -329,7 +341,8 @@ class ImageFXClient:
         seed: Optional[int] = None,
         retry_count: int = 3,
         timeout: int = 180,
-        negative_prompt: str = ""
+        negative_prompt: str = "",
+        output_dir: Optional[str] = None
     ) -> List[GeneratedImage]:
         """
         이미지 생성 (Node.js 래퍼 호출)
@@ -343,6 +356,7 @@ class ImageFXClient:
             retry_count: 재시도 횟수
             timeout: 타임아웃 (초)
             negative_prompt: 네거티브 프롬프트 (이미지에 포함하지 않을 요소)
+            output_dir: v6.4 이미지 저장 경로 (None이면 프로젝트별 imagefx 폴더)
 
         Returns:
             List[GeneratedImage]: 생성된 이미지 리스트
@@ -362,10 +376,14 @@ class ImageFXClient:
                 f"npm install @rohitaryal/imagefx-api"
             )
 
-        # 출력 경로 생성
-        output_dir = Path(self.project_root) / "data" / "images" / "imagefx"
-        output_dir.mkdir(parents=True, exist_ok=True)
-        output_path = str(output_dir / f"{uuid.uuid4()}.png")
+        # v6.4: 출력 경로 생성 (프로젝트별 폴더 지원)
+        if output_dir:
+            output_path_obj = Path(output_dir)
+        else:
+            # 기존 호환성: 글로벌 폴더 사용
+            output_path_obj = Path(self.project_root) / "data" / "images" / "imagefx"
+        output_path_obj.mkdir(parents=True, exist_ok=True)
+        output_path = str(output_path_obj / f"{uuid.uuid4()}.png")
 
         # v6.4: 비율 값 추출 (Enum 안전 변환)
         aspect_value = ensure_string_value(aspect_ratio)
@@ -374,48 +392,60 @@ class ImageFXClient:
         model_value = ensure_string_value(model)
 
         print(f"\n[ImageFX v6.4] ========== 이미지 생성 ==========")
-        print(f"[ImageFX v6.4] 원본 프롬프트: {prompt[:60]}...")
+        print(f"[ImageFX v6.4] 원본 프롬프트 ({len(prompt)}자):\n  {prompt}")
         if negative_prompt:
-            print(f"[ImageFX v6.4] ✅ 네거티브 프롬프트: {negative_prompt[:80]}...")
-        print(f"[ImageFX v6.4] 최종 프롬프트: {final_prompt[:80]}...")
+            print(f"[ImageFX v6.4] 네거티브 프롬프트: {negative_prompt}")
+        print(f"[ImageFX v6.4] 최종 프롬프트 ({len(final_prompt)}자):\n  {final_prompt}")
         print(f"[ImageFX v6.4] 모델: {model_value} (타입: {type(model_value).__name__})")
         print(f"[ImageFX v6.4] 비율: {aspect_value}")
         print(f"[ImageFX v6.4] 출력 경로: {output_path}")
         print(f"[ImageFX v6.4] ===================================")
 
-        # Node.js 스크립트 호출 명령
-        cmd = [
-            "node", self.node_script,
-            "--cookie", self.cookie,
-            "--prompt", final_prompt,  # ⭐ 네거티브 포함된 최종 프롬프트 사용
-            "--outputPath", output_path,
-            "--model", model_value,
-            "--aspectRatio", aspect_value,
-            "--count", str(min(num_images, 4))
-        ]
+        # v6.5: Node.js 스크립트 호출 명령 생성 함수 (current_prompt 사용)
+        def build_cmd(prompt_to_use: str) -> list:
+            """현재 프롬프트로 cmd 생성"""
+            _cmd = [
+                "node", self.node_script,
+                "--cookie", self.cookie,
+                "--prompt", prompt_to_use,  # ⭐ 정제된 프롬프트 사용
+                "--outputPath", output_path,
+                "--model", model_value,
+                "--aspectRatio", aspect_value,
+                "--count", str(min(num_images, 4))
+            ]
 
-        if seed is not None:
-            cmd.extend(["--seed", str(seed)])
+            if seed is not None:
+                _cmd.extend(["--seed", str(seed)])
 
-        # ⭐ 네거티브 프롬프트도 별도로 전달 (라이브러리 지원 시 사용)
+            # ⭐ 네거티브 프롬프트도 별도로 전달 (라이브러리 지원 시 사용)
+            if negative_prompt:
+                _cmd.extend(["--negativePrompt", negative_prompt])
+
+            # ⭐ v6.4: 방어적 코드 - 모든 cmd 인자가 문자열인지 검증
+            for i, arg in enumerate(_cmd):
+                if isinstance(arg, Enum):
+                    _cmd[i] = str(arg.value)
+                elif not isinstance(arg, str):
+                    _cmd[i] = str(arg)
+
+            return _cmd
+
+        # v6.5: 유명인 필터 오류 대응 - 점진적 정제
+        sanitize_level = -1  # 시작 시 정제 안 함, 오류 발생 시 0부터 시작
+        current_prompt = final_prompt  # 현재 사용할 프롬프트 (⚠️ cmd 빌드 전에 반드시 초기화!)
+
+        cmd = build_cmd(current_prompt)
+
         if negative_prompt:
-            cmd.extend(["--negativePrompt", negative_prompt])
-            print(f"[ImageFX v6.4] ✅ 네거티브 프롬프트를 Node.js에 전달 ({len(negative_prompt)}자)")
-
-        # ⭐ v6.4: 방어적 코드 - 모든 cmd 인자가 문자열인지 검증
-        for i, arg in enumerate(cmd):
-            if isinstance(arg, Enum):
-                print(f"[ImageFX v6.4] ⚠️ Enum 객체 감지! cmd[{i}] = {arg} (타입: {type(arg)})")
-                cmd[i] = str(arg.value)
-            elif not isinstance(arg, str):
-                print(f"[ImageFX v6.4] ⚠️ 비문자열 감지! cmd[{i}] = {arg} (타입: {type(arg)})")
-                cmd[i] = str(arg)
+            print(f"[ImageFX v6.5] ✅ 네거티브 프롬프트를 Node.js에 전달 ({len(negative_prompt)}자)")
 
         last_error = None
 
         for attempt in range(retry_count):
             try:
-                print(f"[ImageFX v6.3] Node.js 스크립트 실행 중... (시도 {attempt + 1}/{retry_count})")
+                print(f"[ImageFX v6.5] Node.js 스크립트 실행 중... (시도 {attempt + 1}/{retry_count})")
+                if sanitize_level >= 0:
+                    print(f"[ImageFX v6.5] 🔄 프롬프트 정제 레벨: {sanitize_level}")
 
                 result = subprocess.run(
                     cmd,
@@ -462,12 +492,28 @@ class ImageFXClient:
                                     error_msg = output.get("error", "Unknown error")
                                     # 인증 에러 감지
                                     if is_auth_error(error_msg):
-                                        print(f"[ImageFX v6.3] Auth error detected - cookie expired")
+                                        print(f"[ImageFX v6.5] Auth error detected - cookie expired")
                                         mark_cookie_expired(error_msg)
                                         raise CookieExpiredError(
                                             "ImageFX cookie has expired.\n"
                                             "Please enter a new cookie in the API Management page."
                                         )
+
+                                    # v6.6: 유명인 필터 오류 감지 및 점진적 정제 (아트스타일 보존)
+                                    if is_prominent_people_error(error_msg):
+                                        print(f"[ImageFX v6.6] ⚠️ 유명인 필터 오류 감지 (JSON)!")
+                                        # v6.6: 레벨 0 → 바로 레벨 2 점프 (소폭 수정으로는 필터 우회 불가)
+                                        if sanitize_level < 2:
+                                            sanitize_level = 2
+                                            print(f"[ImageFX v6.6] 🔧 유명인 필터 → 바로 레벨 2 (완전 재작성) 적용...")
+                                        else:
+                                            sanitize_level += 1
+                                        if sanitize_level <= 2:
+                                            print(f"[ImageFX v6.6] 🔧 프롬프트 정제 레벨 {sanitize_level} 적용...")
+                                            current_prompt = aggressive_sanitize(final_prompt, level=sanitize_level)
+                                            cmd = build_cmd(current_prompt)
+                                            print(f"[ImageFX v6.6] 정제된 프롬프트 ({len(current_prompt)}자):\n  {current_prompt[:200]}...")
+
                                     last_error = error_msg
                             except json.JSONDecodeError as e:
                                 print(f"[ImageFX v6.3] JSON parse error: {e}")
@@ -504,6 +550,21 @@ class ImageFXClient:
                 elif not last_error:
                     last_error = combined_output[:500] if combined_output else "Unknown error"
 
+                # v6.6: 유명인 필터 오류 감지 및 점진적 정제 (아트스타일 보존)
+                if is_prominent_people_error(last_error if last_error else ""):
+                    print(f"[ImageFX v6.6] ⚠️ 유명인 필터 오류 감지!")
+                    # v6.6: 레벨 0 → 바로 레벨 2 점프 (소폭 수정으로는 필터 우회 불가)
+                    if sanitize_level < 2:
+                        sanitize_level = 2
+                        print(f"[ImageFX v6.6] 🔧 유명인 필터 → 바로 레벨 2 (완전 재작성) 적용...")
+                    else:
+                        sanitize_level += 1
+                    if sanitize_level <= 2:
+                        print(f"[ImageFX v6.6] 🔧 프롬프트 정제 레벨 {sanitize_level} 적용...")
+                        current_prompt = aggressive_sanitize(final_prompt, level=sanitize_level)
+                        cmd = build_cmd(current_prompt)
+                        print(f"[ImageFX v6.6] 정제된 프롬프트 ({len(current_prompt)}자):\n  {current_prompt[:200]}...")
+
             except CookieExpiredError:
                 raise  # 쿠키 만료는 재시도하지 않고 즉시 전파
 
@@ -513,16 +574,31 @@ class ImageFXClient:
 
             except Exception as e:
                 error_str = str(e)
-                print(f"[ImageFX v6.3] Error: {e}")
+                print(f"[ImageFX v6.5] Error: {e}")
 
                 # 예외에서도 인증 에러 감지
                 if is_auth_error(error_str):
-                    print(f"[ImageFX v6.3] Auth error in exception - cookie expired")
+                    print(f"[ImageFX v6.5] Auth error in exception - cookie expired")
                     mark_cookie_expired(error_str)
                     raise CookieExpiredError(
                         "ImageFX cookie has expired.\n"
                         "Please enter a new cookie in the API Management page."
                     )
+
+                # v6.6: 예외에서도 유명인 필터 오류 감지 (아트스타일 보존)
+                if is_prominent_people_error(error_str):
+                    print(f"[ImageFX v6.6] ⚠️ 유명인 필터 오류 감지 (Exception)!")
+                    # v6.6: 레벨 0 → 바로 레벨 2 점프 (소폭 수정으로는 필터 우회 불가)
+                    if sanitize_level < 2:
+                        sanitize_level = 2
+                        print(f"[ImageFX v6.6] 🔧 유명인 필터 → 바로 레벨 2 (완전 재작성) 적용...")
+                    else:
+                        sanitize_level += 1
+                    if sanitize_level <= 2:
+                        print(f"[ImageFX v6.6] 🔧 프롬프트 정제 레벨 {sanitize_level} 적용...")
+                        current_prompt = aggressive_sanitize(final_prompt, level=sanitize_level)
+                        cmd = build_cmd(current_prompt)
+                        print(f"[ImageFX v6.6] 정제된 프롬프트 ({len(current_prompt)}자):\n  {current_prompt[:200]}...")
 
                 last_error = error_str
 

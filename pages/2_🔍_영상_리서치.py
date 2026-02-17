@@ -1561,7 +1561,7 @@ with tab_recommend:
 
         with col2:
             if topic_ai_provider == "google":
-                model_options = ["gemini-2.0-flash-exp", "gemini-1.5-flash", "gemini-1.5-pro"]
+                model_options = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"]
             else:  # claude_code_agent
                 model_options = ["Max Plan (자동)"]
 

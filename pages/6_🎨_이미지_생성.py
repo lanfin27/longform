@@ -1,12 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-6단계: 이미지 생성 (리팩토링) - v2.0
+6단계: 이미지 생성 (리팩토링) - v3.97
 
 탭 구조:
 - 🎬 씬별 생성: 개별 씬 선택 → 배경 → 캐릭터 배치 → 합성 → 편집 → 저장
 - 🚀 일괄 생성: 전체 씬 자동 생성
 - 🖼️ 갤러리: 생성된 이미지 관리
 - ⚙️ 설정: 스타일 및 API 설정
+
+v3.97 심층 성능 최적화:
+- ⭐ 페이지 로딩 최적화 (optimize_page_load 통합)
+- ⭐ 프로젝트 변경 감지 최적화
+- ⭐ 스타일 변경 감지 최적화 (첫 방문 로그 제거)
+- ⭐ ImageSettings 싱글톤 캐싱 (중복 로드 방지)
+- ⭐ 캐시 키 안정화
+
+v3.96 성능 최적화:
+- 씬 데이터 캐싱 TTL 60초 → 5분 증가
+- 갤러리 캐싱 TTL 30초 → 5분 증가
+- 세션 키 최적화 (불필요한 씬별 키 정리)
+- 썸네일 캐싱 함수 추가
+- 페이지네이션 헬퍼 함수 추가
 
 v2.0: 메모리 관리 및 텍스트 차단 강화
 - memory_manager 통합
@@ -52,7 +66,11 @@ from utils.prominent_people_sanitizer import (
     sanitize_prompt_for_imagefx,
     get_available_sanitizer_models,
     get_recommended_model,
-    check_prominent_people_error
+    check_prominent_people_error,
+    classify_imagefx_error,  # v1.1: 에러 유형 분류
+    get_sanitizer_models_for_ui,  # v1.1: UI용 모델 목록
+    preview_prompt_generalization,  # v1.1: 미리보기
+    needs_sanitization_quick_check  # v1.1: 빠른 체크
 )
 from utils.imagefx_ui_components import (
     show_cookie_status_banner,
@@ -95,6 +113,25 @@ from utils.settings_manager import (
     persistent_number_input,
     render_settings_management_ui
 )
+# v3.94: 프로젝트별 이미지 생성 설정 (배경 스타일 기억)
+from utils.image_generation_settings import (
+    project_persistent_selectbox,
+    load_last_background_style,
+    save_background_style,
+    load_last_composite_style,
+    save_composite_style,
+    clear_image_settings_cache  # v3.97: 캐시 클리어
+)
+# v3.97: 페이지 캐시 최적화
+from utils.page_cache_optimizer import (
+    optimize_page_load,
+    get_stable_cache_version,
+    invalidate_project_cache,
+    get_cached_data,
+    clear_gallery_cache_optimized,
+    detect_style_change_optimized,
+    check_project_change
+)
 from utils.scene_selector import (
     parse_scene_range_input,
     format_selected_scenes,
@@ -124,6 +161,19 @@ from utils.memory_manager import (
     get_session_memory_stats,
     force_gc,
     get_paginated_images  # v2.2: 갤러리 페이지네이션
+)
+
+# v3.95: 실패 씬 관리자 (에러 스킵 + 재생성)
+from utils.failed_scene_manager import (
+    FailedSceneManager,
+    get_failed_scene_manager,
+    get_error_category_info,
+    ERROR_CATEGORY_INFO
+)
+from components.failed_scenes_panel import (
+    render_failed_scenes_panel,
+    render_generation_progress_with_failures,
+    render_failed_scenes_summary_card
 )
 from utils.prompt_sanitizer import (
     sanitize_scene_prompt,
@@ -297,6 +347,47 @@ def format_character_names(characters: list, max_count: int = 3) -> str:
     return result
 
 
+# ===================================================================
+# 헬퍼 함수: 씬 데이터 안전 로드 (v2.1)
+# ===================================================================
+def get_scenes_safe() -> list:
+    """
+    씬 목록을 안전하게 가져오는 함수
+
+    load_scenes_data를 래핑하여 에러 발생 시 빈 리스트 반환
+
+    Returns:
+        씬 목록 (실패 시 빈 리스트)
+    """
+    try:
+        # 세션에서 프로젝트 경로 가져오기
+        project_path = st.session_state.get('current_project_path', '')
+
+        if not project_path:
+            print("[get_scenes_safe] ⚠️ 프로젝트 경로 없음")
+            return []
+
+        # load_scenes_data 사용 (이미 import됨)
+        scenes = load_scenes_data(project_path)
+
+        if scenes:
+            return scenes
+
+        # 대체 경로 시도: current_video 고려
+        video_name = st.session_state.get('current_video', '')
+        if video_name:
+            video_path = Path(project_path) / 'videos' / video_name
+            scenes = load_scenes_data(str(video_path))
+            if scenes:
+                return scenes
+
+        return []
+
+    except Exception as e:
+        print(f"[get_scenes_safe] ❌ 오류: {e}")
+        return []
+
+
 # 페이지 설정
 st.set_page_config(
     page_title="이미지 생성",
@@ -384,6 +475,20 @@ render_lightbox_container()
 project_path = get_current_project()
 
 # ===================================================================
+# v2.3/v2.4: 갤러리 캐시 클리어 (영상 변경 시)
+# v2.4: 함수 정의 전 호출 시 NameError 방지
+# ===================================================================
+if st.session_state.get("_gallery_cache_needs_clear", False):
+    try:
+        _cached_get_gallery_images.clear()
+        print("[이미지 생성] 갤러리 캐시 클리어 완료 (영상 변경)")
+    except NameError:
+        # 함수가 아직 정의되지 않은 경우 - 전체 캐시 클리어
+        st.cache_data.clear()
+        print("[이미지 생성] 전체 캐시 클리어 완료 (함수 미정의)")
+    st.session_state._gallery_cache_needs_clear = False
+
+# ===================================================================
 # 스타일 캐시 동기화 (v2.2)
 # ===================================================================
 # 스타일 관리 페이지에서 변경된 내용이 있으면 자동으로 감지하여 새로고침
@@ -406,12 +511,16 @@ def _get_image_gen_init_key():
 
 
 def sync_all_data():
-    """페이지 로드 시 모든 데이터 동기화 (⭐ 초기화 최적화 적용)"""
+    """페이지 로드 시 모든 데이터 동기화 (⭐ v3.97 최적화 적용)"""
 
-    # ⭐ 성능 최적화: 이미 초기화된 경우 스킵
+    # ⭐ 성능 최적화: 이미 초기화된 경우 스킵 (로그 없음)
     init_key = _get_image_gen_init_key()
     if st.session_state.get(init_key, False):
+        # ⭐ v3.97: 이미 초기화됨 - 아무것도 하지 않음
         return
+
+    # ⭐ v3.97: 실제 초기화 수행 시에만 로그
+    print(f"[SyncData] 데이터 동기화 시작 (1회)")
 
     # 씬 데이터 로드 (통합 로더 사용 - Problem 56 수정)
     # ⭐ v3.41: 캐시된 함수 사용 (성능 최적화)
@@ -480,11 +589,18 @@ def sync_all_data():
     st.session_state[init_key] = True
 
 
-# ⭐ 성능 최적화: 씬 데이터 캐싱
-@st.cache_data(ttl=60, show_spinner=False)
+# ⭐ 성능 최적화: 씬 데이터 캐싱 (v3.97 - 로깅 최적화)
+@st.cache_data(ttl=300, show_spinner=False)
 def _cached_load_scenes(project_path_str: str) -> List[Dict]:
-    """씬 데이터 로드 (캐싱 적용)"""
-    return load_scenes_data(project_path_str)
+    """
+    씬 데이터 로드 (캐싱 적용, 5분 TTL)
+
+    ⭐ v3.97: 이 로그가 출력되면 실제 캐시 미스 (파일 다시 로드)
+    """
+    # ⭐ v3.97: 경로 정규화로 캐시 키 안정화
+    normalized_path = str(Path(project_path_str).resolve())
+    print(f"[Cache] scenes 로드 (캐시 미스): {Path(normalized_path).name}")
+    return load_scenes_data(normalized_path)
 
 
 # ⭐ v3.41 성능 최적화: PromptTemplateManager 싱글톤 캐싱
@@ -553,14 +669,119 @@ def force_refresh_styles():
     print(f"[스타일 새로고침] 클리어된 키: {len(keys_to_clear)}개")
 
 
-# ⭐ 성능 최적화: 갤러리 이미지 목록 캐싱 (TTL 30초)
-@st.cache_data(ttl=30, show_spinner=False)
+# ═══════════════════════════════════════════════════════════════════
+# v3.96 성능 최적화: 썸네일 캐싱 및 페이지네이션 헬퍼
+# ═══════════════════════════════════════════════════════════════════
+
+@st.cache_resource
+def _get_thumbnail_cached(image_path: str, max_size: int = 200):
+    """
+    이미지 썸네일 캐싱 (메모리 상주)
+
+    v3.96: 갤러리 로딩 속도 향상을 위한 썸네일 캐싱
+    - 원본 이미지 대신 작은 썸네일 사용
+    - @st.cache_resource로 세션 간 공유
+
+    Args:
+        image_path: 이미지 파일 경로
+        max_size: 최대 썸네일 크기 (px)
+
+    Returns:
+        base64 인코딩된 썸네일 또는 None
+    """
+    try:
+        from PIL import Image
+        import io
+        import base64
+
+        if not Path(image_path).exists():
+            return None
+
+        img = Image.open(image_path)
+        img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+
+        # RGBA인 경우 RGB로 변환 (JPEG 저장 위해)
+        if img.mode in ('RGBA', 'P'):
+            img = img.convert('RGB')
+
+        buffer = io.BytesIO()
+        img.save(buffer, format="JPEG", quality=75)
+        return base64.b64encode(buffer.getvalue()).decode()
+    except Exception as e:
+        # print(f"[Thumbnail] 오류: {e}")  # 디버그 시 활성화
+        return None
+
+
+def _get_paginated_gallery_images(
+    all_images: List[Dict],
+    page: int,
+    items_per_page: int = 12
+) -> tuple:
+    """
+    갤러리 이미지 페이지네이션 (v3.96)
+
+    Args:
+        all_images: 전체 이미지 목록
+        page: 현재 페이지 (1-based)
+        items_per_page: 페이지당 이미지 수
+
+    Returns:
+        (현재 페이지 이미지 리스트, 총 페이지 수)
+    """
+    total_images = len(all_images)
+    total_pages = max(1, (total_images + items_per_page - 1) // items_per_page)
+
+    # 페이지 범위 검증
+    page = max(1, min(page, total_pages))
+
+    start_idx = (page - 1) * items_per_page
+    end_idx = min(start_idx + items_per_page, total_images)
+
+    return all_images[start_idx:end_idx], total_pages
+
+
+def _optimize_session_keys():
+    """
+    세션 키 최적화 (v3.96)
+
+    불필요한 씬별 선택 키 정리하여 세션 상태 경량화
+    """
+    if st.session_state.get("_session_keys_optimized", False):
+        return
+
+    current_keys = list(st.session_state.keys())
+    keys_to_remove = []
+
+    # 씬별 체크박스 키 정리 (select_scene_* 패턴)
+    for key in current_keys:
+        if key.startswith("select_scene_") and "_idx" in key:
+            keys_to_remove.append(key)
+
+    # 최대 200개까지만 제거 (안전장치)
+    removed = 0
+    for key in keys_to_remove[:200]:
+        if key in st.session_state:
+            del st.session_state[key]
+            removed += 1
+
+    if removed > 0:
+        print(f"[SessionOptimize] {removed}개 세션 키 정리됨")
+
+    st.session_state["_session_keys_optimized"] = True
+
+
+# ⭐ v3.97 성능 최적화: 갤러리 이미지 목록 캐싱 (로깅 최적화)
+@st.cache_data(ttl=300, show_spinner=False)
 def _cached_get_gallery_images(project_path_str: str) -> List[Dict]:
     """
-    모든 생성된 이미지 목록 (캐싱 적용)
+    모든 생성된 이미지 목록 (캐싱 적용, 5분 TTL)
 
     v2.1: 글로벌 폴더(data/images/imagefx 등) 포함
+    v3.96: TTL 30초 → 5분 증가
+    v3.97: 로깅 최적화 (캐시 미스 시에만 로그)
     """
+    # ⭐ v3.97: 이 로그가 출력되면 실제 캐시 미스
+    print(f"[Cache] 갤러리 로드 (캐시 미스): {Path(project_path_str).name}")
     images = []
     project_path_obj = Path(project_path_str)
 
@@ -575,23 +796,22 @@ def _cached_get_gallery_images(project_path_str: str) -> List[Dict]:
                         "path": str(f),
                         "filename": f.name,
                         "type": img_type,
-                        "scene_id": extract_scene_id(f.name),
+                        "scene_id": extract_scene_id(f.name, str(f)),  # v2.1: 메타데이터 조회용 full_path
                         "created": f.stat().st_mtime
                     })
                 except:
                     pass
 
-    # 프로젝트 폴더 이미지
+    # 프로젝트 폴더 이미지 (비디오별 분리)
     scan_folder(project_path_obj / "images" / "composited", "composited")
     scan_folder(project_path_obj / "images" / "scenes", "scene")
     scan_folder(project_path_obj / "images" / "backgrounds", "background")
 
-    # ⭐ v2.1: 글로벌 폴더 이미지 (ImageFX 등)
-    global_images_dir = Path(__file__).parent.parent / "data" / "images"
-    if global_images_dir.exists():
-        scan_folder(global_images_dir / "imagefx", "imagefx")
-        scan_folder(global_images_dir / "generated", "generated")
-        scan_folder(global_images_dir / "backgrounds", "global_background")
+    # v2.3: 비디오별 ImageFX 폴더 스캔 (글로벌 폴더 대신)
+    # 글로벌 폴더(data/images/imagefx)는 모든 영상 이미지가 혼합되어 있어 제외
+    # 프로젝트별 imagefx 폴더만 스캔
+    scan_folder(project_path_obj / "images" / "imagefx", "imagefx")
+    scan_folder(project_path_obj / "images" / "generated", "generated")
 
     # ⭐ 씬 번호순 정렬 (1, 2, 3, 4... 순서)
     def _sort_key(x):
@@ -619,12 +839,109 @@ def clear_gallery_cache():
     print("[갤러리 캐시] 캐시 무효화됨")
 
 
-def extract_scene_id(filename: str) -> str:
-    """파일명에서 씬 ID 추출"""
+def extract_scene_id(filename: str, full_path: str = None) -> str:
+    """
+    파일명에서 씬 ID 추출 (v2.1 - 메타데이터 지원 추가)
+
+    지원 패턴:
+    - scene_049.png → 049
+    - scene49.png → 49
+    - bg_scene_049.png → 049
+    - composited_049.png → 049
+    - 049_background.png → 049
+    - img_049_final.png → 049
+    - 씬49_이미지.png → 49
+    - s049.png → 049
+    - gen_nano_scene49_xxx.png → 49
+    - 메타데이터 JSON에서 scene_id 읽기 (폴백)
+
+    Args:
+        filename: 파일명
+        full_path: 전체 경로 (메타데이터 조회용, 선택)
+    """
     import re
-    match = re.search(r'scene[_\-]?(\d+)', filename, re.IGNORECASE)
-    if match:
-        return match.group(1)
+    import os
+    import json
+
+    if not filename:
+        return "?"
+
+    # 파일명만 추출 (경로 제거)
+    basename = os.path.basename(filename)
+    name_without_ext = os.path.splitext(basename)[0]
+
+    # 여러 패턴 시도 (우선순위 순)
+    patterns = [
+        # 패턴 1: scene_049 또는 scene49 (가장 일반적)
+        r'scene[_\-]?(\d{1,3})',
+
+        # 패턴 2: composited_049, bg_049
+        r'(?:composited|bg|background|char|character)[_\-](\d{1,3})',
+
+        # 패턴 3: _049_ 또는 _049. (중간/끝에 있는 3자리 숫자)
+        r'[_\-](\d{3})[_\-\.]',
+
+        # 패턴 4: 파일명 시작의 숫자 (049_xxx)
+        r'^(\d{2,3})[_\-]',
+
+        # 패턴 5: 한글 패턴 (씬49, 씬_49)
+        r'씬[_\s]?(\d{1,3})',
+
+        # 패턴 6: s049 (축약형)
+        r'\bs(\d{2,3})\b',
+
+        # 패턴 7: nano_banana 등 API 출력 패턴 (scene 뒤에 숫자)
+        r'[_\-]scene[_\-]?(\d{1,3})[_\-]',
+
+        # 패턴 8: 마지막 숫자 그룹 (fallback - 2~3자리만)
+        r'[_\-](\d{2,3})(?:[_\-\.]|$)',
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, name_without_ext, re.IGNORECASE)
+        if match:
+            scene_id = match.group(1)
+            # 숫자 검증 (1-999 범위)
+            scene_num = int(scene_id)
+            if 1 <= scene_num <= 999:
+                return scene_id
+
+    # 마지막 fallback: 파일명에 있는 첫 번째 2-3자리 숫자 그룹
+    fallback_match = re.search(r'(\d{2,3})', name_without_ext)
+    if fallback_match:
+        scene_id = fallback_match.group(1)
+        scene_num = int(scene_id)
+        if 1 <= scene_num <= 999:
+            return scene_id
+
+    # v2.1: 메타데이터 JSON에서 scene_id 조회 (full_path가 제공된 경우)
+    if full_path:
+        try:
+            from pathlib import Path
+            image_path = Path(full_path)
+
+            # 방법 1: 같은 이름의 .json 파일
+            json_path = image_path.with_suffix('.json')
+            if json_path.exists():
+                with open(json_path, 'r', encoding='utf-8') as f:
+                    metadata = json.load(f)
+                if isinstance(metadata, list) and len(metadata) > 0:
+                    metadata = metadata[0]
+                if isinstance(metadata, dict) and metadata.get('scene_id') is not None:
+                    return str(int(metadata['scene_id']))
+
+            # 방법 2: _meta.json 형식
+            meta_path = image_path.with_name(image_path.stem + "_meta.json")
+            if meta_path.exists():
+                with open(meta_path, 'r', encoding='utf-8') as f:
+                    metadata = json.load(f)
+                if isinstance(metadata, list) and len(metadata) > 0:
+                    metadata = metadata[0]
+                if isinstance(metadata, dict) and metadata.get('scene_id') is not None:
+                    return str(int(metadata['scene_id']))
+        except Exception:
+            pass
+
     return "?"
 
 
@@ -648,9 +965,52 @@ def delete_image(image_path: str) -> bool:
 
 
 def get_background_for_scene(scene_id: int) -> Optional[Dict]:
-    """씬의 배경 이미지 가져오기"""
+    """
+    씬의 배경 이미지 가져오기
+
+    v3.93: 같은 bundle의 다른 씬 이미지도 확인
+    - 직접 해당 씬의 이미지가 있으면 반환
+    - 없으면 같은 bundle_id의 다른 씬 이미지 확인
+    """
     bg_images = st.session_state.get("background_images", {})
-    return bg_images.get(str(scene_id))
+
+    # 1. 직접 해당 씬의 이미지 확인
+    direct_image = bg_images.get(str(scene_id))
+    if direct_image:
+        return direct_image
+
+    # 2. 같은 번들의 다른 씬 이미지 확인
+    try:
+        scenes = get_scenes_safe()
+        if not scenes:
+            return None
+
+        # 현재 씬의 bundle_id 찾기
+        current_scene = next((s for s in scenes if s.get('scene_id') == scene_id), None)
+        if not current_scene:
+            return None
+
+        current_bundle_id = current_scene.get('bundle_id')
+        if current_bundle_id is None:
+            return None
+
+        # 같은 bundle의 다른 씬들 확인
+        for scene in scenes:
+            if scene.get('bundle_id') == current_bundle_id:
+                other_scene_id = scene.get('scene_id')
+                if other_scene_id != scene_id:
+                    bundle_image = bg_images.get(str(other_scene_id))
+                    if bundle_image:
+                        # 번들 이미지 정보에 소스 표시 추가
+                        return {
+                            **bundle_image,
+                            "_from_bundle": True,
+                            "_source_scene_id": other_scene_id
+                        }
+    except Exception as e:
+        print(f"[Bundle Image] 번들 이미지 확인 실패: {e}")
+
+    return None
 
 
 def _get_scene_preview_text(scene: Dict, max_len: int = 100) -> str:
@@ -1444,12 +1804,20 @@ def render_background_step(scene_id: int, scene: Dict):
             style_ids = [s.id for s in bg_styles]
             style_names = {s.id: s.name_ko for s in bg_styles}
 
+            # v3.94: 프로젝트별 마지막 사용 스타일 자동 기억
+            # 개별 씬 스타일도 프로젝트 설정에서 기본값 로드
+            last_style = load_last_background_style(str(project_path))
+            default_idx = 0
+            if last_style and last_style in style_ids:
+                default_idx = style_ids.index(last_style)
+
             style = st.selectbox(
                 "배경 스타일",
                 options=style_ids,
+                index=default_idx,
                 format_func=lambda x: style_names.get(x, x),
                 key=f"bg_style_{scene_id}",
-                help="스타일 관리 페이지에서 등록된 배경 스타일"
+                help="스타일 관리 페이지에서 등록된 배경 스타일 (마지막 선택 기억)"
             )
 
             # 스타일 프롬프트 미리보기
@@ -2197,6 +2565,48 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
     st.info("💡 여러 씬의 배경과 합성 이미지를 한 번에 생성합니다.")
 
     # ============================================================
+    # v3.95: 이전 실패 씬 확인 및 표시
+    # ============================================================
+    _current_project = get_current_project()
+    project_path = str(_current_project) if _current_project else ""
+    if project_path:
+        prev_failed_manager = get_failed_scene_manager(str(project_path))
+        prev_failed_scenes = prev_failed_manager.get_unresolved_scenes()
+
+        if prev_failed_scenes:
+            with st.expander(f"이전 생성에서 실패한 씬 ({len(prev_failed_scenes)}개)", expanded=False):
+                # 요약
+                summary = prev_failed_manager.get_summary()
+                cols = st.columns(4)
+                with cols[0]:
+                    st.metric("총 실패", f"{summary['total_failed']}개")
+                with cols[1]:
+                    cats = list(summary['error_categories'].items())[:3]
+                    for cat, count in cats:
+                        info = get_error_category_info(cat)
+                        st.caption(f"{info['icon']} {info['label']}: {count}개")
+
+                # 실패 씬 목록 (간략)
+                failed_ids = summary['scene_ids'][:20]
+                st.markdown(f"**실패 씬:** {', '.join(map(str, failed_ids))}" + ("..." if len(summary['scene_ids']) > 20 else ""))
+
+                # 버튼
+                col_sel, col_clear = st.columns(2)
+                with col_sel:
+                    if st.button("실패 씬만 선택", key="select_prev_failed", use_container_width=True):
+                        for scene in scenes:
+                            scene_id = scene.get("scene_id")
+                            st.session_state[f"batch_select_{scene_id}"] = scene_id in summary['scene_ids']
+                        st.toast(f"{len(summary['scene_ids'])}개 실패 씬 선택됨")
+                        st.rerun()
+
+                with col_clear:
+                    if st.button("실패 기록 삭제", key="clear_prev_failed", use_container_width=True):
+                        prev_failed_manager.clear_all()
+                        st.toast("실패 기록 삭제됨")
+                        st.rerun()
+
+    # ============================================================
     # 씬 선택 (범위 선택 기능 추가)
     # ============================================================
     total_scenes = len(scenes)
@@ -2641,12 +3051,15 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                 style_ids = [s[0] for s in style_options]
                 style_names = {s[0]: s[1] for s in style_options}
 
-                style = st.selectbox(
+                # v3.94: 프로젝트별 마지막 사용 스타일 자동 기억
+                style = project_persistent_selectbox(
                     "배경 스타일",
                     options=style_ids,
+                    video_path=str(project_path),
+                    setting_key="background_style",
                     format_func=lambda x: style_names.get(x, x),
                     key="batch_style",
-                    help="스타일 관리 페이지에서 등록된 배경 스타일"
+                    help="스타일 관리 페이지에서 등록된 배경 스타일 (마지막 선택 기억)"
                 )
 
             with style_col2:
@@ -2715,12 +3128,15 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                     scene_style_ids = [s[0] for s in scene_style_options]
                     scene_style_names = {s[0]: s[1] for s in scene_style_options}
 
-                    composite_style_id = st.selectbox(
+                    # v3.94: 프로젝트별 마지막 사용 스타일 자동 기억
+                    composite_style_id = project_persistent_selectbox(
                         "🎬 씬 합성 스타일",
                         options=scene_style_ids,
+                        video_path=str(project_path),
+                        setting_key="composite_style",
                         format_func=lambda x: scene_style_names.get(x, x),
                         key="batch_composite_style",
-                        help="스타일 관리 페이지에서 등록된 씬 합성 스타일"
+                        help="스타일 관리 페이지에서 등록된 씬 합성 스타일 (마지막 선택 기억)"
                     )
 
                     composite_style = next((s for s in scene_styles if s.id == composite_style_id), None)
@@ -3185,6 +3601,16 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
         error_count = 0
         first_image_processed = False  # 첫 이미지 처리 여부 (시드 잠금용)
 
+        # v3.95: 실패 씬 관리자 (에러 스킵 + 재생성 지원)
+        failed_manager = get_failed_scene_manager(str(project_path))
+
+        # v3.91: 실패한 씬 추적 (유명인 필터 재시도용) - 호환성 유지
+        failed_scenes_data = []  # [{"scene_id": int, "error": str, "prompt": str, "is_prominent_people_error": bool}]
+
+        # v3.95: 에러 스킵 모드 활성화 (에러 발생해도 다음 씬 계속 진행)
+        continue_on_error = True
+        print(f"[일괄생성] 에러 시 계속 진행 모드: 활성화")
+
         # v2.1: 프롬프트 유형별 이모지
         PROMPT_TYPE_EMOJI = {
             "full_prompt": "🖼️",
@@ -3364,6 +3790,12 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
 
                 success_count += 1
 
+                # v3.95: 성공한 씬은 이전 실패 기록에서 해결됨으로 표시
+                failed_manager.mark_resolved(
+                    scene_id,
+                    generation_type="background" if "배경만" in style_mode else "composite"
+                )
+
                 # v3.35: 최적화 모드에서 생성된 이미지 경로 추적
                 if use_batch_optimization and scene_id in scenes_to_copy.values():
                     # 이 씬이 다른 씬들의 소스가 되는 경우 경로 저장
@@ -3384,8 +3816,40 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                         print(f"[일괄생성] ⚠️ 씬 {scene_id} 경로 추적 실패: {track_err}")
 
             except Exception as e:
-                st.error(f"씬 {scene_id} 처리 실패: {e}")
+                error_msg = str(e)
                 error_count += 1
+
+                # v3.95: 에러 발생 시 계속 진행 (건너뛰기)
+                if continue_on_error:
+                    st.warning(f"씬 {scene_id} 실패 - 건너뜀: {error_msg[:80]}...")
+                    print(f"[일괄생성] ⏭️ 씬 {scene_id} 건너뜀: {type(e).__name__}")
+                else:
+                    st.error(f"씬 {scene_id} 처리 실패: {error_msg}")
+
+                # v3.95: FailedSceneManager에 실패 정보 기록
+                try:
+                    failed_prompt = prompt
+                except NameError:
+                    failed_prompt = ""
+
+                failed_manager.add_failed_scene(
+                    scene_id=scene_id,
+                    error=e,
+                    scene_data=scene,
+                    generation_type="background" if "배경만" in style_mode else "composite",
+                    prompt=failed_prompt
+                )
+
+                # v3.91: 기존 호환성 유지 (유명인 필터 재시도용)
+                is_prominent = check_prominent_people_error(error_msg)
+                failed_scenes_data.append({
+                    "scene_id": scene_id,
+                    "error": error_msg,
+                    "prompt": failed_prompt,
+                    "is_prominent_people_error": is_prominent
+                })
+                if is_prominent:
+                    print(f"[일괄생성] 🔴 씬 {scene_id}: PROMINENT_PEOPLE_FILTER 에러 감지")
 
             # 메모리 정리 (Out of Memory 방지)
             gc.collect()
@@ -3422,6 +3886,14 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                     if not source_path or not os.path.exists(source_path):
                         print(f"[일괄생성] ⚠️ 씬 {target_scene}: 소스 씬 {source_scene}의 이미지를 찾을 수 없음")
                         copy_errors += 1
+
+                        # v3.95: 소스 이미지 없음 에러 기록
+                        failed_manager.add_failed_scene(
+                            scene_id=target_scene,
+                            error=FileNotFoundError(f"소스 씬 {source_scene}의 이미지를 찾을 수 없음: {source_path}"),
+                            scene_data={"source_scene": source_scene},
+                            generation_type="copy"
+                        )
                         continue
 
                     # 이미지 타입 결정
@@ -3439,30 +3911,39 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                         copy_count += 1
                         print(f"[일괄생성] ✅ 씬 {target_scene} 복사 완료: {copied_path}")
 
-                        # 씬 데이터에 경로 업데이트
+                        # ✅ v3.90: 씬 데이터에 경로 업데이트 (기존 함수 사용)
                         try:
-                            from core.scene.scene_manager import SceneManager
-                            scene_manager = SceneManager(str(project_path))
-
                             if image_type == "background":
-                                scene_manager.update_scene(target_scene, {
-                                    "background_image": copied_path,
-                                    "copied_from_scene": source_scene
-                                })
+                                update_scene_background(target_scene, copied_path, str(project_path))
+                                print(f"[일괄생성] ✅ 씬 {target_scene} 배경 데이터 업데이트 완료")
                             else:
-                                scene_manager.update_scene(target_scene, {
-                                    "composed_scene_image": copied_path,
-                                    "copied_from_scene": source_scene
-                                })
+                                update_scene_composite(target_scene, copied_path, str(project_path))
+                                print(f"[일괄생성] ✅ 씬 {target_scene} 합성 데이터 업데이트 완료")
                         except Exception as update_err:
                             print(f"[일괄생성] ⚠️ 씬 {target_scene} 데이터 업데이트 실패: {update_err}")
                     else:
                         copy_errors += 1
                         print(f"[일괄생성] ❌ 씬 {target_scene} 복사 실패")
 
+                        # v3.95: 복사 실패 기록
+                        failed_manager.add_failed_scene(
+                            scene_id=target_scene,
+                            error=RuntimeError(f"이미지 복사 실패 (소스: {source_scene})"),
+                            scene_data={"source_scene": source_scene},
+                            generation_type="copy"
+                        )
+
                 except Exception as copy_err:
                     print(f"[일괄생성] ❌ 씬 {target_scene} 복사 중 오류: {copy_err}")
                     copy_errors += 1
+
+                    # v3.95: 복사 예외 기록
+                    failed_manager.add_failed_scene(
+                        scene_id=target_scene,
+                        error=copy_err,
+                        scene_data={"source_scene": source_scene},
+                        generation_type="copy"
+                    )
 
             print(f"[일괄생성] 📋 복사 완료: 성공 {copy_count}개, 실패 {copy_errors}개")
 
@@ -3530,7 +4011,389 @@ def _render_batch_background_and_composite(scenes: List[Dict]):
                 st.caption("각 씬의 프롬프트 상세는 갤러리 탭에서 이미지 클릭 시 확인 가능합니다.")
 
         if error_count > 0:
-            st.warning(f"⚠️ {error_count}개 씬 처리 실패 - 위의 오류 메시지를 확인하세요.")
+            st.warning(f"⚠️ {error_count}개 씬 처리 실패 - 아래에서 재생성할 수 있습니다.")
+
+        # v3.95: 해결된 씬들 정리
+        failed_manager.remove_resolved()
+
+        # ============================================================
+        # v3.95: 실패 씬 패널 (새로운 FailedSceneManager 기반)
+        # ============================================================
+        all_failed_scenes = failed_manager.get_unresolved_scenes()
+
+        if all_failed_scenes:
+            st.markdown("---")
+            st.markdown("### 실패한 씬 관리")
+
+            def handle_retry_selected(selected):
+                """선택 씬 재생성 - 전체 씬 데이터 포함"""
+                st.session_state["retry_failed_scenes_data"] = selected
+                st.rerun()
+
+            def handle_retry_all(all_failed):
+                """전체 재생성"""
+                st.session_state["retry_failed_scenes_data"] = all_failed
+                st.rerun()
+
+            def handle_ai_sanitize(scene_id, prompt):
+                """AI 프롬프트 정제"""
+                try:
+                    ai_model = get_recommended_model()
+                    sanitizer = ProminentPeopleSanitizer(ai_model=ai_model)
+                    result = sanitizer.sanitize(prompt)
+                    if result.was_modified:
+                        st.session_state[f"batch_failed_edit_prompt_{scene_id}"] = result.sanitized_prompt
+                        st.toast(f"씬 {scene_id} 프롬프트 정제 완료: {len(result.replacements)}건 변경")
+                    else:
+                        st.toast(f"씬 {scene_id}: 변경할 내용 없음")
+                except Exception as e:
+                    st.toast(f"AI 정제 실패: {e}")
+                st.rerun()
+
+            def handle_clear():
+                """기록 삭제"""
+                failed_manager.clear_all()
+                st.toast("실패 기록 삭제됨")
+                st.rerun()
+
+            render_failed_scenes_panel(
+                failed_scenes=all_failed_scenes,
+                on_retry_selected=handle_retry_selected,
+                on_retry_all=handle_retry_all,
+                on_clear=handle_clear,
+                on_ai_sanitize=handle_ai_sanitize,
+                key_prefix="batch_failed"
+            )
+
+        # ============================================================
+        # v3.96: 실패 씬 일반 재생성 처리
+        # ============================================================
+        if "retry_failed_scenes_data" in st.session_state:
+            retry_list = st.session_state.pop("retry_failed_scenes_data")
+
+            if retry_list:
+                st.markdown("---")
+                st.markdown("### 실패한 씬 재생성 중...")
+
+                retry_progress = st.progress(0)
+                retry_status = st.empty()
+                retry_success = 0
+                retry_fail = 0
+
+                for idx, item in enumerate(retry_list):
+                    sid = item["scene_id"]
+                    # 수정된 프롬프트 우선, 없으면 원본
+                    prompt = st.session_state.get(
+                        f"batch_failed_edit_prompt_{sid}",
+                        item.get("prompt", "")
+                    )
+
+                    retry_status.text(f"씬 {sid} 재생성 중... ({idx+1}/{len(retry_list)})")
+                    retry_progress.progress((idx + 1) / len(retry_list))
+
+                    if not prompt:
+                        retry_fail += 1
+                        st.warning(f"씬 {sid}: 프롬프트 없음 (건너뜀)")
+                        continue
+
+                    try:
+                        scene = get_scene_by_id(sid)
+                        if not scene:
+                            retry_fail += 1
+                            st.warning(f"씬 {sid}: 씬 정보 없음 (건너뜀)")
+                            continue
+
+                        # API/모델 설정
+                        batch_api = st.session_state.get("_batch_gen_api")
+                        batch_model = st.session_state.get("_batch_gen_model")
+                        current_seed = get_seed_for_generation(key_prefix="batch_seed")
+
+                        # 네거티브 프롬프트
+                        style_config = get_selected_style()
+                        negative_prompt = style_config.get("negative_prompt", "") if style_config else ""
+
+                        generate_background_image_with_prompt(
+                            scene_id=sid,
+                            full_prompt=prompt,
+                            negative_prompt=negative_prompt,
+                            width=1280,
+                            height=720,
+                            api_provider=batch_api,
+                            model=batch_model,
+                            seed=current_seed
+                        )
+
+                        retry_success += 1
+                        st.success(f"씬 {sid} 재생성 성공!")
+
+                        # 성공 시 실패 목록에서 제거
+                        failed_manager.mark_resolved(sid)
+
+                        # Rate limit 방지 (⭐ v3.96: 모듈 레벨 import 사용)
+                        time.sleep(2)
+
+                    except Exception as e:
+                        retry_fail += 1
+                        st.error(f"씬 {sid} 재생성 실패: {e}")
+                        failed_manager.increment_retry_count(sid)
+
+                retry_progress.progress(1.0)
+                retry_status.empty()
+
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("재생성 성공", f"{retry_success}개")
+                with col2:
+                    st.metric("재생성 실패", f"{retry_fail}개")
+
+                if retry_success > 0:
+                    failed_manager.remove_resolved()
+
+        # ============================================================
+        # v3.92: 실패한 씬 분석 및 유명인 필터 재시도 UI (미리보기 추가) - 기존 호환성
+        # ============================================================
+        if failed_scenes_data:
+            prominent_failed = [s for s in failed_scenes_data if s.get("is_prominent_people_error")]
+            other_failed = [s for s in failed_scenes_data if not s.get("is_prominent_people_error")]
+
+            with st.expander(f"🔴 실패한 씬 상세 ({len(failed_scenes_data)}개)", expanded=True):
+                # 유명인 필터 에러 섹션
+                if prominent_failed:
+                    st.markdown("### 👤 유명인 필터 에러")
+                    st.info(f"""
+                        🔍 **{len(prominent_failed)}개 씬**이 유명인/기업명 필터로 인해 실패했습니다.
+
+                        **가능한 원인:**
+                        - 프롬프트에 유명인 이름 포함 (예: 이재용, Elon Musk)
+                        - 기업명 포함 (예: 삼성전자, Tesla)
+                        - Rate limit으로 표시되지만 실제로는 유명인 필터
+
+                        **해결 방법:**
+                        1. 아래에서 **미리보기**를 클릭하여 변환 내용 확인
+                        2. **유명인 일반화 후 재생성** 클릭
+                    """)
+
+                    # v3.92: 탭으로 실패 씬 목록과 미리보기 분리
+                    tab_list, tab_preview = st.tabs(["📋 실패한 씬 목록", "👁️ 일반화 미리보기"])
+
+                    with tab_list:
+                        # 실패한 씬 목록 표시
+                        for item in prominent_failed:
+                            sid = item["scene_id"]
+                            prompt_text = item.get("prompt", "")
+                            prompt_preview = prompt_text[:100] + "..." if len(prompt_text) > 100 else prompt_text
+                            error_type = classify_imagefx_error(item.get("error", ""))
+
+                            col1, col2, col3 = st.columns([1, 3, 1])
+                            with col1:
+                                st.markdown(f"**씬 {sid}**")
+                            with col2:
+                                st.caption(prompt_preview)
+                            with col3:
+                                # 에러 유형 배지
+                                if error_type == "celebrity_filter":
+                                    st.error("🚫 유명인")
+                                elif error_type == "rate_limit_maybe_celebrity":
+                                    st.warning("⚠️ Rate limit")
+                                else:
+                                    st.info(f"ℹ️ {error_type}")
+
+                    with tab_preview:
+                        # v3.92: 일반화 미리보기
+                        st.markdown("#### 📝 유명인 일반화 미리보기")
+                        st.caption("AI가 프롬프트에서 유명인/기업명을 일반화된 표현으로 변환합니다.")
+
+                        # 미리보기 버튼
+                        if st.button("🔍 미리보기 생성", key="generate_preview"):
+                            with st.spinner("AI가 프롬프트를 분석 중..."):
+                                prompts_to_preview = [item.get("prompt", "") for item in prominent_failed]
+                                preview_results = preview_prompt_generalization(prompts_to_preview)
+                                st.session_state["failed_scenes_preview"] = preview_results
+
+                        # 미리보기 결과 표시
+                        if "failed_scenes_preview" in st.session_state:
+                            preview_results = st.session_state["failed_scenes_preview"]
+
+                            for idx, (item, preview) in enumerate(zip(prominent_failed, preview_results)):
+                                sid = item["scene_id"]
+
+                                with st.container():
+                                    st.markdown(f"##### 씬 {sid}")
+
+                                    if preview.get("error"):
+                                        st.error(f"미리보기 오류: {preview['error']}")
+                                    elif preview.get("has_changes"):
+                                        col_orig, col_new = st.columns(2)
+
+                                        with col_orig:
+                                            st.markdown("**원본 프롬프트:**")
+                                            st.text_area(
+                                                "원본",
+                                                preview["original"][:300] + "..." if len(preview["original"]) > 300 else preview["original"],
+                                                height=100,
+                                                key=f"orig_preview_{sid}",
+                                                disabled=True,
+                                                label_visibility="collapsed"
+                                            )
+
+                                        with col_new:
+                                            st.markdown("**일반화된 프롬프트:**")
+                                            st.text_area(
+                                                "일반화",
+                                                preview["generalized"][:300] + "..." if len(preview["generalized"]) > 300 else preview["generalized"],
+                                                height=100,
+                                                key=f"gen_preview_{sid}",
+                                                disabled=True,
+                                                label_visibility="collapsed"
+                                            )
+
+                                        # 변환 내역 표시
+                                        if preview.get("detected_names"):
+                                            st.markdown(f"🔄 **감지된 항목:** {', '.join(preview['detected_names'])}")
+                                    else:
+                                        st.info("변환할 유명인/기업명이 없습니다. (원본 그대로 재생성)")
+
+                                    st.divider()
+
+                    st.markdown("---")
+
+                    # 유명인 필터 적용 및 재생성 버튼
+                    col_model, col_action = st.columns([2, 3])
+
+                    with col_model:
+                        # v3.92: 수정된 모델 선택 UI
+                        available_models = get_sanitizer_models_for_ui()
+
+                        if available_models:
+                            model_options = []
+                            default_idx = 0
+                            for idx, m in enumerate(available_models):
+                                label = f"{m['name']} ({m['provider']})"
+                                if m.get('recommended'):
+                                    label += " ⭐"
+                                    default_idx = idx
+                                model_options.append((m['id'], label))
+
+                            sanitize_model = st.selectbox(
+                                "AI 모델 선택",
+                                options=[m[0] for m in model_options],
+                                format_func=lambda x: next((m[1] for m in model_options if m[0] == x), x),
+                                index=default_idx,
+                                key="failed_sanitize_model"
+                            )
+                        else:
+                            st.warning("사용 가능한 AI 모델이 없습니다.")
+                            sanitize_model = "gemini-2.5-flash"
+
+                    with col_action:
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        if st.button(
+                            f"🔄 유명인 일반화 후 {len(prominent_failed)}개 씬 재생성",
+                            type="primary",
+                            key="retry_prominent_scenes"
+                        ):
+                            # 세션 상태에 재시도 정보 저장
+                            st.session_state["retry_prominent_scenes"] = {
+                                "scenes": prominent_failed,
+                                "model": sanitize_model
+                            }
+                            # 미리보기 캐시 정리
+                            if "failed_scenes_preview" in st.session_state:
+                                del st.session_state["failed_scenes_preview"]
+                            st.rerun()
+
+                # 기타 에러 섹션
+                if other_failed:
+                    st.markdown("### ⚠️ 기타 에러")
+                    for item in other_failed:
+                        sid = item["scene_id"]
+                        error_preview = item.get("error", "")[:150]
+                        error_type = classify_imagefx_error(item.get("error", ""))
+
+                        col1, col2, col3 = st.columns([1, 3, 1])
+                        with col1:
+                            st.markdown(f"**씬 {sid}**")
+                        with col2:
+                            st.error(error_preview)
+                        with col3:
+                            st.caption(f"유형: {error_type}")
+
+        # v3.91: 유명인 필터 재시도 처리
+        if "retry_prominent_scenes" in st.session_state:
+            retry_data = st.session_state.pop("retry_prominent_scenes")
+            retry_scenes = retry_data.get("scenes", [])
+            retry_model = retry_data.get("model", "gemini-2.5-flash")
+
+            if retry_scenes:
+                st.markdown("---")
+                st.markdown("### 🔄 유명인 필터 적용 후 재생성 중...")
+
+                retry_progress = st.progress(0)
+                retry_status = st.empty()
+
+                retry_success = 0
+                retry_fail = 0
+
+                for idx, item in enumerate(retry_scenes):
+                    sid = item["scene_id"]
+                    original_prompt = item.get("prompt", "")
+
+                    retry_status.text(f"씬 {sid} 처리 중... ({idx+1}/{len(retry_scenes)})")
+                    retry_progress.progress((idx + 1) / len(retry_scenes))
+
+                    if not original_prompt:
+                        retry_fail += 1
+                        continue
+
+                    try:
+                        # 유명인 필터 적용
+                        sanitized_prompt, sanitize_result = sanitize_prompt_for_imagefx(
+                            original_prompt,
+                            ai_model=retry_model
+                        )
+
+                        if sanitize_result.was_modified:
+                            st.info(f"씬 {sid}: 프롬프트 변환됨 - {sanitize_result.detected_names}")
+
+                        # 이미지 재생성
+                        scene = get_scene_by_id(sid)
+                        if scene:
+                            # 세션에서 API/모델 설정 가져오기
+                            batch_api = st.session_state.get("_batch_gen_api")
+                            batch_model = st.session_state.get("_batch_gen_model")
+                            current_seed = get_seed_for_generation(key_prefix="batch_seed")
+
+                            # 기본 네거티브 프롬프트
+                            style_config = get_selected_style()
+                            negative_prompt = style_config.get("negative_prompt", "") if style_config else ""
+
+                            generate_background_image_with_prompt(
+                                scene_id=sid,
+                                full_prompt=sanitized_prompt,
+                                negative_prompt=negative_prompt,
+                                width=1280,
+                                height=720,
+                                api_provider=batch_api,
+                                model=batch_model,
+                                seed=current_seed
+                            )
+
+                            retry_success += 1
+                            st.success(f"✅ 씬 {sid} 재생성 성공!")
+                        else:
+                            retry_fail += 1
+                            st.error(f"❌ 씬 {sid}: 씬 정보를 찾을 수 없습니다.")
+
+                    except Exception as e:
+                        retry_fail += 1
+                        st.error(f"씬 {sid} 재시도 실패: {e}")
+
+                st.markdown("---")
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("✅ 재생성 성공", f"{retry_success}개")
+                with col2:
+                    st.metric("❌ 재생성 실패", f"{retry_fail}개")
 
 
 # ===================================================================
@@ -4172,11 +5035,14 @@ def render_gallery_tab():
 
     # ============================================================
     # 🆕 중복 분석 및 최신 이미지 추출
+    # v2.5: include_global=False - 현재 선택된 영상의 이미지만 스캔
+    # 글로벌 폴더(data/images/imagefx 등)는 모든 영상의 이미지가 혼합되어 있어 제외
     # ============================================================
     from utils.image_gallery_manager import ImageGalleryManager
 
     gallery_manager = ImageGalleryManager(str(project_path))
-    all_scanned = gallery_manager.scan_all_images()
+    # v2.5: 글로벌 폴더 제외 - 현재 영상만 스캔
+    all_scanned = gallery_manager.scan_all_images(include_global=False)
     analysis = gallery_manager.analyze_duplicates(all_scanned)
     latest_images = gallery_manager.get_latest_images_list(all_scanned)
 
@@ -4543,10 +5409,11 @@ def render_gallery_tab():
         else:
             total_scenes = len(scenes)
 
-            # 선택 모드
+            # 선택 모드 (v1.7: AI 추천이 기본값)
             korean_mode = st.radio(
                 "선택 방식",
                 options=["랜덤 샘플링", "AI 추천"],
+                index=1,  # AI 추천이 기본값
                 horizontal=True,
                 key="korean_select_mode",
                 label_visibility="collapsed"
@@ -4653,7 +5520,7 @@ def render_gallery_tab():
 
                 ai_model = st.selectbox(
                     "AI 모델",
-                    options=["gemini-2.0-flash-exp", "gemini-2.0-flash", "gemini-1.5-pro", "claude-3-5-sonnet-20241022"],
+                    options=["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash", "claude-3-5-sonnet-20241022"],
                     key="korean_ai_model",
                     help="추천에 사용할 AI 모델"
                 )
@@ -4687,13 +5554,13 @@ def render_gallery_tab():
                         st.info(f"💡 **한글프롬프트 기준**: {korean_prompt_count}개 씬만 한글 프롬프트로 분석합니다.")
                     analysis_target_count = korean_prompt_count
 
-                # ⭐ v1.6: 선택 모드 추가
+                # ⭐ v1.7: 선택 모드 추가 (전체 선택이 기본값)
                 st.markdown("###### 🎯 선택 모드")
 
                 selection_mode = st.radio(
                     "선택 모드",
                     options=["비율 제한", "전체 선택"],
-                    index=0,
+                    index=1,  # 전체 선택이 기본값
                     horizontal=True,
                     key="korean_selection_mode",
                     help="'비율 제한': 목표 비율만큼만 선택 / '전체 선택': 프롬프트 조건에 맞는 모든 씬 선택"
@@ -5187,53 +6054,56 @@ def render_gallery_tab():
                         st.code(error_detail)
 
                 # ============================================================
-                # 📋 스토리보드 연동 (v1.0)
+                # 📋 스토리보드 연동 (v2.0 - @st.fragment로 부분 리렌더링)
                 # ============================================================
-                st.markdown("---")
-                st.markdown("##### 📋 스토리보드 연동")
+                @st.fragment
+                def _storyboard_apply_fragment():
+                    """스토리보드 적용 섹션 - 독립 리렌더링으로 전체 페이지 재실행 방지"""
+                    st.markdown("---")
+                    st.markdown("##### 📋 스토리보드 연동")
 
-                storyboard_col1, storyboard_col2 = st.columns(2)
+                    # fragment 내에서 선택된 씬 가져오기 (session_state 기반)
+                    _selected = get_all_selected_korean_scenes()
 
-                with storyboard_col1:
-                    if st.button(
-                        "📋 스토리보드에 적용",
-                        key="apply_korean_text_to_storyboard",
-                        type="primary",
-                        use_container_width=True,
-                        help="스토리보드 페이지에서 한글 텍스트 씬 필터링 가능"
-                    ):
-                        # 세션에 저장 (스토리보드에서 사용)
-                        st.session_state['korean_text_scenes_applied'] = True
-                        st.session_state['korean_text_scene_ids'] = sorted(list(korean_selected_scenes))
+                    _sb_col1, _sb_col2 = st.columns(2)
 
-                        # 적용 시간 기록 (datetime은 파일 상단에서 import됨)
-                        st.session_state['korean_text_applied_at'] = datetime.now().isoformat()
+                    with _sb_col1:
+                        if st.button(
+                            "📋 스토리보드에 적용",
+                            key="apply_korean_text_to_storyboard",
+                            type="primary",
+                            use_container_width=True,
+                            help="스토리보드 페이지에서 한글 텍스트 씬 필터링 가능"
+                        ):
+                            st.session_state['korean_text_scenes_applied'] = True
+                            st.session_state['korean_text_scene_ids'] = sorted(list(_selected))
+                            st.session_state['korean_text_applied_at'] = datetime.now().isoformat()
 
-                        st.success(f"✅ {len(korean_selected_scenes)}개 한글 텍스트 씬이 스토리보드에 적용되었습니다!")
-                        st.info("💡 스토리보드 페이지에서 '🔤 한글 텍스트 씬 관리' 섹션을 확인하세요.")
+                            st.success(f"✅ {len(_selected)}개 한글 텍스트 씬이 스토리보드에 적용되었습니다!")
+                            st.info("💡 스토리보드 페이지에서 '🔤 한글 텍스트 씬 관리' 섹션을 확인하세요.")
+                            print(f"[한글 텍스트 씬] 스토리보드 적용: {len(_selected)}개", flush=True)
 
-                        print(f"[한글 텍스트 씬] 스토리보드 적용: {len(korean_selected_scenes)}개", flush=True)
+                    with _sb_col2:
+                        if st.session_state.get('korean_text_scenes_applied'):
+                            _applied_count = len(st.session_state.get('korean_text_scene_ids', []))
+                            _applied_at = st.session_state.get('korean_text_applied_at', '')
+                            st.success(f"📋 적용됨 ({_applied_count}개)")
+                            if _applied_at:
+                                st.caption(f"적용 시간: {_applied_at[:16].replace('T', ' ')}")
+                        else:
+                            st.caption("📋 미적용 상태")
 
-                with storyboard_col2:
-                    # 현재 적용 상태 표시
-                    if st.session_state.get('korean_text_scenes_applied'):
-                        applied_count = len(st.session_state.get('korean_text_scene_ids', []))
-                        applied_at = st.session_state.get('korean_text_applied_at', '')
-                        st.success(f"📋 적용됨 ({applied_count}개)")
-                        if applied_at:
-                            st.caption(f"적용 시간: {applied_at[:16].replace('T', ' ')}")
-                    else:
-                        st.caption("📋 미적용 상태")
+                    st.markdown("---")
 
-                st.markdown("---")
+                    # 선택 초기화 (전체 페이지 리렌더링 필요 → scope 미지정)
+                    if st.button("🔄 선택 초기화", key="korean_reset", use_container_width=True):
+                        if 'korean_selected_scenes' in st.session_state:
+                            del st.session_state['korean_selected_scenes']
+                        if 'korean_recommendation_data' in st.session_state:
+                            del st.session_state['korean_recommendation_data']
+                        st.rerun()
 
-                # 선택 초기화 버튼
-                if st.button("🔄 선택 초기화", key="korean_reset", use_container_width=True):
-                    if 'korean_selected_scenes' in st.session_state:
-                        del st.session_state['korean_selected_scenes']
-                    if 'korean_recommendation_data' in st.session_state:
-                        del st.session_state['korean_recommendation_data']
-                    st.rerun()
+                _storyboard_apply_fragment()
 
     # ============================================================
     # 📦 배치 이미지 업로드 섹션 (v1.0 - 씬별 일괄 대체)
@@ -5952,12 +6822,15 @@ def render_settings_tab():
     col1, col2 = st.columns(2)
 
     with col1:
-        default_style = st.selectbox(
+        # v3.94: 프로젝트별 마지막 사용 스타일 자동 기억
+        default_style = project_persistent_selectbox(
             "기본 배경 스타일",
             options=style_ids,
+            video_path=str(project_path),
+            setting_key="background_style",
             format_func=lambda x: style_names.get(x, x),
             key="default_image_style",
-            help="스타일 관리 페이지에서 등록된 배경 스타일"
+            help="스타일 관리 페이지에서 등록된 배경 스타일 (마지막 선택 기억)"
         )
 
         # 선택된 스타일 정보 표시
@@ -6409,13 +7282,16 @@ def generate_background_image(
                 try:
                     # ⭐ v6.2: 네거티브 프롬프트 전달
                     # ⭐ v6.3: 시드 파라미터 추가 (이미지 일관성 유지)
+                    # v6.4: 프로젝트별 출력 폴더 지정
+                    imagefx_output_dir = str(project_path / "images" / "imagefx")
                     images = client.generate_image(
                         prompt=current_prompt,
                         model=model_enum,
                         aspect_ratio=aspect_ratio,
                         num_images=1,
                         negative_prompt=negative_prompt,  # ⭐ 네거티브 프롬프트 추가!
-                        seed=seed  # ⭐ 시드 파라미터
+                        seed=seed,  # ⭐ 시드 파라미터
+                        output_dir=imagefx_output_dir  # v6.4: 비디오별 폴더
                     )
                     if images and len(images) > 0:
                         img_data = images[0].get_bytes()
@@ -6511,6 +7387,11 @@ def generate_background_image(
 
         # SceneImageManager로 씬 데이터 업데이트
         update_scene_background(scene_id, str(filepath), str(project_path))
+
+        # v3.93: 같은 bundle의 다른 씬에 이미지 자동 공유
+        bundle_copy_count = copy_image_to_bundle_scenes(scene_id, str(filepath))
+        if bundle_copy_count > 0:
+            st.info(f"📦 같은 묶음의 {bundle_copy_count}개 씬에 이미지 공유됨")
 
         st.success(f"✅ 씬 {scene_id} 배경 생성 완료: {filename}")
 
@@ -6618,13 +7499,16 @@ def generate_background_image_with_prompt(
 
             # ⭐ v6.2: 네거티브 프롬프트 전달
             # ⭐ v6.3: 시드 파라미터 추가
+            # v6.4: 프로젝트별 출력 폴더 지정
+            imagefx_output_dir = str(project_path / "images" / "imagefx")
             images = client.generate_image(
                 prompt=full_prompt,
                 model=model_enum,
                 aspect_ratio=aspect_ratio,
                 num_images=1,
                 negative_prompt=negative_prompt,  # ⭐ 네거티브 프롬프트 추가!
-                seed=seed  # ⭐ 시드 파라미터
+                seed=seed,  # ⭐ 시드 파라미터
+                output_dir=imagefx_output_dir  # v6.4: 비디오별 폴더
             )
 
             if images and len(images) > 0:
@@ -6683,6 +7567,11 @@ def generate_background_image_with_prompt(
 
         set_background_for_scene(scene_id, str(filepath))
         update_scene_background(scene_id, str(filepath), str(project_path))
+
+        # v3.93: 같은 bundle의 다른 씬에 이미지 자동 공유
+        bundle_copy_count = copy_image_to_bundle_scenes(scene_id, str(filepath))
+        if bundle_copy_count > 0:
+            st.info(f"📦 같은 묶음의 {bundle_copy_count}개 씬에 이미지 공유됨")
 
         print(f"[배경 생성(수정)] 씬 {scene_id} 완료: {filename}")
         return str(filepath)
@@ -6753,13 +7642,16 @@ def generate_scene_composite_image_with_prompt(
 
             # ⭐ v6.2: 네거티브 프롬프트 전달
             # ⭐ v6.3: 시드 파라미터 추가
+            # v6.4: 프로젝트별 출력 폴더 지정
+            imagefx_output_dir = str(project_path / "images" / "imagefx")
             images = client.generate_image(
                 prompt=final_prompt,
                 model=model_enum,
                 aspect_ratio=aspect_ratio,
                 num_images=1,
                 negative_prompt=negative_prompt,  # ⭐ 네거티브 프롬프트 추가!
-                seed=seed  # ⭐ 시드 파라미터
+                seed=seed,  # ⭐ 시드 파라미터
+                output_dir=imagefx_output_dir  # v6.4: 비디오별 폴더
             )
 
             if images and len(images) > 0:
@@ -7006,6 +7898,9 @@ def generate_scene_composite_image(
             max_sanitize_retries = 2
             sanitize_attempt = 0
 
+            # v6.4: 프로젝트별 출력 폴더 지정
+            imagefx_output_dir = str(project_path / "images" / "imagefx")
+
             while True:
                 try:
                     # ⭐ v6.2: 네거티브 프롬프트 전달
@@ -7016,7 +7911,8 @@ def generate_scene_composite_image(
                         aspect_ratio=aspect_ratio,
                         num_images=1,
                         negative_prompt=negative_prompt,  # ⭐ 네거티브 프롬프트 추가!
-                        seed=seed  # ⭐ 시드 파라미터
+                        seed=seed,  # ⭐ 시드 파라미터
+                        output_dir=imagefx_output_dir  # v6.4: 비디오별 폴더
                     )
                     if images and len(images) > 0:
                         img_data = images[0].get_bytes()
@@ -7157,6 +8053,11 @@ def save_uploaded_background(scene_id: int, uploaded_file):
     # ✅ SceneImageManager로 씬 데이터 업데이트
     update_scene_background(scene_id, str(filepath), str(project_path))
 
+    # v3.93: 같은 bundle의 다른 씬에 이미지 자동 공유
+    bundle_copy_count = copy_image_to_bundle_scenes(scene_id, str(filepath))
+    if bundle_copy_count > 0:
+        st.info(f"📦 같은 묶음의 {bundle_copy_count}개 씬에 이미지 공유됨")
+
     st.success("✅ 배경이 저장되었습니다!")
     # v3.40: 즉시 이미지 표시 (rerun 제거)
     st.image(str(filepath), use_container_width=True)
@@ -7179,6 +8080,77 @@ def set_background_for_scene(scene_id: int, filepath: str):
     bg_data = st.session_state["background_images"]
     with open(bg_json, "w", encoding="utf-8") as f:
         json.dump(bg_data, f, ensure_ascii=False, indent=2)
+
+
+def copy_image_to_bundle_scenes(primary_scene_id: int, image_path: str, auto_copy: bool = True) -> int:
+    """
+    v3.93: 같은 bundle의 다른 씬들에 이미지 복사
+
+    Args:
+        primary_scene_id: 이미지가 생성된 원본 씬 ID
+        image_path: 생성된 이미지 경로
+        auto_copy: 자동 복사 여부 (False면 세션 상태만 업데이트)
+
+    Returns:
+        복사된 씬 개수
+    """
+    try:
+        scenes = get_scenes_safe()
+        if not scenes:
+            return 0
+
+        # 원본 씬의 bundle_id 찾기
+        primary_scene = next((s for s in scenes if s.get('scene_id') == primary_scene_id), None)
+        if not primary_scene:
+            return 0
+
+        bundle_id = primary_scene.get('bundle_id')
+        if bundle_id is None:
+            return 0
+
+        # 같은 bundle의 다른 씬들 찾기
+        bundle_scenes = [s for s in scenes if s.get('bundle_id') == bundle_id and s.get('scene_id') != primary_scene_id]
+
+        if not bundle_scenes:
+            return 0
+
+        copied_count = 0
+
+        for scene in bundle_scenes:
+            target_scene_id = scene.get('scene_id')
+
+            # 세션 상태에 이미지 정보 복사 (원본 씬 참조로)
+            if "background_images" not in st.session_state:
+                st.session_state["background_images"] = {}
+
+            st.session_state["background_images"][str(target_scene_id)] = {
+                "path": image_path,
+                "url": image_path,
+                "_from_bundle": True,
+                "_source_scene_id": primary_scene_id
+            }
+
+            copied_count += 1
+            print(f"[Bundle Copy] 씬 {primary_scene_id} → 씬 {target_scene_id} 이미지 공유")
+
+        # 세션 상태를 JSON에도 반영
+        if copied_count > 0:
+            bg_json = project_path / "images" / "backgrounds" / "backgrounds.json"
+            bg_json.parent.mkdir(parents=True, exist_ok=True)
+
+            bg_data = st.session_state.get("background_images", {})
+            with open(bg_json, "w", encoding="utf-8") as f:
+                json.dump(bg_data, f, ensure_ascii=False, indent=2)
+
+            print(f"[Bundle Copy] 총 {copied_count}개 씬에 이미지 공유 완료 (bundle_id={bundle_id})")
+
+        return copied_count
+
+    except Exception as e:
+        print(f"[Bundle Copy] 번들 복사 실패: {e}")
+        import traceback
+        traceback.print_exc()
+        return 0
 
 
 def execute_composite(scene_id: int, scene: Dict, remove_bg: bool, use_scene_pose: bool = False) -> Optional[str]:
@@ -7921,6 +8893,17 @@ def _render_infographic_gallery():
 # 메인
 # ===================================================================
 
+# ⭐ v3.97 성능 최적화: 페이지 로딩 최적화
+_page_opt_result = optimize_page_load(
+    page_name="image_generation",
+    project_path=str(project_path),
+    enable_style_check=True
+)
+
+# 프로젝트 변경 시 관련 캐시 클리어
+if _page_opt_result.get("project_changed"):
+    clear_image_settings_cache(str(project_path))
+
 # 데이터 동기화
 sync_all_data()
 
@@ -7939,6 +8922,9 @@ if not require_api_key("TOGETHER_API_KEY", "Together.ai API"):
     st.stop()
 
 st.divider()
+
+# ⭐ v3.96 성능 최적화: 세션 키 정리 (페이지 로드 시 1회 실행)
+_optimize_session_keys()
 
 # 탭 구성
 tabs = st.tabs([

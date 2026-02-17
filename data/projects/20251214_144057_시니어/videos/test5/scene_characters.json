@@ -1,0 +1,78 @@
+{
+  "45": {
+    "characters": {
+      "임원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png",
+            "updated_at": "2026-01-25T13:41:03.619446"
+          }
+        }
+      },
+      "이재용 회장": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_회장_standing_1769316083784.png",
+            "updated_at": "2026-01-25T13:41:26.205174"
+          }
+        }
+      }
+    }
+  },
+  "46": {
+    "characters": {
+      "임원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png",
+            "updated_at": "2026-01-25T13:41:03.619455"
+          }
+        }
+      },
+      "이재용 회장": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_회장_standing_1769316083784.png",
+            "updated_at": "2026-01-25T13:41:26.205180"
+          }
+        }
+      }
+    }
+  },
+  "47": {
+    "characters": {
+      "이재용 부회장": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png",
+            "updated_at": "2026-01-25T13:41:26.230471"
+          }
+        }
+      }
+    }
+  },
+  "48": {
+    "characters": {
+      "이재용 부회장": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png",
+            "updated_at": "2026-01-25T13:41:26.230482"
+          }
+        }
+      }
+    }
+  },
+  "80": {
+    "characters": {
+      "노동자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+            "updated_at": "2026-01-25T14:28:38.598244"
+          }
+        }
+      }
+    }
+  }
+}

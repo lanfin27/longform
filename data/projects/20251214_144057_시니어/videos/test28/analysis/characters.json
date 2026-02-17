@@ -1,0 +1,49 @@
+[
+  {
+    "name": "이재용 회장을 연상시키는 인물",
+    "name_ko": "이재용 회장을 연상시키는 인물",
+    "role": "등장인물",
+    "visual_prompt": "A male figure resembling Lee Jae-yong, with a contemplative and visionary expression, dressed in smart business attire",
+    "description": "",
+    "appearance_scenes": [
+      46,
+      47,
+      48,
+      49,
+      50
+    ]
+  },
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "role": "등장인물",
+    "visual_prompt": "A generic driver focused on the road, with conceptual digital overlays on their face indicating detection of drowsiness, concentration, and stress. Neutral expression, hands on steering wheel. No specific gender or ethnicity.",
+    "description": "",
+    "appearance_scenes": [
+      101,
+      102,
+      103,
+      104,
+      105,
+      111,
+      112,
+      113,
+      114,
+      115
+    ]
+  },
+  {
+    "name": "삼성 및 ZF 대표팀",
+    "name_ko": "삼성 및 ZF 대표팀",
+    "role": "등장인물",
+    "visual_prompt": "Two groups of business professionals, one group subtly associated with Samsung and the other with ZF, facing away from each other in a tense posture, formal business attire, diverse ethnicities, serious expressions",
+    "description": "",
+    "appearance_scenes": [
+      191,
+      192,
+      193,
+      194,
+      195
+    ]
+  }
+]

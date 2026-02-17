@@ -235,14 +235,22 @@
     "name_ko": "음향기기 덕후 1",
     "role": "등장인물",
     "visual_prompt": "Middle-aged man with a beard, wearing a vintage t-shirt, passionate expression, no text, no logos on clothing, no name tags",
-    "description": ""
+    "description": "",
+    "scenes": [
+      23,
+      24
+    ]
   },
   {
     "name": "음향기기 덕후 2",
     "name_ko": "음향기기 덕후 2",
     "role": "등장인물",
     "visual_prompt": "Young woman with headphones around her neck, intently listening, no text, no logos on clothing, no name tags",
-    "description": ""
+    "description": "",
+    "scenes": [
+      23,
+      24
+    ]
   },
   {
     "name": "엔지니어",
@@ -266,6 +274,16 @@
       105,
       113,
       114
+    ],
+    "scenes": [
+      27,
+      28,
+      30,
+      31,
+      104,
+      105,
+      113,
+      114
     ]
   },
   {
@@ -277,6 +295,10 @@
     "appearance_scenes": [
       21,
       22
+    ],
+    "scenes": [
+      21,
+      22
     ]
   },
   {
@@ -284,21 +306,32 @@
     "name_ko": "분석가",
     "role": "등장인물",
     "visual_prompt": "Middle-aged man in his 40s, sharp eyes, analytical expression, confident in future technologies. Wearing a stylish suit. Short dark hair, slightly receding hairline.",
-    "description": ""
+    "description": "",
+    "scenes": [
+      50,
+      51
+    ]
   },
   {
     "name": "분석가 (과거)",
     "name_ko": "분석가 (과거)",
     "role": "등장인물",
     "visual_prompt": "Middle-aged man in his 40s, the analyst in a flashback, a thoughtful expression, on the verge of making an important decision. Wearing a suit in the style of 2017. Slightly longer hair than in the present.",
-    "description": ""
+    "description": "",
+    "scenes": [
+      56,
+      57
+    ]
   },
   {
     "name": "사업가",
     "name_ko": "사업가",
     "role": "등장인물",
     "visual_prompt": "Middle-aged businessman, wearing an expensive suit, confident expression, well-groomed hair, holding a cigar (optional).",
-    "description": ""
+    "description": "",
+    "scenes": [
+      40
+    ]
   },
   {
     "name": "노동자",
@@ -307,6 +340,10 @@
     "visual_prompt": "Workers in 1915-style work clothes, serious expressions, no text, no logos on clothing, no name tags",
     "description": "",
     "appearance_scenes": [
+      79,
+      80
+    ],
+    "scenes": [
       79,
       80
     ]
@@ -319,6 +356,9 @@
     "description": "",
     "appearance_scenes": [
       7
+    ],
+    "scenes": [
+      7
     ]
   },
   {
@@ -326,7 +366,10 @@
     "name_ko": "ZF 경영진",
     "role": "등장인물",
     "visual_prompt": "German ZF executives in business attire, professional demeanor, no text, no logos on clothing, no name tags",
-    "description": ""
+    "description": "",
+    "scenes": [
+      7
+    ]
   },
   {
     "name": "사람",
@@ -376,6 +419,10 @@
     "appearance_scenes": [
       11,
       12
+    ],
+    "scenes": [
+      11,
+      12
     ]
   },
   {
@@ -387,6 +434,61 @@
     "appearance_scenes": [
       3,
       6
+    ],
+    "scenes": [
+      5,
+      6
+    ]
+  },
+  {
+    "name": "없음",
+    "name_en": "N/A",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      25,
+      26,
+      29
+    ]
+  },
+  {
+    "name": "없음 (기술 강조)",
+    "name_en": "None (focus on technology)",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      32,
+      33
+    ]
+  },
+  {
+    "name": "없음 (브랜드 강조)",
+    "name_en": "None (focus on brands)",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      34,
+      35
+    ]
+  },
+  {
+    "name": "없음 (기업 간 관계 강조)",
+    "name_en": "None (focus on the relationship between the companies)",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      36,
+      37
+    ]
+  },
+  {
+    "name": "없음 (투자 금액 강조)",
+    "name_en": "None (focus on the investment amount)",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      38,
+      39
     ]
   }
 ]

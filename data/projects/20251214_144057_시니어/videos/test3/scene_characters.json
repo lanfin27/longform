@@ -1,0 +1,38 @@
+{
+  "45": {
+    "characters": {
+      "이재용": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test3\\images\\characters\\char_이재용_standing_1769265084659.png",
+            "updated_at": "2026-01-24T23:31:24.688103"
+          }
+        }
+      }
+    }
+  },
+  "46": {
+    "characters": {
+      "이재용": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test3\\images\\characters\\char_이재용_standing_1769265084659.png",
+            "updated_at": "2026-01-24T23:31:24.688113"
+          }
+        }
+      }
+    }
+  },
+  "47": {
+    "characters": {
+      "이재용": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test3\\images\\characters\\char_이재용_standing_1769265084659.png",
+            "updated_at": "2026-01-24T23:31:24.688117"
+          }
+        }
+      }
+    }
+  }
+}

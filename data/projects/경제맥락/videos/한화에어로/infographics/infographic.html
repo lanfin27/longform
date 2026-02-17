@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한화에어로스페이스 인포그래픽 보드</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --canvas-width: 1280px;
+            --canvas-height: 720px;
+            --bg: #ffffff;
+            --text: #222222;
+            --red: #ef4444;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --yellow: #facc15;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --gray: #555555;
+            --light-gray: #f5f5f5;
+            --light-pink: #fce4ec;
+            --light-blue: #dbeafe;
+            --light-green: #dcfce7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Nanum Pen Script', cursive;
+        }
+
+        #video-canvas {
+            width: var(--canvas-width);
+            height: var(--canvas-height);
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+
+        .scene {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+            background: #ffffff;
+        }
+        .scene.active { display: flex; }
+
+        /* 타이포그래피 */
+        h1 { font-size: 72px; line-height: 1.3; margin-bottom: 20px; }
+        h2 { font-size: 56px; line-height: 1.4; margin-bottom: 15px; }
+        p { font-size: 48px; line-height: 1.5; }
+        .text-sm { font-size: 44px; }
+        .text-xs { font-size: 40px; }
+
+        /* 색상 클래스 */
+        .text-red { color: var(--red); }
+        .text-green { color: var(--green); }
+        .text-blue { color: var(--blue); }
+        .text-purple { color: var(--purple); }
+        .text-orange { color: var(--orange); }
+        .text-gray { color: #757575; }
+
+        /* 하이라이트 */
+        .hl-yellow { background: var(--yellow); padding: 5px 15px; border-radius: 8px; }
+        .hl-pink { background: var(--light-pink); padding: 5px 15px; border-radius: 8px; }
+
+        /* 박스 디자인 */
+        .box, .box-gray, .box-pink, .box-blue, .box-green, .box-yellow {
+            border: 3px solid var(--text);
+            border-radius: 12px;
+            padding: 25px 35px;
+            background: white;
+            filter: url(#rough-edge);
+            white-space: nowrap;
+            width: auto;
+            min-width: fit-content;
+            max-width: 90%;
+            font-size: 48px;
+            margin: 10px;
+        }
+        .box-gray { background: var(--light-gray); }
+        .box-pink { background: var(--light-pink); }
+        .box-blue { background: var(--light-blue); }
+        .box-green { background: var(--light-green); }
+        .box-yellow { background: #fef9c3; }
+
+        /* 차트 요소 */
+        .bar {
+            background: var(--gray);
+            border: 3px solid var(--text);
+            border-radius: 8px;
+            filter: url(#rough-strong);
+        }
+        .bar-red { background: var(--red); }
+        .bar-blue { background: var(--blue); }
+        .bar-green { background: var(--green); }
+
+        .gauge-track {
+            width: 100%;
+            height: 45px;
+            background: var(--light-gray);
+            border: 3px solid var(--text);
+            border-radius: 25px;
+            overflow: hidden;
+            filter: url(#rough-edge);
+        }
+        .gauge-fill {
+            height: 100%;
+            border-radius: 22px;
+            filter: url(#rough-strong);
+        }
+
+        .line-chart-container {
+            position: relative;
+            width: 600px;
+            height: 300px;
+            border-left: 3px solid var(--text);
+            border-bottom: 3px solid var(--text);
+            overflow: hidden; /* 필수 */
+            margin: 20px 0;
+        }
+
+        /* 애니메이션 */
+        @keyframes bounce-subtle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes pulse-red { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .animate-subtle { animation: bounce-subtle 4s ease-in-out infinite; }
+        .animate-pulse-red { animation: pulse-red 2s infinite; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+        /* 컨트롤러 스타일 */
+        #controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 24px;
+            cursor: pointer;
+            font-family: inherit;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="rough-edge">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+        </filter>
+        <filter id="rough-strong">
+            <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+        </filter>
+    </svg>
+
+    <div id="video-canvas">
+
+        <!-- 씬 4: 노르웨이 국방부 최종 발표 -->
+        <div class="scene active" id="scene4">
+            <div style="display: flex; gap: 50px; align-items: center;">
+                <div class="box-blue" style="padding: 40px;">
+                    <i class="fa-solid fa-file-signature" style="font-size: 100px; margin-bottom: 20px;"></i>
+                    <h2>노르웨이 국방부</h2>
+                </div>
+                <i class="fa-solid fa-arrow-right" style="font-size: 60px;"></i>
+                <div class="box-green" style="padding: 40px;">
+                    <i class="fa-solid fa-rocket" style="font-size: 100px; margin-bottom: 20px;"></i>
+                    <h2>한화에어로스페이스</h2>
+                </div>
+            </div>
+            <h1 style="margin-top: 40px;"><span class="hl-yellow">최종 사업자 선정</span> 완료</h1>
+        </div>
+
+        <!-- 씬 8: 거대 계약 규모 시각화 -->
+        <div class="scene" id="scene8">
+            <p class="text-gray">총 계약 규모</p>
+            <h1 style="font-size: 160px;" class="animate-float">
+                <span class="text-red">2조 8천</span><span style="font-size: 60px;">억원</span>
+            </h1>
+            <div class="gauge-track" style="width: 70%; margin-top: 30px;">
+                <div class="gauge-fill animate-pulse-red" style="width: 100%; background: var(--red);"></div>
+            </div>
+        </div>
+
+        <!-- 씬 19: 노르웨이 시장 진입 -->
+        <div class="scene" id="scene19">
+            <h1 style="margin-bottom: 30px;">🇳🇴 노르웨이의 선택</h1>
+            <div style="display: flex; gap: 40px;">
+                <div class="box-gray" style="text-align: center;">
+                    <i class="fa-solid fa-mountain-sun" style="font-size: 80px; color: var(--blue);"></i>
+                    <p>북유럽 방어선</p>
+                </div>
+                <div class="box-blue" style="text-align: center;">
+                    <i class="fa-solid fa-shield-halved" style="font-size: 80px; color: var(--text);"></i>
+                    <p>K-방산 상륙</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 20: 신규 파트너십 상징 -->
+        <div class="scene" id="scene20">
+            <div style="display: flex; align-items: center; gap: 40px;">
+                <i class="fa-solid fa-handshake animate-subtle" style="font-size: 150px; color: var(--orange);"></i>
+                <div style="text-align: left;">
+                    <h1>전략적 파트너십</h1>
+                    <p class="text-blue">기술력 + 외교력의 승리</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 31: 전략적 지도 상황 -->
+        <div class="scene" id="scene31">
+            <h2>노르웨이-러시아 국경</h2>
+            <div style="position: relative; width: 600px; height: 350px; background: #eee; border: 3px solid #333; border-radius: 15px; overflow: hidden; filter: url(#rough-edge);">
+                <div style="position: absolute; right: 0; width: 150px; height: 100%; background: rgba(239, 68, 68, 0.2); display: flex; align-items: center; justify-content: center;">
+                    <p class="text-xs text-red">러시아 🇷🇺</p>
+                </div>
+                <div style="position: absolute; left: 50px; top: 100px; width: 100px; height: 100px; border: 4px dashed var(--red); border-radius: 50%;" class="animate-pulse-red"></div>
+                <p style="position: absolute; left: 60px; top: 220px;" class="text-xs">화력 공백 지대</p>
+            </div>
+        </div>
+
+        <!-- 씬 32: 화력 공백 강조 -->
+        <div class="scene" id="scene32">
+            <i class="fa-solid fa-triangle-exclamation animate-pulse-red" style="font-size: 120px; color: var(--red);"></i>
+            <h1 class="text-red">화력 공백 발생</h1>
+            <div class="box-pink" style="margin-top: 30px;">
+                <p>장거리 정밀 타격 체계 부재</p>
+            </div>
+        </div>
+
+        <!-- 씬 34: 2024년 말 경쟁 구도 -->
+        <div class="scene" id="scene34">
+            <h2>수주전 경쟁 구도</h2>
+            <div style="display: flex; gap: 40px; align-items: center;">
+                <div class="box-gray" style="opacity: 0.6;">
+                    <p class="text-sm">미국/독일</p>
+                    <i class="fa-solid fa-truck-rocket" style="font-size: 60px;"></i>
+                </div>
+                <span style="font-size: 60px;">VS</span>
+                <div class="box-blue animate-subtle">
+                    <p class="text-sm">대한민국</p>
+                    <i class="fa-solid fa-truck-fast" style="font-size: 80px; color: var(--blue);"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 37: 실전 능력 비교 -->
+        <div class="scene" id="scene37">
+            <div style="display: flex; gap: 50px;">
+                <div style="text-align: center;">
+                    <p class="text-xs">하이마스(US)</p>
+                    <div class="bar" style="width: 100px; height: 180px;"></div>
+                    <p class="text-sm">실전 검증</p>
+                </div>
+                <div style="text-align: center;">
+                    <p class="text-xs">천무(KR)</p>
+                    <div class="bar bar-blue animate-float" style="width: 100px; height: 210px;"></div>
+                    <p class="text-sm text-blue">압도적 화력</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 40: 파괴된 탄약고 시각화 -->
+        <div class="scene" id="scene40">
+            <div style="position: relative;">
+                <i class="fa-solid fa-burst" style="font-size: 200px; color: var(--orange);"></i>
+                <i class="fa-solid fa-warehouse" style="font-size: 80px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--gray);"></i>
+            </div>
+            <h1>보급로 및 탄약고 <span class="text-red">정밀 타격</span></h1>
+        </div>
+
+        <!-- 씬 41: 전술적 성공 -->
+        <div class="scene" id="scene41">
+            <div class="box-green">
+                <i class="fa-solid fa-check-double" style="font-size: 60px; color: var(--green);"></i>
+                <p>전술적 우위 확보 성공</p>
+            </div>
+        </div>
+
+        <!-- 씬 50: 천무 vs 하이마스 발사관 비교 -->
+        <div class="scene" id="scene50">
+            <h2>화력 비교 (로켓 발사관)</h2>
+            <div style="display: flex; gap: 80px;">
+                <div style="text-align: center;">
+                    <p class="text-xs">하이마스</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 30px); gap: 10px; padding: 20px; border: 2px solid #333;">
+                        <div style="width: 25px; height: 25px; background: var(--gray); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--gray); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--gray); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--gray); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--gray); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--gray); border-radius: 50%;"></div>
+                    </div>
+                    <p>6발</p>
+                </div>
+                <div style="text-align: center;">
+                    <p class="text-xs text-blue">천무</p>
+                    <div style="display: grid; grid-template-columns: repeat(4, 30px); gap: 10px; padding: 20px; border: 3px solid var(--blue); border-radius: 10px;">
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                        <div style="width: 25px; height: 25px; background: var(--blue); border-radius: 50%;"></div>
+                    </div>
+                    <p class="text-blue">12발 (2배)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 52: 압도적 화력 강조 -->
+        <div class="scene" id="scene52">
+            <h1 style="font-size: 100px;"><span class="text-red">2배</span>의 파괴력</h1>
+            <p>단 한 번의 발사로 끝낸다</p>
+            <i class="fa-solid fa-fire animate-pulse-red" style="font-size: 100px; color: var(--orange); margin-top: 30px;"></i>
+        </div>
+
+        <!-- 씬 58: 정밀 타격 기술 -->
+        <div class="scene" id="scene58">
+            <i class="fa-solid fa-crosshairs animate-subtle" style="font-size: 150px; color: var(--red);"></i>
+            <h2 style="margin-top: 20px;">오차 없는 정밀 타격</h2>
+        </div>
+
+        <!-- 씬 59: 타격 지점 시각화 -->
+        <div class="scene" id="scene59">
+            <div class="box-gray" style="text-align: left; padding: 40px;">
+                <p>• 레이저 유도 시스템</p>
+                <p>• GPS 복합 항법 장치</p>
+                <p class="text-blue">• 80km 밖에서 <span class="hl-yellow">창문</span>을 맞춘다</p>
+            </div>
+        </div>
+
+        <!-- 씬 62: 사거리 업그레이드 -->
+        <div class="scene" id="scene62">
+            <h2>사거리 혁명</h2>
+            <div style="display: flex; gap: 30px; align-items: flex-end; height: 250px;">
+                <div style="text-align: center;">
+                    <div class="bar" style="width: 120px; height: 120px;"></div>
+                    <p class="text-sm">기존 290km</p>
+                </div>
+                <i class="fa-solid fa-angles-right" style="font-size: 50px; margin-bottom: 50px;"></i>
+                <div style="text-align: center;">
+                    <div class="bar bar-blue animate-float" style="width: 120px; height: 230px;"></div>
+                    <p class="text-sm text-blue">신규 500km</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 63: 500km 도달 -->
+        <div class="scene" id="scene63">
+            <div class="box-blue" style="font-size: 64px;">
+                전략적 타격 반경 <span class="text-red">70%</span> 확대
+            </div>
+        </div>
+
+        <!-- 씬 70: 글로벌 수요 폭발 -->
+        <div class="scene" id="scene70">
+            <i class="fa-solid fa-earth-americas animate-spin-slow" style="font-size: 120px; color: var(--blue);"></i>
+            <h1>전 세계가 원한다</h1>
+            <div style="display: flex; gap: 20px; margin-top: 20px;">
+                <span class="box-gray text-xs">🇵🇱 폴란드</span>
+                <span class="box-gray text-xs">🇪🇪 에스토니아</span>
+                <span class="box-gray text-xs">🇦🇺 호주</span>
+            </div>
+        </div>
+
+        <!-- 씬 71: 대기 수요 증가 -->
+        <div class="scene" id="scene71">
+            <div class="box-pink">
+                <p>HIMARS 공급 지연</p>
+                <p class="text-red">→ 천무로 시선 집중</p>
+            </div>
+        </div>
+
+        <!-- 씬 81: 재투자 약속 -->
+        <div class="scene" id="scene81">
+            <h2 style="margin-bottom: 30px;">현지 재투자 (오프셋)</h2>
+            <h1 class="text-green">120% 파격 제안</h1>
+            <div class="gauge-track" style="width: 60%; margin-top: 20px;">
+                <div class="gauge-fill" style="width: 100%; background: var(--green);"></div>
+            </div>
+        </div>
+
+        <!-- 씬 82: 2.8조 규모의 투자 -->
+        <div class="scene" id="scene82">
+            <div style="display: flex; gap: 40px; align-items: center;">
+                <i class="fa-solid fa-coins" style="font-size: 100px; color: var(--yellow);"></i>
+                <div class="box-yellow">
+                    <p>노르웨이 경제 활성화</p>
+                    <p class="text-sm">신규 일자리 및 기술 이전</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 90: 방산 생태계 통합 -->
+        <div class="scene" id="scene90">
+            <h2>방산 생태계 파트너십</h2>
+            <div style="display: flex; gap: 30px;">
+                <div class="box-gray">한화</div>
+                <i class="fa-solid fa-plus" style="font-size: 40px; margin-top: 30px;"></i>
+                <div class="box-gray">Nammo</div>
+                <i class="fa-solid fa-plus" style="font-size: 40px; margin-top: 30px;"></i>
+                <div class="box-gray">Kongsberg</div>
+            </div>
+            <p style="margin-top: 30px;" class="text-blue">노르웨이 자국 기업과 공조</p>
+        </div>
+
+        <!-- 씬 104: 계약서 및 예산 배분 -->
+        <div class="scene" id="scene104">
+            <h2>총 예산 2.8조 배분</h2>
+            <div style="display: flex; width: 80%; height: 100px; border: 3px solid #333; border-radius: 10px; overflow: hidden;">
+                <div style="width: 35%; background: var(--blue); display: flex; align-items: center; justify-content: center; color: white;">천무 구매(1조)</div>
+                <div style="width: 65%; background: var(--gray); display: flex; align-items: center; justify-content: center; color: white;">인프라 및 후속지원(1.8조)</div>
+            </div>
+            <p style="margin-top: 20px;">장기적 <span class="hl-yellow">운영 유지</span> 비용 포함</p>
+        </div>
+
+        <!-- 씬 107: 16대의 천무 배치 -->
+        <div class="scene" id="scene107">
+            <h1 class="text-blue">천무 16대 인도</h1>
+            <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; margin-top: 20px;">
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-rocket" style="font-size: 50px; color: var(--blue);"></i>
+            </div>
+        </div>
+
+        <!-- 씬 108: 1.8조의 미래 가치 -->
+        <div class="scene" id="scene108">
+            <div class="box-pink">
+                <h1 class="text-red">1.8조원</h1>
+                <p>지속 가능한 수익 모델 확보</p>
+            </div>
+        </div>
+
+        <!-- 씬 109: 군사 정비 시설 구축 -->
+        <div class="scene" id="scene109">
+            <i class="fa-solid fa-gears animate-spin-slow" style="font-size: 150px; color: var(--gray);"></i>
+            <h2>현지 유지보수(MRO) 센터</h2>
+            <p>24시간 정비 지원 체계</p>
+        </div>
+
+        <!-- 씬 110: 인프라 지원 -->
+        <div class="scene" id="scene110">
+            <div class="box-blue">
+                <i class="fa-solid fa-building-shield" style="font-size: 60px;"></i>
+                <p>훈련 및 정비 인프라 완비</p>
+            </div>
+        </div>
+
+        <!-- 씬 115: 유럽 지도상의 배치 -->
+        <div class="scene" id="scene115">
+            <h1>유럽을 관통하는 K-방산</h1>
+            <div style="position: relative; width: 600px; height: 350px; background: #dbeafe; border-radius: 20px; border: 3px solid #333;">
+                <span style="position: absolute; top: 20px; left: 200px; font-size: 40px;">🇳🇴</span>
+                <span style="position: absolute; top: 150px; left: 350px; font-size: 40px;">🇵🇱</span>
+                <span style="position: absolute; top: 100px; left: 380px; font-size: 40px;">🇪🇪</span>
+                <span style="position: absolute; top: 250px; left: 400px; font-size: 40px;">🇷🇴</span>
+                <i class="fa-solid fa-circle-check" style="position: absolute; top: 60px; left: 215px; color: var(--green);"></i>
+            </div>
+        </div>
+
+        <!-- 씬 116: 주가 반영 모멘텀 -->
+        <div class="scene" id="scene116">
+            <div class="line-chart-container">
+                <svg width="100%" height="100%">
+                    <polyline points="30,250 150,230 300,180 450,100 570,40" stroke="var(--red)" stroke-width="6" fill="none" />
+                </svg>
+            </div>
+            <h2 class="text-red">실적 가이던스 상향</h2>
+        </div>
+
+        <!-- 씬 118: 노르웨이의 평가 -->
+        <div class="scene" id="scene118">
+            <div class="box" style="white-space: normal;">
+                <p>"기술력은 독일을 넘고,<br>가격은 미국보다 합리적이다"</p>
+                <p class="text-gray text-sm">- 노르웨이 국방 전문가 -</p>
+            </div>
+        </div>
+
+        <!-- 씬 119: 국제적 위상 변화 -->
+        <div class="scene" id="scene119">
+            <h1 class="hl-yellow">방산 메이저 진입</h1>
+            <div style="display: flex; gap: 30px; margin-top: 30px;">
+                <div class="box-gray" style="opacity: 0.5;">Lockheed</div>
+                <div class="box-gray" style="opacity: 0.5;">KNDS</div>
+                <div class="box-blue animate-float">HANWHA</div>
+            </div>
+        </div>
+
+        <!-- 씬 123: 폴란드 수주 290대 -->
+        <div class="scene" id="scene123">
+            <h1 class="text-blue">🇵🇱 폴란드 잭팟</h1>
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <i class="fa-solid fa-truck-rocket" style="font-size: 100px;"></i>
+                <h1 style="font-size: 150px;">290<span style="font-size: 50px;">대</span></h1>
+            </div>
+        </div>
+
+        <!-- 씬 125: 에스토니아 수주 6대 -->
+        <div class="scene" id="scene125">
+            <h1 class="text-gray">🇪🇪 에스토니아</h1>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <i class="fa-solid fa-truck-rocket" style="font-size: 80px;"></i>
+                <h1 style="font-size: 120px;">6대</h1>
+            </div>
+            <p>북유럽-동유럽 방어선 완성</p>
+        </div>
+
+        <!-- 씬 128: 대규모 탄약 생산 -->
+        <div class="scene" id="scene128">
+            <i class="fa-solid fa-industry animate-subtle" style="font-size: 150px; color: var(--gray);"></i>
+            <h1>현지 생산 공장 가동</h1>
+            <p>폴란드 현지 공장에서 <span class="text-red">미사일</span> 생산</p>
+        </div>
+
+        <!-- 씬 130: 미사일 조립 로봇 -->
+        <div class="scene" id="scene130">
+            <div style="display: flex; gap: 40px; align-items: center;">
+                <i class="fa-solid fa-robot animate-subtle" style="font-size: 120px; color: var(--blue);"></i>
+                <div class="box-blue">
+                    <p>자동화 조립 라인</p>
+                    <p class="text-sm">연간 수천 발 생산 가능</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 131: 공급망의 핵심 -->
+        <div class="scene" id="scene131">
+            <div class="box-yellow">
+                <p>유럽 방산의 <span class="text-red">새로운 허브</span></p>
+            </div>
+        </div>
+
+        <!-- 씬 133: 효율적 물류 네트워크 -->
+        <div class="scene" id="scene133">
+            <div style="display: flex; align-items: center; gap: 40px;">
+                <i class="fa-solid fa-route" style="font-size: 100px; color: var(--orange);"></i>
+                <h1>폴란드 공장 → 유럽 전역</h1>
+            </div>
+            <p class="text-gray">물류비 절감 및 신속 대응</p>
+        </div>
+
+        <!-- 씬 134: 전략적 확장 -->
+        <div class="scene" id="scene134">
+            <div class="box-green">
+                <i class="fa-solid fa-map-location-dot" style="font-size: 60px;"></i>
+                <p>유럽 시장 점유율 가속화</p>
+            </div>
+        </div>
+
+        <!-- 씬 136: K9 자주포의 존재감 -->
+        <div class="scene" id="scene136">
+            <i class="fa-solid fa-tank" style="font-size: 150px; color: var(--green);"></i>
+            <h1 class="text-green">K9 자주포 세계 1위</h1>
+            <p>세계 시장 점유율 50% 돌파</p>
+        </div>
+
+        <!-- 씬 137: 시너지 효과 -->
+        <div class="scene" id="scene137">
+            <div class="box-gray">
+                <p>K9 자주포 + 천무 다연장</p>
+                <p class="text-blue">패키지 수출의 힘</p>
+            </div>
+        </div>
+
+        <!-- 씬 145: 미국 시장의 기회 -->
+        <div class="scene" id="scene145">
+            <h1 class="text-blue">🇺🇸 미국 심장을 뚫다</h1>
+            <i class="fa-solid fa-flag-usa animate-subtle" style="font-size: 120px; color: var(--red);"></i>
+        </div>
+
+        <!-- 씬 146: 거대 돌파구 -->
+        <div class="scene" id="scene146">
+            <div class="box-blue">
+                <p>아칸소 탄약 공장 건설</p>
+                <p class="text-sm">미군 기지 내 직접 생산</p>
+            </div>
+        </div>
+
+        <!-- 씬 151: 155mm 포탄 생산 라인 -->
+        <div class="scene" id="scene151">
+            <h2>155mm 포탄 제조 혁신</h2>
+            <div style="display: flex; align-items: flex-end; gap: 20px; height: 200px;">
+                <div class="bar bar-blue" style="width: 80px; height: 80px;"></div>
+                <div class="bar bar-blue" style="width: 80px; height: 140px;"></div>
+                <div class="bar bar-blue animate-float" style="width: 80px; height: 200px;"></div>
+            </div>
+            <p class="text-sm">생산성 <span class="text-red">300%</span> 향상</p>
+        </div>
+
+        <!-- 씬 154: 미군 탄약고 부족 상황 -->
+        <div class="scene" id="scene154">
+            <h2 class="text-red">미군 탄약 재고 비상</h2>
+            <div class="gauge-track" style="width: 70%;">
+                <div class="gauge-fill animate-blink" style="width: 20%; background: var(--red);"></div>
+            </div>
+            <p class="text-sm">위험 수준 도달</p>
+        </div>
+
+        <!-- 씬 155: 지원을 통한 고갈 -->
+        <div class="scene" id="scene155">
+            <div class="box-pink">
+                <p>우크라이나 지원으로 인한 공백</p>
+                <p class="text-red">→ 한화가 해결사로 등장</p>
+            </div>
+        </div>
+
+        <!-- 씬 157: 메이드 인 아메리카 공장 -->
+        <div class="scene" id="scene157">
+            <i class="fa-solid fa-industry" style="font-size: 150px; color: var(--blue);"></i>
+            <h1>Made in USA Hanwha</h1>
+            <p>현지 생산을 통한 규제 돌파</p>
+        </div>
+
+        <!-- 씬 158: 시장 진입 전략 -->
+        <div class="scene" id="scene158">
+            <div class="box-yellow">
+                <p>미국 국방부의 <span class="text-blue">핵심 파트너</span> 격상</p>
+            </div>
+        </div>
+
+        <!-- 씬 163: 유럽 내 광범위한 입지 -->
+        <div class="scene" id="scene163">
+            <h2>한화에어로의 유럽 영토</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                <div class="box-gray">🇳🇴 노르웨이</div>
+                <div class="box-gray">🇵🇱 폴란드</div>
+                <div class="box-gray">🇪🇪 에스토니아</div>
+                <div class="box-gray">🇷🇴 루마니아</div>
+            </div>
+        </div>
+
+        <!-- 씬 164: 글로벌 리더십 -->
+        <div class="scene" id="scene164">
+            <i class="fa-solid fa-crown animate-float" style="font-size: 120px; color: var(--yellow);"></i>
+            <h1 class="hl-yellow">K-방산의 자부심</h1>
+        </div>
+
+        <!-- 씬 170: 주가 180만원 전망 -->
+        <div class="scene" id="scene170">
+            <p class="text-gray">시장 목표 주가</p>
+            <h1 style="font-size: 150px;" class="animate-float">
+                <span class="text-red">1,800,000</span><span style="font-size: 60px;">원</span>
+            </h1>
+            <p class="text-green">▲ 추가 상승 여력 충분</p>
+        </div>
+
+        <!-- 씬 176: 울산 vs 폴란드 공장 시너지 -->
+        <div class="scene" id="scene176">
+            <h2>글로벌 투트랙 생산</h2>
+            <div style="display: flex; gap: 40px; align-items: center;">
+                <div class="box-blue" style="text-align: center;">
+                    <p>🇰🇷 울산</p>
+                    <p class="text-xs">국내 및 수출 주력</p>
+                </div>
+                <i class="fa-solid fa-link" style="font-size: 50px;"></i>
+                <div class="box-green" style="text-align: center;">
+                    <p>🇵🇱 폴란드</p>
+                    <p class="text-xs">유럽 현지 공급</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 184: 경쟁사와의 격차 -->
+        <div class="scene" id="scene184">
+            <h2>성장 속도 비교</h2>
+            <div style="display: flex; gap: 40px; align-items: flex-end; height: 200px;">
+                <div style="text-align: center;">
+                    <div class="bar" style="width: 100px; height: 80px;"></div>
+                    <p>경쟁사</p>
+                </div>
+                <div style="text-align: center;">
+                    <div class="bar bar-red animate-float" style="width: 100px; height: 180px;"></div>
+                    <p class="text-red">한화</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 185: 압도적 성장세 -->
+        <div class="scene" id="scene185">
+            <div class="box-pink">
+                <h1 class="text-red">연평균 30%↑</h1>
+                <p>폭발적인 이익 성장</p>
+            </div>
+        </div>
+
+        <!-- 씬 187: 혁신 연구소 -->
+        <div class="scene" id="scene187">
+            <i class="fa-solid fa-microchip animate-subtle" style="font-size: 150px; color: var(--purple);"></i>
+            <h1>무인화·AI 방산 혁신</h1>
+        </div>
+
+        <!-- 씬 188: 미래 기술력 -->
+        <div class="scene" id="scene188">
+            <div class="box-gray">
+                <p>사람이 타지 않는 <span class="text-purple">자주포</span></p>
+                <p class="text-sm">차세대 방산의 표준을 만든다</p>
+            </div>
+        </div>
+
+        <!-- 씬 196: 거대 홀로그램 생태계 -->
+        <div class="scene" id="scene196">
+            <i class="fa-solid fa-network-wired animate-spin-slow" style="font-size: 120px; color: var(--blue);"></i>
+            <h1>육해공 통합 솔루션</h1>
+        </div>
+
+        <!-- 씬 197: 방산 통합 시너지 -->
+        <div class="scene" id="scene197">
+            <div style="display: flex; gap: 20px;">
+                <div class="box-blue">🚀 에어로</div>
+                <div class="box-blue">🚢 오션</div>
+                <div class="box-blue">📡 시스템</div>
+            </div>
+        </div>
+
+        <!-- 씬 202: 대한민국 방산의 미래 -->
+        <div class="scene" id="scene202">
+            <i class="fa-solid fa-rocket animate-float" style="font-size: 150px; color: var(--orange);"></i>
+            <h1 class="hl-yellow">K-방산, 세계를 품다</h1>
+            <p style="margin-top: 30px;">한화에어로스페이스가 그 중심에 있습니다</p>
+        </div>
+
+    </div>
+
+    <div id="controls">
+        <button onclick="move(-1)"><i class="fa-solid fa-chevron-left"></i> 이전</button>
+        <div style="font-size: 32px;"><span id="current-idx">1</span> / <span id="total-scenes">1</span></div>
+        <button onclick="move(1)">다음 <i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+
+    <div id="progress-container" style="width: var(--canvas-width); height: 10px; background: #ddd; margin-top: 10px; border-radius: 5px; overflow: hidden;">
+        <div id="progress-bar" style="width: 0%; height: 100%; background: var(--blue); transition: width 0.3s;"></div>
+    </div>
+
+    <script>
+        let currentIdx = 0;
+        const scenes = document.querySelectorAll('.scene');
+        const progressBar = document.getElementById('progress-bar');
+        const counterText = document.getElementById('current-idx');
+        const totalText = document.getElementById('total-scenes');
+
+        if (totalText) totalText.innerText = scenes.length;
+
+        function update() {
+            scenes.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
+            progressBar.style.width = ((currentIdx + 1) / scenes.length * 100) + '%';
+            counterText.innerText = currentIdx + 1;
+        }
+
+        function move(n) {
+            currentIdx += n;
+            if (currentIdx < 0) currentIdx = 0;
+            if (currentIdx >= scenes.length) currentIdx = scenes.length - 1;
+            update();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') move(1);
+            if (e.key === 'ArrowLeft') move(-1);
+        });
+
+        update();
+    </script>
+</body>
+</html>

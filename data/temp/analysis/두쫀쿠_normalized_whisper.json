@@ -1,0 +1,2216 @@
+[
+  {
+    "scene_id": 1,
+    "text": "요즘 하나의 만원짜리 쿠키가 유행이죠?",
+    "start_time": 0.0,
+    "end_time": 2.08,
+    "duration": 2.08,
+    "timecode": "00:00:00,000 --> 00:00:02,080",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 2,
+    "text": "무려 국밥 한 그릇보다 비싼 쿠키에요",
+    "start_time": 2.6,
+    "end_time": 4.639,
+    "duration": 2.039,
+    "timecode": "00:00:02,600 --> 00:00:04,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 3,
+    "text": "새벽부터 100명씩 줄 서고",
+    "start_time": 4.639,
+    "end_time": 6.66,
+    "duration": 2.021,
+    "timecode": "00:00:04,639 --> 00:00:06,660",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 4,
+    "text": "배달앱 검색량이 1500배 이상 뛰었어요",
+    "start_time": 6.66,
+    "end_time": 9.5,
+    "duration": 2.84,
+    "timecode": "00:00:06,660 --> 00:00:09,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 5,
+    "text": "두바이 쫀득 쿠키",
+    "start_time": 9.5,
+    "end_time": 10.74,
+    "duration": 1.2400000000000002,
+    "timecode": "00:00:09,500 --> 00:00:10,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 6,
+    "text": "줄여서 두 쫀쿠에요",
+    "start_time": 11.269,
+    "end_time": 12.32,
+    "duration": 1.0510000000000002,
+    "timecode": "00:00:11,269 --> 00:00:12,320",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 7,
+    "text": "근데 이게 단순한 디저트 유행이 아니에요",
+    "start_time": 12.32,
+    "end_time": 14.539,
+    "duration": 2.2189999999999994,
+    "timecode": "00:00:12,320 --> 00:00:14,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 8,
+    "text": "왜 불황일수록 비싼 간식이 팔리는지",
+    "start_time": 14.929,
+    "end_time": 17.48,
+    "duration": 2.551,
+    "timecode": "00:00:14,929 --> 00:00:17,480",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 9,
+    "text": "이게 한국경제의 어떤 민낯을 보여주는지 말해드릴게요",
+    "start_time": 17.48,
+    "end_time": 20.46,
+    "duration": 2.9800000000000004,
+    "timecode": "00:00:17,480 --> 00:00:20,460",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 10,
+    "text": "솔직히 좀 습슬했어요",
+    "start_time": 20.46,
+    "end_time": 22.12,
+    "duration": 1.6600000000000001,
+    "timecode": "00:00:20,460 --> 00:00:22,120",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 11,
+    "text": "만원짜리 쿠키에 담긴 우리 사회의 자화상이 보이더라고요",
+    "start_time": 22.679,
+    "end_time": 25.519,
+    "duration": 2.84,
+    "timecode": "00:00:22,678 --> 00:00:25,518",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 12,
+    "text": "일단 두 쫀쿠가 먼지부터 알아야 해요",
+    "start_time": 25.87,
+    "end_time": 27.92,
+    "duration": 2.0500000000000007,
+    "timecode": "00:00:25,870 --> 00:00:27,920",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 13,
+    "text": "두바이 쫀득 쿠키의 줄임말인데요",
+    "start_time": 28.32,
+    "end_time": 30.1,
+    "duration": 1.7800000000000011,
+    "timecode": "00:00:28,320 --> 00:00:30,100",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 14,
+    "text": "2024년 전 세계를 휩쓴 두바이 초콜릿에서 시작됐어요",
+    "start_time": 30.1,
+    "end_time": 33.92,
+    "duration": 3.8200000000000003,
+    "timecode": "00:00:30,100 --> 00:00:33,920",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 15,
+    "text": "두바이 초콜릿이 뭐냐면요",
+    "start_time": 33.92,
+    "end_time": 35.6,
+    "duration": 1.6799999999999997,
+    "timecode": "00:00:33,920 --> 00:00:35,600",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 16,
+    "text": "중동전통 디저트에서 영감을 받은 건데요",
+    "start_time": 35.6,
+    "end_time": 38.28,
+    "duration": 2.6799999999999997,
+    "timecode": "00:00:35,600 --> 00:00:38,280",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 17,
+    "text": "피스타 치오 스프레드에",
+    "start_time": 38.28,
+    "end_time": 39.799,
+    "duration": 1.5189999999999984,
+    "timecode": "00:00:38,280 --> 00:00:39,798",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 18,
+    "text": "카드아이프라는 바삭한 면을 넣고",
+    "start_time": 39.799,
+    "end_time": 41.88,
+    "duration": 2.081000000000003,
+    "timecode": "00:00:39,798 --> 00:00:41,880",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 19,
+    "text": "초콜릿으로 감싼 거예요",
+    "start_time": 41.88,
+    "end_time": 43.479,
+    "duration": 1.5989999999999966,
+    "timecode": "00:00:41,880 --> 00:00:43,478",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 20,
+    "text": "근데 한국 사람들이 이걸 그냥 먹었겠어요?",
+    "start_time": 43.479,
+    "end_time": 45.96,
+    "duration": 2.4810000000000016,
+    "timecode": "00:00:43,478 --> 00:00:45,960",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 21,
+    "text": "우리나라 사람들은 쫀득한 식감을 좋아하잖아요",
+    "start_time": 46.46,
+    "end_time": 48.74,
+    "duration": 2.280000000000001,
+    "timecode": "00:00:46,460 --> 00:00:48,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 22,
+    "text": "떡, 젤리, 찹쌀떡",
+    "start_time": 48.979,
+    "end_time": 50.84,
+    "duration": 1.8610000000000042,
+    "timecode": "00:00:48,978 --> 00:00:50,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 23,
+    "text": "다 쫀득쫀득하죠",
+    "start_time": 50.84,
+    "end_time": 52.219,
+    "duration": 1.3789999999999978,
+    "timecode": "00:00:50,840 --> 00:00:52,219",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 24,
+    "text": "그래서 여기에 마시멜로를 넣은 거예요",
+    "start_time": 52.219,
+    "end_time": 54.28,
+    "duration": 2.061,
+    "timecode": "00:00:52,219 --> 00:00:54,280",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 25,
+    "text": "근데 바삭함과 쫀득함이 동시에 느껴지는 거죠",
+    "start_time": 54.439,
+    "end_time": 57.0,
+    "duration": 2.561,
+    "timecode": "00:00:54,439 --> 00:00:57,000",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 26,
+    "text": "이게 대박이 난 거예요",
+    "start_time": 57.229,
+    "end_time": 58.399,
+    "duration": 1.1700000000000017,
+    "timecode": "00:00:57,228 --> 00:00:58,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 27,
+    "text": "업계에서는 이걸 식감 소비라고 부르거든요",
+    "start_time": 58.92,
+    "end_time": 60.859,
+    "duration": 1.939,
+    "timecode": "00:00:58,920 --> 00:01:00,859",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 28,
+    "text": "맛보다 씹는 재미를 중시하는",
+    "start_time": 61.35,
+    "end_time": 63.079,
+    "duration": 1.7289999999999992,
+    "timecode": "00:01:01,350 --> 00:01:03,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 29,
+    "text": "MZ세대 취향이 반영된 거죠",
+    "start_time": 63.079,
+    "end_time": 64.799,
+    "duration": 1.720000000000006,
+    "timecode": "00:01:03,079 --> 00:01:04,799",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 30,
+    "text": "근데요",
+    "start_time": 64.799,
+    "end_time": 65.719,
+    "duration": 0.9199999999999875,
+    "timecode": "00:01:04,799 --> 00:01:05,718",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 31,
+    "text": "두 쫀쿠가 이렇게 빨리 퍼진되는 이유가 있어요",
+    "start_time": 65.719,
+    "end_time": 68.18,
+    "duration": 2.4610000000000127,
+    "timecode": "00:01:05,718 --> 00:01:08,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 32,
+    "text": "SNS에요",
+    "start_time": 68.18,
+    "end_time": 69.159,
+    "duration": 0.9789999999999992,
+    "timecode": "00:01:08,180 --> 00:01:09,159",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 33,
+    "text": "틱톡이랑 인스타그램 릴스에서",
+    "start_time": 69.159,
+    "end_time": 71.359,
+    "duration": 2.1999999999999886,
+    "timecode": "00:01:09,159 --> 00:01:11,358",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 34,
+    "text": "쿠키 자르는 영상이 엄청나게 돌았거든요",
+    "start_time": 71.359,
+    "end_time": 73.5,
+    "duration": 2.1410000000000053,
+    "timecode": "00:01:11,358 --> 00:01:13,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 35,
+    "text": "카드아이프가 바스락거리는 소리",
+    "start_time": 73.5,
+    "end_time": 75.42,
+    "duration": 1.9200000000000017,
+    "timecode": "00:01:13,500 --> 00:01:15,420",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 36,
+    "text": "마시멜로가 늘어나는 모습",
+    "start_time": 75.42,
+    "end_time": 77.07900000000001,
+    "duration": 1.659000000000006,
+    "timecode": "00:01:15,420 --> 00:01:17,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 37,
+    "text": "이게 ASMR처럼 중독성이 있어요",
+    "start_time": 77.07900000000001,
+    "end_time": 79.78,
+    "duration": 2.7009999999999934,
+    "timecode": "00:01:17,079 --> 00:01:19,780",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 38,
+    "text": "영국 BBC에서도",
+    "start_time": 80.23,
+    "end_time": 81.379,
+    "duration": 1.149000000000001,
+    "timecode": "00:01:20,230 --> 00:01:21,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 39,
+    "text": "한국의 두 쫀쿠 열풍을 집중 보도했거든요",
+    "start_time": 81.379,
+    "end_time": 84.15899999999999,
+    "duration": 2.779999999999987,
+    "timecode": "00:01:21,379 --> 00:01:24,158",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 40,
+    "text": "아이브, 장원영 같은 인플루언서들이 먹는 사진 올리니까요",
+    "start_time": 84.15899999999999,
+    "end_time": 87.62,
+    "duration": 3.4610000000000127,
+    "timecode": "00:01:24,158 --> 00:01:27,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 41,
+    "text": "나도 먹어봐야지",
+    "start_time": 87.62,
+    "end_time": 88.879,
+    "duration": 1.2590000000000003,
+    "timecode": "00:01:27,620 --> 00:01:28,879",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 42,
+    "text": "이러면서 줄 서는 거예요",
+    "start_time": 88.879,
+    "end_time": 90.68,
+    "duration": 1.801000000000002,
+    "timecode": "00:01:28,879 --> 00:01:30,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 43,
+    "text": "이걸 디토 소비라고 하는데요",
+    "start_time": 90.68,
+    "end_time": 92.06,
+    "duration": 1.3799999999999955,
+    "timecode": "00:01:30,680 --> 00:01:32,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 44,
+    "text": "누군가가 하니까 나도 따라하는 소비 패턴이에요",
+    "start_time": 92.06,
+    "end_time": 94.939,
+    "duration": 2.8789999999999907,
+    "timecode": "00:01:32,060 --> 00:01:34,938",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 45,
+    "text": "그런데 여기서 진짜 중요한 질문이 있어요",
+    "start_time": 94.939,
+    "end_time": 97.42,
+    "duration": 2.4810000000000088,
+    "timecode": "00:01:34,938 --> 00:01:37,420",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 46,
+    "text": "왜 하필 지금일까요?",
+    "start_time": 97.75999999999999,
+    "end_time": 99.0,
+    "duration": 1.240000000000009,
+    "timecode": "00:01:37,759 --> 00:01:39,000",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 47,
+    "text": "경기가 안 좋잖아요",
+    "start_time": 99.459,
+    "end_time": 100.34,
+    "duration": 0.8810000000000002,
+    "timecode": "00:01:39,459 --> 00:01:40,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 48,
+    "text": "고물가, 고금니, 고환율",
+    "start_time": 100.92,
+    "end_time": 103.299,
+    "duration": 2.379000000000005,
+    "timecode": "00:01:40,920 --> 00:01:43,299",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 49,
+    "text": "3중고라고 하죠",
+    "start_time": 103.299,
+    "end_time": 104.959,
+    "duration": 1.6599999999999966,
+    "timecode": "00:01:43,299 --> 00:01:44,959",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 50,
+    "text": "근데 왜 만 원짜리 쿠키가",
+    "start_time": 104.959,
+    "end_time": 106.64,
+    "duration": 1.6809999999999974,
+    "timecode": "00:01:44,959 --> 00:01:46,640",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 51,
+    "text": "날개 도친 듯이 팔리는 걸까요",
+    "start_time": 106.64,
+    "end_time": 108.34,
+    "duration": 1.7000000000000028,
+    "timecode": "00:01:46,640 --> 00:01:48,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 52,
+    "text": "여기서 등장하는 게 립스틱 효과예요",
+    "start_time": 108.739,
+    "end_time": 110.799,
+    "duration": 2.0600000000000023,
+    "timecode": "00:01:48,739 --> 00:01:50,799",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 53,
+    "text": "경제학 용어인데요",
+    "start_time": 110.799,
+    "end_time": 112.12,
+    "duration": 1.320999999999998,
+    "timecode": "00:01:50,799 --> 00:01:52,120",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 54,
+    "text": "불황일 때 오히려 립스틱 매출이 올라가는 현상이에요",
+    "start_time": 112.12,
+    "end_time": 115.37899999999999,
+    "duration": 3.258999999999986,
+    "timecode": "00:01:52,120 --> 00:01:55,378",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 55,
+    "text": "수백만 원짜리 명품 가방은 못 사도",
+    "start_time": 115.84,
+    "end_time": 118.0,
+    "duration": 2.1599999999999966,
+    "timecode": "00:01:55,840 --> 00:01:58,000",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 56,
+    "text": "몇 만 원짜리 립스틱은 살 수 있잖아요",
+    "start_time": 118.0,
+    "end_time": 120.359,
+    "duration": 2.3589999999999947,
+    "timecode": "00:01:58,000 --> 00:02:00,358",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 57,
+    "text": "작은 사치로 기분 전환을 하는 거죠",
+    "start_time": 120.819,
+    "end_time": 122.84,
+    "duration": 2.021000000000001,
+    "timecode": "00:02:00,819 --> 00:02:02,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 58,
+    "text": "2016년 현재 이 역할이",
+    "start_time": 123.879,
+    "end_time": 125.879,
+    "duration": 2.0,
+    "timecode": "00:02:03,879 --> 00:02:05,879",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 59,
+    "text": "립스틱에서 디저트로 넘어왔어요",
+    "start_time": 125.879,
+    "end_time": 127.719,
+    "duration": 1.8399999999999892,
+    "timecode": "00:02:05,879 --> 00:02:07,718",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 60,
+    "text": "두 쫀쿠, 니치, 향수, 오마카세",
+    "start_time": 127.959,
+    "end_time": 131.379,
+    "duration": 3.4199999999999875,
+    "timecode": "00:02:07,959 --> 00:02:11,378",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 61,
+    "text": "이런 게 요즘의 립스틱이에요",
+    "start_time": 131.719,
+    "end_time": 133.24,
+    "duration": 1.521000000000015,
+    "timecode": "00:02:11,718 --> 00:02:13,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 62,
+    "text": "전문 용어로 스몰럭셜이라고 하거든요",
+    "start_time": 133.719,
+    "end_time": 135.639,
+    "duration": 1.920000000000016,
+    "timecode": "00:02:13,718 --> 00:02:15,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 63,
+    "text": "적은 비용으로 누리는 작은 사치",
+    "start_time": 135.639,
+    "end_time": 137.939,
+    "duration": 2.299999999999983,
+    "timecode": "00:02:15,639 --> 00:02:17,938",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 64,
+    "text": "숫자로 보면 더 명확해요",
+    "start_time": 137.939,
+    "end_time": 139.75900000000001,
+    "duration": 1.8200000000000216,
+    "timecode": "00:02:17,938 --> 00:02:19,759",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 65,
+    "text": "국내 향수 시장 규모가",
+    "start_time": 139.75900000000001,
+    "end_time": 141.56,
+    "duration": 1.8009999999999877,
+    "timecode": "00:02:19,759 --> 00:02:21,560",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 66,
+    "text": "2019년에 6천억 원이었거든요",
+    "start_time": 141.56,
+    "end_time": 143.78,
+    "duration": 2.219999999999999,
+    "timecode": "00:02:21,560 --> 00:02:23,780",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 67,
+    "text": "근데 2025년에는 1조 원을 돌파했어요",
+    "start_time": 143.78,
+    "end_time": 146.56,
+    "duration": 2.780000000000001,
+    "timecode": "00:02:23,780 --> 00:02:26,560",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 68,
+    "text": "불과 6년 만에 거의 2배가 된 거예요",
+    "start_time": 147.02,
+    "end_time": 148.819,
+    "duration": 1.7989999999999782,
+    "timecode": "00:02:27,020 --> 00:02:28,818",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 69,
+    "text": "경기가 안 좋은데",
+    "start_time": 149.319,
+    "end_time": 150.319,
+    "duration": 1.0,
+    "timecode": "00:02:29,318 --> 00:02:30,318",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 70,
+    "text": "향수 시장은 연평균 12.6%씩 성장한 거죠",
+    "start_time": 150.319,
+    "end_time": 153.84,
+    "duration": 3.521000000000015,
+    "timecode": "00:02:30,318 --> 00:02:33,840",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 71,
+    "text": "두 쫀쿠도 마찬가지예요",
+    "start_time": 154.07999999999998,
+    "end_time": 155.62,
+    "duration": 1.5400000000000205,
+    "timecode": "00:02:34,079 --> 00:02:35,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 72,
+    "text": "만 원이면 명품 가방의 100분의 1도 안 되지만요",
+    "start_time": 155.62,
+    "end_time": 159.3,
+    "duration": 3.680000000000007,
+    "timecode": "00:02:35,620 --> 00:02:39,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 73,
+    "text": "SNS에 올리면 나도 트렌드의 최전선에 있다는 느낌을 받을 수 있거든요",
+    "start_time": 159.3,
+    "end_time": 163.439,
+    "duration": 4.138999999999982,
+    "timecode": "00:02:39,300 --> 00:02:43,438",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 74,
+    "text": "이게 스몰럭셜이의 핵심이에요",
+    "start_time": 163.81900000000002,
+    "end_time": 165.699,
+    "duration": 1.8799999999999955,
+    "timecode": "00:02:43,819 --> 00:02:45,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 75,
+    "text": "자 그런데 여기서 더 깊이 들어가 볼게요",
+    "start_time": 165.699,
+    "end_time": 168.75900000000001,
+    "duration": 3.0600000000000023,
+    "timecode": "00:02:45,699 --> 00:02:48,759",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 76,
+    "text": "왜 사람들이 이런 소비를 할까요",
+    "start_time": 169.06,
+    "end_time": 170.75900000000001,
+    "duration": 1.6990000000000123,
+    "timecode": "00:02:49,060 --> 00:02:50,759",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 77,
+    "text": "한국 경제의 구조적인 문제가 있어요",
+    "start_time": 170.75900000000001,
+    "end_time": 173.0,
+    "duration": 2.2409999999999854,
+    "timecode": "00:02:50,759 --> 00:02:53,000",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 78,
+    "text": "K자형 양극화라고 들어보셨어요?",
+    "start_time": 173.56,
+    "end_time": 175.68,
+    "duration": 2.1200000000000045,
+    "timecode": "00:02:53,560 --> 00:02:55,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 79,
+    "text": "K자 알팝의 모양처럼요",
+    "start_time": 175.68,
+    "end_time": 177.34,
+    "duration": 1.6599999999999966,
+    "timecode": "00:02:55,680 --> 00:02:57,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 80,
+    "text": "위로 올라가는 사람이 있고",
+    "start_time": 177.34,
+    "end_time": 179.139,
+    "duration": 1.7990000000000066,
+    "timecode": "00:02:57,340 --> 00:02:59,139",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 81,
+    "text": "아래로 내려가는 사람이 있어요",
+    "start_time": 179.139,
+    "end_time": 180.96,
+    "duration": 1.820999999999998,
+    "timecode": "00:02:59,139 --> 00:03:00,960",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 82,
+    "text": "수출되기업이랑 IT 분야는 잘 나가요",
+    "start_time": 180.96,
+    "end_time": 183.52,
+    "duration": 2.5600000000000023,
+    "timecode": "00:03:00,960 --> 00:03:03,520",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 83,
+    "text": "근데 중소기업, 자형업자, 지방 경제는",
+    "start_time": 183.52,
+    "end_time": 186.78,
+    "duration": 3.259999999999991,
+    "timecode": "00:03:03,520 --> 00:03:06,780",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 84,
+    "text": "침체의 늪에 빠져 있거든요",
+    "start_time": 186.78,
+    "end_time": 188.47899999999998,
+    "duration": 1.6989999999999839,
+    "timecode": "00:03:06,780 --> 00:03:08,478",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 85,
+    "text": "이게 소비 패턴에서도 똑같이 나타나요",
+    "start_time": 188.819,
+    "end_time": 191.08,
+    "duration": 2.261000000000024,
+    "timecode": "00:03:08,818 --> 00:03:11,080",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 86,
+    "text": "생필품은 다이소에서 사면서요",
+    "start_time": 191.68,
+    "end_time": 193.46,
+    "duration": 1.7800000000000011,
+    "timecode": "00:03:11,680 --> 00:03:13,460",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 87,
+    "text": "두 쫀쿠에는 만 원을 쓰는 거예요",
+    "start_time": 193.46,
+    "end_time": 195.3,
+    "duration": 1.8400000000000034,
+    "timecode": "00:03:13,460 --> 00:03:15,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 88,
+    "text": "필요한 건 최대한 아끼고",
+    "start_time": 195.939,
+    "end_time": 197.25900000000001,
+    "duration": 1.3200000000000216,
+    "timecode": "00:03:15,938 --> 00:03:17,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 89,
+    "text": "원하는 건 과감하게 쓰는 거죠",
+    "start_time": 197.25900000000001,
+    "end_time": 198.97899999999998,
+    "duration": 1.7199999999999704,
+    "timecode": "00:03:17,259 --> 00:03:18,978",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 90,
+    "text": "이걸 엔비벨런트 소비라고 해요",
+    "start_time": 199.319,
+    "end_time": 201.039,
+    "duration": 1.7199999999999989,
+    "timecode": "00:03:19,318 --> 00:03:21,038",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 91,
+    "text": "양가적 소비",
+    "start_time": 201.039,
+    "end_time": 202.18,
+    "duration": 1.1410000000000196,
+    "timecode": "00:03:21,038 --> 00:03:22,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 92,
+    "text": "극단적으로 갈리는 거예요",
+    "start_time": 202.699,
+    "end_time": 203.819,
+    "duration": 1.1199999999999761,
+    "timecode": "00:03:22,699 --> 00:03:23,818",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 93,
+    "text": "2016년 민간 소비 증가율이 1.6%밖에 안 돼요",
+    "start_time": 204.8,
+    "end_time": 208.319,
+    "duration": 3.518999999999977,
+    "timecode": "00:03:24,800 --> 00:03:28,318",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 94,
+    "text": "전체적인 지출은 줄었는데",
+    "start_time": 208.939,
+    "end_time": 210.219,
+    "duration": 1.2800000000000011,
+    "timecode": "00:03:28,938 --> 00:03:30,218",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 95,
+    "text": "특정 품목에는 돈을 아끼지 않는 거죠",
+    "start_time": 210.719,
+    "end_time": 212.74,
+    "duration": 2.021000000000015,
+    "timecode": "00:03:30,718 --> 00:03:32,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 96,
+    "text": "그리고요",
+    "start_time": 213.3,
+    "end_time": 214.07999999999998,
+    "duration": 0.7799999999999727,
+    "timecode": "00:03:33,300 --> 00:03:34,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 97,
+    "text": "두 쫀쿠를 먹는 건 단순히 배고파서가 아니에요",
+    "start_time": 214.07999999999998,
+    "end_time": 216.5,
+    "duration": 2.420000000000016,
+    "timecode": "00:03:34,079 --> 00:03:36,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 98,
+    "text": "경험을 사는 거예요",
+    "start_time": 217.18,
+    "end_time": 218.0,
+    "duration": 0.8199999999999932,
+    "timecode": "00:03:37,180 --> 00:03:38,000",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 99,
+    "text": "100명 줄 서서 기다렸다가 사온 쿠키",
+    "start_time": 218.52,
+    "end_time": 220.46,
+    "duration": 1.9399999999999977,
+    "timecode": "00:03:38,520 --> 00:03:40,460",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 100,
+    "text": "이건 그냥 쿠키가 아니라",
+    "start_time": 220.81900000000002,
+    "end_time": 222.02,
+    "duration": 1.2009999999999934,
+    "timecode": "00:03:40,819 --> 00:03:42,020",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 101,
+    "text": "트로피에요",
+    "start_time": 222.02,
+    "end_time": 223.12,
+    "duration": 1.0999999999999943,
+    "timecode": "00:03:42,020 --> 00:03:43,120",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 102,
+    "text": "내 안목, 내 정보력, 내 인내심을 증명하는 거거든요",
+    "start_time": 223.12,
+    "end_time": 226.97899999999998,
+    "duration": 3.8589999999999804,
+    "timecode": "00:03:43,120 --> 00:03:46,978",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 103,
+    "text": "불확실한 미래 앞에서 느끼는 무력감",
+    "start_time": 227.539,
+    "end_time": 229.539,
+    "duration": 2.0,
+    "timecode": "00:03:47,538 --> 00:03:49,538",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 104,
+    "text": "이걸 작은 성취로 상쇄하는 거예요",
+    "start_time": 229.539,
+    "end_time": 231.47899999999998,
+    "duration": 1.9399999999999977,
+    "timecode": "00:03:49,538 --> 00:03:51,478",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 105,
+    "text": "전문가들은 이걸 성공한 경험을 구매하는 행위라고 해석해요",
+    "start_time": 231.47899999999998,
+    "end_time": 234.74,
+    "duration": 3.261000000000024,
+    "timecode": "00:03:51,478 --> 00:03:54,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 106,
+    "text": "자 이렇게 두 쫀쿠가 대박이 터지니까요",
+    "start_time": 235.02,
+    "end_time": 237.599,
+    "duration": 2.5789999999999793,
+    "timecode": "00:03:55,020 --> 00:03:57,598",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 107,
+    "text": "유통업계가 가만히 있겠어요",
+    "start_time": 237.599,
+    "end_time": 239.3,
+    "duration": 1.7010000000000218,
+    "timecode": "00:03:57,598 --> 00:03:59,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 108,
+    "text": "배달의 빼민에서 두 쫀쿠 검색량이 1500배 폭증했거든요",
+    "start_time": 239.75900000000001,
+    "end_time": 243.219,
+    "duration": 3.4599999999999795,
+    "timecode": "00:03:59,759 --> 00:04:03,218",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 109,
+    "text": "CU, GS25 같은 편의점들이 바로 제품을 출시했어요",
+    "start_time": 243.219,
+    "end_time": 247.099,
+    "duration": 3.8799999999999955,
+    "timecode": "00:04:03,218 --> 00:04:07,098",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 110,
+    "text": "마켓컬리는 더 재밌는 전략을 썼어요",
+    "start_time": 247.099,
+    "end_time": 249.819,
+    "duration": 2.719999999999999,
+    "timecode": "00:04:07,098 --> 00:04:09,818",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 111,
+    "text": "VIP, VIPI 회원들한테만 먼저 파는 거예요",
+    "start_time": 249.819,
+    "end_time": 253.419,
+    "duration": 3.6000000000000227,
+    "timecode": "00:04:09,818 --> 00:04:13,419",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 112,
+    "text": "희소성을 이용한 마케팅이죠",
+    "start_time": 253.419,
+    "end_time": 254.97899999999998,
+    "duration": 1.5599999999999739,
+    "timecode": "00:04:13,419 --> 00:04:14,978",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 113,
+    "text": "호텔들도 가만 안 있었어요",
+    "start_time": 254.97899999999998,
+    "end_time": 256.86,
+    "duration": 1.8810000000000286,
+    "timecode": "00:04:14,978 --> 00:04:16,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 114,
+    "text": "페어먼트 엠베서도 서울 같은 특급 호텔들이",
+    "start_time": 256.86,
+    "end_time": 260.04,
+    "duration": 3.180000000000007,
+    "timecode": "00:04:16,860 --> 00:04:20,040",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 115,
+    "text": "두 쫀쿠를 만들기 시작했거든요",
+    "start_time": 260.04,
+    "end_time": 261.959,
+    "duration": 1.9189999999999827,
+    "timecode": "00:04:20,040 --> 00:04:21,959",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 116,
+    "text": "호텔 셰프가 만드니까 다르죠",
+    "start_time": 262.399,
+    "end_time": 264.079,
+    "duration": 1.6800000000000068,
+    "timecode": "00:04:22,399 --> 00:04:24,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 117,
+    "text": "고급 피스타치오 분태의 프리미엄 소금을 더해서요",
+    "start_time": 264.399,
+    "end_time": 267.18,
+    "duration": 2.781000000000006,
+    "timecode": "00:04:24,399 --> 00:04:27,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 118,
+    "text": "세트당 25,000원이에요",
+    "start_time": 267.18,
+    "end_time": 268.899,
+    "duration": 1.718999999999994,
+    "timecode": "00:04:27,180 --> 00:04:28,899",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 119,
+    "text": "근데 이게 매일 품절이에요",
+    "start_time": 268.899,
+    "end_time": 270.439,
+    "duration": 1.5400000000000205,
+    "timecode": "00:04:28,899 --> 00:04:30,439",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 120,
+    "text": "길거리 간식이 특급 호텔 디저트가 된 거죠",
+    "start_time": 270.439,
+    "end_time": 273.319,
+    "duration": 2.8799999999999955,
+    "timecode": "00:04:30,439 --> 00:04:33,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 121,
+    "text": "근데요 진짜 웃긴 건 따로 있어요",
+    "start_time": 273.319,
+    "end_time": 275.839,
+    "duration": 2.519999999999982,
+    "timecode": "00:04:33,319 --> 00:04:35,838",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 122,
+    "text": "초밥집에서도 두 쫀쿠를 팔아요",
+    "start_time": 276.42,
+    "end_time": 278.06,
+    "duration": 1.6399999999999864,
+    "timecode": "00:04:36,420 --> 00:04:38,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 123,
+    "text": "피자집에서도 팔고요",
+    "start_time": 278.06,
+    "end_time": 279.54,
+    "duration": 1.4800000000000182,
+    "timecode": "00:04:38,060 --> 00:04:39,540",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 124,
+    "text": "심지어 국밥집에서도 팔아요",
+    "start_time": 279.54,
+    "end_time": 281.519,
+    "duration": 1.978999999999985,
+    "timecode": "00:04:39,540 --> 00:04:41,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 125,
+    "text": "디저트랑 전혀 상관없는 가게들이",
+    "start_time": 281.519,
+    "end_time": 283.699,
+    "duration": 2.180000000000007,
+    "timecode": "00:04:41,519 --> 00:04:43,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 126,
+    "text": "손님 끌려고 두 쫀쿠를 파는 거예요",
+    "start_time": 283.699,
+    "end_time": 285.74,
+    "duration": 2.040999999999997,
+    "timecode": "00:04:43,699 --> 00:04:45,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 127,
+    "text": "이게 뭐로 의미하냐면요",
+    "start_time": 285.74,
+    "end_time": 287.199,
+    "duration": 1.4590000000000032,
+    "timecode": "00:04:45,740 --> 00:04:47,199",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 128,
+    "text": "두 쫀쿠가 이제 디저트를 넘어서",
+    "start_time": 287.199,
+    "end_time": 288.92,
+    "duration": 1.7210000000000036,
+    "timecode": "00:04:47,199 --> 00:04:48,920",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 129,
+    "text": "문화적 키워드가 됐다는 거예요",
+    "start_time": 288.92,
+    "end_time": 290.8,
+    "duration": 1.8799999999999955,
+    "timecode": "00:04:48,920 --> 00:04:50,800",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 130,
+    "text": "그런데 이렇게 좋은 얘기만 있는 건 아니에요",
+    "start_time": 291.29,
+    "end_time": 294.079,
+    "duration": 2.7889999999999873,
+    "timecode": "00:04:51,290 --> 00:04:54,079",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 131,
+    "text": "문제도 터지기 시작했거든요",
+    "start_time": 294.629,
+    "end_time": 296.24,
+    "duration": 1.61099999999999,
+    "timecode": "00:04:54,629 --> 00:04:56,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 132,
+    "text": "첫 번째 원재료 대란이에요",
+    "start_time": 296.24,
+    "end_time": 298.699,
+    "duration": 2.459000000000003,
+    "timecode": "00:04:56,240 --> 00:04:58,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 133,
+    "text": "두 쫀쿠의 핵심재료가 뭐예요?",
+    "start_time": 298.699,
+    "end_time": 300.66,
+    "duration": 1.9610000000000127,
+    "timecode": "00:04:58,699 --> 00:05:00,660",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 134,
+    "text": "피스타치오랑 카다이프잖아요",
+    "start_time": 301.06,
+    "end_time": 302.399,
+    "duration": 1.3389999999999986,
+    "timecode": "00:05:01,060 --> 00:05:02,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 135,
+    "text": "근데 이게 다 수입이에요",
+    "start_time": 302.399,
+    "end_time": 303.939,
+    "duration": 1.5400000000000205,
+    "timecode": "00:05:02,399 --> 00:05:03,939",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 136,
+    "text": "갑자기 수요가 폭발하니까 공급이 안 따라가는 거예요",
+    "start_time": 303.939,
+    "end_time": 306.639,
+    "duration": 2.6999999999999886,
+    "timecode": "00:05:03,939 --> 00:05:06,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 137,
+    "text": "피스타치오 가격이요",
+    "start_time": 307.3,
+    "end_time": 308.319,
+    "duration": 1.0190000000000055,
+    "timecode": "00:05:07,300 --> 00:05:08,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 138,
+    "text": "킬로그램당 3만 원이었거든요",
+    "start_time": 308.86,
+    "end_time": 310.379,
+    "duration": 1.5190000000000055,
+    "timecode": "00:05:08,860 --> 00:05:10,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 139,
+    "text": "근데 지금 10만 원 넘어요",
+    "start_time": 310.379,
+    "end_time": 312.279,
+    "duration": 1.8999999999999773,
+    "timecode": "00:05:10,379 --> 00:05:12,278",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 140,
+    "text": "3배 가까이 띈 거예요",
+    "start_time": 312.279,
+    "end_time": 313.639,
+    "duration": 1.3600000000000136,
+    "timecode": "00:05:12,278 --> 00:05:13,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 141,
+    "text": "업계에서는 피스타치오 쇼크라고 불러요",
+    "start_time": 314.36,
+    "end_time": 316.639,
+    "duration": 2.2789999999999964,
+    "timecode": "00:05:14,360 --> 00:05:16,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 142,
+    "text": "소규모 자영업자들은 재료비 부담의 허리가 휘는 거죠",
+    "start_time": 316.639,
+    "end_time": 319.62,
+    "duration": 2.9809999999999945,
+    "timecode": "00:05:16,639 --> 00:05:19,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 143,
+    "text": "두 번째 위생 문제예요",
+    "start_time": 319.86,
+    "end_time": 322.3,
+    "duration": 2.4399999999999977,
+    "timecode": "00:05:19,860 --> 00:05:22,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 144,
+    "text": "원래 베이커리 하던 가게가 아니라요",
+    "start_time": 322.3,
+    "end_time": 324.339,
+    "duration": 2.0389999999999873,
+    "timecode": "00:05:22,300 --> 00:05:24,338",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 145,
+    "text": "고깃집, 옷가게 이런 데서도 만들어 파니까요",
+    "start_time": 324.339,
+    "end_time": 327.72,
+    "duration": 3.3810000000000286,
+    "timecode": "00:05:24,338 --> 00:05:27,720",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 146,
+    "text": "제조 환경이 엉망인 경우가 많은 거예요",
+    "start_time": 328.22,
+    "end_time": 330.72,
+    "duration": 2.5,
+    "timecode": "00:05:28,220 --> 00:05:30,720",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 147,
+    "text": "식약처가 3600여 곳을 집중 점검한다 라고 발표했거든요",
+    "start_time": 331.439,
+    "end_time": 336.0,
+    "duration": 4.560999999999979,
+    "timecode": "00:05:31,439 --> 00:05:36,000",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 148,
+    "text": "무신고 수입 식품 사용 식중독균 검사",
+    "start_time": 336.0,
+    "end_time": 339.06,
+    "duration": 3.0600000000000023,
+    "timecode": "00:05:36,000 --> 00:05:39,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 149,
+    "text": "이런 거 다 하는 거예요",
+    "start_time": 339.06,
+    "end_time": 340.24,
+    "duration": 1.1800000000000068,
+    "timecode": "00:05:39,060 --> 00:05:40,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 150,
+    "text": "특히 중고거래 플랫폼에서",
+    "start_time": 340.24,
+    "end_time": 342.319,
+    "duration": 2.0790000000000077,
+    "timecode": "00:05:40,240 --> 00:05:42,319",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 151,
+    "text": "개인이 만들어 파는 건 더 위험해요",
+    "start_time": 342.319,
+    "end_time": 344.399,
+    "duration": 2.079999999999984,
+    "timecode": "00:05:42,319 --> 00:05:44,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 152,
+    "text": "세 번째 가격 논란이에요",
+    "start_time": 344.399,
+    "end_time": 346.579,
+    "duration": 2.180000000000007,
+    "timecode": "00:05:44,399 --> 00:05:46,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 153,
+    "text": "두 쫌크 하나에 만 원이잖아요",
+    "start_time": 346.579,
+    "end_time": 348.48,
+    "duration": 1.9010000000000105,
+    "timecode": "00:05:46,579 --> 00:05:48,480",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 154,
+    "text": "근데 재료비가 얼마인 줄 아세요?",
+    "start_time": 348.48,
+    "end_time": 350.18,
+    "duration": 1.6999999999999886,
+    "timecode": "00:05:48,480 --> 00:05:50,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 155,
+    "text": "약 3천 원이에요",
+    "start_time": 350.699,
+    "end_time": 351.6,
+    "duration": 0.9010000000000105,
+    "timecode": "00:05:50,699 --> 00:05:51,600",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 156,
+    "text": "3배 이상 마진을 남기는 거죠",
+    "start_time": 351.6,
+    "end_time": 353.62,
+    "duration": 2.019999999999982,
+    "timecode": "00:05:51,600 --> 00:05:53,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 157,
+    "text": "물론 임대료 인건비 다 있지만요",
+    "start_time": 353.62,
+    "end_time": 355.899,
+    "duration": 2.2789999999999964,
+    "timecode": "00:05:53,620 --> 00:05:55,899",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 158,
+    "text": "일각에서는 유행 프리미엄이 너무 과하다는 비판이 나와요",
+    "start_time": 355.899,
+    "end_time": 359.399,
+    "duration": 3.5,
+    "timecode": "00:05:55,899 --> 00:05:59,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 159,
+    "text": "이걸 트렌드에 민감한 젊은 층을 대상으로 한 폭리라고 보는 시각도 있어요",
+    "start_time": 359.399,
+    "end_time": 363.18,
+    "duration": 3.781000000000006,
+    "timecode": "00:05:59,399 --> 00:06:03,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 160,
+    "text": "네 번째 건강 문제예요",
+    "start_time": 363.18,
+    "end_time": 365.22,
+    "duration": 2.0400000000000205,
+    "timecode": "00:06:03,180 --> 00:06:05,220",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 161,
+    "text": "두 쫌크가 뭐예요?",
+    "start_time": 365.22,
+    "end_time": 366.399,
+    "duration": 1.1789999999999736,
+    "timecode": "00:06:05,220 --> 00:06:06,399",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 162,
+    "text": "설탕, 버터, 초콜릿 덩어리잖아요",
+    "start_time": 366.8,
+    "end_time": 368.779,
+    "duration": 1.978999999999985,
+    "timecode": "00:06:06,800 --> 00:06:08,778",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 163,
+    "text": "당분과 포화지방이 고밀도로 응축된 식품이에요",
+    "start_time": 369.5,
+    "end_time": 372.379,
+    "duration": 2.879000000000019,
+    "timecode": "00:06:09,500 --> 00:06:12,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 164,
+    "text": "과하게 먹으면 심혈관 지루한",
+    "start_time": 372.939,
+    "end_time": 375.16,
+    "duration": 2.2210000000000036,
+    "timecode": "00:06:12,939 --> 00:06:15,160",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 165,
+    "text": "비만 위험이 있거든요",
+    "start_time": 375.16,
+    "end_time": 376.439,
+    "duration": 1.2789999999999964,
+    "timecode": "00:06:15,160 --> 00:06:16,439",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 166,
+    "text": "그래서 지금 설탕세 논의까지 나오고 있어요",
+    "start_time": 376.8,
+    "end_time": 379.379,
+    "duration": 2.5790000000000077,
+    "timecode": "00:06:16,800 --> 00:06:19,379",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 167,
+    "text": "이재명 대통령이 당류 섭취 억제를 위해",
+    "start_time": 379.379,
+    "end_time": 382.16,
+    "duration": 2.781000000000006,
+    "timecode": "00:06:19,379 --> 00:06:22,160",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 168,
+    "text": "설탕세 도입을 공론화 했거든요",
+    "start_time": 382.16,
+    "end_time": 384.18,
+    "duration": 2.019999999999982,
+    "timecode": "00:06:22,160 --> 00:06:24,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 169,
+    "text": "두 쫌크 열풍이 정책 논의까지 번진 거예요",
+    "start_time": 384.18,
+    "end_time": 386.62,
+    "duration": 2.4399999999999977,
+    "timecode": "00:06:24,180 --> 00:06:26,620",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 170,
+    "text": "자 여기서 질문이 나와요",
+    "start_time": 386.879,
+    "end_time": 388.68,
+    "duration": 1.8009999999999877,
+    "timecode": "00:06:26,879 --> 00:06:28,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 171,
+    "text": "두 쫌크, 이거 탕후루처럼 반짝하고 사라지는 거 아니냐?",
+    "start_time": 388.68,
+    "end_time": 391.819,
+    "duration": 3.13900000000001,
+    "timecode": "00:06:28,680 --> 00:06:31,819",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 172,
+    "text": "기억나시죠?",
+    "start_time": 392.199,
+    "end_time": 392.819,
+    "duration": 0.6200000000000045,
+    "timecode": "00:06:32,199 --> 00:06:32,819",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 173,
+    "text": "탕후루요",
+    "start_time": 393.42,
+    "end_time": 393.959,
+    "duration": 0.5389999999999873,
+    "timecode": "00:06:33,420 --> 00:06:33,959",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 174,
+    "text": "2023년에 전국이 난리였잖아요",
+    "start_time": 393.959,
+    "end_time": 396.1,
+    "duration": 2.1410000000000196,
+    "timecode": "00:06:33,959 --> 00:06:36,100",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 175,
+    "text": "근데 지금 탕후루 가게 찾기 힘들어요",
+    "start_time": 396.1,
+    "end_time": 398.3,
+    "duration": 2.1999999999999886,
+    "timecode": "00:06:36,100 --> 00:06:38,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 176,
+    "text": "우후 죽순 생겼다가 다 망한 거죠",
+    "start_time": 398.3,
+    "end_time": 400.54,
+    "duration": 2.240000000000009,
+    "timecode": "00:06:38,300 --> 00:06:40,540",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 177,
+    "text": "비교해 볼게요",
+    "start_time": 401.04,
+    "end_time": 401.699,
+    "duration": 0.6589999999999918,
+    "timecode": "00:06:41,040 --> 00:06:41,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 178,
+    "text": "탕후루는 계단 3,000원에서 4,000원이었어요",
+    "start_time": 402.65999999999997,
+    "end_time": 405.199,
+    "duration": 2.539000000000044,
+    "timecode": "00:06:42,659 --> 00:06:45,199",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 179,
+    "text": "두 쫌크는 7,000원에서 1만 5,000원이에요",
+    "start_time": 405.199,
+    "end_time": 407.68,
+    "duration": 2.4809999999999945,
+    "timecode": "00:06:45,199 --> 00:06:47,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 180,
+    "text": "제가 가격 자체가 달라요",
+    "start_time": 407.68,
+    "end_time": 409.639,
+    "duration": 1.9590000000000032,
+    "timecode": "00:06:47,680 --> 00:06:49,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 181,
+    "text": "탕후루는 아이들 청소년 중심 길거리 간식이었고요",
+    "start_time": 409.639,
+    "end_time": 412.839,
+    "duration": 3.1999999999999886,
+    "timecode": "00:06:49,639 --> 00:06:52,838",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 182,
+    "text": "두 쫌크는 MZ세대 VIP 중심의 경험 자산이에요",
+    "start_time": 413.06,
+    "end_time": 416.819,
+    "duration": 3.7590000000000146,
+    "timecode": "00:06:53,060 --> 00:06:56,819",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 183,
+    "text": "탕후루는 대량 생산이 쉬웠어요",
+    "start_time": 416.819,
+    "end_time": 419.04,
+    "duration": 2.2210000000000036,
+    "timecode": "00:06:56,819 --> 00:06:59,040",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 184,
+    "text": "근데 두 쫌크는 수입 원료가 필요하니까",
+    "start_time": 419.04,
+    "end_time": 421.5,
+    "duration": 2.4599999999999795,
+    "timecode": "00:06:59,040 --> 00:07:01,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 185,
+    "text": "진입 장벽이 있어요",
+    "start_time": 421.5,
+    "end_time": 422.6,
+    "duration": 1.1000000000000227,
+    "timecode": "00:07:01,500 --> 00:07:02,600",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 186,
+    "text": "이게 희소성을 유지시켜 주는 거죠",
+    "start_time": 422.939,
+    "end_time": 424.68,
+    "duration": 1.7409999999999854,
+    "timecode": "00:07:02,939 --> 00:07:04,680",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 187,
+    "text": "그리고 두 쫌크는 호텔이랑 프리미엄 플랫폼으로",
+    "start_time": 424.68,
+    "end_time": 427.779,
+    "duration": 3.0989999999999895,
+    "timecode": "00:07:04,680 --> 00:07:07,778",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 188,
+    "text": "시장에 확장됐어요",
+    "start_time": 427.779,
+    "end_time": 428.8,
+    "duration": 1.021000000000015,
+    "timecode": "00:07:07,778 --> 00:07:08,800",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 189,
+    "text": "탕후루는 그런 게 없었거든요",
+    "start_time": 428.8,
+    "end_time": 430.74,
+    "duration": 1.9399999999999977,
+    "timecode": "00:07:08,800 --> 00:07:10,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 190,
+    "text": "다만요 유행이 정말 빠르게 변하는 시대잖아요",
+    "start_time": 430.74,
+    "end_time": 433.939,
+    "duration": 3.1990000000000123,
+    "timecode": "00:07:10,740 --> 00:07:13,939",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 191,
+    "text": "저 두 쫌크가 스테디셀러로 남으려면요",
+    "start_time": 433.939,
+    "end_time": 437.139,
+    "duration": 3.1999999999999886,
+    "timecode": "00:07:13,939 --> 00:07:17,139",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 192,
+    "text": "계속 새로운 맛, 새로운 레시피를 개발해야 해요",
+    "start_time": 437.139,
+    "end_time": 439.939,
+    "duration": 2.8000000000000114,
+    "timecode": "00:07:17,139 --> 00:07:19,939",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 193,
+    "text": "그냥 두바이 따라 하기로는 한계가 있어요",
+    "start_time": 439.939,
+    "end_time": 441.699,
+    "duration": 1.759999999999991,
+    "timecode": "00:07:19,939 --> 00:07:21,699",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 194,
+    "text": "자 재미있는 현상이 또 있어요",
+    "start_time": 442.0,
+    "end_time": 443.98,
+    "duration": 1.9800000000000182,
+    "timecode": "00:07:22,000 --> 00:07:23,980",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 195,
+    "text": "두 쫌크 김장이라고 들어보셨어요",
+    "start_time": 443.98,
+    "end_time": 446.12,
+    "duration": 2.1399999999999864,
+    "timecode": "00:07:23,980 --> 00:07:26,120",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 196,
+    "text": "완제품이 너무 비싸고 구하기도 힘드니까요",
+    "start_time": 446.12,
+    "end_time": 448.8,
+    "duration": 2.680000000000007,
+    "timecode": "00:07:26,120 --> 00:07:28,800",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 197,
+    "text": "사람들이 직접 만들기 시작한 거예요",
+    "start_time": 448.8,
+    "end_time": 450.74,
+    "duration": 1.9399999999999977,
+    "timecode": "00:07:28,800 --> 00:07:30,740",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 198,
+    "text": "마치 김장하듯이 친구들끼리 모여서요",
+    "start_time": 450.74,
+    "end_time": 452.939,
+    "duration": 2.1990000000000123,
+    "timecode": "00:07:30,740 --> 00:07:32,939",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 199,
+    "text": "재료 대량으로 사서 같이 쿠키 굽는 거예요",
+    "start_time": 452.939,
+    "end_time": 455.18,
+    "duration": 2.2409999999999854,
+    "timecode": "00:07:32,939 --> 00:07:35,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 200,
+    "text": "이게 신조어가 됐어요",
+    "start_time": 455.6,
+    "end_time": 456.939,
+    "duration": 1.3389999999999986,
+    "timecode": "00:07:35,600 --> 00:07:36,939",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 201,
+    "text": "두 쫌크 김장",
+    "start_time": 457.139,
+    "end_time": 458.24,
+    "duration": 1.100999999999999,
+    "timecode": "00:07:37,139 --> 00:07:38,240",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 202,
+    "text": "이커머스에서 DIY 키트 판매량이 급증했고요",
+    "start_time": 458.24,
+    "end_time": 461.199,
+    "duration": 2.959000000000003,
+    "timecode": "00:07:38,240 --> 00:07:41,199",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 203,
+    "text": "홈베이킹 용품 매출도 같이 올랐어요",
+    "start_time": 461.199,
+    "end_time": 463.779,
+    "duration": 2.579999999999984,
+    "timecode": "00:07:41,199 --> 00:07:43,778",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 204,
+    "text": "이건 수동적 소비에 그치지 않고요",
+    "start_time": 463.779,
+    "end_time": 465.459,
+    "duration": 1.6800000000000068,
+    "timecode": "00:07:43,778 --> 00:07:45,459",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 205,
+    "text": "능동적으로 트렌드에 참여하겠다는 거예요",
+    "start_time": 465.459,
+    "end_time": 467.959,
+    "duration": 2.5,
+    "timecode": "00:07:45,459 --> 00:07:47,959",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 206,
+    "text": "자기 효능감을 느끼려는 거죠",
+    "start_time": 467.959,
+    "end_time": 469.639,
+    "duration": 1.6800000000000068,
+    "timecode": "00:07:47,959 --> 00:07:49,639",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 207,
+    "text": "자, 2016년 앞으로 어떻게 될까요?",
+    "start_time": 470.0,
+    "end_time": 472.579,
+    "duration": 2.5790000000000077,
+    "timecode": "00:07:50,000 --> 00:07:52,579",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 208,
+    "text": "한국 경제 성장률이 2.1% 수준으로 전망되거든요",
+    "start_time": 473.279,
+    "end_time": 476.92,
+    "duration": 3.6410000000000196,
+    "timecode": "00:07:53,278 --> 00:07:56,920",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 209,
+    "text": "완만한 회복세지만요",
+    "start_time": 476.92,
+    "end_time": 478.65999999999997,
+    "duration": 1.7399999999999523,
+    "timecode": "00:07:56,920 --> 00:07:58,659",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 210,
+    "text": "고환율, 고급리 여파로",
+    "start_time": 479.22,
+    "end_time": 481.019,
+    "duration": 1.7989999999999782,
+    "timecode": "00:07:59,220 --> 00:08:01,019",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 211,
+    "text": "서민들 갇혀분소득은 늘기 힘들어요",
+    "start_time": 481.019,
+    "end_time": 483.36,
+    "duration": 2.341000000000008,
+    "timecode": "00:08:01,019 --> 00:08:03,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 212,
+    "text": "그러면은",
+    "start_time": 483.36,
+    "end_time": 484.3,
+    "duration": 0.9399999999999977,
+    "timecode": "00:08:03,360 --> 00:08:04,300",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 213,
+    "text": "스몰 럭셔리 소비는 더 강해질 거예요",
+    "start_time": 484.3,
+    "end_time": 486.439,
+    "duration": 2.13900000000001,
+    "timecode": "00:08:04,300 --> 00:08:06,439",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 214,
+    "text": "적은 돈으로 확실한 위안을 얻으려는 심리",
+    "start_time": 487.019,
+    "end_time": 490.06,
+    "duration": 3.040999999999997,
+    "timecode": "00:08:07,019 --> 00:08:10,060",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 215,
+    "text": "이건 앞으로 더 고착화될 거예요",
+    "start_time": 490.06,
+    "end_time": 491.519,
+    "duration": 1.4590000000000032,
+    "timecode": "00:08:10,060 --> 00:08:11,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 216,
+    "text": "트렌드 전문가들은 3가지를 예측해요",
+    "start_time": 492.18,
+    "end_time": 494.18,
+    "duration": 2.0,
+    "timecode": "00:08:12,180 --> 00:08:14,180",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 217,
+    "text": "첫째, 초게인화된 럭셔리예요",
+    "start_time": 494.18,
+    "end_time": 496.6,
+    "duration": 2.420000000000016,
+    "timecode": "00:08:14,180 --> 00:08:16,600",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 218,
+    "text": "내 취향에 맞춘 주문 제작형 2.9",
+    "start_time": 496.6,
+    "end_time": 499.339,
+    "duration": 2.738999999999976,
+    "timecode": "00:08:16,600 --> 00:08:19,338",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 219,
+    "text": "프리미엄 멤버십 기반의 독점 공급",
+    "start_time": 499.839,
+    "end_time": 501.92,
+    "duration": 2.0810000000000173,
+    "timecode": "00:08:19,838 --> 00:08:21,920",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 220,
+    "text": "이런 식으로 진화할 거예요",
+    "start_time": 501.92,
+    "end_time": 503.259,
+    "duration": 1.3389999999999986,
+    "timecode": "00:08:21,920 --> 00:08:23,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 221,
+    "text": "둘째, 기술 결합이에요",
+    "start_time": 503.879,
+    "end_time": 505.519,
+    "duration": 1.6399999999999864,
+    "timecode": "00:08:23,879 --> 00:08:25,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 222,
+    "text": "A 알로 디저트 체험을 미리 해보거나",
+    "start_time": 505.519,
+    "end_time": 507.779,
+    "duration": 2.259999999999991,
+    "timecode": "00:08:25,519 --> 00:08:27,778",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 223,
+    "text": "블록체인으로 희귀 디저트 소유권을 인증하거나",
+    "start_time": 508.399,
+    "end_time": 510.779,
+    "duration": 2.3799999999999955,
+    "timecode": "00:08:28,399 --> 00:08:30,778",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 224,
+    "text": "이런 게 나올 수 있어요",
+    "start_time": 510.779,
+    "end_time": 511.939,
+    "duration": 1.160000000000025,
+    "timecode": "00:08:30,778 --> 00:08:31,939",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 225,
+    "text": "셋째, 윤리적 소비예요",
+    "start_time": 511.939,
+    "end_time": 513.96,
+    "duration": 2.021000000000015,
+    "timecode": "00:08:31,939 --> 00:08:33,960",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 226,
+    "text": "피스타 치오가 공정무역인지",
+    "start_time": 513.96,
+    "end_time": 515.98,
+    "duration": 2.019999999999982,
+    "timecode": "00:08:33,960 --> 00:08:35,980",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 227,
+    "text": "설탕 대체제를 썼는지",
+    "start_time": 515.98,
+    "end_time": 517.36,
+    "duration": 1.3799999999999955,
+    "timecode": "00:08:35,980 --> 00:08:37,360",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 228,
+    "text": "이런 게 구매 결정에 중요해질 거예요",
+    "start_time": 517.36,
+    "end_time": 519.34,
+    "duration": 1.9800000000000182,
+    "timecode": "00:08:37,360 --> 00:08:39,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 229,
+    "text": "자 오늘 얘기 정리해 볼게요",
+    "start_time": 519.529,
+    "end_time": 521.059,
+    "duration": 1.5299999999999727,
+    "timecode": "00:08:39,528 --> 00:08:41,058",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 230,
+    "text": "두쩡크 열풍은요",
+    "start_time": 521.57,
+    "end_time": 522.72,
+    "duration": 1.1499999999999773,
+    "timecode": "00:08:41,570 --> 00:08:42,720",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 231,
+    "text": "한국사회의 K 자영 양극화가 만들어낸 현상이에요",
+    "start_time": 524.5,
+    "end_time": 527.86,
+    "duration": 3.3600000000000136,
+    "timecode": "00:08:44,500 --> 00:08:47,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 232,
+    "text": "명품은 못사도 만원짜리 쿠키는 살 수 있잖아요",
+    "start_time": 527.86,
+    "end_time": 531.179,
+    "duration": 3.31899999999996,
+    "timecode": "00:08:47,860 --> 00:08:51,178",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 233,
+    "text": "그 작은 사치가 주는 위안",
+    "start_time": 531.45,
+    "end_time": 533.34,
+    "duration": 1.8899999999999864,
+    "timecode": "00:08:51,450 --> 00:08:53,340",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 234,
+    "text": "팍팍한 현실에서",
+    "start_time": 533.34,
+    "end_time": 534.82,
+    "duration": 1.4800000000000182,
+    "timecode": "00:08:53,340 --> 00:08:54,820",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 235,
+    "text": "스스로에게 건네는 달콤한 보상",
+    "start_time": 534.82,
+    "end_time": 537.08,
+    "duration": 2.259999999999991,
+    "timecode": "00:08:54,820 --> 00:08:57,080",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 236,
+    "text": "그게 두쩡크예요",
+    "start_time": 537.35,
+    "end_time": 538.5,
+    "duration": 1.1499999999999773,
+    "timecode": "00:08:57,350 --> 00:08:58,500",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 237,
+    "text": "결국 이 이야기는요",
+    "start_time": 538.5,
+    "end_time": 540.2,
+    "duration": 1.7000000000000455,
+    "timecode": "00:08:58,500 --> 00:09:00,200",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 238,
+    "text": "우리가 무엇을 먹고 있는가가 아니라요",
+    "start_time": 540.2,
+    "end_time": 542.799,
+    "duration": 2.5989999999999327,
+    "timecode": "00:09:00,200 --> 00:09:02,798",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 239,
+    "text": "우리가 무엇을 꿈꾸고 있는가에 대한 이야기예요",
+    "start_time": 542.799,
+    "end_time": 545.58,
+    "duration": 2.7810000000000628,
+    "timecode": "00:09:02,798 --> 00:09:05,580",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 240,
+    "text": "만원짜리 쿠키 한 조각",
+    "start_time": 545.58,
+    "end_time": 547.519,
+    "duration": 1.9389999999999645,
+    "timecode": "00:09:05,580 --> 00:09:07,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 241,
+    "text": "그건 현대인이 포기할 수 없는",
+    "start_time": 547.519,
+    "end_time": 549.32,
+    "duration": 1.8010000000000446,
+    "timecode": "00:09:07,519 --> 00:09:09,320",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 242,
+    "text": "마지막 품이 일지도 몰라요",
+    "start_time": 549.32,
+    "end_time": 550.86,
+    "duration": 1.5399999999999636,
+    "timecode": "00:09:09,320 --> 00:09:10,860",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 243,
+    "text": "여러분은 어떻게 생각하세요?",
+    "start_time": 550.86,
+    "end_time": 552.259,
+    "duration": 1.399000000000001,
+    "timecode": "00:09:10,860 --> 00:09:12,259",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 244,
+    "text": "두쩡크",
+    "start_time": 552.659,
+    "end_time": 553.139,
+    "duration": 0.4800000000000182,
+    "timecode": "00:09:12,658 --> 00:09:13,139",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 245,
+    "text": "그냥 비싼 쿠키일까요?",
+    "start_time": 553.139,
+    "end_time": 554.519,
+    "duration": 1.3799999999999955,
+    "timecode": "00:09:13,139 --> 00:09:14,519",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 246,
+    "text": "아니면 이 시대가 만들어낸 작은 위로일까요?",
+    "start_time": 554.919,
+    "end_time": 556.96,
+    "duration": 2.0410000000000537,
+    "timecode": "00:09:14,918 --> 00:09:16,960",
+    "is_recovered": false
+  }
+]

@@ -1,0 +1,269 @@
+[
+  {
+    "name": "한국인 투자자",
+    "name_ko": "한국인 투자자",
+    "role": "등장인물",
+    "visual_prompt": "A Korean investor's hand, gently scrolling through multiple smartphone screens",
+    "description": "",
+    "scenes": [
+      22,
+      23,
+      24
+    ],
+    "appearance_scenes": [
+      22,
+      23,
+      24
+    ]
+  },
+  {
+    "name": "손",
+    "name_ko": "손",
+    "role": "등장인물",
+    "visual_prompt": "A hand with a finger pointing towards a computer screen, as if posing a question",
+    "description": "",
+    "scenes": [
+      25,
+      26,
+      27,
+      211,
+      212,
+      213
+    ],
+    "appearance_scenes": [
+      202,
+      203,
+      204
+    ]
+  },
+  {
+    "name": "한국 사람들",
+    "name_ko": "한국 사람들",
+    "role": "등장인물",
+    "visual_prompt": "silhouettes of people reaching out as if mesmerized by glowing investment opportunities, generic human figures",
+    "description": "",
+    "scenes": [
+      61,
+      62,
+      63
+    ],
+    "appearance_scenes": [
+      61,
+      62,
+      63
+    ]
+  },
+  {
+    "name": "대통령",
+    "name_ko": "대통령",
+    "role": "등장인물",
+    "visual_prompt": "solemn Asian leader, middle-aged, wearing a dark suit, delivering an urgent national address with a serious expression at a podium",
+    "description": "",
+    "scenes": [
+      88,
+      89,
+      90,
+      109,
+      110,
+      111
+    ],
+    "appearance_scenes": [
+      88,
+      89,
+      90,
+      109,
+      110,
+      111
+    ]
+  },
+  {
+    "name": "도널드 트럼프",
+    "name_ko": "도널드 트럼프",
+    "role": "등장인물",
+    "visual_prompt": "Former President Donald Trump, powerful and determined expression, commanding presence, wearing a dark suit",
+    "description": "",
+    "scenes": [
+      106,
+      107,
+      108
+    ],
+    "appearance_scenes": [
+      106,
+      107,
+      108
+    ]
+  },
+  {
+    "name": "소비자",
+    "name_ko": "소비자",
+    "role": "등장인물",
+    "visual_prompt": "middle-aged consumer with a surprised and worried expression, looking at an inflated price tag, wearing casual clothes",
+    "description": "",
+    "scenes": [
+      118,
+      119,
+      120
+    ],
+    "appearance_scenes": [
+      118,
+      119,
+      120
+    ]
+  },
+  {
+    "name": "트럼프 특징 인물",
+    "name_ko": "트럼프 특징 인물",
+    "role": "등장인물",
+    "visual_prompt": "figure with the distinctive features of former President Donald Trump, middle-aged, wearing a dark suit and red tie, with a calculating expression, looking at documents",
+    "description": "",
+    "scenes": [
+      121,
+      122,
+      123
+    ],
+    "appearance_scenes": [
+      121,
+      122,
+      123
+    ]
+  },
+  {
+    "name": "도널드 트럼프 전 대통령",
+    "name_ko": "도널드 트럼프 전 대통령",
+    "role": "등장인물",
+    "visual_prompt": "a stern and determined expression, his hand in the act of signing a document",
+    "description": "",
+    "scenes": [
+      130,
+      131,
+      132
+    ],
+    "appearance_scenes": [
+      88,
+      89,
+      90,
+      109,
+      110,
+      111
+    ]
+  },
+  {
+    "name": "한국 정부 (상징)",
+    "name_ko": "한국 정부 (상징)",
+    "role": "등장인물",
+    "visual_prompt": "a symbolic figure representing the government, standing at a crossroads, with a thoughtful and conflicted expression, conveying a sense of heavy responsibility and difficult decision-making, in a pose of contemplation",
+    "description": "",
+    "scenes": [
+      178,
+      179,
+      180
+    ],
+    "appearance_scenes": [
+      178,
+      179,
+      180
+    ]
+  },
+  {
+    "name": "경제 전문가들",
+    "name_ko": "경제 전문가들",
+    "role": "등장인물",
+    "visual_prompt": "diverse group of professional businesspeople in formal attire, engaged in serious discussion, focused expressions",
+    "description": "",
+    "scenes": [
+      187,
+      188,
+      189
+    ],
+    "appearance_scenes": [
+      187,
+      188,
+      189
+    ]
+  },
+  {
+    "name": "신한은행 오건영 단장",
+    "name_ko": "신한은행 오건영 단장",
+    "role": "등장인물",
+    "visual_prompt": "confident Asian financial expert, middle-aged, sharp business suit, focused and serious expression, presenting an economic briefing",
+    "description": "",
+    "scenes": [
+      193,
+      194,
+      195
+    ],
+    "appearance_scenes": [
+      193,
+      194,
+      195
+    ]
+  },
+  {
+    "name": "한국 정부 관계자들",
+    "name_ko": "한국 정부 관계자들",
+    "role": "등장인물",
+    "visual_prompt": "professional Asian government officials in formal business attire, serious and focused expressions, seated around a large conference table",
+    "description": "",
+    "scenes": [
+      199,
+      200,
+      201
+    ],
+    "appearance_scenes": [
+      199,
+      200,
+      201
+    ]
+  },
+  {
+    "name": "미국 정부 관계자들",
+    "name_ko": "미국 정부 관계자들",
+    "role": "등장인물",
+    "visual_prompt": "professional Caucasian government officials in formal business attire, serious and focused expressions, seated around a large conference table",
+    "description": "",
+    "scenes": [
+      199,
+      200,
+      201
+    ],
+    "appearance_scenes": [
+      199,
+      200,
+      201
+    ]
+  },
+  {
+    "name": "대표의 손",
+    "name_ko": "대표의 손",
+    "role": "등장인물",
+    "visual_prompt": "two hands, one holding a pen poised to sign a contract, professional and decisive gesture, symbolizing a major agreement",
+    "description": "",
+    "scenes": [
+      202,
+      203,
+      204
+    ],
+    "appearance_scenes": [
+      202,
+      203,
+      204
+    ]
+  },
+  {
+    "name": "인물 실루엣",
+    "name_ko": "인물 실루엣",
+    "role": "등장인물",
+    "visual_prompt": "A weakened, almost translucent silhouette of a human figure, slumped on the ground, conveying a sense of exhaustion and fragility",
+    "description": "",
+    "scenes": [
+      214,
+      215,
+      216
+    ],
+    "appearance_scenes": [
+      214,
+      215,
+      216
+    ]
+  }
+]

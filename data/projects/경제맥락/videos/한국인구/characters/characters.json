@@ -1,0 +1,382 @@
+[
+  {
+    "id": "char_0",
+    "name": "일론 머스크",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "a visionary entrepreneur, delivering a serious and thought-provoking speech, with a grave and concerned expression, wearing a dark suit",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_일론_머스크_standing_1770993542359.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_일론_머스크_standing_1770993542359.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.102117",
+    "updated_at": "2026-02-13T23:40:02.524713"
+  },
+  {
+    "id": "char_1",
+    "name": "대가족 (부모님과 아이들)",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "parents and five to six children, happy and active, traditional 1960s Korean clothing",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_대가족__부모님과_아이들__standing_1770993543867.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_대가족__부모님과_아이들__standing_1770993543867.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.104677",
+    "updated_at": "2026-02-13T23:40:02.546670"
+  },
+  {
+    "id": "char_2",
+    "name": "실직자들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "disheartened, dressed in shabby clothes, wandering the streets with somber and desperate expressions, conveying a sense of loss and hopelessness",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_실직자들_standing_1770993544069.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_실직자들_standing_1770993544069.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.105944",
+    "updated_at": "2026-02-13T23:40:02.583849"
+  },
+  {
+    "id": "char_3",
+    "name": "젊은 커플",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "disheartened Asian couple, looking up at towering apartment complexes, expressing frustration and helplessness, dressed in casual modern attire",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_젊은_커플_standing_1770993544227.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_젊은_커플_standing_1770993544227.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.107591",
+    "updated_at": "2026-02-13T23:40:02.620383"
+  },
+  {
+    "id": "char_4",
+    "name": "젊은 아시아인",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "seen from behind, sitting in a small, cramped apartment, with a disheartened expression, reflecting economic struggle, casual clothing",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_젊은_아시아인_standing_1770993552109.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_젊은_아시아인_standing_1770993552109.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.108676",
+    "updated_at": "2026-02-13T23:40:02.658025"
+  },
+  {
+    "id": "char_5",
+    "name": "아이",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Asian child studying intently at a desk, surrounded by textbooks",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_아이_standing_1770993556312.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_아이_standing_1770993556312.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.109676",
+    "updated_at": "2026-02-13T23:40:02.695740"
+  },
+  {
+    "id": "char_6",
+    "name": "부모",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Two Asian parents, looking worried and stressed, reviewing stacks of private education bills and receipts, reflecting financial burden",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_부모_standing_1770993554357.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_부모_standing_1770993554357.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.110748",
+    "updated_at": "2026-02-13T23:40:02.734589"
+  },
+  {
+    "id": "char_7",
+    "name": "미혼 남녀",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A young Asian man and woman, standing together with worried expressions, looking at a smartphone screen, reflecting urban anxiety and financial uncertainty, casual modern attire",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_미혼_남녀_standing_1770993558031.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_미혼_남녀_standing_1770993558031.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.111892",
+    "updated_at": "2026-02-13T23:40:02.771710"
+  },
+  {
+    "id": "char_8",
+    "name": "한 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "looking overwhelmed and exhausted by the weight of life, with a contemplative and slightly distressed expression, dressed in casual, worn clothing",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_한_사람_standing_1770993562565.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_한_사람_standing_1770993562565.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.112891",
+    "updated_at": "2026-02-13T23:40:02.808634"
+  },
+  {
+    "id": "char_9",
+    "name": "현대 여성들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Silhouettes of modern women, depicted in various poses suggesting diverse life choices like career, travel, or hobbies, with a sense of independence and agency",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_현대_여성들_standing_1770993567361.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_현대_여성들_standing_1770993567361.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.113940",
+    "updated_at": "2026-02-13T23:40:02.846430"
+  },
+  {
+    "id": "char_10",
+    "name": "아시아 여성",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "thoughtful, concerned, standing in a modern office hallway, with a subtle expression of contemplation and worry, wearing business casual attire, realistic and relatable",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_아시아_여성_standing_1770993569354.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_아시아_여성_standing_1770993569354.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.115098",
+    "updated_at": "2026-02-13T23:40:02.885270"
+  },
+  {
+    "id": "char_11",
+    "name": "군인들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "soldiers in military uniforms, with grave, concerned, or disillusioned expressions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_군인들_standing_1770993571865.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_군인들_standing_1770993571865.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.116261",
+    "updated_at": "2026-02-13T23:40:02.924382"
+  },
+  {
+    "id": "char_12",
+    "name": "노인들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "elderly people with worried and concerned expressions, conveying a sense of anxiety about their future",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_노인들_standing_1770993577865.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_노인들_standing_1770993577865.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.117608",
+    "updated_at": "2026-02-13T23:40:02.962892"
+  },
+  {
+    "id": "char_13",
+    "name": "실직한 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "solitary figure, seen from behind, head bowed in a posture of dejection, wearing plain clothes, conveying a sense of despair and unemployment",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_실직한_사람_standing_1770993580014.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_실직한_사람_standing_1770993580014.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.119604",
+    "updated_at": "2026-02-13T23:40:03.001878"
+  },
+  {
+    "id": "char_14",
+    "name": "다문화 학생들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "students from diverse nationalities and backgrounds, smiling brightly, attentive and engaged",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_다문화_학생들_standing_1770993584904.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_다문화_학생들_standing_1770993584904.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.120696",
+    "updated_at": "2026-02-13T23:40:03.039299"
+  },
+  {
+    "id": "char_15",
+    "name": "한국인 학생들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Korean students, smiling brightly, attentive and engaged, participating with multicultural students",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_한국인_학생들_standing_1770993586093.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_한국인_학생들_standing_1770993586093.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.121891",
+    "updated_at": "2026-02-13T23:40:03.078221"
+  },
+  {
+    "id": "char_16",
+    "name": "병사",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A single soldier, focused expression, wearing futuristic military uniform, operating a holographic interface",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_병사_standing_1770993595929.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_병사_standing_1770993595929.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.123197",
+    "updated_at": "2026-02-13T23:40:03.118108"
+  },
+  {
+    "id": "char_17",
+    "name": "여군",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A female soldier in a modern military uniform, focused and commanding, operating a sleek tablet with strategic maps",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_여군_standing_1770993597505.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_여군_standing_1770993597505.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.124623",
+    "updated_at": "2026-02-13T23:40:03.156789"
+  },
+  {
+    "id": "char_18",
+    "name": "토론 참여자들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Diverse individuals from various backgrounds, engaged in an intense, focused debate, expressing different opinions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_토론_참여자들_standing_1770993602488.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한국인구\\images\\characters\\char_토론_참여자들_standing_1770993602488.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-13T23:36:10.126337",
+    "updated_at": "2026-02-13T23:40:03.197950"
+  }
+]

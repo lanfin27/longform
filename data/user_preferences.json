@@ -1,0 +1,259 @@
+{
+  "character_management.last_image_api": "Google ImageFX",
+  "character_management.last_image_model": "IMAGEN_4",
+  "scene_analysis_settings": {
+    "시니어/test15": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test16": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test17": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test18": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "auto"
+    },
+    "시니어/test19": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "auto"
+    },
+    "시니어/test20": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test21": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test22": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "auto"
+    },
+    "시니어/test23": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test24": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "auto"
+    },
+    "시니어/test25": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test26": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test27": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test28": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test29": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test30": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "시니어/test31": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "경제맥락/환율": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "경제맥락/환율급등": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "auto"
+    },
+    "경제맥락/금가격변동": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "경제맥락/HBM4": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "경제맥락/두쫀쿠": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "경제맥락/은행퇴직": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "경제맥락/한화에어로": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    },
+    "경제맥락/한국인구": {
+      "language": "ja",
+      "script_source": "srt",
+      "analysis_method": "srt_direct"
+    }
+  },
+  "character_batch_settings": {
+    "시니어/test16": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "시니어/test18": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "시니어/test22": {
+      "character_style": "char_animation",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "시니어/test24": {
+      "character_style": "char_animation",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "시니어/test28": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "시니어/test30": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "시니어/test31": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "경제맥락/환율": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "경제맥락/환율급등": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "경제맥락/금가격변동": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "경제맥락/두쫀쿠": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "경제맥락/은행퇴직": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "경제맥락/한화에어로": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    },
+    "경제맥락/한국인구": {
+      "character_style": "재훍_영상툰",
+      "pose": "standing",
+      "background_type": "solid_gray",
+      "width": 1024,
+      "height": 1024,
+      "image_api": "Google ImageFX",
+      "image_model": "IMAGEN_4"
+    }
+  }
+}

@@ -1,0 +1,140 @@
+[
+  {
+    "id": "char_0",
+    "name": "삼성 임원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged businessman in a suit, confident expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_삼성_임원_standing_1769434908888.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_삼성_임원_standing_1769434908888.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T22:41:00.965086",
+    "updated_at": "2026-01-26T22:42:19.303024"
+  },
+  {
+    "id": "char_1",
+    "name": "ZF 임원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged businessman in a suit, confident expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_ZF_임원_standing_1769434909921.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_ZF_임원_standing_1769434909921.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T22:41:00.967808",
+    "updated_at": "2026-01-26T22:42:19.321579"
+  },
+  {
+    "id": "char_2",
+    "name": "이재용",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Lee Jae-yong, determined expression, strategic decision-making",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_이재용_standing_1769434910729.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_이재용_standing_1769434910729.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T22:41:00.969016",
+    "updated_at": "2026-01-26T22:42:19.356476"
+  },
+  {
+    "id": "char_3",
+    "name": "리서처",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Bewildered researcher with glasses",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_리서처_standing_1769434910560.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_리서처_standing_1769434910560.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T22:41:00.969805",
+    "updated_at": "2026-01-26T22:42:19.387544"
+  },
+  {
+    "id": "char_4",
+    "name": "분석가",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Confused analyst gesturing with questioning hands, perplexed facial expression conveying skepticism and doubt, wearing professional business attire, middle-aged, looking directly at the viewer, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "selected_image_path": "",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T22:41:00.970668",
+    "updated_at": "2026-01-26T22:41:21.748637"
+  },
+  {
+    "id": "char_5",
+    "name": "발표자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Excited presenter gesturing towards screen displaying Samsung and BMW logos, confident smile conveying enthusiasm for partnership, wearing professional business attire, standing on stage with spotlights, addressing audience, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_발표자_standing_1769434923177.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_발표자_standing_1769434923177.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T22:41:00.972179",
+    "updated_at": "2026-01-26T22:42:19.432584"
+  },
+  {
+    "id": "char_6",
+    "name": "비즈니스 리더",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "confident business leader wearing professional attire, sitting at negotiation table, engaging in deal",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_비즈니스_리더_standing_1769434922030.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test16\\images\\characters\\char_비즈니스_리더_standing_1769434922030.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T22:41:00.972917",
+    "updated_at": "2026-01-26T22:42:19.464118"
+  }
+]

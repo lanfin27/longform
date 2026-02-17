@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-통합 AI 클라이언트 v1.0
+통합 AI 클라이언트 v1.1
 
 모든 프로바이더를 동일한 인터페이스로 호출
 
@@ -9,12 +9,31 @@
 - Google (Gemini) API 호출
 - OpenAI (GPT) API 호출
 - JSON 응답 파싱
+
+v1.1: config.settings에서 API 키 로드 (scene_analyzer.py와 동일한 방식)
+      - .env 파일 지원
+      - 403 API leaked 에러 수정
 """
 
 import os
 import json
 from typing import Dict, Optional, Any
 from .ai_providers import AIProvider, AIModel, get_model, ALL_MODELS
+
+# API 키를 config.settings에서 로드 (scene_analyzer.py와 동일한 방식)
+# config.settings는 .env 파일을 먼저 로드하므로 일관된 API 키 사용 보장
+try:
+    from config.settings import (
+        ANTHROPIC_API_KEY,
+        GOOGLE_API_KEY,
+        GEMINI_API_KEY,
+    )
+except ImportError:
+    # config.settings 로드 실패 시 환경변수 폴백
+    print("[AI Client] ⚠️ config.settings 로드 실패, 환경변수 사용")
+    ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 
 class UnifiedAIClient:
@@ -49,36 +68,49 @@ class UnifiedAIClient:
             self._init_openai()
 
     def _init_anthropic(self):
-        """Anthropic 클라이언트 초기화"""
+        """Anthropic 클라이언트 초기화 (v1.1: config.settings 사용)"""
         try:
             import anthropic
-            api_key = os.getenv("ANTHROPIC_API_KEY")
+
+            # v1.1: config.settings에서 로드된 API 키 사용
+            api_key = ANTHROPIC_API_KEY
             if not api_key:
-                raise ValueError("ANTHROPIC_API_KEY 환경변수가 설정되지 않았습니다")
+                raise ValueError("ANTHROPIC_API_KEY가 설정되지 않았습니다. API 관리 페이지에서 설정하세요.")
+
             self._client = anthropic.Anthropic(api_key=api_key)
+            print(f"[AI Client] ✅ Anthropic 클라이언트 초기화 완료")
         except ImportError:
             raise ImportError("anthropic 패키지가 설치되지 않았습니다. pip install anthropic")
 
     def _init_google(self):
-        """Google Gemini 클라이언트 초기화"""
+        """Google Gemini 클라이언트 초기화 (v1.1: config.settings 사용)"""
         try:
             import google.generativeai as genai
-            api_key = os.getenv("GOOGLE_API_KEY")
+
+            # v1.1: config.settings에서 로드된 API 키 사용 (scene_analyzer.py와 동일한 방식)
+            api_key = GOOGLE_API_KEY or GEMINI_API_KEY
             if not api_key:
-                raise ValueError("GOOGLE_API_KEY 환경변수가 설정되지 않았습니다")
+                raise ValueError("GOOGLE_API_KEY 또는 GEMINI_API_KEY가 설정되지 않았습니다. API 관리 페이지에서 설정하세요.")
+
             genai.configure(api_key=api_key)
             self._client = genai.GenerativeModel(self.model_id)
+            print(f"[AI Client] ✅ Google Gemini 클라이언트 초기화 완료 (모델: {self.model_id})")
         except ImportError:
             raise ImportError("google-generativeai 패키지가 설치되지 않았습니다. pip install google-generativeai")
 
     def _init_openai(self):
-        """OpenAI 클라이언트 초기화"""
+        """OpenAI 클라이언트 초기화 (v1.1: config.settings 패턴 적용)"""
         try:
             from openai import OpenAI
+
+            # OpenAI는 config.settings에 없으므로 환경변수에서 직접 로드
+            # (필요시 config.settings에 추가 가능)
             api_key = os.getenv("OPENAI_API_KEY")
             if not api_key:
-                raise ValueError("OPENAI_API_KEY 환경변수가 설정되지 않았습니다")
+                raise ValueError("OPENAI_API_KEY가 설정되지 않았습니다. API 관리 페이지에서 설정하세요.")
+
             self._client = OpenAI(api_key=api_key)
+            print(f"[AI Client] ✅ OpenAI 클라이언트 초기화 완료")
         except ImportError:
             raise ImportError("openai 패키지가 설치되지 않았습니다. pip install openai")
 
@@ -134,7 +166,7 @@ class UnifiedAIClient:
         return response.content[0].text
 
     def _generate_google(self, prompt, system_prompt, max_tokens, temperature) -> str:
-        """Google (Gemini) 호출"""
+        """Google (Gemini) 호출 (v1.2: 절단 감지 로깅)"""
 
         # 시스템 프롬프트를 프롬프트 앞에 추가
         full_prompt = prompt
@@ -151,7 +183,19 @@ class UnifiedAIClient:
             generation_config=generation_config
         )
 
-        return response.text
+        # 응답 절단 감지
+        text = response.text
+        finish_reason = None
+        try:
+            if response.candidates and response.candidates[0].finish_reason:
+                finish_reason = response.candidates[0].finish_reason
+                # finish_reason 2 = MAX_TOKENS (응답 잘림)
+                if finish_reason == 2 or str(finish_reason) == 'MAX_TOKENS':
+                    print(f"[AI Client] ⚠️ Gemini 응답 절단됨! (finish_reason=MAX_TOKENS, 응답 길이={len(text)}자, max_output_tokens={max_tokens})")
+        except Exception:
+            pass
+
+        return text
 
     def _generate_openai(self, prompt, system_prompt, max_tokens, temperature, json_mode) -> str:
         """OpenAI (GPT) 호출"""
@@ -202,7 +246,7 @@ class UnifiedAIClient:
         return self._parse_json_response(response)
 
     def _parse_json_response(self, text: str) -> Dict:
-        """JSON 응답 파싱"""
+        """JSON 응답 파싱 (v1.2: 잘린 JSON 복구 지원)"""
 
         text = text.strip()
 
@@ -222,7 +266,21 @@ class UnifiedAIClient:
             return json.loads(text)
         except json.JSONDecodeError as e:
             print(f"[AI Client] JSON 파싱 오류: {e}")
-            print(f"[AI Client] 원본 응답: {text[:500]}...")
+            print(f"[AI Client] 응답 길이: {len(text)}자, 끝부분: ...{text[-200:]}")
+
+            # 잘린 JSON 복구 시도: 마지막 완전한 객체까지 파싱
+            if text.startswith('{'):
+                # 단일 객체가 잘린 경우 - 중괄호 균형 맞추기
+                open_count = text.count('{') - text.count('}')
+                if open_count > 0:
+                    repaired = text + '}' * open_count
+                    try:
+                        result = json.loads(repaired)
+                        print(f"[AI Client] 🔧 중괄호 보정으로 JSON 복구 성공")
+                        return result
+                    except json.JSONDecodeError:
+                        pass
+
             return {}
 
 

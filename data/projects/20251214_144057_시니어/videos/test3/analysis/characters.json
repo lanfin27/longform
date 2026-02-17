@@ -1,0 +1,21 @@
+[
+  {
+    "name": "이재용",
+    "name_ko": "이재용",
+    "role": "등장인물",
+    "visual_prompt": "Lee Jae-yong, determined expression, reviewing documents, wearing professional attire, confident posture, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      45,
+      46,
+      47
+    ]
+  },
+  {
+    "name": "사업가",
+    "name_ko": "사업가",
+    "role": "등장인물",
+    "visual_prompt": "Visionary businessman, observing holographic display, wearing professional attire, thoughtful expression, confident posture, no text, no logos on clothing, no name tags",
+    "description": ""
+  }
+]

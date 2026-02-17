@@ -1,0 +1,263 @@
+[
+  {
+    "name": "줄 서 있는 사람들",
+    "name_ko": "줄 서 있는 사람들",
+    "role": "등장인물",
+    "visual_prompt": "diverse people, casual winter attire, expressions of anticipation and eagerness, waiting patiently",
+    "description": "",
+    "scenes": [
+      1,
+      2,
+      3,
+      97,
+      98,
+      99
+    ],
+    "appearance_scenes": [
+      1,
+      2,
+      3,
+      97,
+      98,
+      99
+    ]
+  },
+  {
+    "name": "사람의 손",
+    "name_ko": "사람의 손",
+    "role": "등장인물",
+    "visual_prompt": "well-groomed human hand holding a modern smartphone, fingers poised near the screen",
+    "description": "",
+    "scenes": [
+      4,
+      5,
+      6
+    ],
+    "appearance_scenes": [
+      4,
+      5,
+      6
+    ]
+  },
+  {
+    "name": "여성 인플루언서",
+    "name_ko": "여성 인플루언서",
+    "role": "등장인물",
+    "visual_prompt": "A stylish young Asian female influencer, resembling K-pop idol Jang Won-young, radiant smile, holding a 'Ddujjonku' cookie, trendy outfit, looking directly at the camera",
+    "description": "",
+    "scenes": [
+      40,
+      41,
+      42
+    ],
+    "appearance_scenes": [
+      40,
+      41,
+      42
+    ]
+  },
+  {
+    "name": "젊은이들",
+    "name_ko": "젊은이들",
+    "role": "등장인물",
+    "visual_prompt": "diverse young adults, casual and trendy outfits, engaged and smiling expressions, happily holding or consuming the same trendy product",
+    "description": "",
+    "scenes": [
+      43,
+      44,
+      45
+    ],
+    "appearance_scenes": [
+      43,
+      44,
+      45
+    ]
+  },
+  {
+    "name": "여성",
+    "name_ko": "여성",
+    "role": "등장인물",
+    "visual_prompt": "sophisticated, elegant, applying vibrant red lipstick, looking into a mirror, confident expression, soft lighting on her face",
+    "description": "",
+    "scenes": [
+      52,
+      53,
+      54
+    ],
+    "appearance_scenes": [
+      40,
+      41,
+      42
+    ]
+  },
+  {
+    "name": "위로 올라가는 사람들",
+    "name_ko": "위로 올라가는 사람들",
+    "role": "등장인물",
+    "visual_prompt": "silhouettes of people, moving upwards, in a bright, prosperous environment",
+    "description": "",
+    "scenes": [
+      79,
+      80,
+      81
+    ],
+    "appearance_scenes": [
+      79,
+      80,
+      81
+    ]
+  },
+  {
+    "name": "아래로 내려가는 사람들",
+    "name_ko": "아래로 내려가는 사람들",
+    "role": "등장인물",
+    "visual_prompt": "silhouettes of people, moving downwards, in a dark, isolated atmosphere",
+    "description": "",
+    "scenes": [
+      79,
+      80,
+      81
+    ],
+    "appearance_scenes": [
+      79,
+      80,
+      81
+    ]
+  },
+  {
+    "name": "쿠키를 들고 있는 사람",
+    "name_ko": "쿠키를 들고 있는 사람",
+    "role": "등장인물",
+    "visual_prompt": "a person holding a meticulously decorated, enticing cookie in elegant, branded packaging, with an eager and satisfied expression",
+    "description": "",
+    "scenes": [
+      97,
+      98,
+      99
+    ],
+    "appearance_scenes": [
+      97,
+      98,
+      99
+    ]
+  },
+  {
+    "name": "호텔 셰프",
+    "name_ko": "호텔 셰프",
+    "role": "등장인물",
+    "visual_prompt": "Skilled hotel chef, wearing a clean white chef's uniform and hat, with hands delicately handling vibrant green premium pistachio powder and fine, crystalline premium salt, mixing ingredients with precision and artistry, focused expression",
+    "description": "",
+    "scenes": [
+      115,
+      116,
+      117
+    ],
+    "appearance_scenes": [
+      115,
+      116,
+      117
+    ]
+  },
+  {
+    "name": "소규모 자영업자",
+    "name_ko": "소규모 자영업자",
+    "role": "등장인물",
+    "visual_prompt": "silhouetted figure, hunched over, conveying the burden of rising ingredient costs, thoughtful and stressed expression",
+    "description": "",
+    "scenes": [
+      142,
+      143,
+      144
+    ],
+    "appearance_scenes": [
+      142,
+      143,
+      144
+    ]
+  },
+  {
+    "name": "정치인들",
+    "name_ko": "정치인들",
+    "role": "등장인물",
+    "visual_prompt": "professional politicians, dressed in formal business attire, engaged in serious discussion, focused expressions",
+    "description": "",
+    "scenes": [
+      166,
+      167,
+      168
+    ],
+    "appearance_scenes": [
+      166,
+      167,
+      168
+    ]
+  },
+  {
+    "name": "다양한 연령대의 사람들",
+    "name_ko": "다양한 연령대의 사람들",
+    "role": "등장인물",
+    "visual_prompt": "people of various ages, with friendly expressions, collaboratively preparing 'Ddujjonku' ingredients, wearing comfortable casual clothes",
+    "description": "",
+    "scenes": [
+      193,
+      194,
+      195
+    ],
+    "appearance_scenes": [
+      193,
+      194,
+      195
+    ]
+  },
+  {
+    "name": "친구들",
+    "name_ko": "친구들",
+    "role": "등장인물",
+    "visual_prompt": "diverse group of friends of various ages, with happy and engaged expressions, collaboratively making 'Ddujjonku' together, wearing casual and comfortable attire, interacting cheerfully",
+    "description": "",
+    "scenes": [
+      196,
+      197,
+      198
+    ],
+    "appearance_scenes": [
+      196,
+      197,
+      198
+    ]
+  },
+  {
+    "name": "친구/가족",
+    "name_ko": "친구/가족",
+    "role": "등장인물",
+    "visual_prompt": "one adult female and one adult male, both with happy and collaborative expressions, wearing casual home attire, actively shaping cookie dough or placing trays into an oven",
+    "description": "",
+    "scenes": [
+      199,
+      200,
+      201
+    ],
+    "appearance_scenes": [
+      199,
+      200,
+      201
+    ]
+  },
+  {
+    "name": "다양한 사람들",
+    "name_ko": "다양한 사람들",
+    "role": "등장인물",
+    "visual_prompt": "male and female, various ages, engaged in creative activities such as urban gardening, crafting, or coding, with focused and empowered expressions, wearing casual and modern attire, faces not clearly visible",
+    "description": "",
+    "scenes": [
+      205,
+      206,
+      207
+    ],
+    "appearance_scenes": [
+      205,
+      206,
+      207
+    ]
+  }
+]

@@ -1,0 +1,2000 @@
+[
+  {
+    "scene_id": 1,
+    "text": "일론 머스크가 한국에 대해서 소름 끼치는 말을 했어요",
+    "start_time": 0.03,
+    "end_time": 3.71,
+    "duration": 3.68,
+    "timecode": "00:00:00,030 --> 00:00:03,710",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 2,
+    "text": "한국인들은 스스로 사라지고 있다",
+    "start_time": 4.23,
+    "end_time": 5.889,
+    "duration": 1.6589999999999998,
+    "timecode": "00:00:04,230 --> 00:00:05,889",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 3,
+    "text": "이대로 가면 3세대 후에 한국인구가 지금의 3%로 줄어들 거라고요",
+    "start_time": 5.889,
+    "end_time": 10.63,
+    "duration": 4.7410000000000005,
+    "timecode": "00:00:05,889 --> 00:00:10,630",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 4,
+    "text": "지금 5천만 명인데 150만 명밖에 안 남는다는 거예요",
+    "start_time": 10.63,
+    "end_time": 14.349,
+    "duration": 3.7189999999999994,
+    "timecode": "00:00:10,630 --> 00:00:14,349",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 5,
+    "text": "세계 최고의 부자가 왜 갑자기 한국인구 얘기를 했을까요",
+    "start_time": 14.589,
+    "end_time": 17.809,
+    "duration": 3.2200000000000006,
+    "timecode": "00:00:14,589 --> 00:00:17,809",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 6,
+    "text": "한국 출산율 때문이에요 0.72명이에요",
+    "start_time": 17.809,
+    "end_time": 20.87,
+    "duration": 3.061,
+    "timecode": "00:00:17,809 --> 00:00:20,870",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 7,
+    "text": "전 세계에서 꼴찌에요",
+    "start_time": 20.87,
+    "end_time": 22.429,
+    "duration": 1.5589999999999975,
+    "timecode": "00:00:20,870 --> 00:00:22,428",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 8,
+    "text": "인구를 유지하려면 2.1명은 돼야 하거든요",
+    "start_time": 22.429,
+    "end_time": 25.109,
+    "duration": 2.6800000000000033,
+    "timecode": "00:00:22,428 --> 00:00:25,109",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 9,
+    "text": "근데 0.72명이면 그 3분의 1도 안 되는 수준이에요",
+    "start_time": 25.109,
+    "end_time": 28.73,
+    "duration": 3.6209999999999987,
+    "timecode": "00:00:25,109 --> 00:00:28,730",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 10,
+    "text": "OECD 평균이 1.5명인데 그 절반도 안 되는 거예요",
+    "start_time": 28.73,
+    "end_time": 32.71,
+    "duration": 3.9800000000000004,
+    "timecode": "00:00:28,730 --> 00:00:32,710",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 11,
+    "text": "근데 머스크가 한말 중에 진짜 충격적인 게 따로 있어요",
+    "start_time": 32.71,
+    "end_time": 36.289,
+    "duration": 3.5790000000000006,
+    "timecode": "00:00:32,710 --> 00:00:36,289",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 12,
+    "text": "북한이 침공할 필요도 없다고 했거든요",
+    "start_time": 36.289,
+    "end_time": 38.57,
+    "duration": 2.280999999999999,
+    "timecode": "00:00:36,289 --> 00:00:38,570",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 13,
+    "text": "아무것도 안 해도 한국이 알아서 사라진다는 거예요",
+    "start_time": 38.57,
+    "end_time": 41.429,
+    "duration": 2.8590000000000018,
+    "timecode": "00:00:38,570 --> 00:00:41,429",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 14,
+    "text": "좀 기분 나쁘긴 하죠",
+    "start_time": 41.429,
+    "end_time": 42.85,
+    "duration": 1.4209999999999994,
+    "timecode": "00:00:41,429 --> 00:00:42,850",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 15,
+    "text": "근데 숫자를 보면요 반박하기가 어려워요",
+    "start_time": 42.85,
+    "end_time": 45.729,
+    "duration": 2.878999999999998,
+    "timecode": "00:00:42,850 --> 00:00:45,728",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 16,
+    "text": "경제, 안보, 연금, 의료, 대한민국이라는 시스템",
+    "start_time": 45.729,
+    "end_time": 49.689,
+    "duration": 3.960000000000001,
+    "timecode": "00:00:45,728 --> 00:00:49,689",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 17,
+    "text": "전체가 흔들리고 있는 건데요",
+    "start_time": 49.689,
+    "end_time": 51.549,
+    "duration": 1.8599999999999994,
+    "timecode": "00:00:49,689 --> 00:00:51,548",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 18,
+    "text": "2025년 기준으로 15세미만 아이들이 전체 인구의 10%밖에 안 돼요",
+    "start_time": 51.549,
+    "end_time": 56.13,
+    "duration": 4.581000000000003,
+    "timecode": "00:00:51,548 --> 00:00:56,130",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 19,
+    "text": "반면에 65세 이상 어르시는 20%를 넘었어요",
+    "start_time": 56.13,
+    "end_time": 59.729,
+    "duration": 3.5989999999999966,
+    "timecode": "00:00:56,130 --> 00:00:59,728",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 20,
+    "text": "아이보다 노인이 2배나 많은 나라가 된 거예요",
+    "start_time": 59.729,
+    "end_time": 62.59,
+    "duration": 2.861000000000004,
+    "timecode": "00:00:59,728 --> 00:01:02,590",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 21,
+    "text": "저도 이번에 자료 정리하면서 좀 충격받았어요",
+    "start_time": 62.59,
+    "end_time": 65.29,
+    "duration": 2.700000000000003,
+    "timecode": "00:01:02,590 --> 00:01:05,290",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 22,
+    "text": "인구 문제가 이렇게까지 심각한 건지 몰랐거든요",
+    "start_time": 65.29,
+    "end_time": 68.01,
+    "duration": 2.719999999999999,
+    "timecode": "00:01:05,290 --> 00:01:08,010",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 23,
+    "text": "자 그럼 처음부터 시작해 볼게요",
+    "start_time": 68.01,
+    "end_time": 69.93,
+    "duration": 1.9200000000000017,
+    "timecode": "00:01:08,010 --> 00:01:09,930",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 24,
+    "text": "한국이 원래부터 아이를 안 나은 나라가 아니거든요",
+    "start_time": 69.93,
+    "end_time": 72.989,
+    "duration": 3.0589999999999975,
+    "timecode": "00:01:09,930 --> 00:01:12,989",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 25,
+    "text": "1960년대에 출산율이 얼마였는지 아세요?",
+    "start_time": 73.87,
+    "end_time": 76.51,
+    "duration": 2.6400000000000006,
+    "timecode": "00:01:13,870 --> 00:01:16,510",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 26,
+    "text": "무려 6.0명이에요",
+    "start_time": 76.849,
+    "end_time": 78.129,
+    "duration": 1.2800000000000011,
+    "timecode": "00:01:16,849 --> 00:01:18,129",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 27,
+    "text": "한 집에 아이가 6명씩 있었던 거예요",
+    "start_time": 78.129,
+    "end_time": 80.73,
+    "duration": 2.600999999999999,
+    "timecode": "00:01:18,129 --> 00:01:20,730",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 28,
+    "text": "너무 많이 나오니까 정부가 둘만 나 잘 기르자",
+    "start_time": 80.73,
+    "end_time": 83.82900000000001,
+    "duration": 3.0990000000000038,
+    "timecode": "00:01:20,730 --> 00:01:23,829",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 29,
+    "text": "이런 캠페인을 한 거예요",
+    "start_time": 83.82900000000001,
+    "end_time": 84.93,
+    "duration": 1.100999999999999,
+    "timecode": "00:01:23,829 --> 00:01:24,930",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 30,
+    "text": "근데 이 정책이 너무 잘 먹혔어요",
+    "start_time": 84.93,
+    "end_time": 87.23,
+    "duration": 2.299999999999997,
+    "timecode": "00:01:24,930 --> 00:01:27,230",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 31,
+    "text": "출산율이 쭉쭉 떨어져서 1983년에",
+    "start_time": 87.23,
+    "end_time": 90.39,
+    "duration": 3.1599999999999966,
+    "timecode": "00:01:27,230 --> 00:01:30,390",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 32,
+    "text": "인구 유지에 필요한 2.1명 밑으로 내려가요",
+    "start_time": 90.39,
+    "end_time": 93.09,
+    "duration": 2.700000000000003,
+    "timecode": "00:01:30,390 --> 00:01:33,090",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 33,
+    "text": "그때까지만 해도 이게 좋은 거였어요",
+    "start_time": 93.09,
+    "end_time": 95.43,
+    "duration": 2.3400000000000034,
+    "timecode": "00:01:33,090 --> 00:01:35,430",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 34,
+    "text": "일할 사람이 많으니까 경제가 폭발적으로 성장했거든요",
+    "start_time": 95.43,
+    "end_time": 98.84899999999999,
+    "duration": 3.4189999999999827,
+    "timecode": "00:01:35,430 --> 00:01:38,848",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 35,
+    "text": "이게 그 유명한 한강의 기적이에요",
+    "start_time": 98.84899999999999,
+    "end_time": 100.62899999999999,
+    "duration": 1.7800000000000011,
+    "timecode": "00:01:38,848 --> 00:01:40,628",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 36,
+    "text": "인구 보너스라고 하는 건데",
+    "start_time": 100.62899999999999,
+    "end_time": 102.269,
+    "duration": 1.6400000000000148,
+    "timecode": "00:01:40,628 --> 00:01:42,269",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 37,
+    "text": "젊은 일꾼이 넘쳐나면서 나라 경제가 쑥쑥 커진 거예요",
+    "start_time": 102.269,
+    "end_time": 105.989,
+    "duration": 3.719999999999999,
+    "timecode": "00:01:42,269 --> 00:01:45,989",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 38,
+    "text": "근데요 1997년에 상황이 확 뒤집혀요",
+    "start_time": 105.989,
+    "end_time": 109.469,
+    "duration": 3.4799999999999898,
+    "timecode": "00:01:45,989 --> 00:01:49,468",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 39,
+    "text": "외환 위기가 터진 거예요",
+    "start_time": 109.469,
+    "end_time": 110.59,
+    "duration": 1.1210000000000093,
+    "timecode": "00:01:49,468 --> 00:01:50,590",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 40,
+    "text": "외환 보이고가 바닥 나고 대기업들이 줄줄이 무너졌어요",
+    "start_time": 111.03,
+    "end_time": 114.489,
+    "duration": 3.459000000000003,
+    "timecode": "00:01:51,030 --> 00:01:54,489",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 41,
+    "text": "실험율이 7%를 돌파했고",
+    "start_time": 114.489,
+    "end_time": 116.689,
+    "duration": 2.1999999999999886,
+    "timecode": "00:01:54,489 --> 00:01:56,688",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 42,
+    "text": "거리의 실직자들이 넘쳐놨어요",
+    "start_time": 116.689,
+    "end_time": 118.65,
+    "duration": 1.9610000000000127,
+    "timecode": "00:01:56,688 --> 00:01:58,650",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 43,
+    "text": "이때 뭐가 바뀌었냐면요",
+    "start_time": 118.65,
+    "end_time": 120.489,
+    "duration": 1.8389999999999986,
+    "timecode": "00:01:58,650 --> 00:02:00,489",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 44,
+    "text": "평생 직장이라는 개념이 완전히 사라져버린 거예요",
+    "start_time": 120.489,
+    "end_time": 123.15,
+    "duration": 2.6610000000000014,
+    "timecode": "00:02:00,489 --> 00:02:03,150",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 45,
+    "text": "이 트라우마가 한 세대의 가치관을 통째로 바꿔놨어요",
+    "start_time": 123.15,
+    "end_time": 126.59,
+    "duration": 3.4399999999999977,
+    "timecode": "00:02:03,150 --> 00:02:06,590",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 46,
+    "text": "결혼, 출산, 감당할 수 있는 사람만 하는 사치가 돼버린 거죠",
+    "start_time": 126.59,
+    "end_time": 131.22899999999998,
+    "duration": 4.638999999999982,
+    "timecode": "00:02:06,590 --> 00:02:11,228",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 47,
+    "text": "그 결과가 뭐냐면요",
+    "start_time": 131.22899999999998,
+    "end_time": 133.129,
+    "duration": 1.9000000000000057,
+    "timecode": "00:02:11,228 --> 00:02:13,128",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 48,
+    "text": "2001년에 출산율이 1.3명까지 추락해요",
+    "start_time": 133.129,
+    "end_time": 136.65,
+    "duration": 3.521000000000015,
+    "timecode": "00:02:13,128 --> 00:02:16,650",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 49,
+    "text": "초저출산 사회에 들어간 거예요",
+    "start_time": 136.65,
+    "end_time": 138.43,
+    "duration": 1.7800000000000011,
+    "timecode": "00:02:16,650 --> 00:02:18,430",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 50,
+    "text": "여기가 바로 한국 인구 분교의 시작점이에요",
+    "start_time": 138.849,
+    "end_time": 141.129,
+    "duration": 2.280000000000001,
+    "timecode": "00:02:18,848 --> 00:02:21,128",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 51,
+    "text": "근데요 이게 끝이 아니에요 진짜",
+    "start_time": 141.129,
+    "end_time": 143.169,
+    "duration": 2.0400000000000205,
+    "timecode": "00:02:21,128 --> 00:02:23,169",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 52,
+    "text": "핵심은 따로 있어요 집중하셔야 해요 지금",
+    "start_time": 143.169,
+    "end_time": 145.59,
+    "duration": 2.4209999999999923,
+    "timecode": "00:02:23,169 --> 00:02:25,590",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 53,
+    "text": "청년들이 왜 아이를 안 낳는지 숫자로 보여드릴게요",
+    "start_time": 145.59,
+    "end_time": 148.72899999999998,
+    "duration": 3.1389999999999816,
+    "timecode": "00:02:25,590 --> 00:02:28,728",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 54,
+    "text": "첫째 지난 10년간 수도권 집값이 약 80% 올랐어요",
+    "start_time": 149.22899999999998,
+    "end_time": 153.03,
+    "duration": 3.801000000000016,
+    "timecode": "00:02:29,228 --> 00:02:33,030",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 55,
+    "text": "같은 기간 청년들 월급이 그만큼 올랐을까요?",
+    "start_time": 153.03,
+    "end_time": 155.889,
+    "duration": 2.859000000000009,
+    "timecode": "00:02:33,030 --> 00:02:35,889",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 56,
+    "text": "당연히 아니에요",
+    "start_time": 156.37,
+    "end_time": 157.03,
+    "duration": 0.6599999999999966,
+    "timecode": "00:02:36,370 --> 00:02:37,030",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 57,
+    "text": "내 집 마련이 완전 신기루가 돼버린 거예요",
+    "start_time": 157.03,
+    "end_time": 159.55,
+    "duration": 2.5200000000000102,
+    "timecode": "00:02:37,030 --> 00:02:39,550",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 58,
+    "text": "둘째 사교육비가 가게 지출의 12%를 차지해요",
+    "start_time": 160.129,
+    "end_time": 163.93,
+    "duration": 3.801000000000016,
+    "timecode": "00:02:40,128 --> 00:02:43,930",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 59,
+    "text": "이게 밥값이랑 맘먹는 수준이에요",
+    "start_time": 163.93,
+    "end_time": 166.03,
+    "duration": 2.0999999999999943,
+    "timecode": "00:02:43,930 --> 00:02:46,030",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 60,
+    "text": "아이 한 명 키우는데 얼마가 되는지 계산하면요",
+    "start_time": 166.03,
+    "end_time": 169.22899999999998,
+    "duration": 3.198999999999984,
+    "timecode": "00:02:46,030 --> 00:02:49,228",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 61,
+    "text": "아이를 낳는 게 자산이 사라지는 거로 느껴지는 거예요",
+    "start_time": 169.22899999999998,
+    "end_time": 171.81,
+    "duration": 2.5810000000000173,
+    "timecode": "00:02:49,228 --> 00:02:51,810",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 62,
+    "text": "셋째 정부 조사를 보면요",
+    "start_time": 171.81,
+    "end_time": 174.37,
+    "duration": 2.5600000000000023,
+    "timecode": "00:02:51,810 --> 00:02:54,370",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 63,
+    "text": "미혼 남녀의 40% 이상이 죽어",
+    "start_time": 174.37,
+    "end_time": 177.22899999999998,
+    "duration": 2.8589999999999804,
+    "timecode": "00:02:54,370 --> 00:02:57,228",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 64,
+    "text": "불안이랑 양육비 부담 때문에 아이를 안 갖겠다라고 했어요",
+    "start_time": 177.22899999999998,
+    "end_time": 180.189,
+    "duration": 2.960000000000008,
+    "timecode": "00:02:57,228 --> 00:03:00,188",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 65,
+    "text": "서울대 조영태 교수가 이런 말을 했거든요",
+    "start_time": 180.189,
+    "end_time": 182.71,
+    "duration": 2.521000000000015,
+    "timecode": "00:03:00,188 --> 00:03:02,710",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 66,
+    "text": "생존이 위협받는 환경에서",
+    "start_time": 182.71,
+    "end_time": 184.669,
+    "duration": 1.9590000000000032,
+    "timecode": "00:03:02,710 --> 00:03:04,669",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 67,
+    "text": "아이를 안 낳는 건 인구학적으로 너무 당연한 반응이라고요",
+    "start_time": 184.669,
+    "end_time": 188.21,
+    "duration": 3.540999999999997,
+    "timecode": "00:03:04,669 --> 00:03:08,210",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 68,
+    "text": "자기가 살기도 힘든데 아이를 어떻게 낳겠냐는 거죠",
+    "start_time": 188.21,
+    "end_time": 191.11,
+    "duration": 2.9000000000000057,
+    "timecode": "00:03:08,210 --> 00:03:11,110",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 69,
+    "text": "근데 더 충격적인 게 뭔지 아세요?",
+    "start_time": 191.11,
+    "end_time": 193.09,
+    "duration": 1.9799999999999898,
+    "timecode": "00:03:11,110 --> 00:03:13,090",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 70,
+    "text": "여성들의 선택이 확 바뀌고 있어요",
+    "start_time": 193.389,
+    "end_time": 194.969,
+    "duration": 1.579999999999984,
+    "timecode": "00:03:13,389 --> 00:03:14,968",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 71,
+    "text": "대졸 여성의 혼인율이 1990년에 81%였는데요",
+    "start_time": 194.969,
+    "end_time": 199.069,
+    "duration": 4.099999999999994,
+    "timecode": "00:03:14,968 --> 00:03:19,068",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 72,
+    "text": "2020년에는 61%로 떨어졌어요",
+    "start_time": 199.069,
+    "end_time": 202.05,
+    "duration": 2.981000000000023,
+    "timecode": "00:03:19,068 --> 00:03:22,050",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 73,
+    "text": "왜냐면요 출산하면 커리어가 끝나는 사회잖아요",
+    "start_time": 202.05,
+    "end_time": 205.11,
+    "duration": 3.0600000000000023,
+    "timecode": "00:03:22,050 --> 00:03:25,110",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 74,
+    "text": "유가 휴직 제도가 있어도",
+    "start_time": 205.11,
+    "end_time": 206.82999999999998,
+    "duration": 1.7199999999999704,
+    "timecode": "00:03:25,110 --> 00:03:26,829",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 75,
+    "text": "회사에서 보이지 않는 차별이 있거든요",
+    "start_time": 206.82999999999998,
+    "end_time": 209.169,
+    "duration": 2.339000000000027,
+    "timecode": "00:03:26,829 --> 00:03:29,169",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 76,
+    "text": "독박 유가에 대한 부담도 크고요",
+    "start_time": 209.61,
+    "end_time": 211.50900000000001,
+    "duration": 1.899000000000001,
+    "timecode": "00:03:29,610 --> 00:03:31,509",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 77,
+    "text": "그러니까 고학력 여성일수록 결혼을 안 하는 거예요",
+    "start_time": 211.50900000000001,
+    "end_time": 214.889,
+    "duration": 3.3799999999999955,
+    "timecode": "00:03:31,509 --> 00:03:34,889",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 78,
+    "text": "결혼 연령도 엄청 늦어졌어요",
+    "start_time": 214.889,
+    "end_time": 216.689,
+    "duration": 1.799999999999983,
+    "timecode": "00:03:34,889 --> 00:03:36,688",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 79,
+    "text": "여성 31.6세 남성 33.9세예요",
+    "start_time": 216.689,
+    "end_time": 220.11,
+    "duration": 3.4210000000000207,
+    "timecode": "00:03:36,688 --> 00:03:40,110",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 80,
+    "text": "30년 전보다 6, 7살이나 늦춰진 거예요",
+    "start_time": 220.11,
+    "end_time": 222.949,
+    "duration": 2.8389999999999986,
+    "timecode": "00:03:40,110 --> 00:03:42,949",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 81,
+    "text": "가임 기간이 짧아지니까 둘째는 사실상 포기인 거죠",
+    "start_time": 222.949,
+    "end_time": 226.889,
+    "duration": 3.9399999999999977,
+    "timecode": "00:03:42,949 --> 00:03:46,889",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 82,
+    "text": "비교하면 더 확 와다하여",
+    "start_time": 227.439,
+    "end_time": 228.849,
+    "duration": 1.4099999999999966,
+    "timecode": "00:03:47,438 --> 00:03:48,848",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 83,
+    "text": "1번도 저출산 국가잖아요",
+    "start_time": 228.849,
+    "end_time": 230.49,
+    "duration": 1.6410000000000196,
+    "timecode": "00:03:48,848 --> 00:03:50,490",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 84,
+    "text": "근데 1번은 고령화 사회에서 초고령 사회로 가는데",
+    "start_time": 230.719,
+    "end_time": 233.56900000000002,
+    "duration": 2.8500000000000227,
+    "timecode": "00:03:50,718 --> 00:03:53,569",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 85,
+    "text": "24년이 걸렸어요 한국은요",
+    "start_time": 233.56900000000002,
+    "end_time": 235.949,
+    "duration": 2.3799999999999955,
+    "timecode": "00:03:53,569 --> 00:03:55,949",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 86,
+    "text": "제 불과 7년이에요",
+    "start_time": 235.949,
+    "end_time": 237.129,
+    "duration": 1.1799999999999784,
+    "timecode": "00:03:55,949 --> 00:03:57,128",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 87,
+    "text": "전 세계 최당의 기록이에요",
+    "start_time": 237.129,
+    "end_time": 238.75,
+    "duration": 1.6210000000000093,
+    "timecode": "00:03:57,128 --> 00:03:58,750",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 88,
+    "text": "이게 얼마나 빠른 속도인지 감이 오시죠",
+    "start_time": 238.75,
+    "end_time": 240.77,
+    "duration": 2.0200000000000102,
+    "timecode": "00:03:58,750 --> 00:04:00,770",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 89,
+    "text": "지금까지 원인을 봤으면요",
+    "start_time": 241.18,
+    "end_time": 242.83,
+    "duration": 1.6500000000000057,
+    "timecode": "00:04:01,180 --> 00:04:02,830",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 90,
+    "text": "이제 이게 뭘 망가뜨리는지 볼게요",
+    "start_time": 242.83,
+    "end_time": 244.43,
+    "duration": 1.5999999999999943,
+    "timecode": "00:04:02,830 --> 00:04:04,430",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 91,
+    "text": "여기서부터 진짜 무서운 숫자가 나와요",
+    "start_time": 244.43,
+    "end_time": 247.15,
+    "duration": 2.719999999999999,
+    "timecode": "00:04:04,430 --> 00:04:07,150",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 92,
+    "text": "2020년에 사망자 수가 출생하수를 앞질렀어요",
+    "start_time": 247.15,
+    "end_time": 250.129,
+    "duration": 2.978999999999985,
+    "timecode": "00:04:07,150 --> 00:04:10,128",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 93,
+    "text": "데드크로스라고 하는 건데요",
+    "start_time": 250.129,
+    "end_time": 251.909,
+    "duration": 1.7800000000000011,
+    "timecode": "00:04:10,128 --> 00:04:11,908",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 94,
+    "text": "이게 5년째 계속되고 있어요",
+    "start_time": 251.909,
+    "end_time": 253.83,
+    "duration": 1.9210000000000207,
+    "timecode": "00:04:11,908 --> 00:04:13,830",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 95,
+    "text": "한 번 시작되면 멈출 수가 없는 거예요",
+    "start_time": 253.83,
+    "end_time": 256.069,
+    "duration": 2.2390000000000043,
+    "timecode": "00:04:13,830 --> 00:04:16,069",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 96,
+    "text": "매년 부모가 될 수 있는 세대 자체가 줄어드니까요",
+    "start_time": 256.47,
+    "end_time": 258.97,
+    "duration": 2.5,
+    "timecode": "00:04:16,470 --> 00:04:18,970",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 97,
+    "text": "다음 세대는 더 작아지고",
+    "start_time": 258.97,
+    "end_time": 260.509,
+    "duration": 1.5389999999999873,
+    "timecode": "00:04:18,970 --> 00:04:20,509",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 98,
+    "text": "그다음은 더 더욱 작아지는 거예요",
+    "start_time": 260.509,
+    "end_time": 262.29,
+    "duration": 1.781000000000006,
+    "timecode": "00:04:20,509 --> 00:04:22,290",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 99,
+    "text": "복합적 수축 효과라고 하는 건데요",
+    "start_time": 262.829,
+    "end_time": 264.99,
+    "duration": 2.1610000000000014,
+    "timecode": "00:04:22,829 --> 00:04:24,990",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 100,
+    "text": "한반도 미래인구 연구원에서 추계를 냈는데요",
+    "start_time": 264.99,
+    "end_time": 267.269,
+    "duration": 2.2789999999999964,
+    "timecode": "00:04:24,990 --> 00:04:27,269",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 101,
+    "text": "최악의 경우",
+    "start_time": 267.829,
+    "end_time": 268.49,
+    "duration": 0.6610000000000014,
+    "timecode": "00:04:27,829 --> 00:04:28,490",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 102,
+    "text": "2025년에 한국 인구가 753만 명까지 떨어질 수 있대요",
+    "start_time": 268.49,
+    "end_time": 273.329,
+    "duration": 4.838999999999999,
+    "timecode": "00:04:28,490 --> 00:04:33,329",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 103,
+    "text": "지금 서울 인구보다 적은 거예요",
+    "start_time": 273.329,
+    "end_time": 274.90999999999997,
+    "duration": 1.5809999999999604,
+    "timecode": "00:04:33,329 --> 00:04:34,909",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 104,
+    "text": "경제도 직격탄을 맞아요",
+    "start_time": 274.90999999999997,
+    "end_time": 276.629,
+    "duration": 1.719000000000051,
+    "timecode": "00:04:34,909 --> 00:04:36,629",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 105,
+    "text": "지난 10년간 취업자가 267만 명 늘었거든요",
+    "start_time": 276.90999999999997,
+    "end_time": 279.99,
+    "duration": 3.080000000000041,
+    "timecode": "00:04:36,909 --> 00:04:39,990",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 106,
+    "text": "근데 앞으로 10년은요",
+    "start_time": 279.99,
+    "end_time": 281.769,
+    "duration": 1.7789999999999964,
+    "timecode": "00:04:39,990 --> 00:04:41,769",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 107,
+    "text": "64000명 밖에 안 늘어요",
+    "start_time": 281.769,
+    "end_time": 283.689,
+    "duration": 1.920000000000016,
+    "timecode": "00:04:41,769 --> 00:04:43,689",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 108,
+    "text": "거의 제로 성장이에요",
+    "start_time": 283.689,
+    "end_time": 285.069,
+    "duration": 1.3799999999999955,
+    "timecode": "00:04:43,689 --> 00:04:45,069",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 109,
+    "text": "정부가 경제 2% 성장을 유지하려면",
+    "start_time": 285.069,
+    "end_time": 287.90999999999997,
+    "duration": 2.8409999999999513,
+    "timecode": "00:04:45,069 --> 00:04:47,909",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 110,
+    "text": "2034년까지 120만 명이 더 필요한데요",
+    "start_time": 287.90999999999997,
+    "end_time": 290.93,
+    "duration": 3.0200000000000387,
+    "timecode": "00:04:47,909 --> 00:04:50,930",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 111,
+    "text": "지금 구조로는 불가능한 숫자예요",
+    "start_time": 290.93,
+    "end_time": 293.23,
+    "duration": 2.3000000000000114,
+    "timecode": "00:04:50,930 --> 00:04:53,230",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 112,
+    "text": "특히 보건복지 쪽에서는 고령화 때문에",
+    "start_time": 293.23,
+    "end_time": 295.47,
+    "duration": 2.240000000000009,
+    "timecode": "00:04:53,230 --> 00:04:55,470",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 113,
+    "text": "인력이 98만 명 이상 더 필요한데요",
+    "start_time": 295.47,
+    "end_time": 297.93,
+    "duration": 2.4599999999999795,
+    "timecode": "00:04:55,470 --> 00:04:57,930",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 114,
+    "text": "반대로 제조업이랑 도소매업에서는",
+    "start_time": 297.93,
+    "end_time": 300.05,
+    "duration": 2.1200000000000045,
+    "timecode": "00:04:57,930 --> 00:05:00,050",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 115,
+    "text": "수십만 명이 줄어들어요",
+    "start_time": 300.05,
+    "end_time": 301.49,
+    "duration": 1.4399999999999977,
+    "timecode": "00:05:00,050 --> 00:05:01,490",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 116,
+    "text": "판매직에서만 26만 8천 명",
+    "start_time": 301.49,
+    "end_time": 303.689,
+    "duration": 2.1990000000000123,
+    "timecode": "00:05:01,490 --> 00:05:03,689",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 117,
+    "text": "기계조작직에서 18만 명이 사라질 거래요",
+    "start_time": 303.689,
+    "end_time": 306.47,
+    "duration": 2.781000000000006,
+    "timecode": "00:05:03,689 --> 00:05:06,470",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 118,
+    "text": "필요한 데는 사람이 없고",
+    "start_time": 306.47,
+    "end_time": 307.709,
+    "duration": 1.238999999999976,
+    "timecode": "00:05:06,470 --> 00:05:07,709",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 119,
+    "text": "있던 데는 일자리가 사라지는 거예요",
+    "start_time": 307.709,
+    "end_time": 309.569,
+    "duration": 1.8600000000000136,
+    "timecode": "00:05:07,709 --> 00:05:09,569",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 120,
+    "text": "이게 딱 은행 상황이랑 비슷하거든요",
+    "start_time": 309.569,
+    "end_time": 311.81,
+    "duration": 2.2409999999999854,
+    "timecode": "00:05:09,569 --> 00:05:11,810",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 121,
+    "text": "사람은 나가는데",
+    "start_time": 311.81,
+    "end_time": 312.99,
+    "duration": 1.1800000000000068,
+    "timecode": "00:05:11,810 --> 00:05:12,990",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 122,
+    "text": "새로 필요한 건 AI 전문가인 것처럼요",
+    "start_time": 312.99,
+    "end_time": 315.47,
+    "duration": 2.480000000000018,
+    "timecode": "00:05:12,990 --> 00:05:15,470",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 123,
+    "text": "나라 전체가 이런 미스매치에 빠진 거예요",
+    "start_time": 315.47,
+    "end_time": 317.709,
+    "duration": 2.238999999999976,
+    "timecode": "00:05:15,470 --> 00:05:17,709",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 124,
+    "text": "군대도 문제예요",
+    "start_time": 317.709,
+    "end_time": 318.709,
+    "duration": 1.0,
+    "timecode": "00:05:17,709 --> 00:05:18,709",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 125,
+    "text": "2015년에 20세 남성 징집 자원이 37만 명이었는데요",
+    "start_time": 318.709,
+    "end_time": 323.11,
+    "duration": 4.4010000000000105,
+    "timecode": "00:05:18,709 --> 00:05:23,110",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 126,
+    "text": "2025년에는 23만 명 미만으로 줄었어요",
+    "start_time": 323.11,
+    "end_time": 326.189,
+    "duration": 3.0790000000000077,
+    "timecode": "00:05:23,110 --> 00:05:26,189",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 127,
+    "text": "2013년 이후에는 12만 명대까지 떨어져요",
+    "start_time": 326.189,
+    "end_time": 329.689,
+    "duration": 3.5,
+    "timecode": "00:05:26,189 --> 00:05:29,689",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 128,
+    "text": "지금 상비병력이 45만 명인데",
+    "start_time": 329.689,
+    "end_time": 332.23,
+    "duration": 2.540999999999997,
+    "timecode": "00:05:29,689 --> 00:05:32,230",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 129,
+    "text": "이걸 유지하는 게 물리적으로 불가능해지는 거예요",
+    "start_time": 332.529,
+    "end_time": 334.889,
+    "duration": 2.3600000000000136,
+    "timecode": "00:05:32,528 --> 00:05:34,889",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 130,
+    "text": "머스크가 인트로에서 했던 그 말",
+    "start_time": 334.889,
+    "end_time": 336.97,
+    "duration": 2.0810000000000173,
+    "timecode": "00:05:34,889 --> 00:05:36,970",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 131,
+    "text": "기억나시죠?",
+    "start_time": 336.97,
+    "end_time": 337.90999999999997,
+    "duration": 0.9399999999999409,
+    "timecode": "00:05:36,970 --> 00:05:37,909",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 132,
+    "text": "좀 냉소적이긴 한데",
+    "start_time": 340.009,
+    "end_time": 341.05,
+    "duration": 1.0409999999999968,
+    "timecode": "00:05:40,009 --> 00:05:41,050",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 133,
+    "text": "숫자를 보면 틀린 말은 아닌 거예요",
+    "start_time": 341.05,
+    "end_time": 343.05,
+    "duration": 2.0,
+    "timecode": "00:05:41,050 --> 00:05:43,050",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 134,
+    "text": "연금은요? 더 심각해요",
+    "start_time": 343.05,
+    "end_time": 345.31,
+    "duration": 2.259999999999991,
+    "timecode": "00:05:43,050 --> 00:05:45,310",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 135,
+    "text": "국민연금이 2041년에 적자 전환되고요",
+    "start_time": 345.31,
+    "end_time": 348.449,
+    "duration": 3.13900000000001,
+    "timecode": "00:05:45,310 --> 00:05:48,449",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 136,
+    "text": "2015년이면 기금이 완전히 바닥나요",
+    "start_time": 348.449,
+    "end_time": 351.329,
+    "duration": 2.8799999999999955,
+    "timecode": "00:05:48,449 --> 00:05:51,329",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 137,
+    "text": "연금 지출이 2022년에 GDP 대비 4%였는데요",
+    "start_time": 351.329,
+    "end_time": 355.389,
+    "duration": 4.060000000000002,
+    "timecode": "00:05:51,329 --> 00:05:55,389",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 138,
+    "text": "2070년이면 10% 이상으로 뛰어요",
+    "start_time": 355.389,
+    "end_time": 358.589,
+    "duration": 3.1999999999999886,
+    "timecode": "00:05:55,389 --> 00:05:58,588",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 139,
+    "text": "이걸 세금으로 메우려면",
+    "start_time": 358.589,
+    "end_time": 360.009,
+    "duration": 1.420000000000016,
+    "timecode": "00:05:58,588 --> 00:06:00,009",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 140,
+    "text": "2070년에 국가 채무가 GDP 대비 180%를 넘을 수도 있대요",
+    "start_time": 360.009,
+    "end_time": 365.009,
+    "duration": 5.0,
+    "timecode": "00:06:00,009 --> 00:06:05,009",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 141,
+    "text": "노년 부양비라는 게 있는데요",
+    "start_time": 365.009,
+    "end_time": 366.649,
+    "duration": 1.6399999999999864,
+    "timecode": "00:06:05,009 --> 00:06:06,649",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 142,
+    "text": "일하는 사람 100명이 부양해야 할 노인수예요",
+    "start_time": 367.089,
+    "end_time": 369.769,
+    "duration": 2.680000000000007,
+    "timecode": "00:06:07,088 --> 00:06:09,769",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 143,
+    "text": "2023년에 30명이었는데요",
+    "start_time": 369.769,
+    "end_time": 372.009,
+    "duration": 2.240000000000009,
+    "timecode": "00:06:09,769 --> 00:06:12,009",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 144,
+    "text": "2050년이면 77명",
+    "start_time": 372.009,
+    "end_time": 374.589,
+    "duration": 2.579999999999984,
+    "timecode": "00:06:12,009 --> 00:06:14,588",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 145,
+    "text": "2070년이면 140명이에요",
+    "start_time": 374.589,
+    "end_time": 376.829,
+    "duration": 2.240000000000009,
+    "timecode": "00:06:14,588 --> 00:06:16,829",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 146,
+    "text": "의료비도 폭증해요",
+    "start_time": 376.829,
+    "end_time": 378.31,
+    "duration": 1.4809999999999945,
+    "timecode": "00:06:16,829 --> 00:06:18,310",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 147,
+    "text": "한국의 공공보건 지출이 2018년에",
+    "start_time": 378.31,
+    "end_time": 381.31,
+    "duration": 3.0,
+    "timecode": "00:06:18,310 --> 00:06:21,310",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 148,
+    "text": "GDP 대비 8.8%였는데요",
+    "start_time": 381.31,
+    "end_time": 383.93,
+    "duration": 2.6200000000000045,
+    "timecode": "00:06:21,310 --> 00:06:23,930",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 149,
+    "text": "2040년이면 11% 이상으로 올라가요",
+    "start_time": 383.93,
+    "end_time": 387.43,
+    "duration": 3.5,
+    "timecode": "00:06:23,930 --> 00:06:27,430",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 150,
+    "text": "노인 1명을 지원하는 생산 가능인구가",
+    "start_time": 387.43,
+    "end_time": 390.11,
+    "duration": 2.680000000000007,
+    "timecode": "00:06:27,430 --> 00:06:30,110",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 151,
+    "text": "2050년이면 1.3명으로 줄어요",
+    "start_time": 392.25,
+    "end_time": 395.40999999999997,
+    "duration": 3.159999999999968,
+    "timecode": "00:06:32,250 --> 00:06:35,409",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 152,
+    "text": "건강보험 재정이 버틸 수가 없는 구조인 거예요",
+    "start_time": 395.40999999999997,
+    "end_time": 398.089,
+    "duration": 2.6790000000000305,
+    "timecode": "00:06:35,409 --> 00:06:38,088",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 153,
+    "text": "자 그러면 정부가 뭐라고 있는지 볼게요",
+    "start_time": 398.389,
+    "end_time": 400.629,
+    "duration": 2.240000000000009,
+    "timecode": "00:06:38,389 --> 00:06:40,629",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 154,
+    "text": "일단 좋은 소식이 하나 있긴 해요",
+    "start_time": 400.629,
+    "end_time": 402.629,
+    "duration": 2.0,
+    "timecode": "00:06:40,629 --> 00:06:42,629",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 155,
+    "text": "2024년에 출산율이 0.75명으로 살짝 반등했어요",
+    "start_time": 402.629,
+    "end_time": 406.31,
+    "duration": 3.680999999999983,
+    "timecode": "00:06:42,629 --> 00:06:46,310",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 156,
+    "text": "혼인 건수가 전년대비 14.9% 늘었거든요",
+    "start_time": 406.689,
+    "end_time": 409.509,
+    "duration": 2.819999999999993,
+    "timecode": "00:06:46,689 --> 00:06:49,509",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 157,
+    "text": "1970년 통계 작성 이래 최대 상승 포기예요",
+    "start_time": 409.509,
+    "end_time": 413.17,
+    "duration": 3.6610000000000014,
+    "timecode": "00:06:49,509 --> 00:06:53,170",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 158,
+    "text": "2025년에는 0.79에서 0.8일 정도가 될 거라는 전망도 나와요",
+    "start_time": 413.17,
+    "end_time": 417.97,
+    "duration": 4.800000000000011,
+    "timecode": "00:06:53,170 --> 00:06:57,970",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 159,
+    "text": "정부가 크게 세 가지를 밀고 있어요",
+    "start_time": 417.97,
+    "end_time": 419.85,
+    "duration": 1.8799999999999955,
+    "timecode": "00:06:57,970 --> 00:06:59,850",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 160,
+    "text": "첫째 AI예요",
+    "start_time": 419.85,
+    "end_time": 421.55,
+    "duration": 1.6999999999999886,
+    "timecode": "00:06:59,850 --> 00:07:01,550",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 161,
+    "text": "2026년에 AI 예산을 전년대비 3배 넘게 늘려서",
+    "start_time": 421.55,
+    "end_time": 425.209,
+    "duration": 3.658999999999992,
+    "timecode": "00:07:01,550 --> 00:07:05,209",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 162,
+    "text": "10.1조 원을 편성했어요",
+    "start_time": 425.209,
+    "end_time": 427.17,
+    "duration": 1.9610000000000127,
+    "timecode": "00:07:05,209 --> 00:07:07,170",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 163,
+    "text": "이게 무슨 의미냐면요",
+    "start_time": 427.17,
+    "end_time": 428.529,
+    "duration": 1.3589999999999804,
+    "timecode": "00:07:07,170 --> 00:07:08,528",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 164,
+    "text": "AI가 단순히 편리한 도구가 아니라",
+    "start_time": 428.529,
+    "end_time": 430.73,
+    "duration": 2.201000000000022,
+    "timecode": "00:07:08,528 --> 00:07:10,730",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 165,
+    "text": "인구 부족을 메울 생존 기술이 된 거예요",
+    "start_time": 430.73,
+    "end_time": 433.35,
+    "duration": 2.6200000000000045,
+    "timecode": "00:07:10,730 --> 00:07:13,350",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 166,
+    "text": "2030년까지 AI 자율 제조공장 500개를 만들겠다는 거예요",
+    "start_time": 433.35,
+    "end_time": 437.87,
+    "duration": 4.519999999999982,
+    "timecode": "00:07:13,350 --> 00:07:17,870",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 167,
+    "text": "사람이 부족하니까 기계로 메우겠다는 거죠",
+    "start_time": 437.87,
+    "end_time": 440.389,
+    "duration": 2.5190000000000055,
+    "timecode": "00:07:17,870 --> 00:07:20,389",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 168,
+    "text": "근데 여기서 아이러니가 생겨요",
+    "start_time": 440.389,
+    "end_time": 442.589,
+    "duration": 2.1999999999999886,
+    "timecode": "00:07:20,389 --> 00:07:22,588",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 169,
+    "text": "AI가 사람을 대체하면 일자리가 사라지는 사람도 생기거든요",
+    "start_time": 442.589,
+    "end_time": 446.569,
+    "duration": 3.980000000000018,
+    "timecode": "00:07:22,588 --> 00:07:26,569",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 170,
+    "text": "인구는 부족한데",
+    "start_time": 446.569,
+    "end_time": 447.949,
+    "duration": 1.3799999999999955,
+    "timecode": "00:07:26,569 --> 00:07:27,949",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 171,
+    "text": "동시에 기술 때문에 실직하는 사람도 나오는 거예요",
+    "start_time": 447.949,
+    "end_time": 450.629,
+    "duration": 2.680000000000007,
+    "timecode": "00:07:27,949 --> 00:07:30,629",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 172,
+    "text": "이걸 어떻게 해결할 건지가 또 다른 과제예요",
+    "start_time": 450.629,
+    "end_time": 453.589,
+    "duration": 2.9599999999999795,
+    "timecode": "00:07:30,629 --> 00:07:33,588",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 173,
+    "text": "둘째, 이민 정책이에요",
+    "start_time": 453.589,
+    "end_time": 455.689,
+    "duration": 2.1000000000000227,
+    "timecode": "00:07:33,588 --> 00:07:35,689",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 174,
+    "text": "AI 분야 외국인 인재한테",
+    "start_time": 455.689,
+    "end_time": 457.79,
+    "duration": 2.100999999999999,
+    "timecode": "00:07:35,689 --> 00:07:37,790",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 175,
+    "text": "영주권 취득 기간을 6년에서 3년으로 줄여주고요",
+    "start_time": 457.79,
+    "end_time": 461.089,
+    "duration": 3.298999999999978,
+    "timecode": "00:07:37,790 --> 00:07:41,088",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 176,
+    "text": "필리핀 가사 관리사 100명도 시범 도입했어요",
+    "start_time": 461.089,
+    "end_time": 463.87,
+    "duration": 2.781000000000006,
+    "timecode": "00:07:41,088 --> 00:07:43,870",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 177,
+    "text": "해외의 세종학당도 대폭 확충하고 있고요",
+    "start_time": 463.87,
+    "end_time": 466.529,
+    "duration": 2.658999999999992,
+    "timecode": "00:07:43,870 --> 00:07:46,528",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 178,
+    "text": "다문화 학생 수가 이미 20만 명을 넘어선 상황이라",
+    "start_time": 466.529,
+    "end_time": 469.93,
+    "duration": 3.4010000000000105,
+    "timecode": "00:07:46,528 --> 00:07:49,930",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 179,
+    "text": "공교육에서도 통합 교육 프로그램을 강화하고 있어요",
+    "start_time": 470.529,
+    "end_time": 473.40999999999997,
+    "duration": 2.880999999999972,
+    "timecode": "00:07:50,528 --> 00:07:53,409",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 180,
+    "text": "근데 여기 문제가 있어요",
+    "start_time": 473.40999999999997,
+    "end_time": 474.55,
+    "duration": 1.1400000000000432,
+    "timecode": "00:07:53,409 --> 00:07:54,550",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 181,
+    "text": "설문조사 보면 한국인의 30% 이상이",
+    "start_time": 474.55,
+    "end_time": 477.47,
+    "duration": 2.920000000000016,
+    "timecode": "00:07:54,550 --> 00:07:57,470",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 182,
+    "text": "다문화 확대의 부정적이에요",
+    "start_time": 477.47,
+    "end_time": 479.31,
+    "duration": 1.839999999999975,
+    "timecode": "00:07:57,470 --> 00:07:59,310",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 183,
+    "text": "이민을 늘리면서 동시에 사회 통합도 해야 하는",
+    "start_time": 479.31,
+    "end_time": 482.269,
+    "duration": 2.959000000000003,
+    "timecode": "00:07:59,310 --> 00:08:02,269",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 184,
+    "text": "어려운 과제가 남아 있는 거죠",
+    "start_time": 482.269,
+    "end_time": 483.529,
+    "duration": 1.259999999999991,
+    "timecode": "00:08:02,269 --> 00:08:03,528",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 185,
+    "text": "셋째, 국방 혁신 4점 연기예요",
+    "start_time": 483.529,
+    "end_time": 486.189,
+    "duration": 2.660000000000025,
+    "timecode": "00:08:03,528 --> 00:08:06,189",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 186,
+    "text": "유무인 복합전투체계라고 해서",
+    "start_time": 486.189,
+    "end_time": 488.149,
+    "duration": 1.9599999999999795,
+    "timecode": "00:08:06,189 --> 00:08:08,149",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 187,
+    "text": "병사 1명이 드론이랑 로봇 여러 대를 제어하는 거예요",
+    "start_time": 488.149,
+    "end_time": 491.089,
+    "duration": 2.9399999999999977,
+    "timecode": "00:08:08,149 --> 00:08:11,088",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 188,
+    "text": "50만 드론 전사를 양성하겠다는 계획이에요",
+    "start_time": 491.089,
+    "end_time": 494.329,
+    "duration": 3.240000000000009,
+    "timecode": "00:08:11,088 --> 00:08:14,329",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 189,
+    "text": "최전방 경계 작전도 AI 기반 시스템으로 바꿔서",
+    "start_time": 494.329,
+    "end_time": 498.269,
+    "duration": 3.9399999999999977,
+    "timecode": "00:08:14,329 --> 00:08:18,269",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 190,
+    "text": "사람 의존도를 확 낮추겠다는 거예요",
+    "start_time": 498.269,
+    "end_time": 500.569,
+    "duration": 2.3000000000000114,
+    "timecode": "00:08:18,269 --> 00:08:20,569",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 191,
+    "text": "사람 대신 기술로 나라를 지키겠다는 건데요",
+    "start_time": 500.569,
+    "end_time": 503.649,
+    "duration": 3.079999999999984,
+    "timecode": "00:08:20,569 --> 00:08:23,649",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 192,
+    "text": "모병제 도입이나 여군 비중 확대 같은",
+    "start_time": 503.649,
+    "end_time": 506.629,
+    "duration": 2.980000000000018,
+    "timecode": "00:08:23,649 --> 00:08:26,629",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 193,
+    "text": "파격적인 대안까지 나오는 상황이에요",
+    "start_time": 506.629,
+    "end_time": 509.069,
+    "duration": 2.4399999999999977,
+    "timecode": "00:08:26,629 --> 00:08:29,069",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 194,
+    "text": "한편에서는 아예 다른 시각이 나오고 있어요",
+    "start_time": 509.069,
+    "end_time": 511.47,
+    "duration": 2.4010000000000105,
+    "timecode": "00:08:29,069 --> 00:08:31,470",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 195,
+    "text": "출산율을 올리려고 하지 말고요",
+    "start_time": 511.47,
+    "end_time": 512.97,
+    "duration": 1.5,
+    "timecode": "00:08:31,470 --> 00:08:32,970",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 196,
+    "text": "줄어든 인구에 맞춰서 나라 시스템을 다시 짜자는 거예요",
+    "start_time": 512.97,
+    "end_time": 516.529,
+    "duration": 3.558999999999969,
+    "timecode": "00:08:32,970 --> 00:08:36,528",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 197,
+    "text": "예전에는 매년 100만 명씩 태어났잖아요",
+    "start_time": 516.529,
+    "end_time": 519.11,
+    "duration": 2.5810000000000173,
+    "timecode": "00:08:36,528 --> 00:08:39,110",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 198,
+    "text": "지금은 20만 명대거든요",
+    "start_time": 519.11,
+    "end_time": 521.129,
+    "duration": 2.0190000000000055,
+    "timecode": "00:08:39,110 --> 00:08:41,129",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 199,
+    "text": "교육, 의료, 행정을 그 규모에 맞게 효율화 하자는 거예요",
+    "start_time": 521.129,
+    "end_time": 524.809,
+    "duration": 3.67999999999995,
+    "timecode": "00:08:41,129 --> 00:08:44,808",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 200,
+    "text": "전국 모든 도시를 다 유지하려고 하지 말고요",
+    "start_time": 524.809,
+    "end_time": 527.85,
+    "duration": 3.0410000000000537,
+    "timecode": "00:08:44,808 --> 00:08:47,850",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 201,
+    "text": "거점 도시를 중심으로 기능을 압축하는 전략이 필요하다는 주장도 나오고 있어요",
+    "start_time": 527.85,
+    "end_time": 532.45,
+    "duration": 4.600000000000023,
+    "timecode": "00:08:47,850 --> 00:08:52,450",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 202,
+    "text": "인구가 줄어도 국민 1명 1명의 삶의 질을",
+    "start_time": 532.97,
+    "end_time": 535.71,
+    "duration": 2.740000000000009,
+    "timecode": "00:08:52,970 --> 00:08:55,710",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 203,
+    "text": "높이면 되지 않겠냐 하는 발상의 전환인 거죠",
+    "start_time": 535.71,
+    "end_time": 538.149,
+    "duration": 2.4389999999999645,
+    "timecode": "00:08:55,710 --> 00:08:58,149",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 204,
+    "text": "정부도 이 문제의 심각성을 알고",
+    "start_time": 538.769,
+    "end_time": 540.429,
+    "duration": 1.6599999999999682,
+    "timecode": "00:08:58,769 --> 00:09:00,428",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 205,
+    "text": "인구 전략 기획부를 새로 만들겠다라고 했는데요",
+    "start_time": 540.429,
+    "end_time": 543.549,
+    "duration": 3.1200000000000045,
+    "timecode": "00:09:00,428 --> 00:09:03,548",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 206,
+    "text": "부처간 권한 조정이 쉽지 않아서",
+    "start_time": 543.549,
+    "end_time": 545.769,
+    "duration": 2.2200000000000273,
+    "timecode": "00:09:03,548 --> 00:09:05,769",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 207,
+    "text": "아직 갈 길이 먼 상황이에요",
+    "start_time": 545.769,
+    "end_time": 547.57,
+    "duration": 1.8010000000000446,
+    "timecode": "00:09:05,769 --> 00:09:07,570",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 208,
+    "text": "오늘 얘기 정리해 볼게요",
+    "start_time": 547.57,
+    "end_time": 549.149,
+    "duration": 1.5789999999999509,
+    "timecode": "00:09:07,570 --> 00:09:09,149",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 209,
+    "text": "지금 한국에서 벌어지는 인구 위기는요",
+    "start_time": 549.149,
+    "end_time": 551.769,
+    "duration": 2.6200000000000045,
+    "timecode": "00:09:09,149 --> 00:09:11,769",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 210,
+    "text": "단순히 아이가 줄어드는 문제가 아니에요",
+    "start_time": 551.769,
+    "end_time": 553.769,
+    "duration": 2.0,
+    "timecode": "00:09:11,769 --> 00:09:13,769",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 211,
+    "text": "나라 전체가 바뀌는 거예요",
+    "start_time": 554.23,
+    "end_time": 555.57,
+    "duration": 1.3400000000000318,
+    "timecode": "00:09:14,230 --> 00:09:15,570",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 212,
+    "text": "출산율 0.72명의 의미",
+    "start_time": 555.57,
+    "end_time": 557.769,
+    "duration": 2.1989999999999554,
+    "timecode": "00:09:15,570 --> 00:09:17,769",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 213,
+    "text": "100년 안에 인구가 753만 명까지 줄 수 있다는",
+    "start_time": 557.769,
+    "end_time": 560.769,
+    "duration": 3.0,
+    "timecode": "00:09:17,769 --> 00:09:20,769",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 214,
+    "text": "예측 국민연금 2015",
+    "start_time": 560.769,
+    "end_time": 562.789,
+    "duration": 2.019999999999982,
+    "timecode": "00:09:20,769 --> 00:09:22,788",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 215,
+    "text": "연고갈 군대 병력 유지 불가능",
+    "start_time": 563.309,
+    "end_time": 565.09,
+    "duration": 1.7810000000000628,
+    "timecode": "00:09:23,308 --> 00:09:25,090",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 216,
+    "text": "다 하나로 연결돼 있어요",
+    "start_time": 565.09,
+    "end_time": 566.19,
+    "duration": 1.1000000000000227,
+    "timecode": "00:09:25,090 --> 00:09:26,190",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 217,
+    "text": "인구가 줄어든다고 나라가 반드시 망하는 건 아니에요",
+    "start_time": 566.19,
+    "end_time": 569.009,
+    "duration": 2.81899999999996,
+    "timecode": "00:09:26,190 --> 00:09:29,009",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 218,
+    "text": "근데 준비 없이 맞이하는 축소는 재앙이 되는 거예요",
+    "start_time": 569.37,
+    "end_time": 572.409,
+    "duration": 3.0389999999999873,
+    "timecode": "00:09:29,370 --> 00:09:32,408",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 219,
+    "text": "결국 이 이야기는요",
+    "start_time": 572.409,
+    "end_time": 573.99,
+    "duration": 1.5810000000000173,
+    "timecode": "00:09:32,408 --> 00:09:33,990",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 220,
+    "text": "한 나라가 사라질 수도 있느냐에 대한 이야기이기도 해요",
+    "start_time": 573.99,
+    "end_time": 576.97,
+    "duration": 2.980000000000018,
+    "timecode": "00:09:33,990 --> 00:09:36,970",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 221,
+    "text": "여러분은 어떻게 생각하세요?",
+    "start_time": 576.97,
+    "end_time": 578.429,
+    "duration": 1.4589999999999463,
+    "timecode": "00:09:36,970 --> 00:09:38,428",
+    "is_recovered": false
+  },
+  {
+    "scene_id": 222,
+    "text": "대한민국 이 인구 절벽을 넘을 수 있을까요?",
+    "start_time": 578.809,
+    "end_time": 581.35,
+    "duration": 2.5410000000000537,
+    "timecode": "00:09:38,808 --> 00:09:41,350",
+    "is_recovered": false
+  }
+]

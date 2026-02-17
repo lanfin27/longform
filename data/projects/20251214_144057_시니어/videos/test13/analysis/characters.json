@@ -1,0 +1,40 @@
+[
+  {
+    "name": "삼성 임원들",
+    "name_ko": "삼성 임원들",
+    "name_en": "",
+    "description": "",
+    "description_en": "",
+    "visual_prompt": "Samsung executives in formal business attire with skeptical and doubtful expressions during corporate meeting",
+    "character_prompt": "Samsung executives in formal business attire with skeptical and doubtful expressions during corporate meeting",
+    "role": "등장인물",
+    "scenes": [
+      45,
+      46
+    ],
+    "appearance_count": 2,
+    "appearance_scenes": [
+      45,
+      46
+    ]
+  },
+  {
+    "name": "이재용",
+    "name_ko": "이재용",
+    "name_en": "",
+    "description": "",
+    "description_en": "",
+    "visual_prompt": "Lee Jae-yong as Vice Chairman in 2016, formal business attire, confident presenting stance before corporate presentation screen",
+    "character_prompt": "Lee Jae-yong as Vice Chairman in 2016, formal business attire, confident presenting stance before corporate presentation screen",
+    "role": "등장인물",
+    "scenes": [
+      47,
+      48
+    ],
+    "appearance_count": 2,
+    "appearance_scenes": [
+      47,
+      48
+    ]
+  }
+]

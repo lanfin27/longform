@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-08T14:36:30.319390",
+  "image_file": "bg_scene_013_1770528990318.png",
+  "scene_id": 13,
+  "prompts": {
+    "original": "Exquisite close-up of an advanced HBM (High Bandwidth Memory) chip, data visually flowing at high speed through its intricate layers, blue and purple light tracing along the delicate circuits, minimalist and sophisticated design emphasizing technological marvel and high bandwidth, educational and clear atmosphere, sharp focus on the chip's architecture, holographic data streams, professional technology photography, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Exquisite close-up of an advanced HBM (High Bandwidth Memory) chip, data visually flowing at high speed through its intricate layers, blue and purple light tracing along the delicate circuits, minimalist and sophisticated design emphasizing technological marvel and high bandwidth, educational and clear atmosphere, sharp focus on the chip's architecture, holographic data streams, professional technology photography, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 160957091
+  },
+  "scene_number": 15,
+  "copied_from": {
+    "scene_number": 13,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\HBM4\\images\\backgrounds\\bg_scene_013_1770528990318.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-08T14:42:26.171055"
+}

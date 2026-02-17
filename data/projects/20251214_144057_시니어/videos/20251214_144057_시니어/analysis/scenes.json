@@ -191,7 +191,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Close-up shot of the illuminated headlights of a futuristic autonomous vehicle, emphasizing advanced technology and connectivity. The scene creates a futuristic atmosphere with a focus on the vehicle's headlights.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시, 연구소",
     "mood": "미래지향적, 혁신적인",
     "source": "srt",
@@ -240,7 +246,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Close-up shot of the illuminated headlights of a futuristic autonomous vehicle, emphasizing advanced technology and connectivity. The scene creates a futuristic atmosphere with a focus on the vehicle's headlights.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시, 연구소",
     "mood": "미래지향적, 혁신적인",
     "source": "srt",
@@ -288,7 +300,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Close-up shot of the illuminated headlights of a futuristic autonomous vehicle, emphasizing advanced technology and connectivity. The scene creates a futuristic atmosphere with a focus on the vehicle's headlights.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시, 연구소",
     "mood": "미래지향적, 혁신적인",
     "source": "srt",
@@ -336,7 +354,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Image displaying the logos of ZF's autonomous driving division and Harman, connected by an arrow symbolizing acquisition. The scene emphasizes the acquisition of ZF's autonomous driving division by Harman.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "기업 회의실, 뉴스 스튜디오",
     "mood": "비즈니스, 전략적인",
     "source": "srt",
@@ -385,7 +409,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Image displaying the logos of ZF's autonomous driving division and Harman, connected by an arrow symbolizing acquisition. The scene emphasizes the acquisition of ZF's autonomous driving division by Harman.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "기업 회의실, 뉴스 스튜디오",
     "mood": "비즈니스, 전략적인",
     "source": "srt",
@@ -433,7 +463,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Image displaying the logos of ZF's autonomous driving division and Harman, connected by an arrow symbolizing acquisition. The scene emphasizes the acquisition of ZF's autonomous driving division by Harman.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "기업 회의실, 뉴스 스튜디오",
     "mood": "비즈니스, 전략적인",
     "source": "srt",
@@ -481,7 +517,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Image featuring the logos of Tesla, BMW, and Hyundai side-by-side, visually representing the impact of Samsung's entry into the automotive industry on these companies. The scene creates tension by alternating between the logos.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "자동차 전시회, 미래 도시",
     "mood": "경쟁적인, 긴장감 있는",
     "source": "srt",
@@ -530,7 +572,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Image featuring the logos of Tesla, BMW, and Hyundai side-by-side, visually representing the impact of Samsung's entry into the automotive industry on these companies. The scene creates tension by alternating between the logos.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "자동차 전시회, 미래 도시",
     "mood": "경쟁적인, 긴장감 있는",
     "source": "srt",
@@ -578,7 +626,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Image featuring the logos of Tesla, BMW, and Hyundai side-by-side, visually representing the impact of Samsung's entry into the automotive industry on these companies. The scene creates tension by alternating between the logos.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "자동차 전시회, 미래 도시",
     "mood": "경쟁적인, 긴장감 있는",
     "source": "srt",
@@ -1304,7 +1358,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "A slow, sweeping pan across a futuristic cityscape with innovative building designs. The color palette emphasizes blue and silver, creating a sleek and modern feel. The camera slowly tilts up, revealing the vastness of the city.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시",
     "mood": "희망찬, 혁신적인",
     "source": "srt",
@@ -1353,7 +1413,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "An aerial view of an intricately connected distribution network. Logistics warehouses, drones, and containers are all visible, showcasing an efficient system. The color palette focuses on green and white. The camera slowly zooms out to reveal the scale of the operation.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "물류 창고, 유통 센터",
     "mood": "효율적인, 체계적인",
     "source": "srt",
@@ -1452,7 +1518,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "A panoramic view of a futuristic road with self-driving cars. The environment is clean and sustainable energy is evident. The color palette emphasizes green and blue. The camera pans smoothly across the scene.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시 외곽 도로",
     "mood": "희망찬, 진보적인",
     "source": "srt",
@@ -1498,7 +1570,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "A tunnel with bright light pouring in. Cars are moving forward, creating a sense of positive energy. The color palette emphasizes white and gold. The camera quickly zooms in on the cars as they exit the tunnel.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "터널",
     "mood": "긍정적인, 희망찬",
     "source": "srt",
@@ -1542,7 +1620,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A visually appealing animation showcasing the wego logo against a blue backdrop. Light rays subtly emanate from the logo, creating a sense of purpose and mission. Camera slowly zooms in on the logo.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "희망, 사명감",
     "source": "srt",
@@ -1588,7 +1672,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A visually appealing animation showcasing the wego logo against a blue backdrop. Light rays subtly emanate from the logo, emphasizing the company's reason for being. Camera slowly pans across the logo.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "존재감, 이유",
     "source": "srt",
@@ -1632,7 +1722,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A wide shot of a Texas city at night, with twinkling city lights and a starry sky. Camera slowly zooms in towards the horizon.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미국 텍사스",
     "mood": "새로운 시작, 희망",
     "source": "srt",
@@ -1676,7 +1772,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "An animation of a single light emerging from the darkness. The camera focuses on the light as it grows brighter.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "시작, 희망",
     "source": "srt",
@@ -1720,7 +1822,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "An animation of two streams of light rising upwards, intertwining and growing brighter together. The camera follows the light as it ascends.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "협력, 성장",
     "source": "srt",
@@ -2039,7 +2147,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "The line graph steadily declines, then plateaus at a low point. Subtle flickering effect.",
     "video_prompt_full": "A close-up shot of a declining line graph. The graph's downward trend visually represents the lack of desired results. The scene is dimly lit to enhance the feeling of stagnation. Slow zoom out to reveal the full graph.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "침체된 분위기의 꺾은선 그래프",
+        "name_en": "A declining line graph representing poor performance",
+        "visual_prompt": "dark colors, stagnant feel"
+      }
+    ],
     "location": "데이터 시각화 공간",
     "mood": "침체, 부진",
     "source": "srt",
@@ -2083,7 +2197,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "A single star twinkles brightly against a dark backdrop. Subtle shimmering effect.",
     "video_prompt_full": "A wide-angle shot of a dark night sky filled with twinkling stars. The camera slowly pans across the sky, highlighting the contrast between the darkness and the bright stars. The scene evokes a sense of hope and resilience.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "어둠 속에서 빛나는 별",
+        "name_en": "Brightly shining star in a dark night sky",
+        "visual_prompt": "hopeful and resilient"
+      }
+    ],
     "location": "밤하늘",
     "mood": "희망, 긍정",
     "source": "srt",
@@ -2127,7 +2247,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "A tiny sprout pushes through the soil, slowly unfurling its leaves. Subtle swaying motion.",
     "video_prompt_full": "A close-up shot of a small sprout emerging from barren land. The camera slowly zooms in on the sprout, highlighting its delicate growth. The scene conveys a sense of hope and potential.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "척박한 땅에서 자라는 작은 싹",
+        "name_en": "A small sprout emerging from barren land",
+        "visual_prompt": "fragile but determined"
+      }
+    ],
     "location": "척박한 땅",
     "mood": "희망, 성장",
     "source": "srt",
@@ -2171,7 +2297,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "The giant tree stands tall and strong, its branches swaying gently in the breeze. Subtle rustling of leaves.",
     "video_prompt_full": "A wide-angle shot of a giant tree in a lush forest. The camera slowly pans across the forest, highlighting the abundance and vibrancy of the ecosystem. The scene conveys a sense of prosperity and fulfillment. Dolly zoom in on the tree.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "울창한 숲을 이루는 거대한 나무",
+        "name_en": "A giant tree dominating a lush forest",
+        "visual_prompt": "strong and fruitful"
+      }
+    ],
     "location": "울창한 숲",
     "mood": "풍요, 번성",
     "source": "srt",
@@ -2216,7 +2348,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Abstract animation of light overcoming darkness. Broken fragments converge towards the light source, symbolizing resilience. Slow zoom out from the light source.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "희망적, 긍정적, 극복",
     "source": "srt",
@@ -2263,7 +2401,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Animation focusing on a shining jewel. Light refracts and emanates outwards. Slow zoom into the jewel, highlighting its brilliance. Subtle camera shake to emphasize the light.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "어두운 공간",
     "mood": "고귀함, 아름다움, 열정",
     "source": "srt",
@@ -2307,7 +2451,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "The GridFlex logo appears above a futuristic city. Energy flows around the logo. Camera pans around the logo, showcasing the cityscape. Slight glow effect around the logo.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시",
     "mood": "혁신적, 미래지향적, 역동적",
     "source": "srt",
@@ -2409,7 +2559,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "Animation of a fortress entrance. A flag waves in the wind. Camera slowly zooms in towards the entrance, emphasizing the strength and security of the fortress. Subtle wind effects on the flag.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "요새",
     "mood": "안정적, 굳건함, 전략적",
     "source": "srt",
@@ -2455,7 +2611,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation in this scene.",
     "video_prompt_full": "A golden arrow flies towards a golden target in slow motion, piercing the center. Soft pastel background. Camera zooms in on the impact.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters in this scene",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상의 공간",
     "mood": "결연한 의지, 희망",
     "source": "srt",
@@ -2548,7 +2710,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation in this scene.",
     "video_prompt_full": "Camera slowly zooms out to reveal a constellation forming in the night sky. Stars twinkle and shine brightly against a deep blue cosmic background.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters in this scene",
+        "visual_prompt": ""
+      }
+    ],
     "location": "우주",
     "mood": "조화, 아름다움, 신비로움",
     "source": "srt",
@@ -2592,7 +2760,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation in this scene.",
     "video_prompt_full": "Camera pans across the vast universe, showing multiple constellations slowly drifting together. They emit a soft, ethereal glow.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters in this scene",
+        "visual_prompt": ""
+      }
+    ],
     "location": "우주",
     "mood": "웅장함, 통합, 연결",
     "source": "srt",
@@ -2637,7 +2811,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation in this scene.",
     "video_prompt_full": "Camera zooms out from a cluster of stars to reveal the majestic Milky Way galaxy forming. The galaxy shines brilliantly against the backdrop of the dark universe.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters in this scene",
+        "visual_prompt": ""
+      }
+    ],
     "location": "우주",
     "mood": "웅장함, 희망, 무한함",
     "source": "srt",
@@ -2731,7 +2911,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation.",
     "video_prompt_full": "The camera slowly zooms out from a globe, showing photos of different countries surrounding it. The scene emphasizes the distance between locations.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "세계 지도",
     "mood": "고독, 분리",
     "source": "srt",
@@ -2824,7 +3010,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation.",
     "video_prompt_full": "The camera focuses on an encouraging banner with bright colors, symbolizing support and motivation. The camera slowly zooms in on the banner.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "응원 현장",
     "mood": "격려, 응원",
     "source": "srt",
@@ -3139,7 +3331,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed for this scene.",
     "video_prompt_full": "A slow zoom into a slightly open door revealing a bright, unknown space. Focus on the light and ethereal atmosphere.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters in this scene.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미지의 공간 입구",
     "mood": "기대감, 신비로움",
     "source": "srt",
@@ -3183,7 +3381,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed for this scene.",
     "video_prompt_full": "A slow pan across a desolate field towards distant mountains under a vibrant sunset sky. Emphasize the vastness and unknown nature of the landscape.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters in this scene.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "황량한 들판",
     "mood": "미지의, 고독한",
     "source": "srt",
@@ -3607,7 +3811,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A, no character.",
     "video_prompt_full": "Establishing shot of a realistic environment. Static camera.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미정",
     "mood": "담담함",
     "source": "srt",
@@ -3863,7 +4073,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A slow zoom into the 'Gas to Power' logo against a sleek blue background. The logo is the primary focus.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간",
     "mood": "희망찬, 미래지향적인",
     "source": "srt",
@@ -3907,7 +4123,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A wide, establishing shot of the UGPS terminal. An LNG carrier is docked at the pier. The sky is blue with scattered clouds. The camera pans slowly across the scene.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "UGPS 터미널",
     "mood": "산업적인, 활기찬",
     "source": "srt",
@@ -3951,7 +4173,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A close-up shot of LNG being unloaded from the carrier through pipes and equipment. Large blue LNG storage tanks are visible in the background. The camera zooms in slightly to emphasize the unloading process.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "LNG 하역 현장",
     "mood": "역동적인, 중요한",
     "source": "srt",
@@ -4044,7 +4272,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A wide, panoramic view of the power plant and gas facilities, highlighting the energy infrastructure. The sky is blue. The camera slowly zooms out, emphasizing the scale of the facilities.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "전력 발전소 및 가스 시설",
     "mood": "웅장한, 중요한",
     "source": "srt",
@@ -4088,7 +4322,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "Two hands slowly reach out and gently connect, symbolizing a business deal closing. Focus on the texture and warmth of the hands.",
     "video_prompt_full": "Close-up shot of two hands reaching out and connecting. Soft, warm lighting. Slow, deliberate movement. The background is blurred to focus on the hands. Zoom in slightly as the hands meet.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "사업가들의 손",
+        "name_en": "Hands of business people",
+        "visual_prompt": ""
+      }
+    ],
     "location": "회의실",
     "mood": "따뜻하고 희망찬",
     "source": "srt",
@@ -4132,7 +4372,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "A group of business people are celebrating a successful deal. They are cheering, raising their hands, and congratulating each other. The atmosphere is energetic and optimistic.",
     "video_prompt_full": "Wide shot of a modern office. Business people are celebrating a successful deal. The camera pans across the room, capturing the excitement and joy of the moment. Zoom in on a few key individuals as they celebrate.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "성공을 축하하는 사업가들",
+        "name_en": "Business people celebrating success",
+        "visual_prompt": ""
+      }
+    ],
     "location": "현대적인 사무실",
     "mood": "기쁘고 활기찬",
     "source": "srt",
@@ -4176,7 +4422,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "The UGPS logo is displayed prominently on a solid foundation. The logo is clean and modern, and the blue color scheme conveys stability and reliability.",
     "video_prompt_full": "Static shot of the UGPS logo on a solid foundation. The camera slowly zooms in on the logo, emphasizing its importance and stability. The background is a clean, modern design.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "UGPS 로고",
+        "name_en": "UGPS logo",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간",
     "mood": "안정적이고 신뢰감 있는",
     "source": "srt",
@@ -4220,7 +4472,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "Energy flows smoothly through a network of power lines, symbolizing a stable power supply. The energy is clean and green, and the technology is futuristic.",
     "video_prompt_full": "Animated shot of a network of power lines and energy flowing smoothly. The camera follows the energy as it travels through the network. The background is a futuristic landscape.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "에너지 흐름",
+        "name_en": "Energy flow",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 전력망",
     "mood": "안정적이고 효율적인",
     "source": "srt",
@@ -4265,7 +4523,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "The power industry and local communities are connected, symbolizing mutual benefit and a bright future. The industry provides clean and reliable energy, and the community benefits from economic development and a higher quality of life.",
     "video_prompt_full": "Shot of the power industry and local communities working together. The camera shows the benefits of their collaboration, such as clean energy, economic development, and a higher quality of life. The background is a vibrant and sustainable landscape.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "산업과 지역 사회",
+        "name_en": "Industry and local community",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시",
     "mood": "희망차고 긍정적인",
     "source": "srt",
@@ -4364,7 +4628,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A dynamic animation of energy flowing through a network, visualized with abstract shapes and colors. The UGPS logo is subtly integrated into the scene. Camera zooms in and out to highlight the energy flow.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "등장인물 없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 에너지 네트워크",
     "mood": "혁신적, 역동적, 미래지향적",
     "source": "srt",
@@ -4410,7 +4680,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "An animated sequence showing the transformation from LPG to LNG. The scene uses fluid transitions and color changes to represent the energy transformation. Camera focuses on the key elements of the process.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "등장인물 없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 에너지 변환 공간",
     "mood": "변화, 발전, 혁신",
     "source": "srt",
@@ -4455,7 +4731,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A sweeping aerial shot of an LNG terminal with large storage tanks. The scene emphasizes the scale and importance of the facility. Camera slowly zooms out to reveal the surrounding landscape.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "등장인물 없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "LNG 터미널",
     "mood": "산업적, 안정적, 깨끗함",
     "source": "srt",
@@ -4501,7 +4783,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "An animated visualization of an expanding energy network, highlighting SK's role in the energy sector. The scene uses dynamic lines and colors to convey growth and innovation. Camera zooms in to showcase the network's complexity.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "등장인물 없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 에너지 네트워크",
     "mood": "혁신적, 역동적, 미래지향적",
     "source": "srt",
@@ -4546,7 +4834,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A - Focus on the gas flames. Animate the flames with realistic flickering and heat distortion.",
     "video_prompt_full": "Close-up shot of natural gas flames burning intensely. The camera slowly pans across the flames, emphasizing their power and energy. Use dynamic lighting to highlight the movement and texture of the flames.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "산업 시설 또는 자연 가스전",
     "mood": "에너지 넘치는, 강렬한",
     "source": "srt",
@@ -4591,7 +4885,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A - Focus on the portfolio and growth charts. Animate the charts to show increasing trends.",
     "video_prompt_full": "Visual representation of a diversified investment portfolio with charts showing positive growth trends. The camera zooms out to reveal a bright and optimistic future landscape.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "사무실 또는 금융 센터",
     "mood": "긍정적인, 희망찬",
     "source": "srt",
@@ -4636,7 +4936,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A - Focus on the turning point and the path ahead.",
     "video_prompt_full": "A slow, deliberate shot of a fork in the road. A weathered sign points towards a 'Turning Point'. The camera pans across the scene, creating a sense of anticipation and uncertainty.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "교차로 또는 분기점",
     "mood": "신중한, 진지한",
     "source": "srt",
@@ -4681,7 +4987,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A - Focus on the uncharted territory and the sense of exploration.",
     "video_prompt_full": "The camera slowly moves forward through a misty landscape, revealing uncharted territory. The scene evokes a sense of exploration and challenge.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미지의 숲 또는 산",
     "mood": "도전적인, 탐험적인",
     "source": "srt",
@@ -5254,7 +5566,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A - No character animation.",
     "video_prompt_full": "Zoom in slowly on the EnerRoute logo against a clean, white background.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "클린 화이트 배경",
     "mood": "신뢰, 혁신",
     "source": "srt",
@@ -5298,7 +5616,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A - No character animation.",
     "video_prompt_full": "The SK Gas logo appears in the center of the screen, with a focus on the logo's design and colors.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "클린 화이트 배경",
     "mood": "에너지, 기업",
     "source": "srt",
@@ -5342,7 +5666,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A - No character animation.",
     "video_prompt_full": "The words 'Net Zero' appear gradually on a green background, emphasizing the color green.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "녹색 배경",
     "mood": "환경, 지속 가능성",
     "source": "srt",
@@ -5387,7 +5717,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A - No character animation.",
     "video_prompt_full": "A close-up of gears interlocking and turning, showing dynamic movement.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "기계 장치 배경",
     "mood": "협력, 역동성",
     "source": "srt",
@@ -5431,7 +5767,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A - No character animation.",
     "video_prompt_full": "A calendar appears on the screen, zooming in on September and highlighting a specific date.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "사무실 배경",
     "mood": "기념, 시작",
     "source": "srt",
@@ -5476,7 +5818,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A sweeping shot of a futuristic cityscape. The camera pans upwards, showcasing towering skyscrapers. Bright streaks of light pulse through the city, representing the flow of energy. The scene conveys a sense of hope and technological advancement. Zoom out slowly to reveal the vastness of the city.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시",
     "mood": "희망찬, 밝은",
     "source": "srt",
@@ -5520,7 +5868,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A close-up shot of strong tree roots extending deep into the earth. The camera slowly moves downwards, emphasizing the depth and stability of the root system. A subtle logo symbolizing the energy industry is incorporated into the roots. The scene uses a warm color palette to convey a sense of strength and reliability. Dolly down to follow the roots further.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "땅 속",
     "mood": "견고한, 안정적인",
     "source": "srt",
@@ -5564,7 +5918,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A time-lapse shot of tree roots spreading and sprouting new shoots. The roots grow rapidly, symbolizing the growth and development of the energy industry. The scene uses a vibrant green color to convey a sense of vitality and progress. The camera zooms in slightly as the roots extend. Fast-forward motion to emphasize the rapid growth.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "땅 속",
     "mood": "성장하는, 발전하는",
     "source": "srt",
@@ -5608,7 +5968,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A close-up shot of a sapling growing, bathed in sunlight. The camera slowly moves upwards, emphasizing the delicate leaves and vibrant green color. The scene conveys a sense of hope and new beginnings. The camera pans up to follow the sapling's growth. Bright sunlight shining down on the sapling.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "자연",
     "mood": "희망찬, 긍정적인",
     "source": "srt",
@@ -5653,7 +6019,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A split-screen showcasing past and present energy production facilities. On one side, windmills and early oil drilling rigs represent the past. On the other side, solar power plants and wind farms represent the present. The camera slowly pans across the screen, highlighting the contrast between the two eras. Dramatic lighting to emphasize the passage of time. Slowly pan across the split-screen.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "과거와 현재의 에너지 생산 시설",
     "mood": "발전, 혁신",
     "source": "srt",
@@ -5752,7 +6124,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A single arrow is released and flies straight towards the center of a target. The camera follows the arrow's trajectory, emphasizing its speed and accuracy. The background is blurred, focusing solely on the arrow and its destination. Slow zoom in on the target as the arrow hits the bullseye.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (추상적인 이미지)",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "결의, 집중",
     "source": "srt",
@@ -5850,7 +6228,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A close-up shot of a sprout emerging from the ground, bathed in sunlight. The camera slowly zooms in, highlighting the delicate details of the new growth. The background is a blur of green and brown, creating a sense of hope and optimism. Gentle pan upwards as the sprout grows.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (추상적인 이미지)",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "자연",
     "mood": "희망, 시작",
     "source": "srt",
@@ -5894,7 +6278,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A visual representation of an idea transforming into a reality. The scene starts with a blueprint, which then morphs into a 3D model, and finally materializes as a finished product. The camera smoothly transitions between each stage, highlighting the progress and evolution of the idea. Focus on the intricate details and the seamless transformation. Subtle zoom in on the final product.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (과정 묘사)",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "성공, 성취",
     "source": "srt",
@@ -5939,7 +6329,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "Wide shot of a power plant complex. The camera slowly zooms in, revealing the intricate details of the pipelines and energy production facilities. The scene transitions to show a more modern and advanced version of the power plant, symbolizing the evolution through policy implementation. Camera: slow zoom in, then a smooth transition.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "산업 단지, 발전소",
     "mood": "발전, 진화, 산업적",
     "source": "srt",
@@ -5983,7 +6379,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "An animated view of architectural blueprints. The camera pans across the blueprints, highlighting the areas where the power plant's size is being adjusted. The changes are clearly visible, showing the scaling up or down of different sections. Camera: slow pan across blueprints.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "설계 사무실",
     "mood": "계획, 조정, 기술적",
     "source": "srt",
@@ -6078,7 +6480,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A wide shot of a substation and heat utilization facility integrated into a modern cityscape. The camera slowly zooms in, highlighting the advanced technology and energy-efficient systems. The scene emphasizes the importance of smart grids in urban environments. Camera: slow zoom in.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "도시, 변전소",
     "mood": "기술, 효율, 현대적",
     "source": "srt",
@@ -6123,7 +6531,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A montage of diverse energy projects, including wind farms, solar thermal plants, and geothermal facilities. The camera pans across these scenes, highlighting the interconnected systems and global network. The scene emphasizes the comprehensive energy solutions offered by the business. Camera: pan and montage.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "다양한 에너지 시설",
     "mood": "포괄적, 확장, 글로벌",
     "source": "srt",
@@ -6415,7 +6829,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed, focus on the power plant.",
     "video_prompt_full": "Wide shot of Ulsan Hydrogen Power Plant Unit 2. Camera slowly pans across the facility showcasing its scale and modern design.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "울산하이드로젠파워 2호 발전소",
     "mood": "산업적, 미래지향적",
     "source": "srt",
@@ -6508,7 +6928,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed, focus on the different energy sources.",
     "video_prompt_full": "Quick cuts showcasing various renewable energy sources: wind turbines spinning, solar panels glistening in the sun, and the hydrogen power plant. The camera swiftly moves between each location.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "다양한 발전소 위치",
     "mood": "희망찬, 에너지 넘치는",
     "source": "srt",
@@ -6552,7 +6978,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed, focus on the completed power plant complex.",
     "video_prompt_full": "Camera slowly zooms out from a close-up of a building within the power plant complex to reveal the entire facility. Drone shot showing the scale of the project and its integration with the surrounding environment.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "발전소 단지",
     "mood": "평화로운, 완성된",
     "source": "srt",
@@ -6596,7 +7028,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed. Focus on the financial growth.",
     "video_prompt_full": "Camera focuses on a graph showing exponential growth, with money and coins visually representing the increasing revenue. The scene is bright and optimistic, conveying financial success.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "사무실 (가상)",
     "mood": "성공적인, 긍정적인",
     "source": "srt",
@@ -6861,7 +7299,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "Camera pans across a series of footprints leading forward on the earth. The scene is lit by the faint light of dawn, creating a sense of hope and progress. Slow, deliberate camera movement.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "대지",
     "mood": "희망찬, 진전",
     "source": "srt",
@@ -6906,7 +7350,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "The camera zooms in on the EnerRoute and SK Gas logos, which are displayed against a vibrant blue background with abstract energy flows. The scene has a corporate presentation style. Slow zoom in.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "스튜디오",
     "mood": "기업적, 미래지향적",
     "source": "srt",
@@ -6951,7 +7401,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "The camera follows a vanguard figure as they charge forward with a flag. Green energy elements and wind effects create a sense of momentum and power. Dynamic camera movement.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 환경",
     "mood": "결의에 찬, 진취적인",
     "source": "srt",
@@ -7046,7 +7502,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "The camera slowly rotates around a stylized representation of a hydrogen molecule structure. The structure is rendered in shades of blue and white, with futuristic design elements and flowing energy lines. Slow, deliberate camera movement.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간",
     "mood": "미래지향적, 혁신적인",
     "source": "srt",
@@ -7090,7 +7552,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation.",
     "video_prompt_full": "Abstract animation of a tree growing upwards, symbolizing the growth of a professional company. Bright colors and a hopeful atmosphere. Camera zooms in slowly.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "희망찬, 긍정적인",
     "source": "srt",
@@ -7134,7 +7602,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation.",
     "video_prompt_full": "Abstract animation of a bright tunnel representing the future. Bright colors and a positive atmosphere. Camera moves forward through the tunnel.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "긍정적인, 미래지향적인",
     "source": "srt",
@@ -7179,7 +7653,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation.",
     "video_prompt_full": "Abstract animation showcasing the SK Gas logo with flowing energy. Green and blue colors. The camera rotates around the logo.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "역동적인, 혁신적인",
     "source": "srt",
@@ -7224,7 +7704,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation.",
     "video_prompt_full": "Visual animation of Net Zero Solution with clean energy sources like solar panels and wind turbines against a blue sky. The camera tilts up towards the sky.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "야외",
     "mood": "친환경적인, 지속 가능한",
     "source": "srt",
@@ -7269,7 +7755,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation.",
     "video_prompt_full": "Animation symbolizing core assets with a solid foundation and bright light. The camera zooms in on the foundation.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적인 공간",
     "mood": "안정적인, 신뢰성 있는",
     "source": "srt",
@@ -7360,7 +7852,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters present in this scene.",
     "video_prompt_full": "A wide shot of Ulsan North Port, showing the rough sea and reclaimed land. The camera slowly pans across the landscape.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "차가운 느낌의 항구 풍경",
+        "name_en": "Cold",
+        "visual_prompt": "industrial harbor landscape"
+      }
+    ],
     "location": "울산 북항",
     "mood": "산업적, 차가움",
     "source": "srt",
@@ -7404,7 +7902,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters present in this scene. The focus is on the massive LNG tank.",
     "video_prompt_full": "A low-angle shot emphasizing the size of the LNG tank under construction. Cranes move in the background.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "거대한 LNG 탱크",
+        "name_en": "Giant LNG tank",
+        "visual_prompt": ""
+      }
+    ],
     "location": "LNG 탱크 건설 현장",
     "mood": "산업적, 웅장함",
     "source": "srt",
@@ -7448,7 +7952,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters present in this scene.",
     "video_prompt_full": "A close-up shot of the LNG tank and its associated piping. The camera slowly zooms in to show the complexity of the system.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "복잡한 배관 시스템",
+        "name_en": "Intricate piping system",
+        "visual_prompt": ""
+      }
+    ],
     "location": "LNG 탱크 설비",
     "mood": "산업적, 복잡함",
     "source": "srt",
@@ -7492,7 +8002,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters present in this scene.",
     "video_prompt_full": "An abstract view of the industrial facility, focusing on the geometric shapes and metallic textures. The camera slowly pans across the scene.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "기능적인 산업 설비",
+        "name_en": "Functional industrial equipment",
+        "visual_prompt": ""
+      }
+    ],
     "location": "산업 시설",
     "mood": "추상적, 기능적",
     "source": "srt",
@@ -7536,7 +8052,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A slow zoom into an hourglass with sand falling, transitioning to a shot of an old book with worn pages and a dusty picture frame. The scene evokes a sense of time passing and history.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "과거를 상징하는 공간",
     "mood": "회상, 역사, 시간의 흐름",
     "source": "srt",
@@ -7629,7 +8151,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A close-up shot of technical drawings and blueprints, highlighting the intricate details and precision. The camera slowly zooms out to reveal a hand-drawn sketch. The scene emphasizes the company's technological expertise.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "설계실",
     "mood": "전문성, 기술, 혁신",
     "source": "srt",
@@ -7726,7 +8254,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A shot of the KET logo (hypothetical), transitioning to a view of a futuristic cityscape with energy-efficient technology. The camera pans across the skyline, highlighting the company's vision for the future.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시",
     "mood": "혁신, 미래, 발전",
     "source": "srt",
@@ -7771,7 +8305,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "Zoom into a futuristic energy storage facility with flowing blue energy streams and glowing effects. The camera slowly pans across the abstract space, highlighting the energy flow.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래형 에너지 저장 시설",
     "mood": "미래지향적, 혁신적",
     "source": "srt",
@@ -7816,7 +8356,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A sweeping shot of an industrial complex with factories and energy pipelines. The camera pans across the scene, highlighting the dynamic movement of energy and the South Korean flag waving in the background.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "산업 단지",
     "mood": "활기찬, 역동적",
     "source": "srt",
@@ -7860,7 +8406,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A close-up shot of a futuristic energy hub with advanced cooling systems. The camera zooms in to showcase the energy efficiency and the intricate details of the cooling technology.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래형 에너지 허브",
     "mood": "첨단 기술, 효율적",
     "source": "srt",
@@ -7904,7 +8456,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A wide, establishing shot of the energy hub, showcasing the various energy sources connected to the central control system. The camera slowly pans across the expansive view, emphasizing the hub's central role.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "에너지 허브",
     "mood": "중심적인, 통합적",
     "source": "srt",
@@ -7948,7 +8506,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "The camera follows energy supply lines as they extend from the energy hub into a bustling cityscape. The scene emphasizes sustainable energy and a clean, pristine environment.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "도시",
     "mood": "지속 가능한, 깨끗한",
     "source": "srt",
@@ -8214,7 +8778,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A wide shot panning across a futuristic cityscape, focusing on renewable energy sources like solar panels and wind turbines. The sky is clear and blue, indicating a clean and sustainable future. Camera slowly zooms in on a specific area showcasing the integration of clean energy into the urban environment.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "None",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시",
     "mood": "희망찬, 발전적인",
     "source": "srt",
@@ -8258,7 +8828,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A close-up shot of an abstract network visualizing data flow. Interconnected nodes light up in blue and green, representing the flow of information. The camera zooms in and out to highlight the complexity and interconnectedness of the network.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "None",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간",
     "mood": "첨단, 연결된",
     "source": "srt",
@@ -8303,7 +8879,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A medium shot showcasing a modern industrial park with SK Multi Utility logo subtly visible. A network of pipelines carries energy, visualized through glowing lines. The camera pans across the park, highlighting the clean energy infrastructure and contemporary factory buildings.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "None",
+        "visual_prompt": ""
+      }
+    ],
     "location": "산업단지",
     "mood": "산업적인, 효율적인",
     "source": "srt",
@@ -8348,7 +8930,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A close-up shot focusing on steam pipes, power lines, and cooling pipes delivering energy to a modern industrial park. The camera follows the flow of energy along the pipelines and power lines. Blue and white color scheme dominates the scene.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "None",
+        "visual_prompt": ""
+      }
+    ],
     "location": "산업단지",
     "mood": "기술적인, 기능적인",
     "source": "srt",
@@ -8392,7 +8980,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A medium shot showcasing the interior of a modern factory with automated equipment and robotic arms. The scene emphasizes energy efficiency technology and a clean, sterile environment. Blue lighting illuminates the factory floor.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "None",
+        "visual_prompt": ""
+      }
+    ],
     "location": "공장 내부",
     "mood": "자동화된, 효율적인",
     "source": "srt",
@@ -8438,7 +9032,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "Drone shot of the Ulsan industrial complex. Focus on the vastness and scale of the industrial area. Slow zoom out to emphasize the location.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "울산 산업단지",
     "mood": "산업적, 활기찬",
     "source": "srt",
@@ -8483,7 +9083,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "Close-up shot of an energy pipeline. Focus on the flow of energy, visualized with blue and white particles. Camera pans along the pipeline, following the energy flow.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "에너지 파이프라인",
     "mood": "안정적인, 역동적인",
     "source": "srt",
@@ -8529,7 +9135,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A wide shot of a city skyline with an overlay of an energy supply network, connecting factories and residential houses. The camera smoothly moves across the city, highlighting the energy connections.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "도시 전경",
     "mood": "연결된, 따뜻한",
     "source": "srt",
@@ -8575,7 +9187,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "An abstract visualization of energy flow, using light and energy particles in blue and gold. The camera follows the dynamic movement of the energy flow.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "추상적 공간",
     "mood": "역동적인, 추상적인",
     "source": "srt",
@@ -8619,7 +9237,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "A focus on the SK Energy logo with a clean and modern background. The camera rotates around the logo, emphasizing the corporate image.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "기업 홍보 공간",
     "mood": "신뢰성 있는, 현대적인",
     "source": "srt",
@@ -8663,7 +9287,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters present. Focus on animating the logo with subtle metallic sheen.",
     "video_prompt_full": "Slow zoom into the Korea Zinc logo, highlighting its metallic texture and corporate colors. Abstract background elements subtly shift and change.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "Abstract corporate space",
     "mood": "Corporate, modern, solid",
     "source": "srt",
@@ -8707,7 +9337,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters present. Animate the S-OIL logo with bright, dynamic colors and subtle movements.",
     "video_prompt_full": "Smooth transition from the Korea Zinc logo to the S-OIL logo. The S-OIL logo is animated with vibrant colors and a dynamic design against a subtly shifting abstract background.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "Abstract corporate space",
     "mood": "Energetic, innovative, corporate",
     "source": "srt",
@@ -8751,7 +9387,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters present. Animate the subtle emergence and floating of the logos above the map.",
     "video_prompt_full": "A stylized map of South Korea with various corporate logos subtly emerging and floating above it. The scene utilizes a clean and modern design with a patriotic color scheme. Camera slowly pans across the map.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "Stylized map of South Korea",
     "mood": "Patriotic, proud, corporate",
     "source": "srt",
@@ -8795,7 +9437,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters present. Animate the abstract lines connecting the logos, creating a sense of network activity.",
     "video_prompt_full": "A visual representation of interconnected corporate logos forming a network, with abstract lines connecting them. The scene features a clean and modern design with corporate colors. The lines animate, showing the interconnectedness.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "Abstract corporate network",
     "mood": "Connected, collaborative, strong",
     "source": "srt",
@@ -8840,7 +9488,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters present. Animate the industrial elements with subtle movements, showcasing strength and stability.",
     "video_prompt_full": "Abstract representation of national infrastructure, including steel girders, power plants, and refineries, set against a backdrop of the South Korean flag colors. The scene features dramatic lighting to emphasize strength and stability. Camera slowly zooms out.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters present.",
+        "visual_prompt": ""
+      }
+    ],
     "location": "Abstract industrial landscape",
     "mood": "Strong, reliable, industrial",
     "source": "srt",
@@ -8884,7 +9538,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "A still shot of hands supporting a building. The building is modern and sleek. The background is a gradient of blue, suggesting a bright, clear sky.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간",
     "mood": "안정적, 희망적",
     "source": "srt",
@@ -8928,7 +9588,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "A close-up shot of a circuit board with heat radiating from various points. The circuit board is complex and detailed, with lines of light representing data flow.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "데이터 센터 내부",
     "mood": "기술적, 역동적",
     "source": "srt",
@@ -8972,7 +9638,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "An abstract animation of hot and cold colors swirling and mixing. The colors are vibrant and contrasting, representing the cycling of energy.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간",
     "mood": "역동적, 추상적",
     "source": "srt",
@@ -9016,7 +9688,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "A detailed shot of a cooling system within an AI data center. The system is advanced and efficient, with pipes and machinery working together to regulate temperature.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "AI 데이터센터",
     "mood": "기술적, 효율적",
     "source": "srt",
@@ -9060,7 +9738,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No character animation needed.",
     "video_prompt_full": "An animated diagram showing the energy recycling process. Arrows indicate the circular flow of energy, highlighting the eco-friendliness and sustainability of the system. Zoom out to show the entire process.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "no characters present",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간",
     "mood": "친환경적, 지속 가능",
     "source": "srt",
@@ -9543,7 +10227,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "Abstract blurred background slowly panning across the screen.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "알 수 없음",
     "mood": "불확실",
     "source": "srt",
@@ -9585,7 +10275,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "Animated KET logo rotating slowly against a clean white background.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간",
     "mood": "전문적",
     "source": "srt",
@@ -9627,7 +10323,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "Animated SK gas logo rotating slowly against a clean white background.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간",
     "mood": "전문적",
     "source": "srt",
@@ -9670,7 +10372,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "Dolly shot through a futuristic cityscape focused on sustainable energy and net zero emissions.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "미래 도시",
     "mood": "희망적",
     "source": "srt",
@@ -9712,7 +10420,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "No characters in this scene.",
     "video_prompt_full": "Zoom into a glowing sphere representing a core asset, with energy flows emanating outwards.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "No characters",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간",
     "mood": "역동적",
     "source": "srt",

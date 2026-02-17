@@ -1,0 +1,40 @@
+[
+  {
+    "name": "삼성 임원들",
+    "name_ko": "삼성 임원들",
+    "name_en": "",
+    "description": "",
+    "description_en": "",
+    "visual_prompt": "Samsung Electronics senior executives in formal dark business suits, serious skeptical expressions, sitting around conference table, professional corporate demeanor",
+    "character_prompt": "Samsung Electronics senior executives in formal dark business suits, serious skeptical expressions, sitting around conference table, professional corporate demeanor",
+    "role": "등장인물",
+    "scenes": [
+      45,
+      46
+    ],
+    "appearance_count": 2,
+    "appearance_scenes": [
+      45,
+      46
+    ]
+  },
+  {
+    "name": "이재용",
+    "name_ko": "이재용",
+    "name_en": "",
+    "description": "",
+    "description_en": "",
+    "visual_prompt": "Lee Jae-yong as Vice Chairman in formal dark suit, serious contemplative expression, reviewing strategic documents, professional executive demeanor, circa 2016 appearance",
+    "character_prompt": "Lee Jae-yong as Vice Chairman in formal dark suit, serious contemplative expression, reviewing strategic documents, professional executive demeanor, circa 2016 appearance",
+    "role": "등장인물",
+    "scenes": [
+      47,
+      48
+    ],
+    "appearance_count": 2,
+    "appearance_scenes": [
+      47,
+      48
+    ]
+  }
+]

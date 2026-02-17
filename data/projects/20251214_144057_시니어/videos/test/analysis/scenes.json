@@ -1593,7 +1593,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A close-up view of the dashboard and various electronic devices inside a car, showcasing the complex and sophisticated technology.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "자동차 내부",
     "mood": "첨단 기술적인",
     "source": "srt",
@@ -1639,7 +1645,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A close-up view of the dashboard and various electronic devices inside a car, showcasing the complex and sophisticated technology.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "자동차 내부",
     "mood": "첨단 기술적인",
     "source": "srt",
@@ -1811,7 +1823,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A close-up view of a car dashboard screen displaying navigation, music playback, and other information, showcasing the car's diverse capabilities.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음",
+        "name_en": "N/A",
+        "visual_prompt": ""
+      }
+    ],
     "location": "자동차 내부",
     "mood": "다채롭고 편리한",
     "source": "srt",
@@ -1985,7 +2003,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A close-up shot of a digital cockpit display. The camera slowly zooms in on the 'Harman' logo. The background reveals the luxurious interior of the car, emphasizing the high-quality and advanced technology. The scene focuses on showcasing Harman's leading position in the digital cockpit market.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (기술 강조)",
+        "name_en": "None (focus on technology)",
+        "visual_prompt": ""
+      }
+    ],
     "location": "고급 자동차 내부",
     "mood": "고급스럽고 기술적인",
     "source": "srt",
@@ -2030,7 +2054,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A close-up shot of a digital cockpit display. The camera slowly zooms in on the 'Harman' logo. The background reveals the luxurious interior of the car, emphasizing the high-quality and advanced technology. The scene focuses on showcasing Harman's leading position in the digital cockpit market.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (기술 강조)",
+        "name_en": "None (focus on technology)",
+        "visual_prompt": ""
+      }
+    ],
     "location": "고급 자동차 내부",
     "mood": "고급스럽고 기술적인",
     "source": "srt",
@@ -2076,7 +2106,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A fast-paced montage featuring the digital cockpit displays of BMW, Mercedes-Benz, Audi, and Hyundai cars. The 'Harman' system logo is subtly integrated into each display. The scene highlights the widespread adoption of Harman's technology across various leading automotive brands, showcasing its industry influence.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (브랜드 강조)",
+        "name_en": "None (focus on brands)",
+        "visual_prompt": ""
+      }
+    ],
     "location": "다양한 자동차 내부",
     "mood": "신뢰감 있고 광범위한",
     "source": "srt",
@@ -2123,7 +2159,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A fast-paced montage featuring the digital cockpit displays of BMW, Mercedes-Benz, Audi, and Hyundai cars. The 'Harman' system logo is subtly integrated into each display. The scene highlights the widespread adoption of Harman's technology across various leading automotive brands, showcasing its industry influence.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (브랜드 강조)",
+        "name_en": "None (focus on brands)",
+        "visual_prompt": ""
+      }
+    ],
     "location": "다양한 자동차 내부",
     "mood": "신뢰감 있고 광범위한",
     "source": "srt",
@@ -2167,7 +2209,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A static shot showcasing the Samsung logo and the Harman logo side-by-side. The background displays the Samsung Electronics headquarters building. The scene emphasizes the strategic acquisition of Harman by Samsung, highlighting the synergy between the two technology giants.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (기업 간 관계 강조)",
+        "name_en": "None (focus on the relationship between the companies)",
+        "visual_prompt": ""
+      }
+    ],
     "location": "삼성전자 본사",
     "mood": "전략적이고 미래지향적인",
     "source": "srt",
@@ -2212,7 +2260,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A static shot showcasing the Samsung logo and the Harman logo side-by-side. The background displays the Samsung Electronics headquarters building. The scene emphasizes the strategic acquisition of Harman by Samsung, highlighting the synergy between the two technology giants.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (기업 간 관계 강조)",
+        "name_en": "None (focus on the relationship between the companies)",
+        "visual_prompt": ""
+      }
+    ],
     "location": "삼성전자 본사",
     "mood": "전략적이고 미래지향적인",
     "source": "srt",
@@ -2257,7 +2311,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A visually striking representation of 8 billion dollars, such as a towering stack of dollar bills or a dynamic graph illustrating the amount. The Samsung and Harman logos are discreetly placed in the scene. The scene underscores the magnitude of Samsung's investment in acquiring Harman, highlighting the financial commitment to future technology.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (투자 금액 강조)",
+        "name_en": "None (focus on the investment amount)",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간 (투자 금액 강조)",
     "mood": "압도적이고 투자적인",
     "source": "srt",
@@ -2303,7 +2363,13 @@
     "camera_suggestion": "",
     "video_prompt_character": "N/A",
     "video_prompt_full": "A visually striking representation of 8 billion dollars, such as a towering stack of dollar bills or a dynamic graph illustrating the amount. The Samsung and Harman logos are discreetly placed in the scene. The scene underscores the magnitude of Samsung's investment in acquiring Harman, highlighting the financial commitment to future technology.",
-    "characters": [],
+    "characters": [
+      {
+        "name": "없음 (투자 금액 강조)",
+        "name_en": "None (focus on the investment amount)",
+        "visual_prompt": ""
+      }
+    ],
     "location": "가상 공간 (투자 금액 강조)",
     "mood": "압도적이고 투자적인",
     "source": "srt",

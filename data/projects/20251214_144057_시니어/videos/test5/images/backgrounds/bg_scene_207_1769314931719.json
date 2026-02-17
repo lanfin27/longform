@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-25T13:22:11.720062",
+  "image_file": "bg_scene_207_1769314931719.png",
+  "scene_id": 207,
+  "prompts": {
+    "original": "World map highlighting geopolitical tension zones, international trade route visualization, country flags in conflict, global politics infographic, risk assessment world view, dark serious atmosphere with red highlight areas",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, World map highlighting geopolitical tension zones, international trade route visualization, country flags in conflict, global politics infographic, risk assessment world view, dark serious atmosphere with red highlight areas, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 2098545503
+  }
+}

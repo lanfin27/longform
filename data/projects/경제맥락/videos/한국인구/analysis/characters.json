@@ -1,0 +1,340 @@
+[
+  {
+    "name": "일론 머스크",
+    "name_ko": "일론 머스크",
+    "role": "등장인물",
+    "visual_prompt": "a visionary entrepreneur, delivering a serious and thought-provoking speech, with a grave and concerned expression, wearing a dark suit",
+    "description": "",
+    "scenes": [
+      1,
+      2,
+      3,
+      130,
+      131,
+      132
+    ],
+    "appearance_scenes": [
+      1,
+      2,
+      3,
+      130,
+      131,
+      132
+    ]
+  },
+  {
+    "name": "대가족 (부모님과 아이들)",
+    "name_ko": "대가족 (부모님과 아이들)",
+    "role": "등장인물",
+    "visual_prompt": "parents and five to six children, happy and active, traditional 1960s Korean clothing",
+    "description": "",
+    "scenes": [
+      25,
+      26,
+      27
+    ],
+    "appearance_scenes": [
+      25,
+      26,
+      27
+    ]
+  },
+  {
+    "name": "실직자들",
+    "name_ko": "실직자들",
+    "role": "등장인물",
+    "visual_prompt": "disheartened, dressed in shabby clothes, wandering the streets with somber and desperate expressions, conveying a sense of loss and hopelessness",
+    "description": "",
+    "scenes": [
+      40,
+      41,
+      42
+    ],
+    "appearance_scenes": [
+      40,
+      41,
+      42
+    ]
+  },
+  {
+    "name": "젊은 커플",
+    "name_ko": "젊은 커플",
+    "role": "등장인물",
+    "visual_prompt": "disheartened Asian couple, looking up at towering apartment complexes, expressing frustration and helplessness, dressed in casual modern attire",
+    "description": "",
+    "scenes": [
+      52,
+      53,
+      54
+    ],
+    "appearance_scenes": [
+      52,
+      53,
+      54
+    ]
+  },
+  {
+    "name": "젊은 아시아인",
+    "name_ko": "젊은 아시아인",
+    "role": "등장인물",
+    "visual_prompt": "seen from behind, sitting in a small, cramped apartment, with a disheartened expression, reflecting economic struggle, casual clothing",
+    "description": "",
+    "scenes": [
+      55,
+      56,
+      57
+    ],
+    "appearance_scenes": [
+      55,
+      56,
+      57
+    ]
+  },
+  {
+    "name": "아이",
+    "name_ko": "아이",
+    "role": "등장인물",
+    "visual_prompt": "Asian child studying intently at a desk, surrounded by textbooks",
+    "description": "",
+    "scenes": [
+      58,
+      59,
+      60
+    ],
+    "appearance_scenes": [
+      25,
+      26,
+      27
+    ]
+  },
+  {
+    "name": "부모",
+    "name_ko": "부모",
+    "role": "등장인물",
+    "visual_prompt": "Two Asian parents, looking worried and stressed, reviewing stacks of private education bills and receipts, reflecting financial burden",
+    "description": "",
+    "scenes": [
+      58,
+      59,
+      60,
+      64,
+      65,
+      66
+    ],
+    "appearance_scenes": [
+      25,
+      26,
+      27
+    ]
+  },
+  {
+    "name": "미혼 남녀",
+    "name_ko": "미혼 남녀",
+    "role": "등장인물",
+    "visual_prompt": "A young Asian man and woman, standing together with worried expressions, looking at a smartphone screen, reflecting urban anxiety and financial uncertainty, casual modern attire",
+    "description": "",
+    "scenes": [
+      61,
+      62,
+      63
+    ],
+    "appearance_scenes": [
+      61,
+      62,
+      63
+    ]
+  },
+  {
+    "name": "한 사람",
+    "name_ko": "한 사람",
+    "role": "등장인물",
+    "visual_prompt": "looking overwhelmed and exhausted by the weight of life, with a contemplative and slightly distressed expression, dressed in casual, worn clothing",
+    "description": "",
+    "scenes": [
+      67,
+      68,
+      69
+    ],
+    "appearance_scenes": [
+      67,
+      68,
+      69
+    ]
+  },
+  {
+    "name": "현대 여성들",
+    "name_ko": "현대 여성들",
+    "role": "등장인물",
+    "visual_prompt": "Silhouettes of modern women, depicted in various poses suggesting diverse life choices like career, travel, or hobbies, with a sense of independence and agency",
+    "description": "",
+    "scenes": [
+      70,
+      71,
+      72
+    ],
+    "appearance_scenes": [
+      70,
+      71,
+      72
+    ]
+  },
+  {
+    "name": "아시아 여성",
+    "name_ko": "아시아 여성",
+    "role": "등장인물",
+    "visual_prompt": "thoughtful, concerned, standing in a modern office hallway, with a subtle expression of contemplation and worry, wearing business casual attire, realistic and relatable",
+    "description": "",
+    "scenes": [
+      73,
+      74,
+      75,
+      76,
+      77,
+      78
+    ],
+    "appearance_scenes": [
+      73,
+      74,
+      75,
+      76,
+      77,
+      78
+    ]
+  },
+  {
+    "name": "군인들",
+    "name_ko": "군인들",
+    "role": "등장인물",
+    "visual_prompt": "soldiers in military uniforms, with grave, concerned, or disillusioned expressions",
+    "description": "",
+    "scenes": [
+      127,
+      128,
+      129
+    ],
+    "appearance_scenes": [
+      127,
+      128,
+      129
+    ]
+  },
+  {
+    "name": "노인들",
+    "name_ko": "노인들",
+    "role": "등장인물",
+    "visual_prompt": "elderly people with worried and concerned expressions, conveying a sense of anxiety about their future",
+    "description": "",
+    "scenes": [
+      133,
+      134,
+      135
+    ],
+    "appearance_scenes": [
+      133,
+      134,
+      135
+    ]
+  },
+  {
+    "name": "실직한 사람",
+    "name_ko": "실직한 사람",
+    "role": "등장인물",
+    "visual_prompt": "solitary figure, seen from behind, head bowed in a posture of dejection, wearing plain clothes, conveying a sense of despair and unemployment",
+    "description": "",
+    "scenes": [
+      169,
+      170,
+      171
+    ],
+    "appearance_scenes": [
+      67,
+      68,
+      69
+    ]
+  },
+  {
+    "name": "다문화 학생들",
+    "name_ko": "다문화 학생들",
+    "role": "등장인물",
+    "visual_prompt": "students from diverse nationalities and backgrounds, smiling brightly, attentive and engaged",
+    "description": "",
+    "scenes": [
+      178,
+      179,
+      180
+    ],
+    "appearance_scenes": [
+      178,
+      179,
+      180
+    ]
+  },
+  {
+    "name": "한국인 학생들",
+    "name_ko": "한국인 학생들",
+    "role": "등장인물",
+    "visual_prompt": "Korean students, smiling brightly, attentive and engaged, participating with multicultural students",
+    "description": "",
+    "scenes": [
+      178,
+      179,
+      180
+    ],
+    "appearance_scenes": [
+      178,
+      179,
+      180
+    ]
+  },
+  {
+    "name": "병사",
+    "name_ko": "병사",
+    "role": "등장인물",
+    "visual_prompt": "A single soldier, focused expression, wearing futuristic military uniform, operating a holographic interface",
+    "description": "",
+    "scenes": [
+      187,
+      188,
+      189
+    ],
+    "appearance_scenes": [
+      187,
+      188,
+      189
+    ]
+  },
+  {
+    "name": "여군",
+    "name_ko": "여군",
+    "role": "등장인물",
+    "visual_prompt": "A female soldier in a modern military uniform, focused and commanding, operating a sleek tablet with strategic maps",
+    "description": "",
+    "scenes": [
+      190,
+      191,
+      192
+    ],
+    "appearance_scenes": [
+      190,
+      191,
+      192
+    ]
+  },
+  {
+    "name": "토론 참여자들",
+    "name_ko": "토론 참여자들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse individuals from various backgrounds, engaged in an intense, focused debate, expressing different opinions",
+    "description": "",
+    "scenes": [
+      193,
+      194,
+      195
+    ],
+    "appearance_scenes": [
+      193,
+      194,
+      195
+    ]
+  }
+]

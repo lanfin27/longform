@@ -1,0 +1,14 @@
+{
+  "이재용": {
+    "success": true,
+    "character_name": "이재용",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test12\\images\\characters\\char_이재용_standing_1769350260572.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test12\\images\\characters\\char_이재용_standing_1769350260572.png",
+    "prompt": "animation style character,, Mature Korean businessman in formal business attire, deep in thought with confident expression, full body character, standing pose, front view, neutral expression, simple solid light gray background, no shadows on background, clean edges suitable for compositing, centered in frame, single character only, clean lines, flat colors, simple background",
+    "pose": "standing",
+    "background": "solid_gray",
+    "seed": 1186810803,
+    "generation_time": 10.019602060317993,
+    "api_provider": "Google ImageFX"
+  }
+}

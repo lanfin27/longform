@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-09T15:10:19.073410",
+  "image_file": "bg_scene_058_1770617419072.png",
+  "scene_id": 58,
+  "prompts": {
+    "original": "A dynamic visual transition, showing an elegant lipstick fading out on one side, while on the other side, a beautifully arranged 'dojjongku' dessert (Korean chewy cookie dessert), a minimalist bottle of niche perfume, and a meticulously crafted omakase sushi dish emerge, symbolizing the shift in modern 'small luxury' trends. The composition is vibrant and contemporary, with sophisticated styling and subtle, appealing lighting, reflecting current consumer desires. no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A dynamic visual transition, showing an elegant lipstick fading out on one side, while on the other side, a beautifully arranged 'dojjongku' dessert (Korean chewy cookie dessert), a minimalist bottle of niche perfume, and a meticulously crafted omakase sushi dish emerge, symbolizing the shift in modern 'small luxury' trends. The composition is vibrant and contemporary, with sophisticated styling and subtle, appealing lighting, reflecting current consumer desires. no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1667921288
+  },
+  "scene_number": 59,
+  "copied_from": {
+    "scene_number": 58,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\backgrounds\\bg_scene_058_1770617419072.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-09T15:19:10.150015"
+}

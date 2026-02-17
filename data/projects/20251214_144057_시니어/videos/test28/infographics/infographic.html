@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>삼성전자 전장사업 분석 인포그래픽</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --canvas-width: 1280px;
+            --canvas-height: 720px;
+            --bg: #ffffff;
+            --text: #222222;
+            --red: #ef4444;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --yellow: #facc15;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --gray: #555555;
+            --light-gray: #f5f5f5;
+            --light-pink: #fce4ec;
+            --light-blue: #dbeafe;
+            --light-green: #dcfce7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Nanum Pen Script', cursive;
+            overflow: hidden;
+        }
+
+        #video-canvas {
+            width: var(--canvas-width);
+            height: var(--canvas-height);
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+
+        .scene {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+            background: #ffffff;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .scene.active { display: flex; }
+
+        /* 타이포그래피 */
+        h1 { font-size: 76px; line-height: 1.2; margin-bottom: 20px; }
+        h2 { font-size: 58px; line-height: 1.3; margin-bottom: 15px; }
+        p { font-size: 46px; line-height: 1.4; color: var(--gray); }
+        .text-sm { font-size: 38px; }
+        .text-xs { font-size: 32px; }
+
+        /* 색상 */
+        .text-red { color: var(--red); }
+        .text-green { color: var(--green); }
+        .text-blue { color: var(--blue); }
+        .text-purple { color: var(--purple); }
+        .text-orange { color: var(--orange); }
+
+        /* 하이라이트 */
+        .hl-yellow { background: var(--yellow); padding: 5px 15px; border-radius: 8px; }
+        .hl-pink { background: var(--light-pink); padding: 5px 15px; border-radius: 8px; }
+
+        /* 박스 모델 */
+        .box, .box-gray, .box-pink, .box-blue, .box-green, .box-yellow {
+            border: 3px solid var(--text);
+            border-radius: 15px;
+            padding: 30px 45px;
+            background: white;
+            filter: url(#rough-edge);
+            white-space: nowrap;
+            width: auto;
+            min-width: fit-content;
+            max-width: 90%;
+            margin: 15px 0;
+        }
+        .box-gray { background: var(--light-gray); }
+        .box-pink { background: var(--light-pink); }
+        .box-blue { background: var(--light-blue); }
+        .box-green { background: var(--light-green); }
+        .box-yellow { background: #fef9c3; }
+
+        /* 차트 요소 */
+        .bar {
+            background: var(--gray);
+            border: 3px solid var(--text);
+            border-radius: 8px;
+            filter: url(#rough-strong);
+            transition: height 0.5s ease;
+        }
+        .bar-red { background: var(--red); }
+        .bar-green { background: var(--green); }
+        .bar-blue { background: var(--blue); }
+
+        .gauge-track {
+            width: 100%;
+            height: 50px;
+            background: var(--light-gray);
+            border: 3px solid var(--text);
+            border-radius: 25px;
+            overflow: hidden;
+            filter: url(#rough-edge);
+        }
+        .gauge-fill {
+            height: 100%;
+            border-radius: 22px;
+            filter: url(#rough-strong);
+        }
+
+        /* 애니메이션 */
+        @keyframes bounce-subtle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes pulse-red { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .animate-subtle { animation: bounce-subtle 4s ease-in-out infinite; }
+        .animate-pulse-red { animation: pulse-red 2s infinite; }
+        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+
+        /* 하단 컨트롤 바 */
+        #controls {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background: var(--light-gray);
+            border: 2px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 24px;
+        }
+        .btn:hover { background: #eee; }
+        #progress-container {
+            width: 300px;
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            height: 100%;
+            background: var(--blue);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="rough-edge">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+        </filter>
+        <filter id="rough-strong">
+            <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+        </filter>
+    </svg>
+
+    <div id="video-canvas">
+        <!-- 씬 1: 도입 -->
+        <div class="scene active" id="scene1">
+            <div class="animate-subtle">
+                <i class="fa-solid fa-building-columns" style="font-size: 150px; color: var(--blue);"></i>
+            </div>
+            <h1 style="margin-top: 40px;">삼성전자 하면<br>뭐가 떠오르세요?</h1>
+        </div>
+
+        <!-- 씬 2: 제품 나열 -->
+        <div class="scene" id="scene2">
+            <div style="display: flex; gap: 50px;">
+                <div class="box-gray" style="text-align: center;">
+                    <i class="fa-solid fa-mobile-screen" style="font-size: 80px;"></i>
+                    <p style="margin-top: 10px;">스마트폰</p>
+                </div>
+                <div class="box-gray" style="text-align: center;">
+                    <i class="fa-solid fa-microchip" style="font-size: 80px;"></i>
+                    <p style="margin-top: 10px;">반도체</p>
+                </div>
+                <div class="box-gray" style="text-align: center;">
+                    <i class="fa-solid fa-tv" style="font-size: 80px;"></i>
+                    <p style="margin-top: 10px;">TV</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 3: 2조원 인수 질문 -->
+        <div class="scene" id="scene3">
+            <div class="box-pink" style="padding: 50px 80px;">
+                <h2 class="text-red">지금 삼성이 2조원을 들여</h2>
+                <h1>사려는 게 뭔지 아세요?</h1>
+            </div>
+            <i class="fa-solid fa-question animate-subtle" style="font-size: 100px; color: var(--orange); margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 4: 자동차의 눈 -->
+        <div class="scene" id="scene4">
+            <div style="position: relative;">
+                <i class="fa-solid fa-car" style="font-size: 200px; color: var(--gray);"></i>
+                <i class="fa-solid fa-eye animate-pulse-red" style="position: absolute; top: 20px; right: 40px; font-size: 60px; color: var(--red);"></i>
+            </div>
+            <h1 style="margin-top: 30px;">"자동차의 눈"</h1>
+            <p>세상을 보는 눈을 사고 있습니다</p>
+        </div>
+
+        <!-- 씬 5: 회사 로고들 -->
+        <div class="scene" id="scene5">
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <div class="box-blue">삼성/하만</div>
+                <i class="fa-solid fa-plus" style="font-size: 40px;"></i>
+                <div class="box-green">독일 ZF</div>
+            </div>
+            <h2 style="margin-top: 30px;">자율주행 사업부 인수</h2>
+        </div>
+
+        <!-- 씬 6: 금액 강조 -->
+        <div class="scene" id="scene6">
+            <p class="text-gray">인수 금액</p>
+            <h1 style="font-size: 160px; color: var(--red);">2<span style="font-size: 60px;">조 원</span></h1>
+            <p>(15억 유로)</p>
+        </div>
+
+        <!-- 씬 7: 중요성 질문 -->
+        <div class="scene" id="scene7">
+            <h1 style="font-size: 100px;">근데 이게 <span class="hl-yellow">왜 중요하냐</span></h1>
+        </div>
+
+        <!-- 씬 8: 경청 유도 -->
+        <div class="scene" id="scene8">
+            <i class="fa-solid fa-ear-listen animate-subtle" style="font-size: 120px; color: var(--blue);"></i>
+            <h2 style="margin-top: 30px;">지금부터 하는 얘기 끝까지 들으시면</h2>
+        </div>
+
+        <!-- 씬 9: 기업들 나열 -->
+        <div class="scene" id="scene9">
+            <div style="display: flex; gap: 30px;">
+                <div class="box">TESLA</div>
+                <div class="box">BMW</div>
+                <div class="box">삼성전자</div>
+            </div>
+            <h2 style="margin-top: 30px;">이 거대 기업들의 관계가 보입니다</h2>
+        </div>
+
+        <!-- 씬 10: 현대차 의미 -->
+        <div class="scene" id="scene10">
+            <div class="box-gray" style="padding: 40px 60px;">
+                <h1 style="color: #002c5f;">HYUNDAI</h1>
+                <p>현대차에게는 어떤 의미일까?</p>
+            </div>
+        </div>
+
+        <!-- 씬 11: 소름 강조 -->
+        <div class="scene" id="scene11">
+            <i class="fa-solid fa-icicles animate-subtle" style="font-size: 120px; color: var(--blue);"></i>
+            <h1 style="margin-top: 30px;">조사하면서 <span class="text-blue">소름</span> 돋았습니다</h1>
+        </div>
+
+        <!-- 씬 12: 무서운 회사 -->
+        <div class="scene" id="scene12">
+            <div class="box" style="border-width: 5px;">
+                <h1>삼성, 진짜 무서운 회사다</h1>
+            </div>
+        </div>
+
+        <!-- 씬 13: 시작 -->
+        <div class="scene" id="scene13">
+            <i class="fa-solid fa-play animate-pulse-red" style="font-size: 100px; color: var(--green);"></i>
+            <h1 style="margin-top: 20px;">자, 시작해볼게요!</h1>
+        </div>
+
+        <!-- 씬 14: 기본 지식 -->
+        <div class="scene" id="scene14">
+            <h2 class="text-gray">STEP 01</h2>
+            <h1>기본부터 깔고 갑시다</h1>
+        </div>
+
+        <!-- 씬 15: 하만 질문 -->
+        <div class="scene" id="scene15">
+            <div class="box-blue">HARMAN</div>
+            <h2>하만, 뭐하는 회사인지 아세요?</h2>
+        </div>
+
+        <!-- 씬 16: 브랜드 나열 -->
+        <div class="scene" id="scene16">
+            <div style="display: flex; gap: 20px;">
+                <div class="box-gray">JBL</div>
+                <div class="box-gray">Harman/Kardon</div>
+                <div class="box-gray">AKG</div>
+            </div>
+            <p style="margin-top: 20px;">우리에게 친숙한 오디오 브랜드들</p>
+        </div>
+
+        <!-- 씬 17: 하만 소속 -->
+        <div class="scene" id="scene17">
+            <div style="display: flex; align-items: center; gap: 40px;">
+                <div class="box-gray">JBL, AKG...</div>
+                <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
+                <div class="box-blue">모두 하만 것!</div>
+            </div>
+        </div>
+
+        <!-- 씬 18: 음향 전설 -->
+        <div class="scene" id="scene18">
+            <i class="fa-solid fa-headphones animate-subtle" style="font-size: 120px; color: var(--purple);"></i>
+            <h2 style="margin-top: 30px;">음향기기 덕후들에겐 <span class="text-purple">전설</span>이죠</h2>
+        </div>
+
+        <!-- 씬 19: 하만의 정체 -->
+        <div class="scene" id="scene19">
+            <h1 style="font-size: 80px;">하지만 진짜 정체는...</h1>
+            <i class="fa-solid fa-mask animate-subtle" style="font-size: 100px; margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 20: 전장 설명 -->
+        <div class="scene" id="scene20">
+            <div class="box-blue" style="padding: 40px 60px;">
+                <h1 style="font-size: 80px;">전장 (電裝)</h1>
+                <p>자동차용 전자장치 부품</p>
+            </div>
+        </div>
+
+        <!-- 씬 21: 하만 절대 강자 -->
+        <div class="scene" id="scene21">
+            <div class="box-blue">HARMAN</div>
+            <i class="fa-solid fa-crown animate-subtle" style="font-size: 80px; color: var(--yellow);"></i>
+            <h2>전장 분야의 절대 강자</h2>
+        </div>
+
+        <!-- 씬 22: 디지털 콕핏 소개 -->
+        <div class="scene" id="scene22">
+            <div style="width: 600px; height: 300px; border: 3px solid #333; border-radius: 20px; background: #222; position: relative;">
+                <div style="position: absolute; left: 50px; top: 50px; width: 150px; height: 150px; border-radius: 50%; border: 5px solid #00ff00;"></div>
+                <div style="position: absolute; right: 50px; top: 100px; width: 300px; height: 100px; background: #444; border-radius: 10px;"></div>
+            </div>
+            <h2 style="margin-top: 30px;">요즘 차의 커다란 화면들</h2>
+        </div>
+
+        <!-- 씬 23: 기능 나열 -->
+        <div class="scene" id="scene23">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                <div class="box-gray"><i class="fa-solid fa-map"></i><br>내비</div>
+                <div class="box-gray"><i class="fa-solid fa-music"></i><br>음악</div>
+                <div class="box-gray"><i class="fa-solid fa-wind"></i><br>공조</div>
+            </div>
+        </div>
+
+        <!-- 씬 24: 콕핏 세계 1등 -->
+        <div class="scene" id="scene24">
+            <h2>디지털 콕핏</h2>
+            <h1 class="text-blue">세계 1위 하만</h1>
+            <div class="gauge-track" style="width: 70%; margin-top: 20px;">
+                <div class="gauge-fill" style="width: 85%; background: var(--blue);"></div>
+            </div>
+        </div>
+
+        <!-- 씬 25: 브랜드들 -->
+        <div class="scene" id="scene25">
+            <div style="display: flex; gap: 30px;">
+                <div class="box">BMW</div>
+                <div class="box">BENZ</div>
+                <div class="box">AUDI</div>
+            </div>
+            <p style="margin-top: 30px;">명차들은 이미 하만을 씁니다</p>
+        </div>
+
+        <!-- 씬 26: 현대차도 하만 -->
+        <div class="scene" id="scene26">
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <div class="box" style="color: #002c5f;">HYUNDAI</div>
+                <i class="fa-solid fa-handshake" style="font-size: 50px;"></i>
+                <div class="box-blue">HARMAN</div>
+            </div>
+        </div>
+
+        <!-- 씬 27: 인수 시점 질문 -->
+        <div class="scene" id="scene27">
+            <h2 class="text-gray">그럼 삼성이 언제 샀느냐?</h2>
+            <i class="fa-solid fa-calendar-days animate-subtle" style="font-size: 100px;"></i>
+        </div>
+
+        <!-- 씬 28: 2017년 -->
+        <div class="scene" id="scene28">
+            <h1 style="font-size: 180px;" class="animate-subtle">2017</h1>
+        </div>
+
+        <!-- 씬 29: 인수 금액 -->
+        <div class="scene" id="scene29">
+            <h1 class="text-red">10조 원</h1>
+            <p>(80억 달러)</p>
+            <i class="fa-solid fa-money-bill-trend-up" style="font-size: 80px; color: var(--green); margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 30: 당시 반응 -->
+        <div class="scene" id="scene30">
+            <div style="display: flex; gap: 20px;">
+                <span style="font-size: 80px;">🤔</span>
+                <span style="font-size: 80px;">🤨</span>
+                <span style="font-size: 80px;">🧐</span>
+            </div>
+            <h2 style="margin-top: 20px;">당시 사람들의 반응은?</h2>
+        </div>
+
+        <!-- 씬 31: 비판적 질문 -->
+        <div class="scene" id="scene31">
+            <div class="box-pink">
+                <h1>"왜 스피커 회사를 사?"</h1>
+            </div>
+            <p style="margin-top: 20px;">이해가 안 된다는 반응들</p>
+        </div>
+
+        <!-- 씬 32: 반응 요약 -->
+        <div class="scene" id="scene32">
+            <h1 style="text-decoration: line-through; opacity: 0.5;">스피커 회사</h1>
+            <h1 class="text-blue">신의 한 수</h1>
+        </div>
+
+        <!-- 씬 33: 이재용 회장의 생각 -->
+        <div class="scene" id="scene33">
+            <div class="animate-subtle">
+                <i class="fa-solid fa-lightbulb" style="font-size: 150px; color: var(--yellow);"></i>
+            </div>
+            <h1 style="margin-top: 30px;">이재용 회장의 생각은<br><span class="text-red">달랐습니다</span></h1>
+        </div>
+
+        <!-- 씬 34: 미래 통찰 -->
+        <div class="scene" id="scene34">
+            <h1>스피커가 아니라</h1>
+            <h1 class="text-blue">미래를 보았습니다</h1>
+        </div>
+
+        <!-- 씬 35: 자동차의 미래 -->
+        <div class="scene" id="scene35">
+            <i class="fa-solid fa-car-side animate-subtle" style="font-size: 150px; color: var(--blue);"></i>
+            <h2 style="margin-top: 20px;">자동차 산업의 대격변</h2>
+        </div>
+
+        <!-- 씬 36: 산업 읽기 -->
+        <div class="scene" id="scene36">
+            <div class="box-gray" style="padding: 40px 60px;">
+                <h2>산업의 판을 읽다</h2>
+                <i class="fa-solid fa-book-open-reader" style="font-size: 60px; margin-top: 15px;"></i>
+            </div>
+        </div>
+
+        <!-- 씬 37: 바퀴 달린 컴퓨터 -->
+        <div class="scene" id="scene37">
+            <div style="position: relative;">
+                <i class="fa-solid fa-computer" style="font-size: 150px;"></i>
+                <div style="display: flex; justify-content: space-around; width: 150px; margin: 0 auto; margin-top: -30px;">
+                    <i class="fa-solid fa-circle" style="font-size: 40px;"></i>
+                    <i class="fa-solid fa-circle" style="font-size: 40px;"></i>
+                </div>
+            </div>
+            <h1 style="margin-top: 30px;">"바퀴 달린 컴퓨터"</h1>
+        </div>
+
+        <!-- 씬 38: 미래 강자 -->
+        <div class="scene" id="scene38">
+            <div class="box-purple" style="padding: 40px;">
+                <h1>두뇌 + 신경망</h1>
+                <p>미래 자동차의 핵심 주도권</p>
+            </div>
+        </div>
+
+        <!-- 씬 39: 2017년의 안목 -->
+        <div class="scene" id="scene39">
+            <h1>2017년에 이미...</h1>
+            <div class="box-yellow" style="margin-top: 20px;">
+                <h2>남들보다 <span class="text-red">8년</span> 앞선 생각</h2>
+            </div>
+        </div>
+
+        <!-- 씬 40: 인수 결과 -->
+        <div class="scene" id="scene40">
+            <h2 class="text-gray">하만 인수 8년 후...</h2>
+            <h1>어떤 결과가 나왔을까요?</h1>
+        </div>
+
+        <!-- 씬 41: 하만 매출 -->
+        <div class="scene" id="scene41">
+            <p class="text-gray">2025년 1분기 하만 매출</p>
+            <h1 style="font-size: 120px;" class="text-blue">3조 4천억</h1>
+            <div class="bar-blue bar" style="width: 500px; height: 40px; margin-top: 20px;"></div>
+        </div>
+
+        <!-- 씬 42: 영업 이익 -->
+        <div class="scene" id="scene42">
+            <p class="text-gray">영업 이익</p>
+            <h1 style="font-size: 120px;" class="text-green">3천억</h1>
+            <div class="gauge-track" style="width: 60%; margin-top: 20px;">
+                <div class="gauge-fill" style="width: 70%; background: var(--green);"></div>
+            </div>
+        </div>
+
+        <!-- 씬 43: TV 사업부 비교 -->
+        <div class="scene" id="scene43">
+            <div style="display: flex; gap: 50px; align-items: flex-end;">
+                <div style="text-align: center;">
+                    <div class="bar-blue bar" style="width: 100px; height: 200px;"></div>
+                    <p style="margin-top: 15px;">TV 사업부</p>
+                </div>
+                <div style="font-size: 50px; margin-bottom: 80px;">≒</div>
+                <div style="text-align: center;">
+                    <div class="bar-green bar" style="width: 100px; height: 195px;"></div>
+                    <p style="margin-top: 15px;">하만</p>
+                </div>
+            </div>
+            <h2 style="margin-top: 30px;">TV 사업부와 맞먹는 수준</h2>
+        </div>
+
+        <!-- 씬 44: 수익성 놀라움 -->
+        <div class="scene" id="scene44">
+            <h1 class="text-red">"스피커가 TV만큼 번다"</h1>
+            <i class="fa-solid fa-money-bill-1-wave animate-subtle" style="font-size: 100px; color: var(--green); margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 45: 멈추지 않는 삼성 -->
+        <div class="scene" id="scene45">
+            <h1 style="font-size: 80px;">삼성은 여기서<br><span class="text-red">멈추지 않았습니다</span></h1>
+            <i class="fa-solid fa-forward-step animate-pulse-red" style="font-size: 100px; margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 46: 하만 강점 질문 -->
+        <div class="scene" id="scene46">
+            <div class="box-blue">하만이 잘하는 것?</div>
+            <i class="fa-solid fa-circle-question" style="font-size: 60px; margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 47: 정보 전달 콕핏 -->
+        <div class="scene" id="scene47">
+            <i class="fa-solid fa-display" style="font-size: 120px; color: var(--blue);"></i>
+            <h2 style="margin-top: 20px;">운전자에게 정보 보여주기</h2>
+            <p>(디지털 콕핏)</p>
+        </div>
+
+        <!-- 씬 48: 자율주행 한계 -->
+        <div class="scene" id="scene48">
+            <div class="box-pink">
+                <h2>자율주행 시대엔</h2>
+                <h1>이것만으론 <span class="text-red">부족합니다</span></h1>
+            </div>
+        </div>
+
+        <!-- 씬 49: 자율주행 필요 요소 -->
+        <div class="scene" id="scene49">
+            <h1>차가 스스로 운전하려면?</h1>
+            <i class="fa-solid fa-robot animate-subtle" style="font-size: 100px; margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 50: 자동차의 눈 필요 -->
+        <div class="scene" id="scene50">
+            <div style="display: flex; gap: 30px; align-items: center;">
+                <i class="fa-solid fa-car" style="font-size: 100px;"></i>
+                <i class="fa-solid fa-plus" style="font-size: 40px;"></i>
+                <i class="fa-solid fa-eye animate-pulse-red" style="font-size: 120px; color: var(--red);"></i>
+            </div>
+            <h1 style="margin-top: 30px;">눈이 필요합니다</h1>
+        </div>
+
+        <!-- 씬 51: 기술 요소들 -->
+        <div class="scene" id="scene51">
+            <div style="display: flex; gap: 30px;">
+                <div class="box-gray">카메라</div>
+                <div class="box-gray">레이더</div>
+                <div class="box-gray">센서</div>
+            </div>
+        </div>
+
+        <!-- 씬 52: 하만의 약점 -->
+        <div class="scene" id="scene52">
+            <div class="box-blue" style="opacity: 0.6;">HARMAN</div>
+            <h1 class="text-red">"없었습니다"</h1>
+            <p>센서 기술의 공백</p>
+        </div>
+
+        <!-- 씬 53: 시야의 한계 -->
+        <div class="scene" id="scene53">
+            <div style="display: flex; gap: 80px; align-items: center;">
+                <div style="text-align: center;">
+                    <i class="fa-solid fa-check text-green" style="font-size: 60px;"></i>
+                    <p>안쪽 (콕핏)</p>
+                </div>
+                <div style="text-align: center;">
+                    <i class="fa-solid fa-xmark text-red" style="font-size: 60px;"></i>
+                    <p>바깥쪽 (센서)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 54: 삼성의 다음 수 -->
+        <div class="scene" id="scene54">
+            <h1 style="font-size: 80px;">그래서 삼성이<br><span class="hl-yellow">무엇을 했느냐?</span></h1>
+        </div>
+
+        <!-- 씬 55: ZF 타겟 -->
+        <div class="scene" id="scene55">
+            <div class="animate-pulse-red">
+                <i class="fa-solid fa-crosshairs" style="font-size: 150px; color: var(--red);"></i>
+            </div>
+            <h1 style="margin-top: 30px;">독일 ZF를 노렸습니다</h1>
+        </div>
+
+        <!-- 씬 56: ZF 설명 시작 -->
+        <div class="scene" id="scene56">
+            <div class="box-green" style="padding: 40px 60px;">
+                <h1>ZF</h1>
+                <p>독일의 자동차 부품 명가</p>
+            </div>
+        </div>
+
+        <!-- 씬 57: 독일 회사 정보 -->
+        <div class="scene" id="scene57">
+            <i class="fa-solid fa-location-dot" style="font-size: 80px; color: var(--red);"></i>
+            <h2>독일 프리드리히스하펜</h2>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <div style="width: 50px; height: 10px; background: black;"></div>
+                <div style="width: 50px; height: 10px; background: red;"></div>
+                <div style="width: 50px; height: 10px; background: gold;"></div>
+            </div>
+        </div>
+
+        <!-- 씬 58: 부품 명가 -->
+        <div class="scene" id="scene58">
+            <h1 class="text-green">명가 중의 명가</h1>
+            <i class="fa-solid fa-medal animate-subtle" style="font-size: 120px; color: var(--yellow); margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 59: 100년 역사 -->
+        <div class="scene" id="scene59">
+            <p class="text-gray">설립 연도</p>
+            <h1 style="font-size: 150px;">1915</h1>
+            <p>110년의 역사</p>
+        </div>
+
+        <!-- 씬 60: 핵심 부품들 -->
+        <div class="scene" id="scene60">
+            <div style="display: flex; gap: 20px;">
+                <div class="box-gray">변속기</div>
+                <div class="box-gray">조향장치</div>
+                <div class="box-gray">샤시</div>
+            </div>
+        </div>
+
+        <!-- 씬 61: ZF의 위기 -->
+        <div class="scene" id="scene61">
+            <h1 class="text-orange">하지만 위기가 찾아왔습니다</h1>
+            <i class="fa-solid fa-cloud-showers-water animate-subtle" style="font-size: 100px; color: var(--gray); margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 62: 전기차 시대 변화 -->
+        <div class="scene" id="scene62">
+            <div style="display: flex; gap: 50px; align-items: center;">
+                <i class="fa-solid fa-plug-circle-bolt" style="font-size: 100px; color: var(--green);"></i>
+                <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
+                <div style="text-align: center;">
+                    <i class="fa-solid fa-gears" style="font-size: 80px; color: var(--red);"></i>
+                    <p class="text-red">수요 급감</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 63: 변속기 불필요 -->
+        <div class="scene" id="scene63">
+            <div class="box-pink">
+                <h2>전기차는</h2>
+                <h1>변속기가 필요 없다!</h1>
+            </div>
+        </div>
+
+        <!-- 씬 64: 구조조정 -->
+        <div class="scene" id="scene64">
+            <i class="fa-solid fa-scissors" style="font-size: 100px; color: var(--red);"></i>
+            <h1 style="margin-top: 20px;">뼈를 깎는 구조조정</h1>
+        </div>
+
+        <!-- 씬 65: ADAS 매각 -->
+        <div class="scene" id="scene65">
+            <div class="box-gray">ADAS 사업부</div>
+            <i class="fa-solid fa-tag" style="font-size: 60px; color: var(--blue); margin-top: 10px;"></i>
+            <h2 style="margin-top: 10px;">매각 결정</h2>
+        </div>
+
+        <!-- 씬 67: ADAS 정의 -->
+        <div class="scene" id="scene67">
+            <div class="box-blue" style="padding: 40px;">
+                <h1>ADAS</h1>
+                <p>첨단 운전자 보조 시스템</p>
+            </div>
+        </div>
+
+        <!-- 씬 68: 자율주행 기초 -->
+        <div class="scene" id="scene68">
+            <h2 class="text-gray">자율주행의</h2>
+            <h1 class="text-blue">가장 기초가 되는 기술</h1>
+        </div>
+
+        <!-- 씬 69: 차선 이탈 경고 -->
+        <div class="scene" id="scene69">
+            <div style="width: 400px; height: 150px; border-left: 5px dashed #ccc; border-right: 5px dashed #ccc; position: relative;">
+                <div style="position: absolute; left: 100px; top: 20px; width: 100px; height: 100px; background: #333; transform: rotate(-5deg); border: 3px solid red;"></div>
+            </div>
+            <h2 style="margin-top: 20px;">차선 이탈 경고</h2>
+        </div>
+
+        <!-- 씬 70: 스마트 크루즈 -->
+        <div class="scene" id="scene70">
+            <div style="display: flex; gap: 80px; align-items: center;">
+                <i class="fa-solid fa-car" style="font-size: 80px;"></i>
+                <i class="fa-solid fa-arrows-left-right" style="font-size: 40px; color: var(--green);"></i>
+                <i class="fa-solid fa-car" style="font-size: 80px;"></i>
+            </div>
+            <h2 style="margin-top: 20px;">스마트 크루즈 컨트롤</h2>
+        </div>
+
+        <!-- 씬 71: 자동 브레이크 -->
+        <div class="scene" id="scene71">
+            <i class="fa-solid fa-hand-stop animate-pulse-red" style="font-size: 120px; color: var(--red);"></i>
+            <h2 style="margin-top: 20px;">긴급 제동 시스템</h2>
+        </div>
+
+        <!-- 씬 72: ZF의 기술력 -->
+        <div class="scene" id="scene72">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                <div class="box-gray">레이더</div>
+                <div class="box-gray">카메라</div>
+                <div class="box-gray">컴퓨팅</div>
+                <div class="box-gray">알고리즘</div>
+            </div>
+        </div>
+
+        <!-- 씬 73: 합병의 의미 -->
+        <div class="scene" id="scene73">
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <div class="box-blue">하만</div>
+                <i class="fa-solid fa-plus" style="font-size: 40px;"></i>
+                <div class="box-green">ZF ADAS</div>
+            </div>
+            <h1 style="margin-top: 30px;">어떤 일이 벌어질까?</h1>
+        </div>
+
+        <!-- 씬 74: 핵심 강조 -->
+        <div class="scene" id="scene74">
+            <h1 style="font-size: 100px;" class="text-red">여기가 핵심입니다!</h1>
+            <i class="fa-solid fa-star animate-subtle" style="font-size: 80px; color: var(--yellow); margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 75: 하만의 시선 -->
+        <div class="scene" id="scene75">
+            <div style="position: relative;">
+                <i class="fa-solid fa-car" style="font-size: 150px;"></i>
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 40px; top: 40px; font-size: 60px; color: var(--blue);"></i>
+            </div>
+            <h2 style="margin-top: 20px;">하만: 차 <span class="text-blue">안쪽</span>을 본다</h2>
+        </div>
+
+        <!-- 씬 76: 운전자 상태 -->
+        <div class="scene" id="scene76">
+            <div style="display: flex; gap: 30px;">
+                <div style="text-align: center;"><span style="font-size: 60px;">😴</span><br>졸음</div>
+                <div style="text-align: center;"><span style="font-size: 60px;">🧐</span><br>집중</div>
+                <div style="text-align: center;"><span style="font-size: 60px;">🤯</span><br>스트레스</div>
+            </div>
+        </div>
+
+        <!-- 씬 77: Ready Care -->
+        <div class="scene" id="scene77">
+            <div class="box-blue" style="padding: 40px 60px;">
+                <h1 style="color: var(--blue);">Ready Care</h1>
+                <p>하만의 운전자 케어 시스템</p>
+            </div>
+        </div>
+
+        <!-- 씬 78: ZF의 시선 -->
+        <div class="scene" id="scene78">
+            <div style="position: relative;">
+                <i class="fa-solid fa-car" style="font-size: 150px;"></i>
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; right: -20px; top: 40px; font-size: 60px; color: var(--green);"></i>
+            </div>
+            <h2 style="margin-top: 20px;">ZF: 차 <span class="text-green">바깥쪽</span>을 본다</h2>
+        </div>
+
+        <!-- 씬 79: 외부 환경 -->
+        <div class="scene" id="scene79">
+            <div style="display: flex; gap: 30px;">
+                <i class="fa-solid fa-truck" style="font-size: 60px;"></i>
+                <i class="fa-solid fa-person-walking" style="font-size: 60px;"></i>
+                <i class="fa-solid fa-traffic-light" style="font-size: 60px;"></i>
+            </div>
+            <p style="margin-top: 20px;">도로 상황 완벽 감지</p>
+        </div>
+
+        <!-- 씬 80: 합쳐진 결과 -->
+        <div class="scene" id="scene80">
+            <div class="animate-subtle" style="display: flex; gap: 10px;">
+                <i class="fa-solid fa-eye" style="font-size: 100px; color: var(--blue);"></i>
+                <i class="fa-solid fa-eye" style="font-size: 100px; color: var(--green);"></i>
+            </div>
+            <h1 style="margin-top: 30px;">두 개의 눈이 합쳐지면?</h1>
+        </div>
+
+        <!-- 씬 81: 안팎 동시 감지 -->
+        <div class="scene" id="scene81">
+            <div class="box" style="border-width: 5px;">
+                <h1>안과 밖을 <span class="text-red">동시에</span> 본다</h1>
+            </div>
+        </div>
+
+        <!-- 씬 82: 예시 시작 -->
+        <div class="scene" id="scene82">
+            <h2 class="text-gray">실제 상황 예시</h2>
+            <i class="fa-solid fa-lightbulb" style="font-size: 80px; color: var(--yellow); margin-top: 10px;"></i>
+        </div>
+
+        <!-- 씬 83: ZF 레이더 상황 -->
+        <div class="scene" id="scene83">
+            <i class="fa-solid fa-satellite-dish animate-pulse-red" style="font-size: 100px; color: var(--red);"></i>
+            <h2 style="margin-top: 20px;">ZF 레이더: "앞에 교통 정체 발생!"</h2>
+        </div>
+
+        <!-- 씬 84: 하만 카메라 상황 -->
+        <div class="scene" id="scene84">
+            <i class="fa-solid fa-video animate-subtle" style="font-size: 100px; color: var(--blue);"></i>
+            <h2 style="margin-top: 20px;">하만 카메라: "운전자가 피곤해 보임!"</h2>
+        </div>
+
+        <!-- 씬 85: 시스템 작동 -->
+        <div class="scene" id="scene85">
+            <div class="box-purple">
+                <h1>AI 시스템 판단 중...</h1>
+                <i class="fa-solid fa-gears animate-spin-slow" style="font-size: 60px; margin-top: 10px;"></i>
+            </div>
+        </div>
+
+        <!-- 씬 86: 자동 조절 -->
+        <div class="scene" id="scene86">
+            <div style="text-align: left; display: inline-block;">
+                <p>• 음악 볼륨 <span class="text-blue">Down</span></p>
+                <p>• 실내 조명 <span class="text-orange">Up</span></p>
+                <p>• 자율주행 개입 <span class="text-red">Max</span></p>
+            </div>
+        </div>
+
+        <!-- 씬 87: 사고 예방 -->
+        <div class="scene" id="scene87">
+            <h1 class="text-green">사고를 미리 막다</h1>
+            <i class="fa-solid fa-shield-halved animate-subtle" style="font-size: 120px; color: var(--green); margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 88: 대단함 강조 -->
+        <div class="scene" id="scene88">
+            <h1 style="font-size: 100px;">이게 <span class="hl-yellow">왜 대단할까?</span></h1>
+        </div>
+
+        <!-- 씬 89: 기존의 방식 -->
+        <div class="scene" id="scene89">
+            <div style="display: flex; gap: 40px;">
+                <div class="box-gray">A사 부품</div>
+                <div class="box-gray">B사 부품</div>
+            </div>
+            <p style="margin-top: 20px;">따로 사서 조립하던 시절</p>
+        </div>
+
+        <!-- 씬 90: 파편화된 구매 -->
+        <div class="scene" id="scene90">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="box-gray" style="width: 300px;">콕핏 (하만)</div>
+                <div class="box-gray" style="width: 300px;">ADAS (기타)</div>
+            </div>
+            <i class="fa-solid fa-link-slash" style="font-size: 40px; margin-top: 10px;"></i>
+        </div>
+
+        <!-- 씬 91: 통합의 어려움 -->
+        <div class="scene" id="scene91">
+            <i class="fa-solid fa-puzzle-piece" style="font-size: 100px; color: var(--orange);"></i>
+            <h2 style="margin-top: 20px;">맞추는 게 지옥이었죠</h2>
+        </div>
+
+        <!-- 씬 92: 하만-ZF 통합 -->
+        <div class="scene" id="scene92">
+            <div class="box-blue" style="width: 500px; padding: 40px;">
+                <h1>All-in-One</h1>
+                <p>하만 + ZF = 완벽한 통합</p>
+            </div>
+        </div>
+
+        <!-- 씬 93: 한 번에 해결 -->
+        <div class="scene" id="scene93">
+            <h1 class="text-blue">한 번에 해결!</h1>
+            <i class="fa-solid fa-wand-magic-sparkles animate-subtle" style="font-size: 100px; color: var(--yellow); margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 94: 차 회사 편리 -->
+        <div class="scene" id="scene94">
+            <i class="fa-solid fa-face-smile" style="font-size: 100px; color: var(--green);"></i>
+            <h2 style="margin-top: 20px;">BMW, 벤츠가 너무 좋아합니다</h2>
+        </div>
+
+        <!-- 씬 95: 기간 비용 절감 -->
+        <div class="scene" id="scene95">
+            <div style="display: flex; gap: 50px;">
+                <div style="text-align: center;">
+                    <i class="fa-solid fa-clock" style="font-size: 60px;"></i>
+                    <p class="text-red">기간 ↓</p>
+                </div>
+                <div style="text-align: center;">
+                    <i class="fa-solid fa-coins" style="font-size: 60px;"></i>
+                    <p class="text-red">비용 ↓</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 96: 인수 완료 기대 -->
+        <div class="scene" id="scene96">
+            <h1 style="font-size: 80px;">인수 완료 후의<br><span class="text-blue">빅 픽처</span></h1>
+        </div>
+
+        <!-- 씬 97: 매출 도약 -->
+        <div class="scene" id="scene97">
+            <div style="display: flex; gap: 50px; align-items: flex-end;">
+                <div style="text-align: center;">
+                    <div class="bar-gray bar" style="width: 80px; height: 100px;"></div>
+                    <p>70억$</p>
+                </div>
+                <i class="fa-solid fa-arrow-right" style="font-size: 40px; margin-bottom: 50px;"></i>
+                <div style="text-align: center;">
+                    <div class="bar-blue bar animate-subtle" style="width: 80px; height: 180px;"></div>
+                    <p class="text-blue">110억$</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 98: 한화 환산 -->
+        <div class="scene" id="scene98">
+            <h1 class="text-green">9조 → 14조</h1>
+            <p>매출 규모가 폭발합니다</p>
+        </div>
+
+        <!-- 씬 99: 미래 기대 -->
+        <div class="scene" id="scene99">
+            <h1 style="font-size: 80px;">하지만 여기가<br><span class="text-red">끝이 아닙니다</span></h1>
+        </div>
+
+        <!-- 씬 100: 진짜 이야기 -->
+        <div class="scene" id="scene100">
+            <i class="fa-solid fa-scroll animate-subtle" style="font-size: 150px; color: var(--orange);"></i>
+            <h2 style="margin-top: 30px;">진짜 이야기는 지금부터!</h2>
+        </div>
+
+        <!-- 씬 101: 자동차 분야 기술 -->
+        <div class="scene" id="scene101">
+            <h1 style="font-size: 80px;">삼성이 꿈꾸는<br>자동차의 미래</h1>
+        </div>
+
+        <!-- 씬 102: 소름 유도 -->
+        <div class="scene" id="scene102">
+            <h1 class="text-blue">진짜 소름 돋으실 거예요</h1>
+            <i class="fa-solid fa-wind animate-subtle" style="font-size: 80px; color: var(--blue);"></i>
+        </div>
+
+        <!-- 씬 103: 승승장구 의문 -->
+        <div class="scene" id="scene103">
+            <h1>삼성은 꽃길만 걸었을까?</h1>
+            <span style="font-size: 100px;">🤔</span>
+        </div>
+
+        <!-- 씬 104: 현실 어려움 -->
+        <div class="scene" id="scene104">
+            <div class="box-pink">
+                <h1>현실은 <span class="text-red">가시밭길</span>이었습니다</h1>
+            </div>
+        </div>
+
+        <!-- 씬 105: 내부 갈등 도전 -->
+        <div class="scene" id="scene105">
+            <div style="display: flex; gap: 30px; align-items: center;">
+                <i class="fa-solid fa-people-group" style="font-size: 80px;"></i>
+                <i class="fa-solid fa-bolt" style="font-size: 50px; color: var(--orange);"></i>
+                <i class="fa-solid fa-people-group" style="font-size: 80px;"></i>
+            </div>
+            <h2 style="margin-top: 20px;">내부의 갈등과 도전</h2>
+        </div>
+
+        <!-- 씬 106: 2025년 말 사건 -->
+        <div class="scene" id="scene106">
+            <p class="text-gray">2025년 말</p>
+            <h1>이상한 소문이 돕니다</h1>
+        </div>
+
+        <!-- 씬 107: 개발팀 축소 소문 -->
+        <div class="scene" id="scene107">
+            <div class="box-pink">
+                <h2>"엑시노스 오토 팀 축소?"</h2>
+            </div>
+            <p class="text-red">사업 포기설 확산</p>
+        </div>
+
+        <!-- 씬 108: 엑시노스 오토 설명 -->
+        <div class="scene" id="scene108">
+            <i class="fa-solid fa-microchip" style="font-size: 120px; color: var(--blue);"></i>
+            <h2 style="margin-top: 20px;">삼성의 차량용 반도체</h2>
+            <p>(Exynos Auto)</p>
+        </div>
+
+        <!-- 씬 109: AI 조직 흡수 -->
+        <div class="scene" id="scene109">
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <div class="box-gray">자동차 반도체</div>
+                <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
+                <div class="box-purple">AI 통합 조직</div>
+            </div>
+        </div>
+
+        <!-- 씬 110: 업계 불안감 -->
+        <div class="scene" id="scene110">
+            <h1 class="text-red">"삼성, 차 반도체 접나?"</h1>
+            <p style="margin-top: 20px;">불안해하는 업계 관계자들</p>
+        </div>
+
+        <!-- 씬 111: 조사 당황 -->
+        <div class="scene" id="scene111">
+            <span style="font-size: 100px;">😰</span>
+            <h1 style="margin-top: 20px;">저도 조사하면서 당황했습니다</h1>
+        </div>
+
+        <!-- 씬 112: 모순적 상황 -->
+        <div class="scene" id="scene112">
+            <div style="display: flex; gap: 30px; align-items: center;">
+                <div style="text-align: center;">
+                    <i class="fa-solid fa-plus text-green" style="font-size: 50px;"></i>
+                    <p>전장 키운다며?</p>
+                </div>
+                <i class="fa-solid fa-not-equal" style="font-size: 40px;"></i>
+                <div style="text-align: center;">
+                    <i class="fa-solid fa-minus text-red" style="font-size: 50px;"></i>
+                    <p>칩은 줄여?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 113: 질문 -->
+        <div class="scene" id="scene113">
+            <h1 style="font-size: 120px;">이게 말이 돼요?</h1>
+        </div>
+
+        <!-- 씬 114: 다른 그림 발견 -->
+        <div class="scene" id="scene114">
+            <i class="fa-solid fa-magnifying-glass-chart animate-subtle" style="font-size: 120px; color: var(--blue);"></i>
+            <h2 style="margin-top: 20px;">하지만 이면엔 <span class="text-blue">다른 전략</span>이...</h2>
+        </div>
+
+        <!-- 씬 115: BMW 계약 발표 -->
+        <div class="scene" id="scene115">
+            <div style="display: flex; gap: 30px; align-items: center;">
+                <div class="box">SAMSUNG</div>
+                <i class="fa-solid fa-file-contract" style="font-size: 50px; color: var(--green);"></i>
+                <div class="box">BMW</div>
+            </div>
+            <h1 style="margin-top: 20px;">대형 계약 성사!</h1>
+        </div>
+
+        <!-- 씬 116: 노이에 클라세 -->
+        <div class="scene" id="scene116">
+            <div class="box-gray">Neue Klasse</div>
+            <p style="margin-top: 20px;">BMW의 차세대 전기차 플랫폼</p>
+        </div>
+
+        <!-- 씬 117: 2025 전기차 시리즈 -->
+        <div class="scene" id="scene117">
+            <i class="fa-solid fa-car-rear" style="font-size: 120px; color: var(--blue);"></i>
+            <h2 style="margin-top: 20px;">2025년, 새로운 역사가 시작됩니다</h2>
+        </div>
+
+        <!-- 씬 118: 핵심 칩 공급 -->
+        <div class="scene" id="scene118">
+            <div style="display: flex; align-items: center; gap: 40px;">
+                <i class="fa-solid fa-microchip" style="font-size: 100px; color: var(--blue);"></i>
+                <i class="fa-solid fa-truck-fast" style="font-size: 50px;"></i>
+                <i class="fa-solid fa-car" style="font-size: 100px;"></i>
+            </div>
+            <h1 style="margin-top: 20px;">핵심 두뇌는 삼성칩!</h1>
+        </div>
+
+        <!-- 씬 119: V720 칩 -->
+        <div class="scene" id="scene119">
+            <div class="box-blue" style="padding: 40px 60px;">
+                <h1 style="font-size: 60px;">Exynos Auto V720</h1>
+                <p>최첨단 차량용 칩</p>
+            </div>
+        </div>
+
+        <!-- 씬 120: 5나노 공정 -->
+        <div class="scene" id="scene120">
+            <i class="fa-solid fa-microscope" style="font-size: 100px; color: var(--purple);"></i>
+            <h1 style="font-size: 100px;">5<span style="font-size: 50px;">nm</span></h1>
+            <p>초정밀 미세 공정의 승리</p>
+        </div>
+
+        <!-- 씬 121: BMW iX3 -->
+        <div class="scene" id="scene121">
+            <div class="box">BMW iX3</div>
+            <p style="margin-top: 20px;">노이에 클라세의 주인공</p>
+        </div>
+
+        <!-- 씬 122: 삼성 칩 탑재 -->
+        <div class="scene" id="scene122">
+            <i class="fa-solid fa-heart animate-pulse-red" style="font-size: 120px; color: var(--red);"></i>
+            <h1 style="margin-top: 20px;">BMW의 심장이 된 삼성</h1>
+        </div>
+
+        <!-- 씬 123: V920 기대 -->
+        <div class="scene" id="scene123">
+            <p class="text-gray">7시리즈 등 최상위 모델엔?</p>
+            <h1 class="text-purple">V920 탑재 기대!</h1>
+        </div>
+
+        <!-- 씬 124: 철수설 의문 해결 -->
+        <div class="scene" id="scene124">
+            <h1 style="font-size: 100px;">그럼 철수설은?</h1>
+            <i class="fa-solid fa-xmark" style="font-size: 120px; color: var(--red); margin-top: 20px;"></i>
+        </div>
+
+        <!-- 씬 125: 선택과 집중 -->
+        <div class="scene" id="scene125">
+            <div class="box-green" style="padding: 50px;">
+                <h1>전략적 선택과 집중</h1>
+                <p>버릴 것은 버리고 키울 것은 키운다</p>
+            </div>
+        </div>
+
+        <!-- 씬 126: 삼성의 전략 -->
+        <div class="scene" id="scene126">
+            <i class="fa-solid fa-chess" style="font-size: 120px; color: var(--gray);"></i>
+            <h1 style="margin-top: 20px;">삼성의 고단수 체스</h1>
+        </div>
+
+        <!-- 씬 127: 범용 칩 중단 -->
+        <div class="scene" id="scene127">
+            <div class="box-gray" style="opacity: 0.5;">범용 반도체 (저수익)</div>
+            <i class="fa-solid fa-trash-can" style="font-size: 60px; margin-top: 10px;"></i>
+        </div>
+
+        <!-- 씬 128: 맞춤형 집중 -->
+        <div class="scene" id="scene128">
+            <div class="box-blue">BMW · TESLA · HYUNDAI</div>
+            <h2 class="text-blue">맞춤형 프리미엄 칩에 올인!</h2>
+        </div>
+
+        <!-- 씬 129: 자율주행 핵심 AI -->
+        <div class="scene" id="scene129">
+            <div style="display: flex; gap: 30px; align-items: center;">
+                <h1 style="font-size: 100px;">자율주행</h1>
+                <i class="fa-solid fa-equals" style="font-size: 40px;"></i>
+                <h1 style="font-size: 100px;" class="text-purple">AI</h1>
+            </div>
+        </div>
+
+        <!-- 씬 130: 조직 합병 -->
+        <div class="scene" id="scene130">
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <div class="box-gray">자동차 반도체</div>
+                <i class="fa-solid fa-plus" style="font-size: 40px;"></i>
+                <div class="box-purple">AI 연구소</div>
+            </div>
+            <h2 style="margin-top: 30px;">기술 시너지를 위한 통합</h2>
+        </div>
+
+        <!-- 씬 131: 기술 융합 -->
+        <div class="scene" id="scene131">
+            <i class="fa-solid fa-dna animate-subtle" style="font-size: 120px; color: var(--purple);"></i>
+            <h1 style="margin-top: 20px;">기술 융합을 위한 <span class="text-purple">재배치</span></h1>
+        </div>
+
+        <!-- 씬 132: 테슬라 예고 -->
+        <div class="scene" id="scene132">
+            <h2 class="text-gray">다음 화 예고...</h2>
+            <h1 style="font-size: 120px;">진짜 대박은<br><span class="text-red">TESLA</span>입니다</h1>
+        </div>
+
+    </div>
+
+    <div id="controls">
+        <button class="btn" onclick="move(-1)">◀ 이전 (Left)</button>
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+        <div style="font-size: 24px;">
+            <span id="current-idx">1</span> / <span id="total-scenes">132</span>
+        </div>
+        <button class="btn" onclick="move(1)">다음 (Right) ▶</button>
+    </div>
+
+    <script>
+        let currentIdx = 0;
+        const scenes = document.querySelectorAll('.scene');
+        const progressBar = document.getElementById('progress-bar');
+        const counterText = document.getElementById('current-idx');
+        const totalText = document.getElementById('total-scenes');
+
+        if (totalText) totalText.innerText = scenes.length;
+
+        function update() {
+            scenes.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
+            progressBar.style.width = ((currentIdx + 1) / scenes.length * 100) + '%';
+            counterText.innerText = currentIdx + 1;
+        }
+
+        function move(n) {
+            currentIdx += n;
+            if (currentIdx < 0) currentIdx = 0;
+            if (currentIdx >= scenes.length) currentIdx = scenes.length - 1;
+            update();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') move(1);
+            if (e.key === 'ArrowLeft') move(-1);
+        });
+
+        // 초기 업데이트
+        update();
+    </script>
+</body>
+</html>

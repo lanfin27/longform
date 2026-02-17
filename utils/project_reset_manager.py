@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-프로젝트 초기화 관리자 (v2.0)
+프로젝트 초기화 관리자 (v2.1)
 
 3단계 레벨의 프로젝트 초기화 기능:
 1. 영상(Video) 초기화 - 특정 영상의 모든 산출물 삭제
@@ -10,6 +10,11 @@
 삭제 모드:
 - Hard Delete: 실제 파일 삭제 (복구 불가)
 - Soft Delete: 숨김 처리 (복구 가능)
+
+v2.1 추가:
+- 영상/채널 폴더 완전 삭제 기능
+- 휴지통 기능 (복구 가능한 삭제)
+- 휴지통 비우기 기능
 
 v2.0 추가:
 - 선택적 삭제 기능 (항목별 체크박스)
@@ -997,6 +1002,477 @@ class ProjectResetManager:
 
         print(f"[전체 복구] {len(result['restored'])}개 복구됨", flush=True)
         return result
+
+    # ========================================
+    # v2.1: 영상/채널 폴더 삭제 기능
+    # ========================================
+
+    def get_trash_directory(self) -> Path:
+        """휴지통 디렉토리 경로 반환 (없으면 생성)"""
+        trash_dir = self.base_path / ".trash"
+        trash_dir.mkdir(parents=True, exist_ok=True)
+        return trash_dir
+
+    def get_video_list_for_delete(self, project_id: str) -> List[Dict[str, Any]]:
+        """
+        프로젝트 내 모든 영상 목록 조회 (삭제용)
+
+        Returns:
+            [
+                {
+                    "name": "test4",
+                    "path": "C:/.../videos/test4",
+                    "file_count": 49,
+                    "size_bytes": 5242880,
+                    "size_display": "5.2 MB"
+                },
+                ...
+            ]
+        """
+        videos_dir = self.projects_path / project_id / "videos"
+
+        if not videos_dir.exists():
+            return []
+
+        videos = []
+
+        for video_dir in videos_dir.iterdir():
+            if not video_dir.is_dir() or video_dir.name.startswith('.'):
+                continue
+
+            if self._is_hidden(video_dir):
+                continue
+
+            file_count = self._count_files(video_dir)
+            total_size = self._get_size(video_dir)
+
+            videos.append({
+                "name": video_dir.name,
+                "path": str(video_dir),
+                "file_count": file_count,
+                "size_bytes": total_size,
+                "size_display": self.format_size(total_size)
+            })
+
+        return sorted(videos, key=lambda x: x["name"])
+
+    def get_project_list_for_delete(self) -> List[Dict[str, Any]]:
+        """
+        모든 프로젝트(채널) 목록 조회 (삭제용)
+
+        Returns:
+            [
+                {
+                    "name": "20251214_144057_시니어",
+                    "display_name": "시니어",
+                    "path": "C:/.../projects/20251214_144057_시니어",
+                    "video_count": 5,
+                    "file_count": 147,
+                    "size_bytes": 14417920,
+                    "size_display": "13.8 MB"
+                },
+                ...
+            ]
+        """
+        if not self.projects_path.exists():
+            return []
+
+        projects = []
+
+        for project_dir in self.projects_path.iterdir():
+            if not project_dir.is_dir() or project_dir.name.startswith('.'):
+                continue
+
+            if self._is_hidden(project_dir):
+                continue
+
+            # 표시 이름 추출 (20251214_144057_시니어 → 시니어)
+            parts = project_dir.name.split("_")
+            display_name = parts[-1] if len(parts) >= 3 else project_dir.name
+
+            # 영상 수 계산
+            videos_dir = project_dir / "videos"
+            video_count = 0
+            if videos_dir.exists():
+                video_count = len([
+                    d for d in videos_dir.iterdir()
+                    if d.is_dir() and not d.name.startswith('.') and not self._is_hidden(d)
+                ])
+
+            file_count = self._count_files(project_dir)
+            total_size = self._get_size(project_dir)
+
+            projects.append({
+                "name": project_dir.name,
+                "display_name": display_name,
+                "path": str(project_dir),
+                "video_count": video_count,
+                "file_count": file_count,
+                "size_bytes": total_size,
+                "size_display": self.format_size(total_size)
+            })
+
+        return sorted(projects, key=lambda x: x["name"], reverse=True)
+
+    def delete_video_folder(
+        self,
+        video_path: str,
+        use_trash: bool = True
+    ) -> Dict[str, Any]:
+        """
+        영상 폴더 전체 삭제
+
+        Args:
+            video_path: 삭제할 영상 폴더 경로
+            use_trash: True면 휴지통으로 이동, False면 즉시 삭제
+
+        Returns:
+            {'success': bool, 'message': str, 'size_deleted': int}
+        """
+        video_path = Path(video_path)
+
+        if not video_path.exists():
+            return {
+                'success': False,
+                'message': f"경로가 존재하지 않습니다: {video_path}",
+                'size_deleted': 0
+            }
+
+        video_name = video_path.name
+        size = self._get_size(video_path)
+
+        try:
+            if use_trash:
+                # 휴지통 폴더로 이동
+                trash_dir = self.get_trash_directory()
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                backup_name = f"{video_name}_{timestamp}"
+                backup_path = trash_dir / "videos" / backup_name
+
+                backup_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(video_path), str(backup_path))
+
+                print(f"[VideoDelete] ✅ 영상 '{video_name}' → 휴지통으로 이동", flush=True)
+                return {
+                    'success': True,
+                    'message': f"영상 '{video_name}'이(가) 휴지통으로 이동되었습니다.",
+                    'size_deleted': size
+                }
+            else:
+                # 즉시 삭제
+                shutil.rmtree(str(video_path))
+
+                print(f"[VideoDelete] ✅ 영상 '{video_name}' 완전 삭제됨", flush=True)
+                return {
+                    'success': True,
+                    'message': f"영상 '{video_name}'이(가) 삭제되었습니다.",
+                    'size_deleted': size
+                }
+
+        except PermissionError as e:
+            print(f"[VideoDelete] ❌ 권한 오류: {e}", flush=True)
+            return {
+                'success': False,
+                'message': f"권한 오류: 파일이 사용 중일 수 있습니다.",
+                'size_deleted': 0
+            }
+
+        except Exception as e:
+            print(f"[VideoDelete] ❌ 삭제 실패: {e}", flush=True)
+            return {
+                'success': False,
+                'message': f"삭제 실패: {str(e)}",
+                'size_deleted': 0
+            }
+
+    def delete_project_folder(
+        self,
+        project_path: str,
+        use_trash: bool = True
+    ) -> Dict[str, Any]:
+        """
+        프로젝트(채널) 폴더 전체 삭제
+
+        Args:
+            project_path: 삭제할 프로젝트 폴더 경로
+            use_trash: True면 휴지통으로 이동, False면 즉시 삭제
+
+        Returns:
+            {'success': bool, 'message': str, 'size_deleted': int}
+        """
+        project_path = Path(project_path)
+
+        if not project_path.exists():
+            return {
+                'success': False,
+                'message': f"경로가 존재하지 않습니다: {project_path}",
+                'size_deleted': 0
+            }
+
+        project_name = project_path.name
+        size = self._get_size(project_path)
+
+        try:
+            if use_trash:
+                # 휴지통 폴더로 이동
+                trash_dir = self.get_trash_directory()
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                backup_name = f"{project_name}_{timestamp}"
+                backup_path = trash_dir / "projects" / backup_name
+
+                backup_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(project_path), str(backup_path))
+
+                print(f"[ProjectDelete] ✅ 프로젝트 '{project_name}' → 휴지통으로 이동", flush=True)
+                return {
+                    'success': True,
+                    'message': f"프로젝트 '{project_name}'이(가) 휴지통으로 이동되었습니다.",
+                    'size_deleted': size
+                }
+            else:
+                # 즉시 삭제
+                shutil.rmtree(str(project_path))
+
+                print(f"[ProjectDelete] ✅ 프로젝트 '{project_name}' 완전 삭제됨", flush=True)
+                return {
+                    'success': True,
+                    'message': f"프로젝트 '{project_name}'이(가) 삭제되었습니다.",
+                    'size_deleted': size
+                }
+
+        except PermissionError as e:
+            print(f"[ProjectDelete] ❌ 권한 오류: {e}", flush=True)
+            return {
+                'success': False,
+                'message': f"권한 오류: 파일이 사용 중일 수 있습니다.",
+                'size_deleted': 0
+            }
+
+        except Exception as e:
+            print(f"[ProjectDelete] ❌ 삭제 실패: {e}", flush=True)
+            return {
+                'success': False,
+                'message': f"삭제 실패: {str(e)}",
+                'size_deleted': 0
+            }
+
+    def get_trash_contents(self) -> Dict[str, Any]:
+        """
+        휴지통 내용 조회
+
+        Returns:
+            {
+                'projects': [{'name': ..., 'path': ..., 'size': ..., 'size_display': ...}],
+                'videos': [...],
+                'total_size': int,
+                'total_size_display': str
+            }
+        """
+        trash_dir = self.get_trash_directory()
+
+        contents = {
+            "projects": [],
+            "videos": [],
+            "total_size": 0,
+            "total_size_display": "0 B"
+        }
+
+        # 프로젝트 휴지통
+        projects_trash = trash_dir / "projects"
+        if projects_trash.exists():
+            for item in projects_trash.iterdir():
+                if item.is_dir():
+                    size = self._get_size(item)
+                    contents["projects"].append({
+                        "name": item.name,
+                        "path": str(item),
+                        "size": size,
+                        "size_display": self.format_size(size),
+                        "deleted_at": self._extract_timestamp_from_name(item.name)
+                    })
+                    contents["total_size"] += size
+
+        # 영상 휴지통
+        videos_trash = trash_dir / "videos"
+        if videos_trash.exists():
+            for item in videos_trash.iterdir():
+                if item.is_dir():
+                    size = self._get_size(item)
+                    contents["videos"].append({
+                        "name": item.name,
+                        "path": str(item),
+                        "size": size,
+                        "size_display": self.format_size(size),
+                        "deleted_at": self._extract_timestamp_from_name(item.name)
+                    })
+                    contents["total_size"] += size
+
+        contents["total_size_display"] = self.format_size(contents["total_size"])
+
+        return contents
+
+    def _extract_timestamp_from_name(self, name: str) -> str:
+        """이름에서 타임스탬프 추출 (예: video_20251214_153000 → 2025-12-14 15:30:00)"""
+        import re
+        match = re.search(r'_(\d{8})_(\d{6})$', name)
+        if match:
+            date_str, time_str = match.groups()
+            try:
+                return f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]} {time_str[:2]}:{time_str[2:4]}:{time_str[4:6]}"
+            except:
+                pass
+        return ""
+
+    def restore_from_trash(
+        self,
+        trash_item_path: str,
+        item_type: str  # 'project' or 'video'
+    ) -> Dict[str, Any]:
+        """
+        휴지통에서 복구
+
+        Args:
+            trash_item_path: 휴지통 내 항목 경로
+            item_type: 'project' 또는 'video'
+
+        Returns:
+            {'success': bool, 'message': str, 'restored_path': str}
+        """
+        import re
+
+        trash_path = Path(trash_item_path)
+
+        if not trash_path.exists():
+            return {
+                'success': False,
+                'message': f"휴지통에서 항목을 찾을 수 없습니다: {trash_path}",
+                'restored_path': ""
+            }
+
+        # 원래 이름 추출 (타임스탬프 제거)
+        name = trash_path.name
+        original_name = re.sub(r'_\d{8}_\d{6}$', '', name)
+
+        try:
+            if item_type == 'project':
+                restore_path = self.projects_path / original_name
+            elif item_type == 'video':
+                # 영상의 경우 원래 프로젝트 경로를 찾아야 함
+                # 휴지통에 저장된 경로 정보가 없으므로 현재 프로젝트로 복구
+                # 간단하게 첫 번째 프로젝트에 복구
+                projects = self.get_all_projects()
+                if not projects:
+                    return {
+                        'success': False,
+                        'message': "복구할 프로젝트가 없습니다. 프로젝트를 먼저 생성해주세요.",
+                        'restored_path': ""
+                    }
+                restore_path = Path(projects[0]['path']) / "videos" / original_name
+            else:
+                return {
+                    'success': False,
+                    'message': f"알 수 없는 항목 유형: {item_type}",
+                    'restored_path': ""
+                }
+
+            # 이미 같은 이름이 있으면 새 이름 생성
+            if restore_path.exists():
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                restore_path = restore_path.parent / f"{original_name}_restored_{timestamp}"
+
+            restore_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(trash_path), str(restore_path))
+
+            print(f"[Restore] ✅ '{name}' → '{restore_path}' 복구됨", flush=True)
+            return {
+                'success': True,
+                'message': f"'{original_name}'이(가) 복구되었습니다.",
+                'restored_path': str(restore_path)
+            }
+
+        except Exception as e:
+            print(f"[Restore] ❌ 복구 실패: {e}", flush=True)
+            return {
+                'success': False,
+                'message': f"복구 실패: {str(e)}",
+                'restored_path': ""
+            }
+
+    def empty_trash(self) -> Dict[str, Any]:
+        """
+        휴지통 비우기
+
+        Returns:
+            {'success': bool, 'message': str, 'size_deleted': int}
+        """
+        trash_dir = self.get_trash_directory()
+
+        if not trash_dir.exists():
+            return {
+                'success': True,
+                'message': "휴지통이 이미 비어있습니다.",
+                'size_deleted': 0
+            }
+
+        try:
+            size = self._get_size(trash_dir)
+            shutil.rmtree(str(trash_dir))
+            trash_dir.mkdir(parents=True, exist_ok=True)
+
+            print(f"[EmptyTrash] ✅ 휴지통 비움: {self.format_size(size)}", flush=True)
+            return {
+                'success': True,
+                'message': f"휴지통이 비워졌습니다. ({self.format_size(size)} 확보)",
+                'size_deleted': size
+            }
+
+        except Exception as e:
+            print(f"[EmptyTrash] ❌ 휴지통 비우기 실패: {e}", flush=True)
+            return {
+                'success': False,
+                'message': f"휴지통 비우기 실패: {str(e)}",
+                'size_deleted': 0
+            }
+
+    def permanently_delete_from_trash(self, trash_item_path: str) -> Dict[str, Any]:
+        """
+        휴지통에서 영구 삭제
+
+        Args:
+            trash_item_path: 휴지통 내 항목 경로
+
+        Returns:
+            {'success': bool, 'message': str, 'size_deleted': int}
+        """
+        trash_path = Path(trash_item_path)
+
+        if not trash_path.exists():
+            return {
+                'success': False,
+                'message': f"항목을 찾을 수 없습니다: {trash_path}",
+                'size_deleted': 0
+            }
+
+        try:
+            size = self._get_size(trash_path)
+            name = trash_path.name
+
+            shutil.rmtree(str(trash_path))
+
+            print(f"[PermanentDelete] ✅ '{name}' 영구 삭제됨", flush=True)
+            return {
+                'success': True,
+                'message': f"'{name}'이(가) 영구 삭제되었습니다.",
+                'size_deleted': size
+            }
+
+        except Exception as e:
+            print(f"[PermanentDelete] ❌ 영구 삭제 실패: {e}", flush=True)
+            return {
+                'success': False,
+                'message': f"영구 삭제 실패: {str(e)}",
+                'size_deleted': 0
+            }
 
     # ========================================
     # 미리보기

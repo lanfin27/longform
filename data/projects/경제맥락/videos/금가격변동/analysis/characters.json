@@ -1,0 +1,116 @@
+[
+  {
+    "name": "투자자들",
+    "name_ko": "투자자들",
+    "role": "등장인물",
+    "visual_prompt": "diverse group of determined and hopeful individuals, eagerly reaching out or gazing longingly towards the gold bars, professional attire",
+    "description": "",
+    "scenes": [
+      34,
+      35,
+      36
+    ],
+    "appearance_scenes": [
+      34,
+      35,
+      36
+    ]
+  },
+  {
+    "name": "한국은행 고위 관계자들",
+    "name_ko": "한국은행 고위 관계자들",
+    "role": "등장인물",
+    "visual_prompt": "professional individuals in suits, engaged in a serious and contemplative discussion, with focused expressions",
+    "description": "",
+    "scenes": [
+      70,
+      71,
+      72
+    ],
+    "appearance_scenes": [
+      70,
+      71,
+      72
+    ]
+  },
+  {
+    "name": "케빈 워시",
+    "name_ko": "케빈 워시",
+    "role": "등장인물",
+    "visual_prompt": "confident and intelligent-looking man, wearing a business suit, thoughtful expression",
+    "description": "",
+    "scenes": [
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      142,
+      143,
+      144
+    ],
+    "appearance_scenes": [
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      142,
+      143,
+      144
+    ]
+  },
+  {
+    "name": "시장 참여자들",
+    "name_ko": "시장 참여자들",
+    "role": "등장인물",
+    "visual_prompt": "diverse group of people, some in business attire, looking disappointed and concerned, gazing at a large vault door",
+    "description": "",
+    "scenes": [
+      103,
+      104,
+      105
+    ],
+    "appearance_scenes": [
+      103,
+      104,
+      105
+    ]
+  },
+  {
+    "name": "뉴스 앵커",
+    "name_ko": "뉴스 앵커",
+    "role": "등장인물",
+    "visual_prompt": "A retro 1970s news anchor, male, serious expression, wearing a formal suit, delivering news",
+    "description": "",
+    "scenes": [
+      130,
+      131,
+      132
+    ],
+    "appearance_scenes": [
+      130,
+      131,
+      132
+    ]
+  },
+  {
+    "name": "강력한 비즈니스맨",
+    "name_ko": "강력한 비즈니스맨",
+    "role": "등장인물",
+    "visual_prompt": "powerful, confident Asian businessman, middle-aged, sharp dark suit, thoughtful expression, conveying influence over financial markets",
+    "description": "",
+    "scenes": [
+      160,
+      161,
+      162
+    ],
+    "appearance_scenes": [
+      160,
+      161,
+      162
+    ]
+  }
+]

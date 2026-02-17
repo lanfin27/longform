@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBM4 반도체 시장 인포그래픽</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --canvas-width: 1280px;
+            --canvas-height: 720px;
+            --bg: #ffffff;
+            --text: #222222;
+            --red: #ef4444;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --yellow: #facc15;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --gray: #555555;
+            --light-gray: #f5f5f5;
+            --light-pink: #fce4ec;
+            --light-blue: #dbeafe;
+            --light-green: #dcfce7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Nanum Pen Script', cursive;
+        }
+
+        #video-canvas {
+            width: var(--canvas-width);
+            height: var(--canvas-height);
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scene {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+            background: #ffffff;
+        }
+        .scene.active { display: flex; }
+
+        h1 { font-size: 82px; line-height: 1.2; margin-bottom: 20px; }
+        h2 { font-size: 64px; line-height: 1.3; margin-bottom: 15px; }
+        p { font-size: 52px; line-height: 1.4; }
+        .text-sm { font-size: 44px; }
+        .text-xs { font-size: 40px; }
+
+        .text-red { color: var(--red); }
+        .text-green { color: var(--green); }
+        .text-blue { color: var(--blue); }
+        .hl-yellow { background: var(--yellow); padding: 5px 15px; border-radius: 8px; }
+
+        .box {
+            border: 4px solid var(--text);
+            border-radius: 15px;
+            padding: 30px 45px;
+            background: white;
+            filter: url(#rough-edge);
+            white-space: nowrap;
+            width: auto;
+            min-width: fit-content;
+        }
+        .box-pink { background: var(--light-pink); border: 4px solid var(--text); border-radius: 15px; padding: 30px 45px; filter: url(#rough-edge); white-space: nowrap; }
+        .box-blue { background: var(--light-blue); border: 4px solid var(--text); border-radius: 15px; padding: 30px 45px; filter: url(#rough-edge); white-space: nowrap; }
+        .box-gray { background: var(--light-gray); border: 4px solid var(--text); border-radius: 15px; padding: 30px 45px; filter: url(#rough-edge); white-space: nowrap; }
+
+        .bar { background: var(--gray); border: 3px solid var(--text); border-radius: 8px; filter: url(#rough-strong); }
+        .bar-red { background: var(--red); }
+        .bar-blue { background: var(--blue); }
+
+        .gauge-track { width: 100%; height: 50px; background: var(--light-gray); border: 4px solid var(--text); border-radius: 30px; overflow: hidden; filter: url(#rough-edge); }
+        .gauge-fill { height: 100%; filter: url(#rough-strong); }
+
+        @keyframes bounce-subtle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes pulse-red { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+        .animate-subtle { animation: bounce-subtle 3s ease-in-out infinite; }
+        .animate-pulse { animation: pulse-red 2s infinite; }
+
+        #nav-controls { margin-top: 20px; display: flex; gap: 20px; align-items: center; }
+        button { padding: 10px 20px; font-size: 24px; cursor: pointer; font-family: inherit; }
+        #progress-container { width: 800px; height: 10px; background: #ccc; border-radius: 5px; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: var(--blue); transition: width 0.3s; }
+    </style>
+</head>
+<body>
+
+<svg style="position: absolute; width: 0; height: 0;">
+    <filter id="rough-edge">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+    </filter>
+    <filter id="rough-strong">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+    </filter>
+</svg>
+
+<div id="video-canvas">
+    <!-- 씬 1: 반도체 3파전 서막 -->
+    <div class="scene active" id="scene1">
+        <h2 style="margin-bottom: 40px;">반도체 패권 전쟁의 시작</h2>
+        <div style="display: flex; gap: 40px; align-items: center;">
+            <div class="box-blue animate-subtle" style="text-align: center;">
+                <p style="font-size: 60px;">SAMSUNG</p>
+                <p class="text-sm">반격의 서막</p>
+            </div>
+            <div style="font-size: 60px; font-weight: bold;">VS</div>
+            <div class="box-pink animate-subtle" style="text-align: center;">
+                <p style="font-size: 60px;">SK hynix</p>
+                <p class="text-sm">왕좌의 수성</p>
+            </div>
+        </div>
+        <p style="margin-top: 40px;"><i class="fa-solid fa-microchip"></i> HBM4: 제로 베이스 경쟁</p>
+    </div>
+
+    <!-- 씬 2: 기술적 긴장감 -->
+    <div class="scene" id="scene2">
+        <div style="display: flex; gap: 50px; align-items: center;">
+            <i class="fa-solid fa-bolt-lightning animate-pulse" style="font-size: 150px; color: var(--yellow);"></i>
+            <div style="text-align: left;">
+                <h1>격돌하는 거인들</h1>
+                <p>삼성 • SK • 엔비디아</p>
+                <div class="hl-yellow" style="margin-top: 20px; font-size: 40px;">글로벌 AI 생태계의 중심</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 3: 전략적 파트너십 -->
+    <div class="scene" id="scene3">
+        <h2 style="margin-bottom: 30px;">누가 엔비디아를 차지할 것인가?</h2>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 30px;">
+            <div class="box" style="padding: 20px 40px;">SAMSUNG</div>
+            <span style="font-size: 50px;">→</span>
+            <div class="box-gray" style="border-radius: 50%; width: 150px; height: 150px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-brain" style="font-size: 60px;"></i>
+            </div>
+            <span style="font-size: 50px;">←</span>
+            <div class="box" style="padding: 20px 40px;">SK hynix</div>
+        </div>
+    </div>
+
+    <!-- 씬 7: 시장 규모 폭발 -->
+    <div class="scene" id="scene7">
+        <h2 style="margin-bottom: 30px;">HBM 시장 가치 (2026년 전망)</h2>
+        <div style="display: flex; align-items: flex-end; gap: 40px; height: 300px;">
+            <div style="text-align: center;">
+                <p class="text-sm">2023</p>
+                <div class="bar bar-blue" style="width: 120px; height: 80px;"></div>
+                <p class="text-sm">10조</p>
+            </div>
+            <div style="text-align: center;">
+                <p class="text-sm">2026</p>
+                <div class="bar bar-red animate-pulse" style="width: 150px; height: 250px;"></div>
+                <p class="text-sm text-red">78조 원</p>
+            </div>
+        </div>
+        <p style="margin-top: 30px;">연평균 성장률 <span class="text-red">68%</span> 폭발</p>
+    </div>
+
+    <!-- 씬 8: 거대 자본의 유입 -->
+    <div class="scene" id="scene8">
+        <div class="box-blue" style="padding: 50px;">
+            <h2 style="font-size: 80px;">시장 가치: 78,000,000,000,000원</h2>
+            <p style="margin-top: 20px;">대한민국 국방 예산보다 큰 시장</p>
+        </div>
+    </div>
+
+    <!-- 씬 16: HBM의 속도 혁명 -->
+    <div class="scene" id="scene16">
+        <h2>데이터 전송의 "워프 속도"</h2>
+        <div style="display: flex; align-items: center; gap: 40px; margin: 40px 0;">
+            <i class="fa-solid fa-gauge-high animate-pulse" style="font-size: 120px; color: var(--blue);"></i>
+            <div style="flex: 1;">
+                <div class="gauge-track">
+                    <div class="gauge-fill" style="width: 95%; background: linear-gradient(to right, var(--blue), var(--purple));"></div>
+                </div>
+            </div>
+        </div>
+        <p>기존 메모리 벽을 허무는 유일한 열쇠</p>
+    </div>
+
+    <!-- 씬 17: 왜 HBM인가? -->
+    <div class="scene" id="scene17">
+        <div style="display: flex; gap: 30px;">
+            <div class="box-gray" style="flex: 1;">
+                <i class="fa-solid fa-road" style="font-size: 60px; margin-bottom: 10px;"></i>
+                <p class="text-sm">기존: 2차선 도로</p>
+            </div>
+            <div class="box-blue" style="flex: 1;">
+                <i class="fa-solid fa-bridge" style="font-size: 60px; margin-bottom: 10px;"></i>
+                <p class="text-sm">HBM: 2048차선 고속도로</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 26: 3D 적층 기술 -->
+    <div class="scene" id="scene26">
+        <h2>DRAM을 수직으로 쌓다</h2>
+        <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 20px;">
+            <div class="bar bar-blue" style="width: 300px; height: 30px;"></div>
+            <div class="bar bar-blue" style="width: 300px; height: 30px;"></div>
+            <div class="bar bar-blue" style="width: 300px; height: 30px;"></div>
+            <div class="bar bar-red" style="width: 300px; height: 40px;">Base Die</div>
+        </div>
+        <p style="margin-top: 20px;">3D Stacking 기술의 정점</p>
+    </div>
+
+    <!-- 씬 27: 대역폭의 확장 -->
+    <div class="scene" id="scene27">
+        <div class="box-gray">
+            <h1 class="text-blue">Memory Wall 돌파</h1>
+            <p>데이터 병목 현상을 해결하는 입체 설계</p>
+        </div>
+    </div>
+
+    <!-- 씬 29: 12단/16단 적층 -->
+    <div class="scene" id="scene29">
+        <h2>적층의 한계 도전</h2>
+        <div style="display: flex; gap: 40px; align-items: flex-end;">
+            <div style="text-align: center;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div class="bar" style="width: 80px; height: 10px;"></div>
+                    <div class="bar" style="width: 80px; height: 10px;"></div>
+                    <div class="bar" style="width: 80px; height: 10px;"></div>
+                    <div class="bar" style="width: 80px; height: 10px;"></div>
+                </div>
+                <p class="text-xs">8단</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div class="bar bar-blue" style="width: 80px; height: 10px;" v-for="i in 12"></div>
+                    <div class="bar bar-blue" style="width: 80px; height: 10px;"></div>
+                    <div class="bar bar-blue" style="width: 80px; height: 10px;"></div>
+                    <div class="bar bar-blue" style="width: 80px; height: 10px;"></div>
+                    <div class="bar bar-blue" style="width: 80px; height: 10px;"></div>
+                </div>
+                <p class="text-xs">12단</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div class="bar bar-red animate-pulse" style="width: 80px; height: 10px;"></div>
+                    <div class="bar bar-red animate-pulse" style="width: 80px; height: 10px;"></div>
+                    <div class="bar bar-red animate-pulse" style="width: 80px; height: 10px;"></div>
+                    <div class="bar bar-red animate-pulse" style="width: 80px; height: 10px;"></div>
+                    <div class="bar bar-red animate-pulse" style="width: 80px; height: 10px;"></div>
+                    <div class="bar bar-red animate-pulse" style="width: 80px; height: 10px;"></div>
+                </div>
+                <p class="text-xs text-red">16단(HBM4)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 30: 초정밀 엔지니어링 -->
+    <div class="scene" id="scene30">
+        <i class="fa-solid fa-microscope" style="font-size: 100px; margin-bottom: 20px;"></i>
+        <h1>나노 미터의 미학</h1>
+        <p>오차 없는 적층이 수율을 결정한다</p>
+    </div>
+
+    <!-- 씬 34: 시장 쟁탈전 -->
+    <div class="scene" id="scene34">
+        <h2>점유율 전쟁</h2>
+        <div style="display: flex; gap: 20px; align-items: center; width: 80%;">
+            <div style="flex: 6; background: var(--purple); height: 80px; border: 3px solid #000; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">SK hynix 60%</div>
+            <div style="flex: 2; background: var(--blue); height: 80px; border: 3px solid #000; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px;">삼성 22%</div>
+            <div style="flex: 2; background: var(--gray); height: 80px; border: 3px solid #000; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px;">마이크론</div>
+        </div>
+        <p style="margin-top: 30px;">판을 뒤집으려는 삼성의 <span class="text-red">반격</span></p>
+    </div>
+
+    <!-- 씬 35: 급격한 변화 -->
+    <div class="scene" id="scene35">
+        <div style="display: flex; gap: 40px; align-items: center;">
+            <i class="fa-solid fa-fire-flame-curved animate-pulse" style="font-size: 120px; color: var(--orange);"></i>
+            <h1>과열되는 HBM 시장</h1>
+        </div>
+    </div>
+
+    <!-- 씬 42: HBM3E 스펙 -->
+    <div class="scene" id="scene42">
+        <h2 style="margin-bottom: 20px;">HBM3E: 현재의 표준</h2>
+        <div class="box-gray" style="padding: 40px 60px;">
+            <h1>1024-bit</h1>
+            <p>인터페이스 폭</p>
+        </div>
+    </div>
+
+    <!-- 씬 43: HBM4의 도약 -->
+    <div class="scene" id="scene43">
+        <h2 style="margin-bottom: 30px;">HBM4: 차원이 다른 확장</h2>
+        <div style="display: flex; gap: 50px; align-items: center;">
+            <div class="box" style="opacity: 0.5;">1024-bit</div>
+            <i class="fa-solid fa-angles-right animate-pulse" style="font-size: 60px; color: var(--red);"></i>
+            <div class="box-pink" style="padding: 40px 60px;">
+                <h1 class="text-red">2048-bit</h1>
+                <p>데이터 통로 2배 확장</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 44: 압도적 성능 -->
+    <div class="scene" id="scene44">
+        <i class="fa-solid fa-rocket animate-float" style="font-size: 120px; color: var(--red);"></i>
+        <h1 style="margin-top: 20px;">성능의 퀀텀 점프</h1>
+    </div>
+
+    <!-- 씬 47: 고속도로 확장 비유 -->
+    <div class="scene" id="scene47">
+        <h2>데이터 고속도로 확장</h2>
+        <div style="width: 80%; display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="width: 150px; font-size: 36px;">HBM3E</span>
+                <div class="gauge-track" style="flex: 1; height: 40px;">
+                    <div class="gauge-fill" style="width: 50%; background: var(--gray);"></div>
+                </div>
+                <span class="text-sm">4차선</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="width: 150px; font-size: 36px;">HBM4</span>
+                <div class="gauge-track" style="flex: 1; height: 60px;">
+                    <div class="gauge-fill animate-pulse" style="width: 100%; background: var(--blue);"></div>
+                </div>
+                <span class="text-sm text-blue">8차선</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 48: 물동량 증가 -->
+    <div class="scene" id="scene48">
+        <h1 class="text-blue">정체 없는 데이터 흐름</h1>
+        <p>AI 연산 속도가 비약적으로 빨라집니다</p>
+    </div>
+
+    <!-- 씬 50: HBM3E 정밀도 -->
+    <div class="scene" id="scene50">
+        <h2 style="margin-bottom: 20px;">HBM3E: 초당 전송량</h2>
+        <div class="box-blue">
+            <h1 style="font-size: 120px;">1.2TB/s</h1>
+        </div>
+    </div>
+
+    <!-- 씬 51: 정교한 회로 -->
+    <div class="scene" id="scene51">
+        <i class="fa-solid fa-microchip" style="font-size: 120px; color: var(--blue);"></i>
+        <p style="margin-top: 20px;">기술적 완성도의 정점</p>
+    </div>
+
+    <!-- 씬 52: HBM4의 전송 속도 -->
+    <div class="scene" id="scene52">
+        <h2>HBM4: 압도적 데이터 전송</h2>
+        <div style="position: relative; width: 600px; height: 300px; border-left: 4px solid #222; border-bottom: 4px solid #222; overflow: hidden;">
+            <svg width="100%" height="100%" style="position: absolute;">
+                <polyline points="30,270 150,220 300,100 450,50 550,30" 
+                          stroke="#ef4444" stroke-width="6" fill="none" style="filter: url(#rough-edge);"/>
+            </svg>
+            <p style="position: absolute; right: 50px; top: 20px; font-size: 44px; color: var(--red);">3.0TB/s</p>
+        </div>
+        <p style="margin-top: 20px;">HBM3E 대비 <span class="text-red">2.5배</span> 향상</p>
+    </div>
+
+    <!-- 씬 53: 혁신의 증거 -->
+    <div class="scene" id="scene53">
+        <div class="box-pink">
+            <h1>초당 영화 200편 전송</h1>
+            <p>상상을 초월하는 대역폭</p>
+        </div>
+    </div>
+
+    <!-- 씬 58: 4나노 로직 칩 -->
+    <div class="scene" id="scene58">
+        <h2>생각하는 메모리: Base Die의 혁명</h2>
+        <div style="display: flex; gap: 30px; align-items: center;">
+            <div class="box-gray" style="padding: 40px;">일반 DRAM 공정</div>
+            <span style="font-size: 50px;">→</span>
+            <div class="box-blue" style="padding: 40px;">
+                <h2 class="text-blue">4나노 로직 공정</h2>
+                <p>지능형 베이스 다이</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 59: 전력 효율 -->
+    <div class="scene" id="scene59">
+        <div style="display: flex; align-items: center; gap: 40px;">
+            <i class="fa-solid fa-leaf animate-subtle" style="font-size: 120px; color: var(--green);"></i>
+            <div>
+                <h1>에너지 효율 40% 개선</h1>
+                <p>저전력 • 저발열의 핵심 기술</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 73: 열 관리 기술 -->
+    <div class="scene" id="scene73">
+        <h2>반도체의 적, '열'을 잡아라</h2>
+        <div style="display: flex; align-items: center; gap: 30px;">
+            <div style="width: 80px; height: 250px; background: linear-gradient(to top, var(--blue), var(--yellow), var(--red)); border-radius: 40px; border: 4px solid #000; position: relative;">
+                <div style="position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: white; border-radius: 50%;"></div>
+            </div>
+            <div style="text-align: left;">
+                <p class="text-red">● 발열 해결 필수</p>
+                <p class="text-blue">● 특수 보호재 삽입</p>
+                <p class="text-green">● 수율 안정화의 관건</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 74: 정밀 설계 -->
+    <div class="scene" id="scene74">
+        <i class="fa-solid fa-wind animate-subtle" style="font-size: 120px; color: var(--blue);"></i>
+        <h1>냉각 효율의 극대화</h1>
+    </div>
+
+    <!-- 씬 75: 클린룸의 기술력 -->
+    <div class="scene" id="scene75">
+        <div class="box-gray">
+            <p>초미세 공정의 승부처</p>
+            <h2>Thermal Management</h2>
+        </div>
+    </div>
+
+    <!-- 씬 76: SK하이닉스의 신뢰 -->
+    <div class="scene" id="scene76">
+        <h2 style="margin-bottom: 30px;">검증된 파트너십</h2>
+        <div style="display: flex; gap: 40px; align-items: center;">
+            <div class="box-pink" style="font-size: 60px;">SK hynix</div>
+            <i class="fa-solid fa-handshake" style="font-size: 70px;"></i>
+            <div class="box-gray" style="font-size: 60px;">NVIDIA</div>
+        </div>
+        <p style="margin-top: 30px;">4년간 쌓아온 <span class="hl-yellow">압도적 수율</span></p>
+    </div>
+
+    <!-- 씬 77: 데이터센터의 심장 -->
+    <div class="scene" id="scene77">
+        <i class="fa-solid fa-server animate-pulse" style="font-size: 120px; color: var(--gray);"></i>
+        <p style="margin-top: 20px;">엔비디아 루빈의 심장이 되다</p>
+    </div>
+
+    <!-- 씬 78: 품질의 상징 -->
+    <div class="scene" id="scene78">
+        <div class="box-green">
+            <i class="fa-solid fa-award" style="font-size: 60px; color: var(--orange);"></i>
+            <h1>품질 테스트 프리패스</h1>
+        </div>
+    </div>
+
+    <!-- 씬 88: 삼성의 반격 -->
+    <div class="scene" id="scene88">
+        <h1 class="text-blue animate-pulse" style="font-size: 120px;">SAMSUNG</h1>
+        <h2 class="text-red">거인의 반격이 시작된다</h2>
+        <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 60px; margin-top: 20px;"></i>
+    </div>
+
+    <!-- 씬 89: 에너지의 압축 -->
+    <div class="scene" id="scene89">
+        <i class="fa-solid fa-atom animate-spin-slow" style="font-size: 150px; color: var(--blue);"></i>
+        <p style="margin-top: 30px;">3년간의 와신상담</p>
+    </div>
+
+    <!-- 씬 90: 전략적 혁신 -->
+    <div class="scene" id="scene90">
+        <div class="box-blue">
+            <h2>한 세대를 건너뛰는 승부수</h2>
+            <p class="text-red">HBM4 조기 양산 체제 구축</p>
+        </div>
+    </div>
+
+    <!-- 씬 103: 수직 계열화의 힘 -->
+    <div class="scene" id="scene103">
+        <h2>삼성만의 무기: 원스톱 솔루션</h2>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div class="box-gray" style="padding: 20px;">설계</div>
+            <span style="font-size: 40px;">→</span>
+            <div class="box-gray" style="padding: 20px;">생산</div>
+            <span style="font-size: 40px;">→</span>
+            <div class="box-gray" style="padding: 20px;">패키징</div>
+        </div>
+        <div class="hl-yellow" style="margin-top: 30px;">전 세계 유일의 수직 계열화</div>
+    </div>
+
+    <!-- 씬 104: 시너지 효과 -->
+    <div class="scene" id="scene104">
+        <i class="fa-solid fa-gears animate-subtle" style="font-size: 120px; color: var(--blue);"></i>
+        <h1>메모리 + 파운드리 시너지</h1>
+    </div>
+
+    <!-- 씬 105: 자급자족 생태계 -->
+    <div class="scene" id="scene105">
+        <div class="box-blue">
+            <p>외부 의존도 ZERO</p>
+            <h2>Total Integrated Solution</h2>
+        </div>
+    </div>
+
+    <!-- 씬 106: 효율과 자율성 -->
+    <div class="scene" id="scene106">
+        <h2>삼성 시스템의 장점</h2>
+        <div style="display: flex; gap: 40px;">
+            <div style="text-align: center;">
+                <i class="fa-solid fa-gauge-simple-high" style="font-size: 80px; color: var(--green);"></i>
+                <p class="text-sm">설계 최적화</p>
+            </div>
+            <div style="text-align: center;">
+                <i class="fa-solid fa-sack-dollar" style="font-size: 80px; color: var(--orange);"></i>
+                <p class="text-sm">비용 절감</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 107: 전략적 이점 -->
+    <div class="scene" id="scene107">
+        <h1 class="text-green">품질 관리의 일관성</h1>
+        <p>처음부터 끝까지 삼성의 기술로</p>
+    </div>
+
+    <!-- 씬 108: 독보적 역량 -->
+    <div class="scene" id="scene108">
+        <i class="fa-solid fa-shield-halved animate-pulse" style="font-size: 120px; color: var(--blue);"></i>
+        <p style="margin-top: 20px;">경쟁사가 넘볼 수 없는 인프라</p>
+    </div>
+
+    <!-- 씬 112: 하이브리드 본딩 -->
+    <div class="scene" id="scene112">
+        <h2>차세대 패키징: 하이브리드 본딩</h2>
+        <div style="display: flex; gap: 50px; align-items: center;">
+            <div style="text-align: center;">
+                <div style="width: 150px; height: 100px; border: 2px dashed #999;">기존</div>
+                <p class="text-xs">범프 필요</p>
+            </div>
+            <i class="fa-solid fa-arrow-right" style="font-size: 50px;"></i>
+            <div style="text-align: center;">
+                <div class="box-blue" style="width: 150px; height: 100px; border: 4px solid #222;">Hybrid</div>
+                <p class="text-xs text-blue">구리 직접 접합</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 113: 칩 간격의 혁명 -->
+    <div class="scene" id="scene113">
+        <h1 class="text-red">두께는 줄이고, 단수는 높이고</h1>
+        <p>16단 적층을 가능케 하는 마법</p>
+    </div>
+
+    <!-- 씬 114: 나노 스케일의 정밀함 -->
+    <div class="scene" id="scene114">
+        <i class="fa-solid fa-microchip animate-pulse" style="font-size: 120px; color: var(--purple);"></i>
+        <p style="margin-top: 20px;">나노 단위의 초정밀 접합 기술</p>
+    </div>
+
+    <!-- 씬 130: 불확실한 미래 -->
+    <div class="scene" id="scene130">
+        <h1 style="font-size: 100px;">?</h1>
+        <h2>예측 불가능한 2026</h2>
+        <p>누가 승자가 될 것인가</p>
+    </div>
+
+    <!-- 씬 131: 복잡한 네트워크 -->
+    <div class="scene" id="scene131">
+        <i class="fa-solid fa-network-wired animate-spin-slow" style="font-size: 120px; color: var(--gray);"></i>
+        <p style="margin-top: 20px;">얽히고설킨 공급망 리스크</p>
+    </div>
+
+    <!-- 씬 132: 미지의 경로 -->
+    <div class="scene" id="scene132">
+        <div class="box-gray">
+            <p>기술적 난제 • 수율 전쟁</p>
+            <h2 class="text-red">The Unknown Future</h2>
+        </div>
+    </div>
+
+    <!-- 씬 133: 평행선상의 경쟁 -->
+    <div class="scene" id="scene133">
+        <h2>공급망 구도 비교</h2>
+        <div style="display: flex; gap: 40px;">
+            <div class="box-pink" style="flex: 1;">
+                <p class="text-sm">SK + TSMC</p>
+                <p class="text-xs">연합군 모델</p>
+            </div>
+            <div class="box-blue" style="flex: 1;">
+                <p class="text-sm">SAMSUNG</p>
+                <p class="text-xs">단독 수직계열화</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 134: 기술적 자부심 -->
+    <div class="scene" id="scene134">
+        <i class="fa-solid fa-chess-queen animate-float" style="font-size: 120px; color: var(--purple);"></i>
+        <h1>메모리 왕좌를 향한 투쟁</h1>
+    </div>
+
+    <!-- 씬 135: 경쟁의 풍경 -->
+    <div class="scene" id="scene135">
+        <div class="hl-yellow">
+            <h1 style="font-size: 60px;">Winner Takes All</h1>
+        </div>
+    </div>
+
+    <!-- 씬 136: 수직 계열화의 명암 -->
+    <div class="scene" id="scene136">
+        <h2>수직 계열화: 양날의 검</h2>
+        <div style="display: flex; gap: 30px;">
+            <div class="box-green" style="flex: 1;">
+                <p class="text-sm">장점</p>
+                <p class="text-xs">속도 • 효율 • 보안</p>
+            </div>
+            <div class="box-pink" style="flex: 1;">
+                <p class="text-sm">리스크</p>
+                <p class="text-xs">거대 조직의 경직성</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 137: 견고한 요새 -->
+    <div class="scene" id="scene137">
+        <i class="fa-solid fa-fort-awesome animate-subtle" style="font-size: 120px; color: var(--gray);"></i>
+        <p style="margin-top: 20px;">무너지지 않는 공급망 구축</p>
+    </div>
+
+    <!-- 씬 138: 잠재적 균열 -->
+    <div class="scene" id="scene138">
+        <div class="box-gray" style="border: 4px dashed #ef4444;">
+            <h2 class="text-red">리스크 관리의 중요성</h2>
+            <p>한 곳의 실패가 전체의 실패로</p>
+        </div>
+    </div>
+
+    <!-- 씬 157: 삼성 R&D의 결기 -->
+    <div class="scene" id="scene157">
+        <h2 style="margin-bottom: 20px;">연구소의 불은 꺼지지 않는다</h2>
+        <div class="box-blue" style="padding: 50px;">
+            <i class="fa-solid fa-flask-vial animate-pulse" style="font-size: 80px; margin-bottom: 20px;"></i>
+            <h1>R&D 투자 사상 최대</h1>
+            <p>초격차 기술로 승부한다</p>
+        </div>
+    </div>
+
+    <!-- 씬 158: 반격의 시간 -->
+    <div class="scene" id="scene158">
+        <i class="fa-solid fa-stopwatch animate-pulse" style="font-size: 120px; color: var(--red);"></i>
+        <h1>2026년 2월, 양산 개시</h1>
+    </div>
+
+    <!-- 씬 159: 전략적 우위 확보 -->
+    <div class="scene" id="scene159">
+        <div class="box-pink">
+            <h2 class="text-red">"고객사 재설계 요청 없음"</h2>
+            <p>첫 시도에 품질 테스트 통과</p>
+        </div>
+    </div>
+
+    <!-- 씬 160: 글로벌 네트워크 장악 -->
+    <div class="scene" id="scene160">
+        <h2>데이터가 지배하는 세상</h2>
+        <div style="position: relative; width: 300px; height: 300px;">
+            <i class="fa-solid fa-earth-asia animate-spin-slow" style="font-size: 200px; color: var(--blue);"></i>
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 4px solid var(--orange); border-radius: 50%; filter: url(#rough-edge);"></div>
+        </div>
+        <p style="margin-top: 30px;">글로벌 AI 인프라의 <span class="text-blue">코어</span></p>
+    </div>
+
+    <!-- 씬 161: 시스템의 주도권 -->
+    <div class="scene" id="scene161">
+        <i class="fa-solid fa-diagram-project animate-subtle" style="font-size: 120px; color: var(--purple);"></i>
+        <h1>단순 부품을 넘어 시스템으로</h1>
+    </div>
+
+    <!-- 씬 162: 전략적 중요성 -->
+    <div class="scene" id="scene162">
+        <div class="box-gray">
+            <h2 style="font-size: 80px;">Global Influence</h2>
+            <p>HBM4, 인류의 연산 능력을 정의하다</p>
+        </div>
+    </div>
+</div>
+
+<div id="nav-controls">
+    <button onclick="move(-1)"><i class="fa-solid fa-chevron-left"></i> 이전 (←)</button>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    <button onclick="move(1)">다음 (→) <i class="fa-solid fa-chevron-right"></i></button>
+    <div style="font-size: 24px;">
+        <span id="current-idx">1</span> / <span id="total-scenes">0</span>
+    </div>
+</div>
+
+<script>
+    let currentIdx = 0;
+    const scenes = document.querySelectorAll('.scene');
+    const progressBar = document.getElementById('progress-bar');
+    const counterText = document.getElementById('current-idx');
+    const totalText = document.getElementById('total-scenes');
+
+    if (totalText) totalText.innerText = scenes.length;
+
+    function update() {
+        scenes.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
+        progressBar.style.width = ((currentIdx + 1) / scenes.length * 100) + '%';
+        counterText.innerText = currentIdx + 1;
+    }
+
+    function move(n) {
+        currentIdx += n;
+        if (currentIdx < 0) currentIdx = 0;
+        if (currentIdx >= scenes.length) currentIdx = scenes.length - 1;
+        update();
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') move(1);
+        if (e.key === 'ArrowLeft') move(-1);
+    });
+
+    update();
+</script>
+
+</body>
+</html>

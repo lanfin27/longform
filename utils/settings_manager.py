@@ -24,7 +24,7 @@ DEFAULT_SETTINGS = {
         "style": "animation",
         "api_interval": 1.0,
         "celebrity_replacement": True,
-        "celebrity_ai_model": "gemini-2.0-flash-exp",
+        "celebrity_ai_model": "gemini-2.5-flash",
         "rembg_enabled": False,
         "auto_save_storyboard": False,
         "style_mode": "🖼️ 배경만 생성 (배경 스타일 사용)",
@@ -62,10 +62,10 @@ DEFAULT_SETTINGS = {
     },
     "scene_analysis": {
         "ai_provider": "google",
-        "ai_model": "gemini-2.0-flash-exp",
+        "ai_model": "gemini-2.5-flash",
         "language": "ko",
         "srt_bundle_size": 2,
-        "hybrid_ai_model": "gemini-2.0-flash-exp",
+        "hybrid_ai_model": "gemini-2.5-flash",
         "srt_generate_prompts": True
     }
 }

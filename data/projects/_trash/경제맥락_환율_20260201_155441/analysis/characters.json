@@ -1,0 +1,158 @@
+[
+  {
+    "name": "한국인 투자자",
+    "name_ko": "한국인 투자자",
+    "role": "등장인물",
+    "visual_prompt": "Subtle Asian hands holding a smartphone or tablet, subtly interacting with a stock investment app",
+    "description": "",
+    "scenes": [
+      31,
+      32,
+      33
+    ],
+    "appearance_scenes": [
+      31,
+      32,
+      33
+    ]
+  },
+  {
+    "name": "대통령",
+    "name_ko": "대통령",
+    "role": "등장인물",
+    "visual_prompt": "delivering a solemn address on a television screen, with a grave and serious expression, wearing formal attire",
+    "description": "",
+    "scenes": [
+      100,
+      101,
+      102
+    ],
+    "appearance_scenes": [
+      100,
+      101,
+      102
+    ]
+  },
+  {
+    "name": "도널드 트럼프 전 대통령",
+    "name_ko": "도널드 트럼프 전 대통령",
+    "role": "등장인물",
+    "visual_prompt": "strong and determined Caucasian man, looking directly forward with a resolute expression, exuding a powerful presence, wearing a dark suit and red tie",
+    "description": "",
+    "scenes": [
+      121,
+      122,
+      123,
+      133,
+      134,
+      135
+    ],
+    "appearance_scenes": [
+      100,
+      101,
+      102
+    ]
+  },
+  {
+    "name": "정치 지도자",
+    "name_ko": "정치 지도자",
+    "role": "등장인물",
+    "visual_prompt": "resolute and determined political leader, reminiscent of Donald Trump, with a stern expression and strong posture, conveying unwavering resolve, powerful and authoritative demeanor, middle-aged",
+    "description": "",
+    "scenes": [
+      139,
+      140,
+      141
+    ],
+    "appearance_scenes": [
+      139,
+      140,
+      141
+    ]
+  },
+  {
+    "name": "한국 정부 관료",
+    "name_ko": "한국 정부 관료",
+    "role": "등장인물",
+    "visual_prompt": "solemn-faced, middle-aged, wearing a dark suit, looking deeply troubled and caught in a difficult decision, conveying a sense of immense pressure",
+    "description": "",
+    "scenes": [
+      190,
+      191,
+      192
+    ],
+    "appearance_scenes": [
+      190,
+      191,
+      192
+    ]
+  },
+  {
+    "name": "한국 정부 관료 실루엣",
+    "name_ko": "한국 정부 관료 실루엣",
+    "role": "등장인물",
+    "visual_prompt": "head bowed in deep despair and indecision, conveying immense pressure and a feeling of being trapped",
+    "description": "",
+    "scenes": [
+      196,
+      197,
+      198
+    ],
+    "appearance_scenes": [
+      190,
+      191,
+      192
+    ]
+  },
+  {
+    "name": "금융 전문가들",
+    "name_ko": "금융 전문가들",
+    "role": "등장인물",
+    "visual_prompt": "diverse financial experts, various ethnicities, sharp business attire, intently observing and discussing a digital dashboard, focused and professional expressions",
+    "description": "",
+    "scenes": [
+      202,
+      203,
+      204
+    ],
+    "appearance_scenes": [
+      202,
+      203,
+      204
+    ]
+  },
+  {
+    "name": "오건영 단장",
+    "name_ko": "오건영 단장",
+    "role": "등장인물",
+    "visual_prompt": "knowledgeable Asian economist and director, middle-aged, wearing a business suit, with a serious and analytical expression, gesturing as if explaining complex financial concepts",
+    "description": "",
+    "scenes": [
+      208,
+      209,
+      210
+    ],
+    "appearance_scenes": [
+      208,
+      209,
+      210
+    ]
+  },
+  {
+    "name": "한 인물",
+    "name_ko": "한 인물",
+    "role": "등장인물",
+    "visual_prompt": "contemplative posture, symbolizing decision-making at a critical juncture, dressed in modern, neutral attire",
+    "description": "",
+    "scenes": [
+      247,
+      248,
+      249
+    ],
+    "appearance_scenes": [
+      247,
+      248,
+      249
+    ]
+  }
+]

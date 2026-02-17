@@ -60,6 +60,7 @@ class APIConfig:
     price_per_unit: float = 0.0
     unit_name: str = "request"
     max_requests_per_minute: int = 60
+    max_requests_per_day: int = 0  # 일일 요청 제한 (0 = 무제한)
     max_output_tokens: int = 8192  # ⭐ 최대 출력 토큰 수
     description: str = ""
     is_enabled: bool = True
@@ -139,42 +140,50 @@ class APIManager:
             description="빠르고 저렴한 간단한 작업"
         ),
         # ⭐ Gemini 모델들 (정확한 모델명과 출력 토큰 표시)
-        "gemini-2.0-flash-exp": APIConfig(
+        "gemini-2.5-flash": APIConfig(
             provider="google",
-            name="Gemini 2.0 Flash Exp (64K출력) ⭐추천",
-            model_id="gemini-2.0-flash-exp",
+            name="Gemini 2.5 Flash ⭐추천",
+            model_id="gemini-2.5-flash",
             function="text_generation",
             is_free=True,
+            max_requests_per_minute=10,
+            max_requests_per_day=250,
             max_output_tokens=65536,  # ⭐ 64K 토큰!
-            description="최신 실험 모델, 최대 65,536 토큰 출력 (긴 JSON에 최적)"
+            description="최신 2.5 Flash 모델, 최대 65,536 토큰 출력 (긴 JSON에 최적)"
         ),
-        "gemini-2.0-flash": APIConfig(
+        "gemini-2.5-flash-lite": APIConfig(
             provider="google",
-            name="Gemini 2.0 Flash (8K출력)",
-            model_id="gemini-2.0-flash",
+            name="Gemini 2.5 Flash Lite",
+            model_id="gemini-2.5-flash-lite",
             function="text_generation",
             is_free=True,
-            max_output_tokens=8192,
-            description="안정적인 Flash 모델, 8,192 토큰 출력"
+            max_requests_per_minute=15,
+            max_requests_per_day=1000,
+            max_output_tokens=65536,  # ⭐ 64K 토큰
+            description="초고속 Flash Lite 모델, 대량 처리 최적 (일 1,000회)"
         ),
         "gemini-1.5-flash": APIConfig(
             provider="google",
-            name="Gemini 1.5 Flash (8K출력)",
+            name="Gemini 1.5 Flash",
             model_id="gemini-1.5-flash",
             function="text_generation",
             is_free=True,
-            max_output_tokens=8192,
-            description="이전 버전 Flash 모델, 8,192 토큰 출력"
+            max_requests_per_minute=15,
+            max_requests_per_day=1500,
+            max_output_tokens=32768,  # ⭐ 32K 토큰
+            description="안정적 Flash 모델, 일 1,500회 (최대 RPD)"
         ),
-        "gemini-1.5-pro": APIConfig(
+        "gemini-2.5-pro": APIConfig(
             provider="google",
-            name="Gemini 1.5 Pro (8K출력)",
-            model_id="gemini-1.5-pro",
+            name="Gemini 2.5 Pro (8K출력)",
+            model_id="gemini-2.5-pro",
             function="text_generation",
             price_per_unit=0.00125,
             unit_name="1K tokens",
+            max_requests_per_minute=5,
+            max_requests_per_day=100,
             max_output_tokens=8192,
-            description="고품질 분석, 8,192 토큰 출력"
+            description="고품질 분석, 일 100회"
         ),
         "gpt-4o": APIConfig(
             provider="openai",
@@ -264,7 +273,7 @@ class APIManager:
         "gemini-vision": APIConfig(
             provider="google",
             name="Gemini Vision",
-            model_id="gemini-2.0-flash-exp",
+            model_id="gemini-2.5-flash",
             function="image_analysis",
             is_free=True,
             description="무료 이미지 분석"

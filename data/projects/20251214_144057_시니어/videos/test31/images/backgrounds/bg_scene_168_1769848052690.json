@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-31T17:19:56.626330",
+  "image_file": "bg_scene_166_1769847596625.png",
+  "scene_id": 166,
+  "prompts": {
+    "original": "Extreme close-up of an advanced semiconductor wafer highlighting the powerful V920 chip, intricate circuit diagrams and data visualizations subtly blurred in the background, conveying technological superiority and complexity, futuristic blue and purple lighting emphasizing cutting-edge innovation, sharp focus on the chip's intricate details, high-tech research lab aesthetic, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Extreme close-up of an advanced semiconductor wafer highlighting the powerful V920 chip, intricate circuit diagrams and data visualizations subtly blurred in the background, conveying technological superiority and complexity, futuristic blue and purple lighting emphasizing cutting-edge innovation, sharp focus on the chip's intricate details, high-tech research lab aesthetic, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1394316814
+  },
+  "scene_number": 168,
+  "copied_from": {
+    "scene_number": 166,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test31\\images\\backgrounds\\bg_scene_166_1769847596625.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-01-31T17:27:32.692429"
+}

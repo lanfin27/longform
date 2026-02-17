@@ -1,0 +1,129 @@
+[
+  {
+    "id": "char_0",
+    "name": "비즈니스맨들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Diverse businesspeople, professional attire, confused and animated expressions, discussing in a modern office",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_비즈니스맨들_standing_1769829699529.png"
+    ],
+    "appearance_scenes": [
+      43,
+      44,
+      45
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_비즈니스맨들_standing_1769829699529.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-31T11:44:51.558710",
+    "updated_at": "2026-01-31T12:58:40.504723"
+  },
+  {
+    "id": "char_1",
+    "name": "이재용 회장",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "then Vice Chairman of Samsung, an Asian businessman in a sharp dark suit, with a thoughtful, visionary expression, gazing out of a window, conveying deep strategic contemplation",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [
+      46,
+      47,
+      48
+    ],
+    "selected_image_path": "",
+    "auto_select_latest": true,
+    "created_at": "2026-01-31T11:44:51.561934",
+    "updated_at": "2026-01-31T12:58:40.504789"
+  },
+  {
+    "id": "char_2",
+    "name": "운전자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A driver, potentially a middle-aged Asian man, seated in the driver's seat, looking at the display with a focused and comfortable expression, hands on the steering wheel",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_운전자_standing_1769829703755.png"
+    ],
+    "appearance_scenes": [
+      64,
+      65,
+      66,
+      103,
+      104,
+      105,
+      115,
+      116,
+      117,
+      244,
+      245,
+      246
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_운전자_standing_1769829703755.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-31T11:44:51.562998",
+    "updated_at": "2026-01-31T12:58:40.504851"
+  },
+  {
+    "id": "char_3",
+    "name": "핵심 인력들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "business professionals, looking worried or stressed, in formal business attire, conveying deep concern",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_핵심_인력들_standing_1769829703218.png"
+    ],
+    "appearance_scenes": [
+      199,
+      200,
+      201
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_핵심_인력들_standing_1769829703218.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-31T11:44:51.563908",
+    "updated_at": "2026-01-31T12:58:40.504912"
+  },
+  {
+    "id": "char_4",
+    "name": "유튜버",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Smiling presenter, friendly expression, making a gesture suggesting subscribe and like, looking directly at the camera, professional yet approachable",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_유튜버_standing_1769829708190.png"
+    ],
+    "appearance_scenes": [
+      316,
+      317,
+      318
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_유튜버_standing_1769829708190.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-31T11:44:51.565083",
+    "updated_at": "2026-01-31T12:58:40.504985"
+  }
+]

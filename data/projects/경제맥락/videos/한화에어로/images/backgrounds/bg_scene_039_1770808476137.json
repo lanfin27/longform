@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-11T20:06:44.454631",
+  "image_file": "bg_scene_037_1770808004454.png",
+  "scene_id": 37,
+  "prompts": {
+    "original": "Dynamic action shot of a US Lockheed Martin HIMARS multiple rocket launcher system and a South Korean Hanwha Aerospace Chunmoo multiple rocket launcher system, both firing missiles simultaneously on a battlefield, showcasing their powerful impact in a warzone, dramatic dark sky with flashes of explosions, Lockheed Martin logo visible on HIMARS and Hanwha Aerospace logo visible on Chunmoo, vast battlefield landscape stretching to the horizon, emphasizing overwhelming military might and advanced technology, cinematic wide shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Dynamic action shot of a US Lockheed Martin HIMARS multiple rocket launcher system and a South Korean Hanwha Aerospace Chunmoo multiple rocket launcher system, both firing missiles simultaneously on a battlefield, showcasing their powerful impact in a warzone, dramatic dark sky with flashes of explosions, Lockheed Martin logo visible on HIMARS and Hanwha Aerospace logo visible on Chunmoo, vast battlefield landscape stretching to the horizon, emphasizing overwhelming military might and advanced technology, cinematic wide shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 2035834427
+  },
+  "scene_number": 39,
+  "copied_from": {
+    "scene_number": 37,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\backgrounds\\bg_scene_037_1770808004454.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-11T20:14:36.139069"
+}

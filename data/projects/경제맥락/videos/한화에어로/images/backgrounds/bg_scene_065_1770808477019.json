@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-11T20:08:03.506233",
+  "image_file": "bg_scene_064_1770808083505.png",
+  "scene_id": 64,
+  "prompts": {
+    "original": "Dramatic night launch of a long-range precision missile, a glowing trajectory arcing across the night sky, superimposed over a stylized map showing the vast distance from Seoul to Busan, with a precise target point highlighted, holographic overlay illustrating an error margin of 9 to 15 meters, emphasizing extreme accuracy and advanced military technology, powerful and awe-inspiring, cinematic wide shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Dramatic night launch of a long-range precision missile, a glowing trajectory arcing across the night sky, superimposed over a stylized map showing the vast distance from Seoul to Busan, with a precise target point highlighted, holographic overlay illustrating an error margin of 9 to 15 meters, emphasizing extreme accuracy and advanced military technology, powerful and awe-inspiring, cinematic wide shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1333538651
+  },
+  "scene_number": 65,
+  "copied_from": {
+    "scene_number": 64,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\backgrounds\\bg_scene_064_1770808083505.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-11T20:14:37.029235"
+}

@@ -1,0 +1,758 @@
+{
+  "4": {
+    "characters": {
+      "40대 은행원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_은행원들_standing_1770705506422.png",
+            "updated_at": "2026-02-10T15:39:46.995721"
+          }
+        }
+      },
+      "은행원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행원_standing_1770705547813.png",
+            "updated_at": "2026-02-10T15:39:47.444670"
+          }
+        }
+      },
+      "40대 은행원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_은행원_standing_1770705586940.png",
+            "updated_at": "2026-02-10T15:39:47.662513"
+          }
+        }
+      }
+    }
+  },
+  "5": {
+    "characters": {
+      "40대 은행원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_은행원들_standing_1770705506422.png",
+            "updated_at": "2026-02-10T15:39:46.995730"
+          }
+        }
+      },
+      "은행원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행원_standing_1770705547813.png",
+            "updated_at": "2026-02-10T15:39:47.444678"
+          }
+        }
+      },
+      "40대 은행원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_은행원_standing_1770705586940.png",
+            "updated_at": "2026-02-10T15:39:47.662521"
+          }
+        }
+      }
+    }
+  },
+  "6": {
+    "characters": {
+      "40대 은행원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_은행원들_standing_1770705506422.png",
+            "updated_at": "2026-02-10T15:39:46.995733"
+          }
+        }
+      },
+      "은행원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행원_standing_1770705547813.png",
+            "updated_at": "2026-02-10T15:39:47.444681"
+          }
+        }
+      },
+      "40대 은행원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_은행원_standing_1770705586940.png",
+            "updated_at": "2026-02-10T15:39:47.662523"
+          }
+        }
+      }
+    }
+  },
+  "22": {
+    "characters": {
+      "은행 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png",
+            "updated_at": "2026-02-10T15:39:47.033265"
+          }
+        }
+      }
+    }
+  },
+  "23": {
+    "characters": {
+      "은행 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png",
+            "updated_at": "2026-02-10T15:39:47.033276"
+          }
+        }
+      }
+    }
+  },
+  "24": {
+    "characters": {
+      "은행 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png",
+            "updated_at": "2026-02-10T15:39:47.033279"
+          }
+        }
+      }
+    }
+  },
+  "25": {
+    "characters": {
+      "은행 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png",
+            "updated_at": "2026-02-10T15:39:47.033281"
+          }
+        }
+      },
+      "은행 경영진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_경영진_standing_1770705507677.png",
+            "updated_at": "2026-02-10T15:39:47.069250"
+          }
+        }
+      }
+    }
+  },
+  "26": {
+    "characters": {
+      "은행 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png",
+            "updated_at": "2026-02-10T15:39:47.033284"
+          }
+        }
+      },
+      "은행 경영진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_경영진_standing_1770705507677.png",
+            "updated_at": "2026-02-10T15:39:47.069257"
+          }
+        }
+      }
+    }
+  },
+  "27": {
+    "characters": {
+      "은행 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png",
+            "updated_at": "2026-02-10T15:39:47.033286"
+          }
+        }
+      },
+      "은행 경영진": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_경영진_standing_1770705507677.png",
+            "updated_at": "2026-02-10T15:39:47.069258"
+          }
+        }
+      }
+    }
+  },
+  "136": {
+    "characters": {
+      "은행 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png",
+            "updated_at": "2026-02-10T15:39:47.033289"
+          }
+        }
+      },
+      "테크 기업 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_테크_기업_직원들_standing_1770705560536.png",
+            "updated_at": "2026-02-10T15:39:47.531741"
+          }
+        }
+      }
+    }
+  },
+  "137": {
+    "characters": {
+      "은행 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png",
+            "updated_at": "2026-02-10T15:39:47.033292"
+          }
+        }
+      },
+      "테크 기업 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_테크_기업_직원들_standing_1770705560536.png",
+            "updated_at": "2026-02-10T15:39:47.531749"
+          }
+        }
+      }
+    }
+  },
+  "138": {
+    "characters": {
+      "은행 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png",
+            "updated_at": "2026-02-10T15:39:47.033294"
+          }
+        }
+      },
+      "테크 기업 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_테크_기업_직원들_standing_1770705560536.png",
+            "updated_at": "2026-02-10T15:39:47.531751"
+          }
+        }
+      }
+    }
+  },
+  "64": {
+    "characters": {
+      "50대 후반 비즈니스맨": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_50대_후반_비즈니스맨_standing_1770705518486.png",
+            "updated_at": "2026-02-10T15:39:47.108333"
+          }
+        }
+      }
+    }
+  },
+  "65": {
+    "characters": {
+      "50대 후반 비즈니스맨": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_50대_후반_비즈니스맨_standing_1770705518486.png",
+            "updated_at": "2026-02-10T15:39:47.108342"
+          }
+        }
+      }
+    }
+  },
+  "66": {
+    "characters": {
+      "50대 후반 비즈니스맨": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_50대_후반_비즈니스맨_standing_1770705518486.png",
+            "updated_at": "2026-02-10T15:39:47.108345"
+          }
+        }
+      }
+    }
+  },
+  "67": {
+    "characters": {
+      "40대 초반 비즈니스맨": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_초반_비즈니스맨_standing_1770705526935.png",
+            "updated_at": "2026-02-10T15:39:47.145529"
+          }
+        }
+      },
+      "동료들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_동료들_standing_1770705520606.png",
+            "updated_at": "2026-02-10T15:39:47.183210"
+          }
+        }
+      }
+    }
+  },
+  "68": {
+    "characters": {
+      "40대 초반 비즈니스맨": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_초반_비즈니스맨_standing_1770705526935.png",
+            "updated_at": "2026-02-10T15:39:47.145539"
+          }
+        }
+      },
+      "동료들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_동료들_standing_1770705520606.png",
+            "updated_at": "2026-02-10T15:39:47.183218"
+          }
+        }
+      }
+    }
+  },
+  "69": {
+    "characters": {
+      "40대 초반 비즈니스맨": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_초반_비즈니스맨_standing_1770705526935.png",
+            "updated_at": "2026-02-10T15:39:47.145541"
+          }
+        }
+      },
+      "동료들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_동료들_standing_1770705520606.png",
+            "updated_at": "2026-02-10T15:39:47.183221"
+          }
+        }
+      }
+    }
+  },
+  "70": {
+    "characters": {
+      "40대 책임자급 비즈니스맨": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_책임자급_비즈니스맨_standing_1770705518267.png",
+            "updated_at": "2026-02-10T15:39:47.219189"
+          }
+        }
+      }
+    }
+  },
+  "71": {
+    "characters": {
+      "40대 책임자급 비즈니스맨": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_책임자급_비즈니스맨_standing_1770705518267.png",
+            "updated_at": "2026-02-10T15:39:47.219199"
+          }
+        }
+      }
+    }
+  },
+  "72": {
+    "characters": {
+      "40대 책임자급 비즈니스맨": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_책임자급_비즈니스맨_standing_1770705518267.png",
+            "updated_at": "2026-02-10T15:39:47.219202"
+          }
+        }
+      }
+    }
+  },
+  "73": {
+    "characters": {
+      "노동조합 대표": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_노동조합_대표_standing_1770705527956.png",
+            "updated_at": "2026-02-10T15:39:47.250329"
+          }
+        }
+      },
+      "회사 관계자들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_회사_관계자들_standing_1770705531681.png",
+            "updated_at": "2026-02-10T15:39:47.281839"
+          }
+        }
+      }
+    }
+  },
+  "74": {
+    "characters": {
+      "노동조합 대표": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_노동조합_대표_standing_1770705527956.png",
+            "updated_at": "2026-02-10T15:39:47.250337"
+          }
+        }
+      },
+      "회사 관계자들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_회사_관계자들_standing_1770705531681.png",
+            "updated_at": "2026-02-10T15:39:47.281846"
+          }
+        }
+      }
+    }
+  },
+  "75": {
+    "characters": {
+      "노동조합 대표": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_노동조합_대표_standing_1770705527956.png",
+            "updated_at": "2026-02-10T15:39:47.250339"
+          }
+        }
+      },
+      "회사 관계자들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_회사_관계자들_standing_1770705531681.png",
+            "updated_at": "2026-02-10T15:39:47.281849"
+          }
+        }
+      }
+    }
+  },
+  "79": {
+    "characters": {
+      "시니어 직원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_시니어_직원_standing_1770705533870.png",
+            "updated_at": "2026-02-10T15:39:47.313383"
+          }
+        }
+      }
+    }
+  },
+  "80": {
+    "characters": {
+      "시니어 직원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_시니어_직원_standing_1770705533870.png",
+            "updated_at": "2026-02-10T15:39:47.313392"
+          }
+        }
+      }
+    }
+  },
+  "81": {
+    "characters": {
+      "시니어 직원": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_시니어_직원_standing_1770705533870.png",
+            "updated_at": "2026-02-10T15:39:47.313395"
+          }
+        }
+      }
+    }
+  },
+  "82": {
+    "characters": {
+      "젊은 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_젊은_직원들_standing_1770705537996.png",
+            "updated_at": "2026-02-10T15:39:47.349808"
+          }
+        }
+      }
+    }
+  },
+  "83": {
+    "characters": {
+      "젊은 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_젊은_직원들_standing_1770705537996.png",
+            "updated_at": "2026-02-10T15:39:47.349815"
+          }
+        }
+      }
+    }
+  },
+  "84": {
+    "characters": {
+      "젊은 직원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_젊은_직원들_standing_1770705537996.png",
+            "updated_at": "2026-02-10T15:39:47.349818"
+          }
+        }
+      }
+    }
+  },
+  "121": {
+    "characters": {
+      "중년 비즈니스맨들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_중년_비즈니스맨들_standing_1770705543403.png",
+            "updated_at": "2026-02-10T15:39:47.380217"
+          }
+        }
+      }
+    }
+  },
+  "122": {
+    "characters": {
+      "중년 비즈니스맨들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_중년_비즈니스맨들_standing_1770705543403.png",
+            "updated_at": "2026-02-10T15:39:47.380225"
+          }
+        }
+      }
+    }
+  },
+  "123": {
+    "characters": {
+      "중년 비즈니스맨들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_중년_비즈니스맨들_standing_1770705543403.png",
+            "updated_at": "2026-02-10T15:39:47.380227"
+          }
+        }
+      }
+    }
+  },
+  "124": {
+    "characters": {
+      "젊은 세대 실루엣": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_젊은_세대_실루엣_standing_1770705544876.png",
+            "updated_at": "2026-02-10T15:39:47.412882"
+          }
+        }
+      }
+    }
+  },
+  "125": {
+    "characters": {
+      "젊은 세대 실루엣": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_젊은_세대_실루엣_standing_1770705544876.png",
+            "updated_at": "2026-02-10T15:39:47.412892"
+          }
+        }
+      }
+    }
+  },
+  "126": {
+    "characters": {
+      "젊은 세대 실루엣": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_젊은_세대_실루엣_standing_1770705544876.png",
+            "updated_at": "2026-02-10T15:39:47.412895"
+          }
+        }
+      }
+    }
+  },
+  "130": {
+    "characters": {
+      "데이터 사이언티스트 및 클라우드 아키텍트": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_데이터_사이언티스트_및_클라우드_아키텍트_standing_1770705552635.png",
+            "updated_at": "2026-02-10T15:39:47.473605"
+          }
+        }
+      }
+    }
+  },
+  "131": {
+    "characters": {
+      "데이터 사이언티스트 및 클라우드 아키텍트": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_데이터_사이언티스트_및_클라우드_아키텍트_standing_1770705552635.png",
+            "updated_at": "2026-02-10T15:39:47.473610"
+          }
+        }
+      }
+    }
+  },
+  "132": {
+    "characters": {
+      "데이터 사이언티스트 및 클라우드 아키텍트": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_데이터_사이언티스트_및_클라우드_아키텍트_standing_1770705552635.png",
+            "updated_at": "2026-02-10T15:39:47.473611"
+          }
+        }
+      }
+    }
+  },
+  "133": {
+    "characters": {
+      "AI 전문가들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_AI_전문가들_standing_1770705556963.png",
+            "updated_at": "2026-02-10T15:39:47.502380"
+          }
+        }
+      }
+    }
+  },
+  "134": {
+    "characters": {
+      "AI 전문가들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_AI_전문가들_standing_1770705556963.png",
+            "updated_at": "2026-02-10T15:39:47.502385"
+          }
+        }
+      }
+    }
+  },
+  "135": {
+    "characters": {
+      "AI 전문가들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_AI_전문가들_standing_1770705556963.png",
+            "updated_at": "2026-02-10T15:39:47.502387"
+          }
+        }
+      }
+    }
+  },
+  "139": {
+    "characters": {
+      "AI 인력 실루엣": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_AI_인력_실루엣_standing_1770705566513.png",
+            "updated_at": "2026-02-10T15:39:47.567906"
+          }
+        }
+      }
+    }
+  },
+  "140": {
+    "characters": {
+      "AI 인력 실루엣": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_AI_인력_실루엣_standing_1770705566513.png",
+            "updated_at": "2026-02-10T15:39:47.567915"
+          }
+        }
+      }
+    }
+  },
+  "141": {
+    "characters": {
+      "AI 인력 실루엣": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_AI_인력_실루엣_standing_1770705566513.png",
+            "updated_at": "2026-02-10T15:39:47.567918"
+          }
+        }
+      }
+    }
+  },
+  "157": {
+    "characters": {
+      "정부 관계자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_정부_관계자_standing_1770705569111.png",
+            "updated_at": "2026-02-10T15:39:47.598613"
+          }
+        }
+      }
+    }
+  },
+  "158": {
+    "characters": {
+      "정부 관계자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_정부_관계자_standing_1770705569111.png",
+            "updated_at": "2026-02-10T15:39:47.598619"
+          }
+        }
+      }
+    }
+  },
+  "159": {
+    "characters": {
+      "정부 관계자": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_정부_관계자_standing_1770705569111.png",
+            "updated_at": "2026-02-10T15:39:47.598620"
+          }
+        }
+      }
+    }
+  },
+  "160": {
+    "characters": {
+      "고객": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_고객_standing_1770705574102.png",
+            "updated_at": "2026-02-10T15:39:47.631040"
+          }
+        }
+      }
+    }
+  },
+  "161": {
+    "characters": {
+      "고객": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_고객_standing_1770705574102.png",
+            "updated_at": "2026-02-10T15:39:47.631047"
+          }
+        }
+      }
+    }
+  },
+  "162": {
+    "characters": {
+      "고객": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_고객_standing_1770705574102.png",
+            "updated_at": "2026-02-10T15:39:47.631050"
+          }
+        }
+      }
+    }
+  }
+}

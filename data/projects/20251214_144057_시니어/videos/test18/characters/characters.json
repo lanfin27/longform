@@ -1,0 +1,218 @@
+[
+  {
+    "id": "char_0",
+    "name": "사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "People with questioning expressions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_사람들_standing_1769438484740.png"
+    ],
+    "appearance_scenes": [
+      43,
+      44,
+      45
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_사람들_standing_1769438484740.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T23:35:16.676965",
+    "updated_at": "2026-01-27T00:11:02.226901"
+  },
+  {
+    "id": "char_1",
+    "name": "운전자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A male driver showing signs of fatigue, such as drooping eyelids and a slight slouch, inside a modern car.",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_운전자_standing_1769438487395.png"
+    ],
+    "appearance_scenes": [
+      112,
+      113,
+      114
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_운전자_standing_1769438487395.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T23:35:16.677988",
+    "updated_at": "2026-01-27T00:11:02.226916"
+  },
+  {
+    "id": "char_2",
+    "name": "뉴스 앵커",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "News anchor with serious and concerned expression, wearing professional attire, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_뉴스_앵커_standing_1769438487862.png"
+    ],
+    "appearance_scenes": [
+      142,
+      143,
+      144
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_뉴스_앵커_standing_1769438487862.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T23:35:16.679545",
+    "updated_at": "2026-01-27T00:11:02.226923"
+  },
+  {
+    "id": "char_3",
+    "name": "혼란스러워하는 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Perplexed facial expression reflecting surprise and concern, showing signs of unease and ambiguity, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_혼란스러워하는_사람_standing_1769438487477.png"
+    ],
+    "appearance_scenes": [
+      148,
+      149,
+      150
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_혼란스러워하는_사람_standing_1769438487477.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T23:35:16.680514",
+    "updated_at": "2026-01-27T00:11:02.226929"
+  },
+  {
+    "id": "char_4",
+    "name": "발표자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "person with a confused expression, questioning automotive strategy",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_발표자_standing_1769438493634.png"
+    ],
+    "appearance_scenes": [
+      151,
+      152,
+      153
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_발표자_standing_1769438493634.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T23:35:16.681486",
+    "updated_at": "2026-01-27T00:11:02.226935"
+  },
+  {
+    "id": "char_5",
+    "name": "삼성 임원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Samsung executive shaking hands with automotive manufacturer executive, confident expression, wearing suit",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_삼성_임원_standing_1769438496594.png"
+    ],
+    "appearance_scenes": [
+      253,
+      254,
+      255
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_삼성_임원_standing_1769438496594.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T23:35:16.682539",
+    "updated_at": "2026-01-27T00:11:02.226941"
+  },
+  {
+    "id": "char_6",
+    "name": "자동차 제조사 임원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Automotive manufacturer executive shaking hands with Samsung executive, professional attire",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_자동차_제조사_임원_standing_1769438523047.png"
+    ],
+    "appearance_scenes": [
+      253,
+      254,
+      255
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_자동차_제조사_임원_standing_1769438523047.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-26T23:35:16.683564",
+    "updated_at": "2026-01-27T00:11:02.226947"
+  },
+  {
+    "id": "char_7",
+    "name": "Executive 1",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged businessman in a dark suit, confident expression, shaking hands firmly",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_Executive_1_standing_1769440276722.png"
+    ],
+    "appearance_scenes": [
+      7,
+      8,
+      9
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_Executive_1_standing_1769440276722.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-27T00:10:51.872403",
+    "updated_at": "2026-01-27T00:11:20.387761"
+  },
+  {
+    "id": "char_8",
+    "name": "Executive 2",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Middle-aged businessman in a gray suit, smiling, holding the contract",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_Executive_2_standing_1769440280368.png"
+    ],
+    "appearance_scenes": [
+      7,
+      8,
+      9
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test18\\images\\characters\\char_Executive_2_standing_1769440280368.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-27T00:10:51.873843",
+    "updated_at": "2026-01-27T00:11:20.406821"
+  }
+]

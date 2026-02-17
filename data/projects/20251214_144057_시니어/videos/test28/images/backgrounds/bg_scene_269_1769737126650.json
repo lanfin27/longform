@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-30T10:37:02.679838",
+  "image_file": "bg_scene_266_1769737022679.png",
+  "scene_id": 266,
+  "prompts": {
+    "original": "A panoramic, visually rich depiction of Samsung's end-to-end vertical integration, starting from microchip fabrication (with Samsung logo on machinery) on one side, flowing through battery production (with Samsung SDI logo) and advanced display manufacturing (with Samsung Display logo), culminating in a sleek, modern car interior featuring a Harman Kardon audio system (with Harman Kardon logo) and an infotainment display with a Samsung logo. The entire scene is seamlessly connected, showing a complete, unified ecosystem under the Samsung brand, bathed in advanced, futuristic lighting. The composition conveys immense power, control, and innovation. The final segment transitions to an open, bright, and expansive view of a futuristic city or landscape, symbolizing future possibilities and leadership, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A panoramic, visually rich depiction of Samsung's end-to-end vertical integration, starting from microchip fabrication (with Samsung logo on machinery) on one side, flowing through battery production (with Samsung SDI logo) and advanced display manufacturing (with Samsung Display logo), culminating in a sleek, modern car interior featuring a Harman Kardon audio system (with Harman Kardon logo) and an infotainment display with a Samsung logo. The entire scene is seamlessly connected, showing a complete, unified ecosystem under the Samsung brand, bathed in advanced, futuristic lighting. The composition conveys immense power, control, and innovation. The final segment transitions to an open, bright, and expansive view of a futuristic city or landscape, symbolizing future possibilities and leadership, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1281546925
+  },
+  "scene_number": 269,
+  "copied_from": {
+    "scene_number": 266,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test28\\images\\backgrounds\\bg_scene_266_1769737022679.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-01-30T10:38:46.651953"
+}

@@ -34,7 +34,7 @@ class AIOriginalCorrector:
 
     # Provider별 기본 모델
     DEFAULT_MODELS = {
-        'google': 'gemini-2.0-flash-exp',
+        'google': 'gemini-2.5-flash',
         'anthropic': 'claude-3-5-sonnet-20241022'
     }
 

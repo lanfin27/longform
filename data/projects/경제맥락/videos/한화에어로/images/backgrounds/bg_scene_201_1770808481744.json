@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-11T20:14:25.237176",
+  "image_file": "bg_scene_199_1770808465236.png",
+  "scene_id": 199,
+  "prompts": {
+    "original": "A dynamic and comprehensive visual representing Hanwha's global success in a complex package deal. Various iconic elements like a diplomatic handshake, an industrial factory, a signed contract, and financial graphs are integrated seamlessly on a stylized world map, symbolizing diplomacy, industrial cooperation, localization, delivery, and financial conditions. A subtle Hanwha logo is visible within a sleek, modern business environment, conveying achievement and strategic triumph. The composition is vibrant and forward-looking, emphasizing a successful outcome, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A dynamic and comprehensive visual representing Hanwha's global success in a complex package deal. Various iconic elements like a diplomatic handshake, an industrial factory, a signed contract, and financial graphs are integrated seamlessly on a stylized world map, symbolizing diplomacy, industrial cooperation, localization, delivery, and financial conditions. A subtle Hanwha logo is visible within a sleek, modern business environment, conveying achievement and strategic triumph. The composition is vibrant and forward-looking, emphasizing a successful outcome, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1383570960
+  },
+  "scene_number": 201,
+  "copied_from": {
+    "scene_number": 199,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\backgrounds\\bg_scene_199_1770808465236.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-11T20:14:41.746706"
+}

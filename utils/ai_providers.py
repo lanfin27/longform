@@ -37,6 +37,8 @@ class AIModel:
     max_tokens: int = 4096       # 최대 토큰
     supports_vision: bool = False  # 이미지 입력 지원
     api_key_env: str = ""        # API 키 환경변수 이름
+    rpm: int = 0                 # Requests Per Minute (0 = 제한 없음/미확인)
+    rpd: int = 0                 # Requests Per Day (0 = 제한 없음/미확인)
 
 
 # ============================================================
@@ -84,29 +86,33 @@ ALL_MODELS: Dict[str, AIModel] = {
     ),
 
     # ==================== Google (Gemini) ====================
-    "gemini-2.0-flash-exp": AIModel(
-        id="gemini-2.0-flash-exp",
-        name="Gemini 2.0 Flash",
+    "gemini-2.5-flash": AIModel(
+        id="gemini-2.5-flash",
+        name="Gemini 2.5 Flash",
         provider=AIProvider.GOOGLE,
         speed="fast",
         quality="high",
         cost="low",
         description="⚡ 최신 Gemini, 빠르고 강력함",
-        max_tokens=8192,
+        max_tokens=65536,
         supports_vision=True,
-        api_key_env="GOOGLE_API_KEY"
+        api_key_env="GOOGLE_API_KEY",
+        rpm=10,
+        rpd=250
     ),
-    "gemini-1.5-pro": AIModel(
-        id="gemini-1.5-pro",
-        name="Gemini 1.5 Pro",
+    "gemini-2.5-flash-lite": AIModel(
+        id="gemini-2.5-flash-lite",
+        name="Gemini 2.5 Flash Lite",
         provider=AIProvider.GOOGLE,
-        speed="medium",
-        quality="best",
-        cost="medium",
-        description="🎯 최고 성능 Gemini, 긴 컨텍스트 지원",
-        max_tokens=8192,
+        speed="fast",
+        quality="standard",
+        cost="low",
+        description="⚡ 경량 Gemini, 대량 처리 최적",
+        max_tokens=65536,
         supports_vision=True,
-        api_key_env="GOOGLE_API_KEY"
+        api_key_env="GOOGLE_API_KEY",
+        rpm=15,
+        rpd=1000
     ),
     "gemini-1.5-flash": AIModel(
         id="gemini-1.5-flash",
@@ -115,10 +121,12 @@ ALL_MODELS: Dict[str, AIModel] = {
         speed="fast",
         quality="standard",
         cost="low",
-        description="⚡ 빠른 Gemini, 비용 효율적",
-        max_tokens=8192,
+        description="⚡ 안정적 Gemini, 일일 1,500회",
+        max_tokens=32768,
         supports_vision=True,
-        api_key_env="GOOGLE_API_KEY"
+        api_key_env="GOOGLE_API_KEY",
+        rpm=15,
+        rpd=1500
     ),
 
     # ==================== OpenAI (GPT) ====================
@@ -310,3 +318,22 @@ def get_fallback_model() -> Optional[str]:
     if available:
         return list(available.keys())[0]
     return None
+
+
+# ============================================================
+# Rate Limit 유틸리티
+# ============================================================
+
+def get_model_rate_info(model_id: str) -> dict:
+    """모델의 RPM/RPD 정보와 계산된 호출 간격 반환"""
+    model = ALL_MODELS.get(model_id)
+    if not model or model.rpm <= 0:
+        return {"rpm": 0, "rpd": 0, "delay_seconds": 0}
+    delay = 60.0 / model.rpm
+    return {"rpm": model.rpm, "rpd": model.rpd, "delay_seconds": round(delay, 1)}
+
+
+def get_gemini_fallback_models(exclude: str = None) -> list:
+    """Gemini 폴백 모델 순서 반환 (RPD 내림차순: 안정성 우선)"""
+    order = ["gemini-1.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-flash"]
+    return [m for m in order if m != exclude and m in ALL_MODELS]

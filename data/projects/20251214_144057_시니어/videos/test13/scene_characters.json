@@ -1,0 +1,50 @@
+{
+  "45": {
+    "characters": {
+      "삼성 임원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test13\\images\\characters\\char_삼성_임원들_standing_1769351995781.png",
+            "updated_at": "2026-01-25T23:40:23.002671"
+          }
+        }
+      }
+    }
+  },
+  "46": {
+    "characters": {
+      "삼성 임원들": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test13\\images\\characters\\char_삼성_임원들_standing_1769351995781.png",
+            "updated_at": "2026-01-25T23:40:23.002680"
+          }
+        }
+      }
+    }
+  },
+  "47": {
+    "characters": {
+      "이재용": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test13\\images\\characters\\char_이재용_standing_1769351965053.png",
+            "updated_at": "2026-01-25T23:39:25.109688"
+          }
+        }
+      }
+    }
+  },
+  "48": {
+    "characters": {
+      "이재용": {
+        "poses": {
+          "standing": {
+            "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test13\\images\\characters\\char_이재용_standing_1769351965053.png",
+            "updated_at": "2026-01-25T23:39:25.109695"
+          }
+        }
+      }
+    }
+  }
+}

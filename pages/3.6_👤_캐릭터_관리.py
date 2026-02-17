@@ -44,6 +44,21 @@ from components.image_viewer import (
     DIALOG_AVAILABLE
 )
 
+# 사용자 설정 (마지막 선택값 기억)
+from utils.user_preferences import (
+    get_last_image_api,
+    set_last_image_api,
+    get_last_image_model,
+    set_last_image_model,
+    get_last_concurrent_count,
+    set_last_concurrent_count,
+    # v3.40: 채널-영상별 배치 설정 저장
+    get_character_batch_settings,
+    save_character_batch_settings,
+    get_character_batch_setting,
+    update_character_batch_setting
+)
+
 # 대표 캐릭터 시스템
 from utils.representative_character import (
     RepresentativeCharacter,
@@ -67,7 +82,9 @@ from utils.prominent_people_sanitizer import (
     preview_character_sanitization,
     needs_sanitization_quick_check,
     get_recommended_model as get_sanitizer_recommended_model,
-    get_available_sanitizer_models
+    get_available_sanitizer_models,
+    get_sanitizer_models_for_ui,
+    SANITIZE_PROMPT_TEMPLATE
 )
 
 # 대표 캐릭터 라이브러리 (다중 캐릭터 관리)
@@ -104,6 +121,55 @@ if not ensure_project_selected():
     st.stop()
 
 project_path = get_current_project()
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# v3.40: 채널-영상 정보 추출 (배치 설정 저장용)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _extract_channel_video_from_path(path: Path) -> tuple:
+    """
+    프로젝트 경로에서 채널과 영상 이름 추출
+
+    경로 형식: data/projects/{timestamp}_{channel}/videos/{video_name}
+
+    Returns:
+        (channel, video) 튜플
+    """
+    try:
+        parts = path.parts
+        # videos 폴더 위치 찾기
+        if 'videos' in parts:
+            videos_idx = parts.index('videos')
+            # channel: projects 바로 뒤 폴더에서 타임스탬프 제거
+            if videos_idx >= 2:
+                project_folder = parts[videos_idx - 1]  # e.g., "20251214_144057_시니어"
+                # 타임스탬프 패턴 제거 (YYYYMMDD_HHMMSS_)
+                if len(project_folder) > 16 and project_folder[8] == '_' and project_folder[15] == '_':
+                    channel = project_folder[16:]  # "시니어"
+                else:
+                    channel = project_folder
+
+            # video: videos 폴더 바로 뒤
+            if videos_idx + 1 < len(parts):
+                video = parts[videos_idx + 1]
+            else:
+                video = project_folder
+
+            return channel, video
+    except Exception as e:
+        print(f"[캐릭터 관리] 경로 파싱 오류: {e}")
+
+    # 폴백: 폴더 이름 사용
+    return path.name, path.name
+
+# 현재 채널-영상 정보
+_current_channel, _current_video = _extract_channel_video_from_path(Path(project_path))
+print(f"[캐릭터 관리] 채널: {_current_channel}, 영상: {_current_video}")
+
+# 저장된 배치 설정 로드
+_saved_batch_settings = get_character_batch_settings(_current_channel, _current_video)
+if _saved_batch_settings:
+    print(f"[캐릭터 관리] 저장된 설정 로드: {list(_saved_batch_settings.keys())}")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -321,8 +387,25 @@ def auto_sync_characters():
             print(f"[캐릭터 관리] {synced}명 등장 씬 동기화 완료")
 
 
-# ⭐ 성능 최적화: 이미 초기화되었으면 스킵
+# ⭐ 성능 최적화: 분석 파일 변경 감지 기반 동기화
+# - 최초 방문 시: 무조건 동기화
+# - 재방문 시: analysis/characters.json 수정 시간이 변경된 경우에만 재동기화
+_CHAR_SYNC_MTIME_KEY = f"char_sync_mtime_{project_path}"
+_analysis_path_for_sync = project_path / "analysis" / "characters.json"
+
+_need_sync = False
 if not st.session_state.get(_CHAR_INIT_KEY, False):
+    # 최초 방문: 무조건 동기화
+    _need_sync = True
+elif _analysis_path_for_sync.exists():
+    # 재방문: 분석 파일 수정 시간 비교
+    _current_mtime = _analysis_path_for_sync.stat().st_mtime
+    _last_mtime = st.session_state.get(_CHAR_SYNC_MTIME_KEY, 0)
+    if _current_mtime > _last_mtime:
+        _need_sync = True
+        print(f"[캐릭터 관리] 🔄 분석 파일 변경 감지 (mtime: {_last_mtime} → {_current_mtime}), 재동기화")
+
+if _need_sync:
     auto_sync_characters()
 
     # === 씬-캐릭터 등장 정보 자동 동기화 (Problem 56 수정) ===
@@ -336,8 +419,10 @@ if not st.session_state.get(_CHAR_INIT_KEY, False):
     except Exception as e:
         print(f"[캐릭터 관리] ⚠️ 씬-캐릭터 동기화 오류: {e}")
 
-    # ⭐ 초기화 완료 플래그 설정
+    # ⭐ 초기화 완료 플래그 + 수정 시간 저장
     st.session_state[_CHAR_INIT_KEY] = True
+    if _analysis_path_for_sync.exists():
+        st.session_state[_CHAR_SYNC_MTIME_KEY] = _analysis_path_for_sync.stat().st_mtime
 
 # === 씬 분석 데이터 로드 함수 (v2.0 - 최신 파일 자동 감지) ===
 from datetime import datetime
@@ -680,18 +765,79 @@ with tab1:
                                 st.rerun()
 
                     with col2:
-                        # 생성된 이미지 표시 (작은 썸네일 - 클릭 시 확대)
+                        # 🔴 v3.78: 이미지 선택 기능 추가
                         st.markdown("**생성된 이미지:**")
+
                         if char.generated_images:
-                            for img_idx, img_path in enumerate(char.generated_images[-3:]):  # 최근 3개만
-                                if Path(img_path).exists():
-                                    # v3.0: Streamlit 네이티브 확대 기능 사용
+                            # 현재 선택된 이미지 확인
+                            selected_image = char.get_selected_image() if hasattr(char, 'get_selected_image') else None
+
+                            # 자동 선택 토글 (기본값: True)
+                            auto_select = getattr(char, 'auto_select_latest', True)
+                            new_auto_select = st.checkbox(
+                                "🔄 최신 이미지 자동 적용",
+                                value=auto_select,
+                                key=f"auto_select_{char.id}_{idx}",
+                                help="새 이미지 생성 시 자동으로 적용합니다"
+                            )
+                            if new_auto_select != auto_select:
+                                manager.set_auto_select_latest(char.id, new_auto_select)
+                                st.rerun()
+
+                            # 최신순으로 이미지 정렬 (역순)
+                            images_to_show = list(reversed(char.generated_images[-5:]))  # 최근 5개만
+
+                            for img_idx, img_path in enumerate(images_to_show):
+                                if not Path(img_path).exists():
+                                    continue
+
+                                # 선택 상태 및 최신 여부 확인
+                                is_selected = (selected_image and
+                                               Path(selected_image).resolve() == Path(img_path).resolve())
+                                is_latest = (img_idx == 0)  # 역순이므로 첫 번째가 최신
+
+                                # 이미지 표시 컨테이너
+                                img_col1, img_col2 = st.columns([3, 1])
+
+                                with img_col1:
+                                    # 라벨 생성
+                                    labels = []
+                                    if is_selected:
+                                        labels.append("⭐ 적용중")
+                                    if is_latest:
+                                        labels.append("🆕 최신")
+                                    label_str = " | ".join(labels) if labels else ""
+
+                                    # 썸네일 표시
+                                    caption = f"{char.name}"
+                                    if label_str:
+                                        caption = f"{label_str}"
+
                                     render_clickable_thumbnail(
                                         img_path,
-                                        caption=f"{char.name} #{img_idx+1}",
-                                        width=120,
-                                        key=f"char_img_{char.id}_{img_idx}"
+                                        caption=caption,
+                                        width=100,
+                                        key=f"char_img_{char.id}_{idx}_{img_idx}"
                                     )
+
+                                with img_col2:
+                                    # 선택 버튼
+                                    if is_selected:
+                                        st.success("✅ 적용됨")
+                                    else:
+                                        if st.button(
+                                            "적용",
+                                            key=f"select_img_{char.id}_{idx}_{img_idx}",
+                                            type="secondary",
+                                            use_container_width=True
+                                        ):
+                                            manager.select_character_image(char.id, img_path)
+                                            st.success(f"✅ 이미지 적용됨!")
+                                            st.rerun()
+
+                            # 현재 적용 이미지 요약
+                            if selected_image:
+                                st.caption(f"📌 적용: {Path(selected_image).name[:30]}...")
                         else:
                             st.info("이미지가 없습니다.")
 
@@ -795,6 +941,14 @@ with tab3:
 
     # 스타일 선택 (StyleManager 사용)
     style_manager = get_style_manager(str(project_path))
+
+    # v3.40: 저장된 character_style을 session_state에 복원
+    saved_character_style = _saved_batch_settings.get("character_style")
+    style_session_key = "selected_style_character_char_batch"
+    if saved_character_style and style_session_key not in st.session_state:
+        st.session_state[style_session_key] = saved_character_style
+        print(f"[캐릭터 관리] 저장된 스타일 복원: {saved_character_style}")
+
     selected_style = style_radio_selector(
         segment="character",
         key="char_batch",
@@ -811,11 +965,21 @@ with tab3:
 
     col1, col2 = st.columns(2)
 
+    # v3.40: 채널-영상별 저장된 설정값 로드
+    pose_options = ["standing", "standing_left", "standing_right", "portrait"]
+    saved_pose = _saved_batch_settings.get("pose", "standing")
+    pose_default_idx = pose_options.index(saved_pose) if saved_pose in pose_options else 0
+
+    bg_options = ["solid_gray", "solid_white", "solid_blue"]
+    saved_bg = _saved_batch_settings.get("background_type", "solid_gray")
+    bg_default_idx = bg_options.index(saved_bg) if saved_bg in bg_options else 0
+
     with col1:
         st.markdown("#### 🧍 포즈")
         char_pose = st.selectbox(
             "기본 포즈",
-            ["standing", "standing_left", "standing_right", "portrait"],
+            pose_options,
+            index=pose_default_idx,
             format_func=lambda x: {
                 "standing": "정면 서있기",
                 "standing_left": "왼쪽 향해 서있기",
@@ -829,7 +993,8 @@ with tab3:
         st.markdown("#### 🖼️ 배경")
         char_background = st.selectbox(
             "배경 타입",
-            ["solid_gray", "solid_white", "solid_blue"],
+            bg_options,
+            index=bg_default_idx,
             format_func=lambda x: {
                 "solid_gray": "단색 회색 (합성 추천)",
                 "solid_white": "단색 흰색",
@@ -838,12 +1003,18 @@ with tab3:
             key="char_bg_select"
         )
 
-    # 이미지 크기
+    # 이미지 크기 (v3.40: 저장된 값 로드)
+    size_options = [1024, 768, 512]
+    saved_width = _saved_batch_settings.get("width", 1024)
+    saved_height = _saved_batch_settings.get("height", 1024)
+    width_default_idx = size_options.index(saved_width) if saved_width in size_options else 0
+    height_default_idx = size_options.index(saved_height) if saved_height in size_options else 0
+
     col_size1, col_size2 = st.columns(2)
     with col_size1:
-        char_width = st.selectbox("너비", [1024, 768, 512], index=0, key="char_width")
+        char_width = st.selectbox("너비", size_options, index=width_default_idx, key="char_width")
     with col_size2:
-        char_height = st.selectbox("높이", [1024, 768, 512], index=0, key="char_height")
+        char_height = st.selectbox("높이", size_options, index=height_default_idx, key="char_height")
 
     st.divider()
 
@@ -857,13 +1028,25 @@ with tab3:
     with col_api1:
         # API 제공자 선택
         api_options = ["Together.ai FLUX", "Google ImageFX", "OpenAI DALL-E", "Stability AI", "Replicate SDXL"]
+
+        # v3.40: 채널-영상별 저장된 API 우선, 없으면 전역 설정
+        saved_api_cv = _saved_batch_settings.get("image_api")
+        saved_api = saved_api_cv or get_last_image_api()
+        api_default_index = 0
+        if saved_api and saved_api in api_options:
+            api_default_index = api_options.index(saved_api)
+
         char_api_provider = st.selectbox(
             "🔧 이미지 생성 API",
             options=api_options,
-            index=0,
+            index=api_default_index,
             key="char_api_provider",
             help="⚡ 빠른 생성: Together.ai FLUX\n🆓 무료: Google ImageFX\n🎨 고품질: OpenAI DALL-E\n🚀 초고속: Replicate Lightning"
         )
+
+        # 선택 변경 시 저장 (전역 + 채널-영상별)
+        if char_api_provider != saved_api:
+            set_last_image_api(char_api_provider)
 
     with col_api2:
         # API별 모델 옵션
@@ -893,25 +1076,44 @@ with tab3:
         }
 
         options = model_options_map.get(char_api_provider, [("default", "기본")])
+        model_ids = [o[0] for o in options]
+
+        # 저장된 모델 로드
+        saved_model = get_last_image_model()
+        model_default_index = 0
+        if saved_model and saved_model in model_ids:
+            model_default_index = model_ids.index(saved_model)
+
         char_model = st.selectbox(
             "🤖 모델",
-            options=[o[0] for o in options],
+            options=model_ids,
+            index=model_default_index,
             format_func=lambda x: next((o[1] for o in options if o[0] == x), x),
             key="char_model"
         )
 
+        # 선택 변경 시 저장
+        if char_model != saved_model:
+            set_last_image_model(char_model)
+
     col_perf1, col_perf2 = st.columns(2)
 
     with col_perf1:
-        # 병렬 처리 옵션
+        # 저장된 동시 생성 수 로드
+        saved_parallel = get_last_concurrent_count()
+
         char_parallel = st.slider(
             "⚡ 동시 생성 수",
             min_value=1,
             max_value=5,
-            value=2,
+            value=saved_parallel,
             key="char_parallel",
             help="높을수록 빠르지만 API Rate Limit에 주의하세요.\n무료 API는 1~2 추천"
         )
+
+        # 선택 변경 시 저장
+        if char_parallel != saved_parallel:
+            set_last_concurrent_count(char_parallel)
 
     with col_perf2:
         # API 키 상태 확인
@@ -934,6 +1136,25 @@ with tab3:
             api_key_status = "✅ 설정됨" if replicate_key else "❌ 미설정"
 
         st.markdown(f"**🔑 API 키 상태:** {api_key_status}")
+
+    # ═══════════════════════════════════════════════════════════════
+    # v3.40: 채널-영상별 설정 자동 저장
+    # ═══════════════════════════════════════════════════════════════
+    _current_settings = {
+        "character_style": selected_style.id if selected_style else None,
+        "pose": char_pose,
+        "background_type": char_background,
+        "width": char_width,
+        "height": char_height,
+        "image_api": char_api_provider,
+        "image_model": char_model,
+    }
+
+    # 설정이 변경되었는지 확인 후 저장
+    if _current_settings != _saved_batch_settings:
+        save_character_batch_settings(_current_channel, _current_video, _current_settings)
+        # 메모리 내 캐시 업데이트
+        _saved_batch_settings.update(_current_settings)
 
     st.divider()
 
@@ -1085,8 +1306,8 @@ with tab3:
 
             with col1:
                 model_options = {
-                    "Gemini 2.0 Flash Exp (무료, 추천)": "gemini-2.0-flash-exp",
-                    "Gemini 2.0 Flash (무료)": "gemini-2.0-flash",
+                    "Gemini 2.5 Flash (무료, 추천)": "gemini-2.5-flash",
+                    "Gemini 2.5 Flash Lite (무료, 초고속)": "gemini-2.5-flash-lite",
                     "Claude Sonnet 4 ($0.003/1K)": "claude-sonnet-4-20250514",
                     "Claude Haiku 3.5 ($0.001/1K)": "claude-3-5-haiku-latest",
                     "GPT-4o Mini ($0.00015/1K)": "gpt-4o-mini",
@@ -1373,13 +1594,85 @@ with tab3:
 
             use_anonymization_filter = st.checkbox(
                 "🛡️ 유명인 일반화 필터 적용",
-                value=st.session_state.get("use_char_anonymization_filter", False),
+                value=st.session_state.get("use_char_anonymization_filter", True),
                 key="char_anonymization_filter_checkbox",
                 help="캐릭터 이미지 생성 전 AI가 기업명/인물명을 일반화합니다"
             )
             st.session_state["use_char_anonymization_filter"] = use_anonymization_filter
 
             if use_anonymization_filter:
+                # ═══════════════════════════════════════════════════════════
+                # ⚙️ 고급 설정 (AI 모델 및 프롬프트)
+                # ═══════════════════════════════════════════════════════════
+                with st.expander("⚙️ 고급 설정 (AI 모델 및 프롬프트)", expanded=False):
+                    # --- AI 모델 선택 ---
+                    st.markdown("##### 🤖 AI 모델 선택")
+                    available_models = get_sanitizer_models_for_ui()
+                    if available_models:
+                        model_ids = [m["id"] for m in available_models]
+                        default_model = get_sanitizer_recommended_model()
+                        default_idx = model_ids.index(default_model) if default_model in model_ids else 0
+
+                        def _format_model(mid):
+                            for m in available_models:
+                                if m["id"] == mid:
+                                    label = m["name"]
+                                    if m.get("recommended"):
+                                        label += " (추천)"
+                                    return label
+                            return mid
+
+                        sanitizer_model = st.selectbox(
+                            "치환용 AI 모델",
+                            options=model_ids,
+                            index=default_idx,
+                            format_func=_format_model,
+                            key="char_sanitizer_model_select",
+                            help="프롬프트에서 유명인 이름을 감지하고 치환하는 데 사용할 AI 모델"
+                        )
+                        st.session_state["char_sanitizer_model"] = sanitizer_model
+
+                        for m in available_models:
+                            if m["id"] == sanitizer_model:
+                                if m.get("recommended"):
+                                    st.caption(f"✨ 추천 모델 ({m['provider']})")
+                                else:
+                                    st.caption(f"ℹ️ {m['provider']}")
+                                break
+                    else:
+                        st.warning("사용 가능한 AI 모델이 없습니다. API 키를 확인하세요.")
+                        sanitizer_model = "gemini-2.5-flash"
+                        st.session_state["char_sanitizer_model"] = sanitizer_model
+
+                    st.divider()
+
+                    # --- 프롬프트 설정 ---
+                    st.markdown("##### 📝 일반화 프롬프트")
+                    prompt_preset = st.radio(
+                        "프롬프트 모드",
+                        options=["기본 프롬프트", "사용자 정의"],
+                        index=0 if st.session_state.get("char_sanitizer_prompt_mode", "기본 프롬프트") == "기본 프롬프트" else 1,
+                        horizontal=True,
+                        key="char_sanitizer_prompt_mode_radio"
+                    )
+                    st.session_state["char_sanitizer_prompt_mode"] = prompt_preset
+
+                    if prompt_preset == "사용자 정의":
+                        custom_prompt = st.text_area(
+                            "일반화 프롬프트 (수정 가능)",
+                            value=st.session_state.get("char_sanitizer_custom_prompt", SANITIZE_PROMPT_TEMPLATE),
+                            height=250,
+                            key="char_sanitizer_custom_prompt_area",
+                            help="캐릭터 이름을 일반화하는 데 사용되는 AI 프롬프트입니다. {prompt} 변수가 입력 텍스트로 대체됩니다."
+                        )
+                        st.session_state["char_sanitizer_custom_prompt"] = custom_prompt
+                    else:
+                        with st.expander("📄 기본 프롬프트 미리보기", expanded=False):
+                            st.code(SANITIZE_PROMPT_TEMPLATE, language="text")
+
+                # 선택된 모델 가져오기
+                sanitizer_model = st.session_state.get("char_sanitizer_model", get_sanitizer_recommended_model())
+
                 # 빠른 위험도 체크 (v3.32 fix: 안전한 헬퍼 함수 사용)
                 needs_check_count = sum(
                     1 for c in selected_chars
@@ -1391,12 +1684,19 @@ with tab3:
                 else:
                     st.success("✅ 모든 캐릭터가 안전해 보입니다. (API 호출 시 추가 검증)")
 
+                # 사용자 정의 프롬프트 결정
+                _custom_prompt_tpl = None
+                if st.session_state.get("char_sanitizer_prompt_mode") == "사용자 정의":
+                    _custom_prompt_tpl = st.session_state.get("char_sanitizer_custom_prompt")
+
+                st.caption(f"🤖 사용 모델: **{sanitizer_model}**")
+
                 # 미리보기 버튼
                 if st.button("🔍 변환 미리보기", key="preview_char_anonymization"):
-                    with st.spinner("AI 분석 중..."):
+                    with st.spinner(f"AI({sanitizer_model}) 분석 중..."):
                         # 캐릭터 데이터 변환 (v3.32 fix: 안전한 헬퍼 함수 사용)
                         char_dicts = [{"name": get_character_name(c), "visual_prompt": get_character_visual_prompt(c)} for c in selected_chars]
-                        previews = preview_character_sanitization(char_dicts)
+                        previews = preview_character_sanitization(char_dicts, ai_model=sanitizer_model, prompt_template=_custom_prompt_tpl)
 
                         changed_count = sum(1 for p in previews if p["changed"])
 
@@ -1565,16 +1865,22 @@ with tab3:
             # ⭐ v3.31: 유명인 일반화 필터 적용
             # ═══════════════════════════════════════════════════════════════
             if use_anonymization_filter:
-                generation_logs.append(f"[{time.strftime('%H:%M:%S')}] 🛡️ 유명인 일반화 필터 적용 중...")
+                _sanitizer_model = st.session_state.get("char_sanitizer_model", get_sanitizer_recommended_model())
+                _batch_custom_prompt = None
+                if st.session_state.get("char_sanitizer_prompt_mode") == "사용자 정의":
+                    _batch_custom_prompt = st.session_state.get("char_sanitizer_custom_prompt")
+                generation_logs.append(f"[{time.strftime('%H:%M:%S')}] 🛡️ 유명인 일반화 필터 적용 중... (모델: {_sanitizer_model})")
 
-                with st.spinner("🛡️ AI가 캐릭터 이름을 분석하고 있습니다..."):
+                with st.spinner(f"🛡️ AI({_sanitizer_model})가 캐릭터 이름을 분석하고 있습니다..."):
                     def on_sanitize_progress(current, total, char_name):
                         generation_logs.append(f"[{time.strftime('%H:%M:%S')}] 🔍 분석 중: {char_name} ({current}/{total})")
                         log_area.code("\n".join(generation_logs[-15:]))
 
                     sanitized_chars, sanitize_results = sanitize_characters_batch(
                         char_dicts,
-                        on_progress=on_sanitize_progress
+                        ai_model=_sanitizer_model,
+                        on_progress=on_sanitize_progress,
+                        prompt_template=_batch_custom_prompt
                     )
 
                     # 결과 로깅 및 매핑 생성
@@ -1597,6 +1903,15 @@ with tab3:
 
                     # 익명화된 캐릭터 데이터 사용
                     char_dicts = sanitized_chars
+
+                    # v2.0: 익명화된 프롬프트 적용 확인 로깅
+                    for _ci, _cd in enumerate(char_dicts):
+                        _anon_flag = _cd.get("_prompt_was_anonymized", False)
+                        _vp_full = _cd.get("visual_prompt") or ""
+                        generation_logs.append(
+                            f"[{time.strftime('%H:%M:%S')}] [{_ci+1}] 익명화={_anon_flag}, "
+                            f"visual_prompt ({len(_vp_full)}자): {_vp_full}"
+                        )
 
                     # 상태 테이블도 업데이트 (원본 이름으로 표시하되, 익명화 정보 추가)
                     for orig_char, result in zip(selected_chars, sanitize_results):
@@ -1628,15 +1943,25 @@ with tab3:
                 for char_idx, char in enumerate(selected_chars):
                     # v3.31: 익명화된 데이터 사용 (해당 인덱스의 char_dicts 참조)
                     char_dict = char_dicts[char_idx]
-                    original_char_name = char.name  # 원본 이름 (상태 표시용)
+                    original_char_name = char.name  # 원본 이름 (상태 표시용 + 포즈 매칭용)
                     char_name = char_dict.get("name", char.name)  # 익명화된 이름 (프롬프트용)
                     visual_prompt = char_dict.get("visual_prompt") or char_dict.get("character_prompt") or char.character_prompt
+
+                    # v2.0: 포즈 매칭은 원본 이름 사용 (AI 분석 결과가 원본 이름 기준)
+                    # 익명화된 이름으로 매칭하면 매칭 실패
+                    match_name = original_char_name
+                    # name_en도 매칭에 사용 (AI 분석이 영문 이름으로 저장했을 수 있음)
+                    match_name_en = char.name_en if hasattr(char, 'name_en') else ""
 
                     # 해당 캐릭터의 포즈 할당 필터
                     char_pose_assignments = [
                         p for p in pose_analysis
-                        if p.get("character", "").strip().lower().replace(" ", "") in char_name.strip().lower().replace(" ", "")
-                        or char_name.strip().lower().replace(" ", "") in p.get("character", "").strip().lower().replace(" ", "")
+                        if p.get("character", "").strip().lower().replace(" ", "") in match_name.strip().lower().replace(" ", "")
+                        or match_name.strip().lower().replace(" ", "") in p.get("character", "").strip().lower().replace(" ", "")
+                        or (match_name_en and (
+                            p.get("character", "").strip().lower().replace(" ", "") in match_name_en.strip().lower().replace(" ", "")
+                            or match_name_en.strip().lower().replace(" ", "") in p.get("character", "").strip().lower().replace(" ", "")
+                        ))
                     ]
 
                     if not char_pose_assignments:
@@ -2297,7 +2622,11 @@ with tab5:
 
         # ═══════════════════════════════════════════════════════════════
         # v3.60: 캐싱된 함수 사용 (성능 최적화)
+        # v3.61: analysis_path 정의 추가 (버그 수정)
         # ═══════════════════════════════════════════════════════════════
+        from pathlib import Path
+        analysis_path = Path(project_path) / "analysis" / "characters.json"
+
         analysis_chars, data_source = _cached_load_characters_from_analysis(str(project_path))
 
         # 파일에서 못 찾으면 세션에서 로드 시도 (fallback)
@@ -3921,7 +4250,12 @@ with tab7:
 
 
 def _render_regeneration_dialog():
-    """재생성 다이얼로그 렌더링"""
+    """
+    재생성 다이얼로그 렌더링 (v2.0)
+
+    v2.0: Google ImageFX (Imagen 4)를 기본 API로 설정
+          다양한 모델 선택 옵션 제공
+    """
     char_name = st.session_state.get('regen_char_name', '')
     pose = st.session_state.get('regen_pose', 'standing')
     scene_num = st.session_state.get('regen_scene_num', 0)
@@ -3934,7 +4268,145 @@ def _render_regeneration_dialog():
     **씬**: {scene_num}
     """)
 
-    # 스타일 선택
+    # ========================================
+    # v2.0: 이미지 생성 API 선택 (Google ImageFX 기본)
+    # ========================================
+    st.markdown("#### 🖼️ 이미지 생성 API 선택")
+
+    # API 옵션 정의 (Google ImageFX를 첫 번째, 기본값으로)
+    REGEN_API_OPTIONS = {
+        "Google ImageFX": {
+            "models": [
+                ("IMAGEN_4", "Imagen 4 (최신, 무료)"),
+                ("IMAGEN_3_5", "Imagen 3.5 (무료)"),
+                ("IMAGEN_3_1", "Imagen 3.1 (무료)"),
+                ("IMAGEN_3", "Imagen 3.0 (무료)"),
+            ],
+            "default_model": "IMAGEN_4",
+            "icon": "🎨",
+            "cost": "무료 (쿠키 필요)",
+            "description": "Google의 최신 이미지 생성 모델"
+        },
+        "Together.ai FLUX": {
+            "models": [
+                ("black-forest-labs/FLUX.2-dev", "FLUX.2 Dev (권장, ~20원)"),
+                ("black-forest-labs/FLUX.2-flex", "FLUX.2 Flex (~40원)"),
+                ("black-forest-labs/FLUX.2-pro", "FLUX.2 Pro (고품질, ~40원)"),
+            ],
+            "default_model": "black-forest-labs/FLUX.2-dev",
+            "icon": "🚀",
+            "cost": "유료 (~20원/장)",
+            "description": "빠른 속도의 고품질 이미지 생성"
+        },
+        "Gemini (Nano Banana)": {
+            "models": [
+                ("gemini_nano_banana", "Nano Banana (~15원, 레퍼런스 지원)"),
+                ("gemini_nano_banana_pro", "Nano Banana Pro (~25원)"),
+            ],
+            "default_model": "gemini_nano_banana",
+            "icon": "🍌",
+            "cost": "유료 (~15원/장)",
+            "description": "레퍼런스 이미지 지원, 캐릭터 일관성"
+        },
+        "OpenAI DALL-E": {
+            "models": [
+                ("dall-e-3", "DALL-E 3 (최신, ~60원)"),
+                ("dall-e-2", "DALL-E 2 (~30원)"),
+            ],
+            "default_model": "dall-e-3",
+            "icon": "🖼️",
+            "cost": "유료 (~60원/장)",
+            "description": "OpenAI의 프리미엄 이미지 생성"
+        },
+    }
+
+    api_options = list(REGEN_API_OPTIONS.keys())
+
+    # 기본값: Google ImageFX (첫 번째)
+    default_api_idx = 0
+
+    # API 선택
+    selected_api = st.selectbox(
+        "API 제공자",
+        options=api_options,
+        index=default_api_idx,
+        format_func=lambda x: f"{REGEN_API_OPTIONS[x]['icon']} {x} ({REGEN_API_OPTIONS[x]['cost']})",
+        key="regen_api_select"
+    )
+
+    api_config = REGEN_API_OPTIONS[selected_api]
+    st.caption(f"📝 {api_config['description']}")
+
+    # 모델 선택
+    model_options = api_config["models"]
+    model_ids = [m[0] for m in model_options]
+    model_labels = [m[1] for m in model_options]
+
+    default_model_idx = 0
+    if api_config["default_model"] in model_ids:
+        default_model_idx = model_ids.index(api_config["default_model"])
+
+    selected_model_idx = st.selectbox(
+        "모델",
+        options=range(len(model_options)),
+        index=default_model_idx,
+        format_func=lambda x: model_labels[x],
+        key="regen_model_select"
+    )
+    selected_model = model_ids[selected_model_idx]
+
+    st.divider()
+
+    # ========================================
+    # 생성 옵션
+    # ========================================
+    st.markdown("#### ⚙️ 생성 옵션")
+
+    col_opt1, col_opt2 = st.columns(2)
+
+    with col_opt1:
+        # 이미지 크기 (Google ImageFX는 aspect ratio만 지원)
+        if selected_api == "Google ImageFX":
+            aspect_options = ["1:1 (정사각형)", "16:9 (가로)", "9:16 (세로)", "4:3", "3:4"]
+            aspect_ratio = st.selectbox(
+                "비율",
+                options=aspect_options,
+                index=0,
+                key="regen_aspect_ratio"
+            )
+        else:
+            width = st.selectbox(
+                "너비",
+                [512, 768, 1024, 1408],
+                index=2,  # 기본 1024
+                key="regen_width"
+            )
+
+    with col_opt2:
+        if selected_api != "Google ImageFX":
+            height = st.selectbox(
+                "높이",
+                [512, 768, 1024, 1408],
+                index=2,  # 기본 1024
+                key="regen_height"
+            )
+        else:
+            st.empty()
+
+    # 동시 생성 수
+    num_images = st.slider(
+        "동시 생성 수",
+        min_value=1,
+        max_value=4,
+        value=2,
+        key="regen_num_images"
+    )
+
+    st.divider()
+
+    # ========================================
+    # 스타일 선택 (기존)
+    # ========================================
     style_manager = get_style_manager()
     available_styles = style_manager.get_all_styles()
     style_names = [s['name'] for s in available_styles]
@@ -3948,14 +4420,82 @@ def _render_regeneration_dialog():
         key="regen_style_select"
     )
 
+    st.divider()
+
+    # ========================================
+    # 버튼
+    # ========================================
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        if st.button("재생성 시작", type="primary", use_container_width=True):
-            # 재생성 로직
-            st.session_state['show_regen_dialog'] = False
+        if st.button("🔄 재생성 시작", type="primary", use_container_width=True):
+            # v2.0: 실제 재생성 실행
+            _execute_character_regeneration(
+                char_name=char_name,
+                pose=pose,
+                scene_num=scene_num,
+                api=selected_api,
+                model=selected_model,
+                style=selected_style,
+                num_images=num_images,
+                aspect_ratio=aspect_ratio if selected_api == "Google ImageFX" else None,
+                width=width if selected_api != "Google ImageFX" else 1024,
+                height=height if selected_api != "Google ImageFX" else 1024
+            )
 
-            # 캐릭터 찾기
+    with col2:
+        if st.button("❌ 취소", use_container_width=True):
+            st.session_state['show_regen_dialog'] = False
+            st.rerun()
+
+    with col3:
+        if st.button("📋 갤러리로", use_container_width=True):
+            st.session_state['show_regen_dialog'] = False
+            st.rerun()
+
+
+def _execute_character_regeneration(
+    char_name: str,
+    pose: str,
+    scene_num: int,
+    api: str,
+    model: str,
+    style: str,
+    num_images: int = 2,
+    aspect_ratio: str = None,
+    width: int = 1024,
+    height: int = 1024
+):
+    """
+    캐릭터 이미지 재생성 실행 (v2.0)
+
+    Args:
+        char_name: 캐릭터 이름
+        pose: 포즈
+        scene_num: 씬 번호
+        api: API 제공자
+        model: 모델 ID
+        style: 스타일 이름
+        num_images: 동시 생성 수
+        aspect_ratio: 비율 (Google ImageFX용)
+        width: 이미지 너비
+        height: 이미지 높이
+    """
+    import traceback
+
+    st.info(f"🔄 재생성 중... (API: {api}, 모델: {model})")
+
+    # 프로젝트 경로 가져오기
+    project = get_current_project()
+    if not project:
+        st.error("프로젝트가 선택되지 않았습니다.")
+        return
+
+    project_path = Path(project.get('path', ''))
+
+    with st.spinner(f"'{char_name}' 캐릭터 이미지 생성 중..."):
+        try:
+            # 캐릭터 프롬프트 가져오기
             char_manager = CharacterManager(str(project_path))
             all_chars = char_manager.get_all_characters()
 
@@ -3967,21 +4507,335 @@ def _render_regeneration_dialog():
 
             if not target_char:
                 st.error(f"캐릭터 '{char_name}'를 찾을 수 없습니다.")
+                return
+
+            # 프롬프트 생성
+            char_prompt = target_char.get('prompt_en', '') or target_char.get('description', '')
+
+            if not char_prompt:
+                st.error("캐릭터 프롬프트가 없습니다.")
+                return
+
+            # 스타일 추가
+            style_manager = get_style_manager()
+            style_data = style_manager.get_style_by_name(style)
+            if style_data:
+                style_prompt = style_data.get('prompt_suffix', '')
+                if style_prompt:
+                    char_prompt = f"{char_prompt}, {style_prompt}"
+
+            # 포즈 추가
+            if pose:
+                char_prompt = f"{char_prompt}, {pose} pose"
+
+            st.caption(f"📝 프롬프트: {char_prompt[:100]}...")
+
+            # API별 이미지 생성
+            generated_images = []
+
+            if api == "Google ImageFX":
+                # ImageFX API 호출
+                generated_images = _generate_with_imagefx(
+                    prompt=char_prompt,
+                    model=model,
+                    aspect_ratio=aspect_ratio,
+                    num_images=num_images
+                )
+            elif "Together" in api or "FLUX" in api:
+                # Together.ai FLUX API 호출
+                generated_images = _generate_with_flux(
+                    prompt=char_prompt,
+                    model=model,
+                    width=width,
+                    height=height,
+                    num_images=num_images
+                )
+            elif "Gemini" in api or "Banana" in api:
+                # Gemini Nano Banana API 호출
+                generated_images = _generate_with_gemini_banana(
+                    prompt=char_prompt,
+                    model=model,
+                    width=width,
+                    height=height,
+                    num_images=num_images
+                )
+            elif "DALL-E" in api or "OpenAI" in api:
+                # OpenAI DALL-E API 호출
+                generated_images = _generate_with_dalle(
+                    prompt=char_prompt,
+                    model=model,
+                    width=width,
+                    height=height,
+                    num_images=num_images
+                )
             else:
-                st.info(f"'{char_name}' 재생성은 '배치 생성' 탭에서 진행하세요.")
-                st.session_state['selected_chars_for_regen'] = [char_name]
+                st.error(f"지원하지 않는 API: {api}")
+                return
 
-            st.rerun()
+            if generated_images:
+                # 이미지 저장
+                saved_paths = _save_regenerated_images(
+                    char_name=char_name,
+                    scene_num=scene_num,
+                    project_path=project_path,
+                    images=generated_images
+                )
 
-    with col2:
-        if st.button("취소", use_container_width=True):
-            st.session_state['show_regen_dialog'] = False
-            st.rerun()
+                st.success(f"✅ {len(saved_paths)}개 이미지 생성 완료!")
 
-    with col3:
-        if st.button("갤러리로", use_container_width=True):
-            st.session_state['show_regen_dialog'] = False
-            st.rerun()
+                # 생성된 이미지 미리보기
+                if saved_paths:
+                    cols = st.columns(min(len(saved_paths), 4))
+                    for i, path in enumerate(saved_paths[:4]):
+                        with cols[i]:
+                            st.image(path, use_container_width=True)
+
+                # 다이얼로그 닫기
+                st.session_state['show_regen_dialog'] = False
+                time.sleep(1)
+                st.rerun()
+            else:
+                st.error("이미지 생성 결과가 없습니다.")
+
+        except Exception as e:
+            st.error(f"❌ 재생성 오류: {str(e)}")
+            st.code(traceback.format_exc())
+
+
+def _generate_with_imagefx(
+    prompt: str,
+    model: str = "IMAGEN_4",
+    aspect_ratio: str = "1:1 (정사각형)",
+    num_images: int = 2
+) -> list:
+    """
+    Google ImageFX API로 이미지 생성
+
+    Returns:
+        이미지 데이터 리스트 (bytes)
+    """
+    images = []
+
+    try:
+        from utils.imagefx_client import ImageFXClient, ImagenModel, AspectRatio
+        from config.settings import load_imagefx_cookie
+
+        # 쿠키 로드 (session_state > 파일 순서, 이미지 생성 탭과 동일)
+        imagefx_cookie = st.session_state.get("imagefx_cookie", "") or load_imagefx_cookie()
+        if not imagefx_cookie:
+            st.error("❌ ImageFX 쿠키가 설정되지 않았습니다. API 관리 페이지에서 쿠키를 입력해주세요.")
+            return images
+
+        print(f"[캐릭터 ImageFX] 쿠키 로드됨 (길이: {len(imagefx_cookie)})")
+
+        # aspect ratio 매핑 (UI 문자열 → AspectRatio enum)
+        ar_map = {
+            "1:1 (정사각형)": AspectRatio.SQUARE,
+            "16:9 (가로)": AspectRatio.LANDSCAPE,
+            "9:16 (세로)": AspectRatio.PORTRAIT,
+            "4:3": AspectRatio.LANDSCAPE,
+            "3:4": AspectRatio.PORTRAIT
+        }
+        ar = ar_map.get(aspect_ratio, AspectRatio.SQUARE)
+
+        # ImageFX 클라이언트 초기화 (쿠키 전달)
+        client = ImageFXClient(cookie=imagefx_cookie)
+
+        # 모델 매핑 (문자열 → ImagenModel enum)
+        model_enum_map = {
+            "IMAGEN_4": ImagenModel.IMAGEN_4,
+            "IMAGEN_3_5": ImagenModel.IMAGEN_3_5,
+            "IMAGEN_3_1": ImagenModel.IMAGEN_3_1,
+            "IMAGEN_3": ImagenModel.IMAGEN_3
+        }
+        imagefx_model = model_enum_map.get(model, ImagenModel.IMAGEN_4)
+
+        # 이미지 생성 (1장씩 num_images번 호출)
+        for i in range(num_images):
+            result_list = client.generate_image(
+                prompt=prompt,
+                model=imagefx_model,
+                aspect_ratio=ar,
+                num_images=1
+            )
+
+            if result_list:
+                for gen_img in result_list:
+                    try:
+                        img_bytes = gen_img.get_bytes()
+                        if img_bytes:
+                            images.append(img_bytes)
+                            print(f"[ImageFX] ✅ 이미지 {i+1}/{num_images} 생성 완료")
+                    except Exception as e:
+                        print(f"[ImageFX] ⚠️ 이미지 {i+1} 바이트 변환 실패: {e}")
+            else:
+                print(f"[ImageFX] ⚠️ 이미지 {i+1} 생성 실패: 결과 없음")
+
+    except ImportError:
+        st.warning("ImageFX 클라이언트를 찾을 수 없습니다. 쿠키 설정을 확인하세요.")
+    except Exception as e:
+        st.error(f"ImageFX 오류: {str(e)}")
+        import traceback
+        traceback.print_exc()
+
+    return images
+
+
+def _generate_with_flux(
+    prompt: str,
+    model: str,
+    width: int,
+    height: int,
+    num_images: int
+) -> list:
+    """Together.ai FLUX API로 이미지 생성"""
+    images = []
+
+    try:
+        from utils.parallel_image_generator import generate_with_together_flux
+
+        for i in range(num_images):
+            result = generate_with_together_flux(
+                prompt=prompt,
+                model=model,
+                width=width,
+                height=height
+            )
+
+            if result:
+                images.append(result)
+                print(f"[FLUX] ✅ 이미지 {i+1}/{num_images} 생성 완료")
+
+    except ImportError:
+        st.warning("FLUX 생성기를 찾을 수 없습니다.")
+    except Exception as e:
+        st.error(f"FLUX 오류: {str(e)}")
+
+    return images
+
+
+def _generate_with_gemini_banana(
+    prompt: str,
+    model: str,
+    width: int,
+    height: int,
+    num_images: int
+) -> list:
+    """Gemini Nano Banana API로 이미지 생성"""
+    images = []
+
+    try:
+        from utils.gemini_image_generator import generate_with_gemini
+
+        for i in range(num_images):
+            result = generate_with_gemini(
+                prompt=prompt,
+                width=width,
+                height=height
+            )
+
+            if result:
+                images.append(result)
+                print(f"[Gemini Banana] ✅ 이미지 {i+1}/{num_images} 생성 완료")
+
+    except ImportError:
+        st.warning("Gemini 생성기를 찾을 수 없습니다.")
+    except Exception as e:
+        st.error(f"Gemini 오류: {str(e)}")
+
+    return images
+
+
+def _generate_with_dalle(
+    prompt: str,
+    model: str,
+    width: int,
+    height: int,
+    num_images: int
+) -> list:
+    """OpenAI DALL-E API로 이미지 생성"""
+    images = []
+
+    try:
+        from openai import OpenAI
+
+        client = OpenAI()
+
+        # DALL-E 3는 한 번에 1개만 생성 가능
+        for i in range(num_images):
+            response = client.images.generate(
+                model=model,
+                prompt=prompt,
+                size=f"{width}x{height}",
+                quality="standard",
+                n=1
+            )
+
+            if response.data:
+                import requests
+                img_url = response.data[0].url
+                img_response = requests.get(img_url)
+                if img_response.status_code == 200:
+                    images.append(img_response.content)
+                    print(f"[DALL-E] ✅ 이미지 {i+1}/{num_images} 생성 완료")
+
+    except ImportError:
+        st.warning("OpenAI 라이브러리를 찾을 수 없습니다.")
+    except Exception as e:
+        st.error(f"DALL-E 오류: {str(e)}")
+
+    return images
+
+
+def _save_regenerated_images(
+    char_name: str,
+    scene_num: int,
+    project_path: Path,
+    images: list
+) -> list:
+    """
+    재생성된 이미지 저장
+
+    Returns:
+        저장된 이미지 경로 리스트
+    """
+    saved_paths = []
+
+    # 저장 디렉토리
+    char_dir = project_path / "images" / "characters"
+    char_dir.mkdir(parents=True, exist_ok=True)
+
+    timestamp = int(time.time() * 1000)
+
+    for idx, img_data in enumerate(images):
+        try:
+            # 파일명 생성
+            safe_name = char_name.replace(' ', '_').replace('/', '_')
+            filename = f"{safe_name}_scene{scene_num:03d}_{timestamp}_{idx}.png"
+            filepath = char_dir / filename
+
+            # 이미지 저장
+            if isinstance(img_data, bytes):
+                with open(filepath, 'wb') as f:
+                    f.write(img_data)
+            elif hasattr(img_data, 'save'):
+                # PIL Image
+                img_data.save(filepath, 'PNG')
+            else:
+                # base64 문자열일 수 있음
+                import base64
+                if isinstance(img_data, str):
+                    img_bytes = base64.b64decode(img_data)
+                    with open(filepath, 'wb') as f:
+                        f.write(img_bytes)
+
+            saved_paths.append(str(filepath))
+            print(f"[저장] ✅ {filename}")
+
+        except Exception as e:
+            print(f"[저장] ❌ 이미지 {idx} 저장 실패: {e}")
+
+    return saved_paths
 
 
 # 다음 단계 안내

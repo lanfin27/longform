@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-01T17:52:26.362014",
+  "image_file": "bg_scene_160_1769935946360.png",
+  "scene_id": 160,
+  "prompts": {
+    "original": "A desolate, abandoned large-scale factory building, overgrown with weeds and featuring rusted steel structures standing like a white elephant, symbolizing wasted investment. In a corner, a torn calendar prominently displays \"January 2026,\" and scattered nearby are official-looking documents with the US Treasury logo, hinting at a shocking new policy announcement. The overall scene is dark and ominous, with dramatic lighting that heightens the sense of foreboding and emphasizes the escalating problems. Low angle, deep shadows, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A desolate, abandoned large-scale factory building, overgrown with weeds and featuring rusted steel structures standing like a white elephant, symbolizing wasted investment. In a corner, a torn calendar prominently displays \"January 2026,\" and scattered nearby are official-looking documents with the US Treasury logo, hinting at a shocking new policy announcement. The overall scene is dark and ominous, with dramatic lighting that heightens the sense of foreboding and emphasizes the escalating problems. Low angle, deep shadows, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1085170881
+  }
+}

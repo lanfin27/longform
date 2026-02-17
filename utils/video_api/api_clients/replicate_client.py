@@ -300,7 +300,17 @@ class ReplicateClient(BaseVideoAPIClient):
         # 모델별 파라미터
         model_id = model.model_id.lower()
 
-        if "wan" in model_id:
+        if "wan-2.2" in model_id or "wan-video" in model_id:
+            # ⭐ v2.4: Wan 2.2 I2V Fast 모델 (속도 최적화)
+            input_data["num_frames"] = request.duration * 16 + 1
+            input_data["guide_scale"] = 5.0  # wan-2.2는 guide_scale 사용
+            input_data["steps"] = 4  # 빠른 추론 (기본값)
+            input_data["shift"] = 5.0
+
+            if request.negative_prompt:
+                input_data["negative_prompt"] = request.negative_prompt
+
+        elif "wan" in model_id:
             # Wan 2.1 모델
             input_data["num_frames"] = request.duration * 16 + 1
             input_data["guidance_scale"] = 5.0
@@ -308,6 +318,13 @@ class ReplicateClient(BaseVideoAPIClient):
 
             if request.negative_prompt:
                 input_data["negative_prompt"] = request.negative_prompt
+
+        elif "seedance" in model_id:
+            # ⭐ v2.4: ByteDance Seedance 1 Lite 모델
+            input_data["duration"] = request.duration
+            # 해상도 매핑
+            res_height = {"480p": 480, "720p": 720, "1080p": 1080}.get(request.resolution, 720)
+            input_data["resolution"] = f"{int(res_height * 16 / 9)}x{res_height}"
 
         elif "minimax" in model_id or "video-01" in model_id:
             # MiniMax/Hailuo 모델

@@ -1,0 +1,220 @@
+[
+  {
+    "name": "한국 사람들",
+    "name_ko": "한국 사람들",
+    "role": "등장인물",
+    "visual_prompt": "silhouettes of diverse individuals, eyes reflecting intense desire for overseas investment, mysterious and obsessed expressions",
+    "description": "",
+    "scenes": [
+      61,
+      62,
+      63
+    ],
+    "appearance_scenes": [
+      61,
+      62,
+      63
+    ]
+  },
+  {
+    "name": "투자자",
+    "name_ko": "투자자",
+    "role": "등장인물",
+    "visual_prompt": "silhouette of an investor's hand, contemplating a choice between two financial options, reaching towards one side",
+    "description": "",
+    "scenes": [
+      70,
+      71,
+      72
+    ],
+    "appearance_scenes": [
+      70,
+      71,
+      72
+    ]
+  },
+  {
+    "name": "불안해하는 사람들",
+    "name_ko": "불안해하는 사람들",
+    "role": "등장인물",
+    "visual_prompt": "silhouettes of anxious people, slightly blurred, conveying widespread distress",
+    "description": "",
+    "scenes": [
+      85,
+      86,
+      87
+    ],
+    "appearance_scenes": [
+      85,
+      86,
+      87
+    ]
+  },
+  {
+    "name": "대통령",
+    "name_ko": "대통령",
+    "role": "등장인물",
+    "visual_prompt": "A solemn Asian male president, middle-aged, wearing a dark suit, with a grave and serious expression, delivering an address from a formal podium",
+    "description": "",
+    "scenes": [
+      88,
+      89,
+      90,
+      109,
+      110,
+      111
+    ],
+    "appearance_scenes": [
+      88,
+      89,
+      90,
+      109,
+      110,
+      111
+    ]
+  },
+  {
+    "name": "도널드 트럼프",
+    "name_ko": "도널드 트럼프",
+    "role": "등장인물",
+    "visual_prompt": "prominent political figure, middle-aged, determined and impactful expression, looking directly at the viewer, wearing a dark suit",
+    "description": "",
+    "scenes": [
+      106,
+      107,
+      108,
+      121,
+      122,
+      123
+    ],
+    "appearance_scenes": [
+      106,
+      107,
+      108,
+      121,
+      122,
+      123
+    ]
+  },
+  {
+    "name": "정치 지도자 (실루엣)",
+    "name_ko": "정치 지도자 (실루엣)",
+    "role": "등장인물",
+    "visual_prompt": "A shadowy silhouette of a powerful figure, appearing to impose tariffs on the world with a commanding gesture",
+    "description": "",
+    "scenes": [
+      112,
+      113,
+      114
+    ],
+    "appearance_scenes": [
+      112,
+      113,
+      114
+    ]
+  },
+  {
+    "name": "도널드 트럼프 전 대통령",
+    "name_ko": "도널드 트럼프 전 대통령",
+    "role": "등장인물",
+    "visual_prompt": "former president, powerful silhouette, authoritative posture, standing against dramatic light",
+    "description": "",
+    "scenes": [
+      130,
+      131,
+      132
+    ],
+    "appearance_scenes": [
+      88,
+      89,
+      90,
+      109,
+      110,
+      111
+    ]
+  },
+  {
+    "name": "한국 정부를 상징하는 인물",
+    "name_ko": "한국 정부를 상징하는 인물",
+    "role": "등장인물",
+    "visual_prompt": "seen from behind or as a silhouette, contemplating two diverging paths",
+    "description": "",
+    "scenes": [
+      178,
+      179,
+      180
+    ],
+    "appearance_scenes": [
+      178,
+      179,
+      180
+    ]
+  },
+  {
+    "name": "사람들",
+    "name_ko": "사람들",
+    "role": "등장인물",
+    "visual_prompt": "worried and anxious expressions, holding empty or partially filled shopping carts, diverse ages and backgrounds, dressed in casual clothing",
+    "description": "",
+    "scenes": [
+      184,
+      185,
+      186
+    ],
+    "appearance_scenes": [
+      61,
+      62,
+      63
+    ]
+  },
+  {
+    "name": "금융 분석가들",
+    "name_ko": "금융 분석가들",
+    "role": "등장인물",
+    "visual_prompt": "serious and focused expressions, monitoring multiple computer screens, wearing business attire, diverse ages and ethnicities",
+    "description": "",
+    "scenes": [
+      187,
+      188,
+      189
+    ],
+    "appearance_scenes": [
+      187,
+      188,
+      189
+    ]
+  },
+  {
+    "name": "오건영 단장",
+    "name_ko": "오건영 단장",
+    "role": "등장인물",
+    "visual_prompt": "Head of Shinhan Bank, an authoritative Asian financial expert, middle-aged, wearing a dark business suit, presenting confidently at a podium with a microphone, gesturing towards the audience",
+    "description": "",
+    "scenes": [
+      193,
+      194,
+      195
+    ],
+    "appearance_scenes": [
+      193,
+      194,
+      195
+    ]
+  },
+  {
+    "name": "미래를 고민하는 한 사람의 실루엣.",
+    "name_en": "A solitary silhouette of a person",
+    "description": "standing thoughtfully, contemplating future directions",
+    "visual_prompt": "standing thoughtfully, contemplating future directions",
+    "scenes": [
+      229,
+      230,
+      231
+    ],
+    "appearance_scenes": [
+      229,
+      230,
+      231
+    ]
+  }
+]

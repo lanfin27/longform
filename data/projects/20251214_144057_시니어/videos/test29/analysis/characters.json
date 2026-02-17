@@ -1,0 +1,34 @@
+[
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "role": "등장인물",
+    "visual_prompt": "A male driver in a futuristic car, hands on the steering wheel, with a neutral and focused expression.",
+    "description": "",
+    "scenes": [
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      112,
+      113,
+      114,
+      244,
+      245,
+      246
+    ]
+  },
+  {
+    "name": "이재용 회장",
+    "name_en": "Lee Jae-yong",
+    "description": "a confident and visionary Asian businessman, middle-aged, wearing a sharp dark suit, with a thoughtful expression, looking into the distance",
+    "visual_prompt": "a confident and visionary Asian businessman, middle-aged, wearing a sharp dark suit, with a thoughtful expression, looking into the distance",
+    "scenes": [
+      46,
+      47,
+      48
+    ]
+  }
+]

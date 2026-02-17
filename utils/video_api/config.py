@@ -254,6 +254,35 @@ REPLICATE_MODELS: Dict[str, VideoModelConfig] = {
         speed=SpeedTier.SLOW,
         quality=QualityTier.GREAT,
     ),
+
+    # === v2.4: 신규 모델 추가 ===
+    "wan_22_fast": VideoModelConfig(
+        model_id="wan-video/wan-2.2-i2v-fast",
+        display_name="Wan 2.2 I2V Fast (최저가)",
+        platform="replicate",
+        video_type=VideoType.IMAGE_TO_VIDEO,
+        resolutions=["480p", "720p"],
+        default_resolution="480p",
+        durations=[5],
+        default_duration=5,
+        price_per_video=0.05,  # 빠른 추론으로 더 저렴
+        speed=SpeedTier.FAST,
+        quality=QualityTier.GREAT,
+        supports_negative_prompt=True,
+    ),
+    "seedance_lite": VideoModelConfig(
+        model_id="bytedance/seedance-1-lite",
+        display_name="Seedance 1 Lite (고품질)",
+        platform="replicate",
+        video_type=VideoType.IMAGE_TO_VIDEO,
+        resolutions=["720p", "1080p"],
+        default_resolution="720p",
+        durations=[5, 10],
+        default_duration=5,
+        price_per_video=0.15,
+        speed=SpeedTier.MEDIUM,
+        quality=QualityTier.BEST,
+    ),
 }
 
 
@@ -432,3 +461,47 @@ def get_models_by_type(video_type: str, platform: Optional[str] = None) -> Dict[
                 result[p][key] = model
 
     return result
+
+
+def validate_video_duration(
+    duration: float,
+    platform: str,
+    model_key: str
+) -> int:
+    """
+    비디오 API에 맞게 duration 값 검증 및 보정
+
+    float duration을 해당 모델의 허용된 정수 값으로 스냅.
+    규칙: duration 이상인 가장 작은 허용 값 선택 (내용이 잘리지 않도록)
+
+    Args:
+        duration: 원본 duration (초, float 가능)
+        platform: API 플랫폼 (fal_ai, replicate, pixverse)
+        model_key: 모델 키 (kling_pro, wan_i2v 등)
+
+    Returns:
+        허용된 duration 값 (정수)
+    """
+    model_config = get_model_config(platform, model_key)
+    if model_config:
+        allowed = sorted(model_config.durations)
+    else:
+        allowed = [5, 10]
+
+    try:
+        duration_float = float(duration)
+    except (ValueError, TypeError):
+        print(f"[Duration] 잘못된 duration 값: {duration}, 기본값 {allowed[0]}초 사용")
+        return allowed[0]
+
+    # duration 이상인 가장 작은 허용 값 선택
+    for allowed_d in allowed:
+        if allowed_d >= duration_float:
+            if allowed_d != duration_float:
+                print(f"[Duration] {duration_float}초 → {allowed_d}초 (자동 보정)")
+            return allowed_d
+
+    # 모든 허용 값보다 큰 경우 → 최대값
+    max_allowed = allowed[-1]
+    print(f"[Duration] {duration_float}초 > 최대 {max_allowed}초, 최대값 사용")
+    return max_allowed

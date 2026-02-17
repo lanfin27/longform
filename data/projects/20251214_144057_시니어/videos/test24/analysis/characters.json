@@ -1,0 +1,49 @@
+[
+  {
+    "name": "이재용 부회장 (과거)",
+    "name_ko": "이재용 부회장 (과거)",
+    "role": "등장인물",
+    "visual_prompt": "Lee Jae-yong (former Vice Chairman) with a thoughtful and visionary expression, looking into the distance towards a futuristic automotive scene.",
+    "description": "",
+    "appearance_scenes": [
+      46,
+      47,
+      48,
+      49,
+      50
+    ]
+  },
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "role": "등장인물",
+    "visual_prompt": "Close-up on the driver's facial expressions, meticulously portraying subtle signs of drowsiness, intense focus, or noticeable stress, detailed rendering of facial muscles and skin texture, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      101,
+      102,
+      103,
+      104,
+      105,
+      111,
+      112,
+      113,
+      114,
+      115
+    ]
+  },
+  {
+    "name": "비즈니스맨",
+    "name_ko": "비즈니스맨",
+    "role": "등장인물",
+    "visual_prompt": "Businessman seated in the driver's seat operating the ADAS system, focused expression, professional attire, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      201,
+      202,
+      203,
+      204,
+      205
+    ]
+  }
+]

@@ -662,18 +662,362 @@ def render_status_tab():
                         st.caption(f"  └ {video['video_id']}: {asset_summary}")
 
 
+def render_folder_delete_tab():
+    """영상/채널 폴더 삭제 탭"""
+    st.markdown("### 🗑️ 영상/채널 폴더 삭제")
+    st.caption("영상 또는 채널 폴더 전체를 삭제합니다. (휴지통 이동 또는 영구 삭제)")
+
+    st.error("""
+    ⚠️ **경고**: 이 작업은 선택한 영상 또는 채널의 **모든 데이터**를 삭제합니다.
+    - 이미지, TTS 오디오, 스크립트, 분석 결과, 설정 등 **모든 파일**이 삭제됩니다.
+    - 휴지통으로 이동 옵션을 선택하면 '휴지통' 섹션에서 복원할 수 있습니다.
+    """)
+
+    st.markdown("---")
+
+    manager = get_reset_manager()
+
+    # 현재 작업 중인 프로젝트/영상
+    current_project = st.session_state.get("current_project", "")
+    current_video = st.session_state.get("current_video", "")
+
+    # ========================
+    # 영상 삭제 섹션
+    # ========================
+    st.markdown("#### 📹 영상 삭제")
+
+    # 프로젝트 선택
+    projects = manager.get_project_list_for_delete()
+
+    if not projects:
+        st.info("삭제할 프로젝트가 없습니다.")
+    else:
+        project_options = {p["name"]: p for p in projects}
+        selected_project_name = st.selectbox(
+            "프로젝트 선택",
+            options=list(project_options.keys()),
+            format_func=lambda x: f"{project_options[x]['display_name']} ({project_options[x]['video_count']}개 영상)",
+            key="delete_video_project_select"
+        )
+
+        if selected_project_name:
+            selected_project = project_options[selected_project_name]
+
+            # 영상 목록 조회
+            videos = manager.get_video_list_for_delete(selected_project_name)
+
+            if not videos:
+                st.info("이 프로젝트에 삭제할 영상이 없습니다.")
+            else:
+                st.write("**삭제할 영상 선택:**")
+
+                # 세션 상태 초기화
+                if "selected_videos_for_delete" not in st.session_state:
+                    st.session_state["selected_videos_for_delete"] = set()
+
+                selected_videos = []
+
+                for video in videos:
+                    is_current = (video["name"] == current_video and selected_project_name == current_project)
+
+                    col1, col2, col3, col4 = st.columns([0.5, 2.5, 1.5, 1.5])
+
+                    with col1:
+                        is_selected = st.checkbox(
+                            video["name"],
+                            key=f"delete_video_{video['name']}",
+                            disabled=is_current,
+                            label_visibility="collapsed"
+                        )
+                        if is_selected:
+                            selected_videos.append(video)
+
+                    with col2:
+                        status = " 🔴 (현재 작업 중)" if is_current else ""
+                        st.write(f"**{video['name']}**{status}")
+
+                    with col3:
+                        st.caption(f"{video['file_count']}개 파일")
+
+                    with col4:
+                        st.caption(video['size_display'])
+
+                st.markdown("---")
+
+                # 삭제 옵션
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    use_trash = st.checkbox(
+                        "🗑️ 휴지통으로 이동 (복구 가능)",
+                        value=True,
+                        key="video_delete_use_trash"
+                    )
+
+                with col2:
+                    if selected_videos:
+                        total_size = sum(v["size_bytes"] for v in selected_videos)
+                        st.write(f"선택: **{len(selected_videos)}개** ({manager.format_size(total_size)})")
+
+                # 삭제 버튼
+                if selected_videos:
+                    st.write("")
+
+                    # 확인 입력
+                    confirm_text = st.text_input(
+                        "삭제를 확인하려면 '삭제'를 입력하세요:",
+                        key="video_delete_confirm"
+                    )
+
+                    col1, col2 = st.columns([1, 3])
+
+                    with col1:
+                        delete_btn = st.button(
+                            f"🗑️ {len(selected_videos)}개 영상 삭제",
+                            type="primary",
+                            disabled=confirm_text != "삭제",
+                            key="video_delete_btn"
+                        )
+
+                    if delete_btn and confirm_text == "삭제":
+                        success_count = 0
+                        fail_count = 0
+
+                        for video in selected_videos:
+                            result = manager.delete_video_folder(video["path"], use_trash=use_trash)
+
+                            if result["success"]:
+                                st.success(f"✅ {video['name']}: {result['message']}")
+                                success_count += 1
+                            else:
+                                st.error(f"❌ {video['name']}: {result['message']}")
+                                fail_count += 1
+
+                        if success_count > 0:
+                            st.balloons()
+                            st.rerun()
+                else:
+                    st.info("삭제할 영상을 선택해주세요.")
+
+    st.markdown("---")
+
+    # ========================
+    # 채널/프로젝트 삭제 섹션
+    # ========================
+    st.markdown("#### 📁 채널(프로젝트) 삭제")
+
+    st.warning("""
+    🚨 **주의**: 채널 전체가 삭제됩니다!
+    - 해당 채널의 **모든 영상, 이미지, TTS, 스크립트, 설정** 등이 삭제됩니다.
+    """)
+
+    if not projects:
+        st.info("삭제할 채널이 없습니다.")
+    else:
+        st.write("**삭제할 채널 선택:**")
+
+        selected_projects = []
+
+        for project in projects:
+            is_current = project["name"] == current_project
+
+            col1, col2, col3, col4 = st.columns([0.5, 3, 2, 1.5])
+
+            with col1:
+                is_selected = st.checkbox(
+                    project["name"],
+                    key=f"delete_project_{project['name']}",
+                    disabled=is_current,
+                    label_visibility="collapsed"
+                )
+                if is_selected:
+                    selected_projects.append(project)
+
+            with col2:
+                status = " 🔴 (현재 작업 중)" if is_current else ""
+                st.write(f"**{project['display_name']}**{status}")
+                st.caption(project["name"])
+
+            with col3:
+                st.caption(f"{project['video_count']}개 영상, {project['file_count']}개 파일")
+
+            with col4:
+                st.caption(project['size_display'])
+
+        st.markdown("---")
+
+        # 삭제 옵션
+        col1, col2 = st.columns(2)
+
+        with col1:
+            project_use_trash = st.checkbox(
+                "🗑️ 휴지통으로 이동 (복구 가능)",
+                value=True,
+                key="project_delete_use_trash"
+            )
+
+        with col2:
+            if selected_projects:
+                total_size = sum(p["size_bytes"] for p in selected_projects)
+                total_videos = sum(p["video_count"] for p in selected_projects)
+                st.write(f"선택: **{len(selected_projects)}개 채널** ({total_videos}개 영상, {manager.format_size(total_size)})")
+
+        # 삭제 버튼
+        if selected_projects:
+            st.write("")
+
+            # 이중 확인 (채널명 입력)
+            channel_names = ", ".join([p["display_name"] for p in selected_projects])
+            st.warning(f"🚨 다음 채널이 삭제됩니다: **{channel_names}**")
+
+            confirm_text = st.text_input(
+                "삭제를 확인하려면 '영구삭제'를 입력하세요:",
+                key="project_delete_confirm"
+            )
+
+            col1, col2 = st.columns([1, 3])
+
+            with col1:
+                delete_btn = st.button(
+                    f"🗑️ {len(selected_projects)}개 채널 삭제",
+                    type="primary",
+                    disabled=confirm_text != "영구삭제",
+                    key="project_delete_btn"
+                )
+
+            if delete_btn and confirm_text == "영구삭제":
+                success_count = 0
+                fail_count = 0
+
+                for project in selected_projects:
+                    result = manager.delete_project_folder(project["path"], use_trash=project_use_trash)
+
+                    if result["success"]:
+                        st.success(f"✅ {project['display_name']}: {result['message']}")
+                        success_count += 1
+                    else:
+                        st.error(f"❌ {project['display_name']}: {result['message']}")
+                        fail_count += 1
+
+                if success_count > 0:
+                    # session_state 초기화 (현재 채널이 삭제된 경우)
+                    if current_project in [p["name"] for p in selected_projects]:
+                        st.session_state.pop("current_project", None)
+                        st.session_state.pop("project_path", None)
+
+                    st.balloons()
+                    st.rerun()
+        else:
+            st.info("삭제할 채널을 선택해주세요.")
+
+    st.markdown("---")
+
+    # ========================
+    # 휴지통 섹션
+    # ========================
+    st.markdown("#### 🗑️ 휴지통")
+
+    trash_contents = manager.get_trash_contents()
+
+    if trash_contents["total_size"] == 0:
+        st.info("휴지통이 비어 있습니다.")
+    else:
+        st.write(f"**휴지통 사용량**: {trash_contents['total_size_display']}")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.write(f"- 채널: {len(trash_contents['projects'])}개")
+
+        with col2:
+            st.write(f"- 영상: {len(trash_contents['videos'])}개")
+
+        # 삭제된 프로젝트 목록
+        if trash_contents["projects"]:
+            with st.expander(f"📁 삭제된 채널 ({len(trash_contents['projects'])}개)", expanded=True):
+                for project in trash_contents["projects"]:
+                    col1, col2, col3 = st.columns([3, 1, 1])
+
+                    with col1:
+                        st.write(f"**{project['name']}** ({project['size_display']})")
+                        if project.get("deleted_at"):
+                            st.caption(f"삭제: {project['deleted_at']}")
+
+                    with col2:
+                        if st.button("🔄 복구", key=f"restore_project_{project['name']}", use_container_width=True):
+                            result = manager.restore_from_trash(project["path"], "project")
+                            if result["success"]:
+                                st.success(result["message"])
+                                st.rerun()
+                            else:
+                                st.error(result["message"])
+
+                    with col3:
+                        if st.button("🗑️ 영구삭제", key=f"perm_delete_project_{project['name']}", use_container_width=True):
+                            result = manager.permanently_delete_from_trash(project["path"])
+                            if result["success"]:
+                                st.success(result["message"])
+                                st.rerun()
+                            else:
+                                st.error(result["message"])
+
+        # 삭제된 영상 목록
+        if trash_contents["videos"]:
+            with st.expander(f"📹 삭제된 영상 ({len(trash_contents['videos'])}개)", expanded=True):
+                for video in trash_contents["videos"]:
+                    col1, col2, col3 = st.columns([3, 1, 1])
+
+                    with col1:
+                        st.write(f"**{video['name']}** ({video['size_display']})")
+                        if video.get("deleted_at"):
+                            st.caption(f"삭제: {video['deleted_at']}")
+
+                    with col2:
+                        if st.button("🔄 복구", key=f"restore_video_{video['name']}", use_container_width=True):
+                            result = manager.restore_from_trash(video["path"], "video")
+                            if result["success"]:
+                                st.success(result["message"])
+                                st.rerun()
+                            else:
+                                st.error(result["message"])
+
+                    with col3:
+                        if st.button("🗑️ 영구삭제", key=f"perm_delete_video_{video['name']}", use_container_width=True):
+                            result = manager.permanently_delete_from_trash(video["path"])
+                            if result["success"]:
+                                st.success(result["message"])
+                                st.rerun()
+                            else:
+                                st.error(result["message"])
+
+        # 휴지통 비우기 버튼
+        st.markdown("---")
+
+        col1, col2 = st.columns([1, 3])
+
+        with col1:
+            if st.button("🗑️ 휴지통 비우기", key="empty_trash", type="secondary"):
+                result = manager.empty_trash()
+                if result["success"]:
+                    st.success(result["message"])
+                    st.rerun()
+                else:
+                    st.error(result["message"])
+
+
 def main():
     """메인 함수"""
     st.title("🗑️ 프로젝트 초기화")
     st.caption("프로젝트, 채널, 영상 단위로 데이터를 초기화합니다.")
 
     # 탭
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "🎬 영상 초기화",
         "📺 채널 초기화",
         "🌐 전체 초기화",
         "♻️ 복구",
-        "📊 현황"
+        "📊 현황",
+        "🗑️ 폴더 삭제"
     ])
 
     with tab1:
@@ -690,6 +1034,9 @@ def main():
 
     with tab5:
         render_status_tab()
+
+    with tab6:
+        render_folder_delete_tab()
 
 
 if __name__ == "__main__":

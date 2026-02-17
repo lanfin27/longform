@@ -1,0 +1,302 @@
+[
+  {
+    "id": "char_0",
+    "name": "줄 서 있는 사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "diverse people, casual winter attire, expressions of anticipation and eagerness, waiting patiently",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_줄_서_있는_사람들_standing_1770617146505.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_줄_서_있는_사람들_standing_1770617146505.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.314754",
+    "updated_at": "2026-02-09T15:06:28.245003"
+  },
+  {
+    "id": "char_1",
+    "name": "사람의 손",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "well-groomed human hand holding a modern smartphone, fingers poised near the screen",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_사람의_손_standing_1770617149643.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_사람의_손_standing_1770617149643.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.317261",
+    "updated_at": "2026-02-09T15:06:28.264599"
+  },
+  {
+    "id": "char_2",
+    "name": "여성 인플루언서",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A stylish young Asian female influencer, resembling K-pop idol Jang Won-young, radiant smile, holding a 'Ddujjonku' cookie, trendy outfit, looking directly at the camera",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_여성_인플루언서_standing_1770617157040.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_여성_인플루언서_standing_1770617157040.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.318479",
+    "updated_at": "2026-02-09T15:06:28.300164"
+  },
+  {
+    "id": "char_3",
+    "name": "젊은이들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "diverse young adults, casual and trendy outfits, engaged and smiling expressions, happily holding or consuming the same trendy product",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_젊은이들_standing_1770617149350.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_젊은이들_standing_1770617149350.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.319660",
+    "updated_at": "2026-02-09T15:06:28.333968"
+  },
+  {
+    "id": "char_4",
+    "name": "여성",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "sophisticated, elegant, applying vibrant red lipstick, looking into a mirror, confident expression, soft lighting on her face",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_여성_standing_1770617153672.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_여성_standing_1770617153672.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.320761",
+    "updated_at": "2026-02-09T15:06:28.371091"
+  },
+  {
+    "id": "char_5",
+    "name": "위로 올라가는 사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "silhouettes of people, moving upwards, in a bright, prosperous environment",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_위로_올라가는_사람들_standing_1770617158504.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_위로_올라가는_사람들_standing_1770617158504.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.321729",
+    "updated_at": "2026-02-09T15:06:28.411531"
+  },
+  {
+    "id": "char_6",
+    "name": "아래로 내려가는 사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "silhouettes of people, moving downwards, in a dark, isolated atmosphere",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_아래로_내려가는_사람들_standing_1770617161182.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_아래로_내려가는_사람들_standing_1770617161182.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.322548",
+    "updated_at": "2026-02-09T15:06:28.445999"
+  },
+  {
+    "id": "char_7",
+    "name": "쿠키를 들고 있는 사람",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "a person holding a meticulously decorated, enticing cookie in elegant, branded packaging, with an eager and satisfied expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_쿠키를_들고_있는_사람_standing_1770617163940.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_쿠키를_들고_있는_사람_standing_1770617163940.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.323853",
+    "updated_at": "2026-02-09T15:06:28.480288"
+  },
+  {
+    "id": "char_8",
+    "name": "호텔 셰프",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Skilled hotel chef, wearing a clean white chef's uniform and hat, with hands delicately handling vibrant green premium pistachio powder and fine, crystalline premium salt, mixing ingredients with precision and artistry, focused expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_호텔_셰프_standing_1770617166423.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_호텔_셰프_standing_1770617166423.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.324671",
+    "updated_at": "2026-02-09T15:06:28.507922"
+  },
+  {
+    "id": "char_9",
+    "name": "소규모 자영업자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "silhouetted figure, hunched over, conveying the burden of rising ingredient costs, thoughtful and stressed expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_소규모_자영업자_standing_1770617169905.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_소규모_자영업자_standing_1770617169905.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.325467",
+    "updated_at": "2026-02-09T15:06:28.539210"
+  },
+  {
+    "id": "char_10",
+    "name": "정치인들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "professional politicians, dressed in formal business attire, engaged in serious discussion, focused expressions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_정치인들_standing_1770617180561.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_정치인들_standing_1770617180561.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.326136",
+    "updated_at": "2026-02-09T15:06:28.571690"
+  },
+  {
+    "id": "char_11",
+    "name": "다양한 연령대의 사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "people of various ages, with friendly expressions, collaboratively preparing 'Ddujjonku' ingredients, wearing comfortable casual clothes",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_다양한_연령대의_사람들_standing_1770617175569.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_다양한_연령대의_사람들_standing_1770617175569.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.327338",
+    "updated_at": "2026-02-09T15:06:28.604303"
+  },
+  {
+    "id": "char_12",
+    "name": "친구들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "diverse group of friends of various ages, with happy and engaged expressions, collaboratively making 'Ddujjonku' together, wearing casual and comfortable attire, interacting cheerfully",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_친구들_standing_1770617178574.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_친구들_standing_1770617178574.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.328278",
+    "updated_at": "2026-02-09T15:06:28.635022"
+  },
+  {
+    "id": "char_13",
+    "name": "친구/가족",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "one adult female and one adult male, both with happy and collaborative expressions, wearing casual home attire, actively shaping cookie dough or placing trays into an oven",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_친구_가족_standing_1770617181543.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_친구_가족_standing_1770617181543.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.331935",
+    "updated_at": "2026-02-09T15:06:28.663120"
+  },
+  {
+    "id": "char_14",
+    "name": "다양한 사람들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "male and female, various ages, engaged in creative activities such as urban gardening, crafting, or coding, with focused and empowered expressions, wearing casual and modern attire, faces not clearly visible",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_다양한_사람들_standing_1770617188200.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\두쫀쿠\\images\\characters\\char_다양한_사람들_standing_1770617188200.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-09T15:03:39.333286",
+    "updated_at": "2026-02-09T15:06:28.697153"
+  }
+]

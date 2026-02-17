@@ -1,0 +1,52 @@
+[
+  {
+    "name": "비즈니스맨",
+    "name_ko": "비즈니스맨",
+    "name_en": "",
+    "description": "",
+    "description_en": "",
+    "visual_prompt": "Businessman pointing towards a large screen displaying financial data with Harman Kardon logo visible, confident posture, professional attire, in a modern corporate meeting room setting, no text, no logos on clothing, no name tags",
+    "character_prompt": "Businessman pointing towards a large screen displaying financial data with Harman Kardon logo visible, confident posture, professional attire, in a modern corporate meeting room setting, no text, no logos on clothing, no name tags",
+    "role": "등장인물",
+    "scenes": [
+      56,
+      57,
+      58,
+      59,
+      60
+    ],
+    "appearance_count": 5,
+    "appearance_scenes": [
+      56,
+      57,
+      58,
+      59,
+      60
+    ]
+  },
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "name_en": "",
+    "description": "",
+    "description_en": "",
+    "visual_prompt": "Driver with a drowsy expression, mid-shot focusing on face and upper body, no text, no logos on clothing, no name tags",
+    "character_prompt": "Driver with a drowsy expression, mid-shot focusing on face and upper body, no text, no logos on clothing, no name tags",
+    "role": "등장인물",
+    "scenes": [
+      101,
+      102,
+      103,
+      104,
+      105
+    ],
+    "appearance_count": 5,
+    "appearance_scenes": [
+      101,
+      102,
+      103,
+      104,
+      105
+    ]
+  }
+]

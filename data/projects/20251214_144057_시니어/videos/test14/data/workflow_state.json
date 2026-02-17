@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "step1_scenes": [],
+  "step2_scenes": [],
+  "step3_scenes": [],
+  "step4_scenes": [],
+  "step5_scenes": [],
+  "completed_step1": [
+    45,
+    46,
+    47,
+    48
+  ],
+  "completed_step2": [],
+  "completed_step3": [
+    50
+  ],
+  "completed_step4": [],
+  "completed_step5": [],
+  "excluded_scenes": [],
+  "current_step": 1,
+  "created_at": "2026-01-26T21:12:59.826340",
+  "updated_at": "2026-01-26T21:17:27.071109"
+}

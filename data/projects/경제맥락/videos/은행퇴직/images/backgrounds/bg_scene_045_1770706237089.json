@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-10T15:43:24.617637",
+  "image_file": "bg_scene_043_1770705804617.png",
+  "scene_id": 43,
+  "prompts": {
+    "original": "Dynamic wide shot of a Shinhan Bank AI banker kiosk, visually representing the processing of 64 diverse financial counter tasks (using abstract graphic icons to symbolize the complexity of 64 tasks, with the number 64 integrated as a non-readable design element), a subtle transition effect showing the NH Nonghyup Bank logo emerging in the background, emphasizing the vast capabilities of AI, dramatic and thought-provoking composition, calm yet technical lighting, conveying efficiency and the scale of automation, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Dynamic wide shot of a Shinhan Bank AI banker kiosk, visually representing the processing of 64 diverse financial counter tasks (using abstract graphic icons to symbolize the complexity of 64 tasks, with the number 64 integrated as a non-readable design element), a subtle transition effect showing the NH Nonghyup Bank logo emerging in the background, emphasizing the vast capabilities of AI, dramatic and thought-provoking composition, calm yet technical lighting, conveying efficiency and the scale of automation, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1183044655
+  },
+  "scene_number": 45,
+  "copied_from": {
+    "scene_number": 43,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\backgrounds\\bg_scene_043_1770705804617.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-10T15:50:37.091720"
+}

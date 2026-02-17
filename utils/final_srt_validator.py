@@ -148,7 +148,7 @@ class FinalSRTValidator:
             api_key = os.getenv("GOOGLE_API_KEY")
             if api_key:
                 genai.configure(api_key=api_key)
-                self.gemini_client = genai.GenerativeModel("gemini-2.0-flash-exp")
+                self.gemini_client = genai.GenerativeModel("gemini-2.5-flash")
                 print("[FinalValidator] [OK] Gemini 준비 완료")
             else:
                 print("[FinalValidator] [ERROR] GOOGLE_API_KEY 없음")

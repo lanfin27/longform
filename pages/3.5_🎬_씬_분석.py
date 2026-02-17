@@ -53,6 +53,27 @@ from utils.settings_manager import (
     persistent_selectbox, persistent_radio, persistent_checkbox
 )
 
+# 채널-영상별 씬 분석 설정 (v1.1)
+from utils.user_preferences import (
+    get_scene_analysis_settings,
+    save_scene_analysis_settings,
+    get_script_source,
+    set_script_source,
+    get_analysis_method,
+    set_analysis_method,
+    get_analysis_language,
+    set_analysis_language
+)
+
+# 씬 검증 유틸리티 (background_prompt_en 자동 수정)
+try:
+    from utils.scene_validator import validate_scenes_before_save
+    SCENE_VALIDATOR_AVAILABLE = True
+except ImportError:
+    SCENE_VALIDATOR_AVAILABLE = False
+    def validate_scenes_before_save(scenes, verbose=True):
+        return scenes
+
 # 페이지 설정 키
 PAGE_SETTINGS_NAME = "scene_analysis"
 
@@ -105,7 +126,8 @@ def extract_scripts_from_scenes(scenes: list) -> str:
     for scene in scenes:
         # 스크립트 텍스트 추출 (여러 가능한 키 이름 처리)
         script = None
-        possible_keys = ["script_text", "text", "narration", "대사", "content", "dialogue", "나레이션"]
+        # v3.36: script_ko 우선 추가 (scenes.json의 기본 필드)
+        possible_keys = ["script_ko", "script_text", "text", "narration", "대사", "content", "dialogue", "나레이션"]
 
         for key in possible_keys:
             if scene.get(key):
@@ -594,40 +616,77 @@ def _render_claude_code_agent_ui():
                 st.error("프롬프트를 찾을 수 없습니다.")
 
     with copy_col2:
-        if st.button("🔄 결과 확인", use_container_width=True, key="check_result_batch_agent"):
+        if st.button("🔄 결과 확인 + Bundle 병합", use_container_width=True, key="check_result_batch_agent"):
             if scenes_path and os.path.exists(scenes_path):
                 try:
-                    with open(scenes_path, 'r', encoding='utf-8') as f:
-                        data = json.load(f)
+                    # v13.13: Bundle 병합 적용
+                    from utils.claude_code_runner import sync_claude_code_results_with_bundle_merge
+                    video_path = str(Path(scenes_path).parent.parent)
 
-                    reload_scenes = data.get('scenes', data) if isinstance(data, dict) else data
+                    with st.spinner("Bundle 병합 적용 중..."):
+                        merge_result = sync_claude_code_results_with_bundle_merge(video_path)
 
-                    if reload_scenes:
-                        stats = check_scenes_analysis_status(reload_scenes)
+                    if merge_result.get('success'):
+                        reload_scenes = merge_result.get('scenes', [])
+                        merged_count = merge_result.get('merged_count', 0)
 
-                        if stats['background_prompt_en'] > 0:
-                            st.success(f"✅ 분석 결과 감지! {stats['background_prompt_en']}/{stats['total']} 씬 완료")
+                        if reload_scenes:
+                            stats = check_scenes_analysis_status(reload_scenes)
 
-                            # 세션 업데이트
-                            st.session_state['scenes'] = reload_scenes
-                            st.session_state['_agent_analysis_stats'] = stats
-                            st.session_state['claude_code_agent_mode'] = False  # 에이전트 모드 해제
+                            if stats['background_prompt_en'] > 0:
+                                st.success(f"✅ 분석 결과 감지! {stats['background_prompt_en']}/{stats['total']} 씬 완료 (Bundle 병합: {merged_count}개)")
 
-                            st.info("💡 '페이지 새로고침' 버튼을 클릭하면 분석 결과가 적용됩니다.")
+                                # 세션 업데이트 (sync_data 적용)
+                                sync_data = merge_result.get('sync_data', {})
+                                for key, value in sync_data.items():
+                                    st.session_state[key] = value
 
-                            if st.button("🔄 페이지 새로고침", key="refresh_page_after_agent"):
-                                st.rerun()
+                                st.session_state['scenes'] = reload_scenes
+                                st.session_state['_agent_analysis_stats'] = stats
+                                st.session_state['claude_code_agent_mode'] = False  # 에이전트 모드 해제
+
+                                st.info("💡 '페이지 새로고침' 버튼을 클릭하면 분석 결과가 적용됩니다.")
+
+                                if st.button("🔄 페이지 새로고침", key="refresh_page_after_agent"):
+                                    st.rerun()
+                            else:
+                                st.warning("아직 분석 결과가 없습니다. Claude Code에서 실행을 완료해주세요.")
+
+                                # 파일 수정 시간 표시
+                                mtime = os.path.getmtime(scenes_path)
+                                mtime_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(mtime))
+                                st.caption(f"📅 마지막 수정: {mtime_str}")
                         else:
-                            st.warning("아직 분석 결과가 없습니다. Claude Code에서 실행을 완료해주세요.")
-
-                            # 파일 수정 시간 표시
-                            mtime = os.path.getmtime(scenes_path)
-                            mtime_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(mtime))
-                            st.caption(f"📅 마지막 수정: {mtime_str}")
+                            st.warning("씬 데이터가 비어있습니다.")
                     else:
-                        st.warning("씬 데이터가 비어있습니다.")
+                        st.error(f"Bundle 병합 실패: {merge_result.get('error', '알 수 없는 오류')}")
+                        # 폴백: 기존 방식
+                        with open(scenes_path, 'r', encoding='utf-8') as f:
+                            data = json.load(f)
+                        reload_scenes = data.get('scenes', data) if isinstance(data, dict) else data
+                        if reload_scenes:
+                            stats = check_scenes_analysis_status(reload_scenes)
+                            st.session_state['scenes'] = reload_scenes
+                            st.info(f"폴백: {stats['background_prompt_en']}/{stats['total']} 씬")
+
+                except ImportError:
+                    # 폴백: 기존 방식 (bundle merge 없이)
+                    try:
+                        with open(scenes_path, 'r', encoding='utf-8') as f:
+                            data = json.load(f)
+                        reload_scenes = data.get('scenes', data) if isinstance(data, dict) else data
+                        if reload_scenes:
+                            stats = check_scenes_analysis_status(reload_scenes)
+                            if stats['background_prompt_en'] > 0:
+                                st.success(f"✅ {stats['background_prompt_en']}/{stats['total']} 씬 완료")
+                                st.session_state['scenes'] = reload_scenes
+                                st.session_state['claude_code_agent_mode'] = False
+                            else:
+                                st.warning("아직 분석 결과가 없습니다.")
+                    except Exception as e:
+                        st.error(f"파일 로드 실패: {e}")
                 except Exception as e:
-                    st.error(f"파일 로드 실패: {e}")
+                    st.error(f"오류 발생: {e}")
             else:
                 st.error("scenes.json 파일을 찾을 수 없습니다.")
 
@@ -820,6 +879,45 @@ if not ensure_project_selected():
 project_path = get_current_project()
 project_config = get_current_project_config()
 
+
+# ═══════════════════════════════════════════════════════════════
+# v1.1: 채널-영상별 설정 로드
+# ═══════════════════════════════════════════════════════════════
+def _extract_channel_video_from_path(path: Path) -> tuple:
+    """
+    프로젝트 경로에서 채널과 영상 이름 추출
+
+    경로 형식: data/projects/{timestamp}_{channel}/videos/{video_name}
+    """
+    try:
+        parts = path.parts
+        if 'videos' in parts:
+            videos_idx = parts.index('videos')
+            # channel: projects 바로 뒤 폴더에서 타임스탬프 제거
+            channel = path.name  # 기본값
+            if videos_idx >= 2:
+                project_folder = parts[videos_idx - 1]
+                # 타임스탬프 패턴 제거 (YYYYMMDD_HHMMSS_)
+                if len(project_folder) > 16 and project_folder[8] == '_' and project_folder[15] == '_':
+                    channel = project_folder[16:]
+                else:
+                    channel = project_folder
+            # video: videos 폴더 바로 뒤
+            if videos_idx + 1 < len(parts):
+                video = parts[videos_idx + 1]
+            else:
+                video = path.name
+            return channel, video
+    except Exception as e:
+        print(f"[씬 분석] 경로 파싱 오류: {e}")
+    return path.name, path.name
+
+_current_channel, _current_video = _extract_channel_video_from_path(Path(project_path))
+_saved_scene_settings = get_scene_analysis_settings(_current_channel, _current_video)
+if _saved_scene_settings:
+    print(f"[씬 분석] 저장된 설정 로드: {_current_channel}/{_current_video} - {list(_saved_scene_settings.keys())}")
+
+
 st.title("🎬 3.5단계: 씬 분석")
 st.caption("스크립트를 씬 단위로 분할하고 연출가이드 생성")
 
@@ -843,13 +941,24 @@ if synced_script and synced_info.get("has_content"):
 else:
     default_lang_index = 0 if project_config.get("language") == "ko" else 1
 
+# v1.1: 저장된 언어 설정 우선 적용
+_saved_language = _saved_scene_settings.get("language")
+if _saved_language:
+    default_lang_index = 0 if _saved_language == "ko" else 1
+
 # 언어 선택
+_language_options = ["ko", "ja"]
 language = st.selectbox(
     "언어",
-    ["ko", "ja"],
+    _language_options,
     format_func=lambda x: "한국어" if x == "ko" else "일본어",
-    index=default_lang_index
+    index=default_lang_index,
+    key="scene_analysis_language"
 )
+
+# v1.1: 언어 설정 저장 (변경 시에만)
+if language != _saved_scene_settings.get("language"):
+    set_analysis_language(_current_channel, _current_video, language)
 
 # 스크립트 로드 (동기화 우선, 없으면 기존 파일)
 if synced_script and synced_language == language:
@@ -887,17 +996,29 @@ with tab1:
     st.info("씬 분석에 사용할 스크립트를 선택하세요. 이전 단계에서 가져오거나 직접 입력할 수 있습니다.")
 
     # 입력 소스 선택 (v3.14: SRT 옵션 추가)
+    # v1.1: 저장된 설정 적용
+    _script_source_options = [
+        "🔄 자동: 스크립트 탭에서 가져오기",
+        "✏️ 수동: 직접 입력",
+        "📁 수동: 파일 업로드",
+        "🎬 SRT: 자막 파일 업로드"
+    ]
+    _script_source_keys = ["auto", "manual", "file", "srt"]
+    _saved_script_source = _saved_scene_settings.get("script_source", "auto")
+    _script_source_default_idx = _script_source_keys.index(_saved_script_source) if _saved_script_source in _script_source_keys else 0
+
     script_source = st.radio(
         "스크립트 소스",
-        [
-            "🔄 자동: 스크립트 탭에서 가져오기",
-            "✏️ 수동: 직접 입력",
-            "📁 수동: 파일 업로드",
-            "🎬 SRT: 자막 파일 업로드"
-        ],
+        _script_source_options,
         horizontal=True,
+        index=_script_source_default_idx,
         key="scene_script_source"
     )
+
+    # v1.1: 스크립트 소스 설정 저장
+    _current_script_source_key = _script_source_keys[_script_source_options.index(script_source)]
+    if _current_script_source_key != _saved_script_source:
+        set_script_source(_current_channel, _current_video, _current_script_source_key)
 
     script = None
     srt_scenes = None  # SRT 파싱 결과 저장용
@@ -1102,14 +1223,25 @@ with tab2:
         analysis_options.append("srt_direct")
         analysis_format_func["srt_direct"] = "🎬 SRT 직접 적용"
 
+    # v1.1: 저장된 분석 방식 설정 적용
+    _saved_analysis_method = _saved_scene_settings.get("analysis_method", "auto")
+    _analysis_default_idx = 0
+    if _saved_analysis_method in analysis_options:
+        _analysis_default_idx = analysis_options.index(_saved_analysis_method)
+
     analysis_mode = st.radio(
         "분석 방식",
         options=analysis_options,
         format_func=lambda x: analysis_format_func[x],
         horizontal=True,
+        index=_analysis_default_idx,
         help="SRT 파일을 업로드했다면 'SRT 직접 적용'으로 시간 코드 기반 씬 구분을 유지할 수 있습니다.",
         key="scene_analysis_mode"
     )
+
+    # v1.1: 분석 방식 설정 저장
+    if analysis_mode != _saved_analysis_method:
+        set_analysis_method(_current_channel, _current_video, analysis_mode)
 
     # SRT 안내 메시지
     if has_srt_data and analysis_mode != "srt_direct":
@@ -1263,7 +1395,8 @@ with tab2:
                     return False, {}, f"씬 {i+1}이 객체가 아닙니다."
 
                 # 필수 필드 체크 및 기본값 설정
-                script_text = scene.get("script_text", scene.get("text", scene.get("narration", "")))
+                # v3.36: script_ko 우선 체크 추가
+                script_text = scene.get("script_ko", scene.get("script_text", scene.get("text", scene.get("narration", ""))))
 
                 if not script_text:
                     return False, {}, f"씬 {i+1}에 'script_text'가 없습니다."
@@ -1322,7 +1455,9 @@ with tab2:
                 # 미리보기
                 with st.expander("📊 미리보기", expanded=True):
                     for scene in result.get("scenes", [])[:3]:
-                        st.markdown(f"**씬 {scene.get('scene_id')}**: {scene.get('script_text', '')[:100]}...")
+                        # v3.36: script_ko 우선 체크
+                        _script = scene.get('script_ko') or scene.get('script_text', '')
+                        st.markdown(f"**씬 {scene.get('scene_id')}**: {_script[:100]}...")
 
                     if len(result.get("scenes", [])) > 3:
                         st.caption(f"... 외 {len(result.get('scenes', [])) - 3}개 씬")
@@ -1339,11 +1474,34 @@ with tab2:
                 analysis_dir = project_path / "analysis"
                 analysis_dir.mkdir(parents=True, exist_ok=True)
 
+                # 🔴 저장 전 검증 및 자동 수정 (background_prompt_en 불일치 해결)
+                scenes_to_save = result.get("scenes", [])
+                if scenes_to_save and SCENE_VALIDATOR_AVAILABLE:
+                    scenes_to_save = validate_scenes_before_save(scenes_to_save, verbose=True)
+                    result["scenes"] = scenes_to_save
+
+                # character_prompt -> characters 후처리 동기화
+                try:
+                    from utils.character_sync import sync_all_scenes_characters, update_characters_json
+                    scenes_to_save, _sync_cnt = sync_all_scenes_characters(scenes_to_save)
+                    if _sync_cnt > 0:
+                        print(f"[후처리] {_sync_cnt}개 씬 characters 배열 동기화")
+                        result["scenes"] = scenes_to_save
+                except Exception as _e:
+                    print(f"[후처리] 동기화 오류 (무시): {_e}")
+
                 with open(analysis_dir / "scenes.json", "w", encoding="utf-8") as f:
-                    json.dump(result.get("scenes", []), f, ensure_ascii=False, indent=2)
+                    json.dump(scenes_to_save, f, ensure_ascii=False, indent=2)
 
                 with open(analysis_dir / "characters.json", "w", encoding="utf-8") as f:
                     json.dump(result.get("characters", []), f, ensure_ascii=False, indent=2)
+
+                # characters.json에 씬 기반 캐릭터 추가
+                try:
+                    from utils.character_sync import update_characters_json as _update_cj
+                    _update_cj(scenes_to_save, analysis_dir / "characters.json")
+                except Exception:
+                    pass
 
                 with open(analysis_dir / "full_analysis.json", "w", encoding="utf-8") as f:
                     json.dump(result, f, ensure_ascii=False, indent=2)
@@ -1358,6 +1516,8 @@ with tab2:
 
                 # 다른 페이지 캐시 클리어 (Problem 56)
                 clear_scene_cache(str(project_path))
+                # 캐릭터 관리 페이지 동기화 플래그 리셋 (재방문 시 재동기화)
+                st.session_state.pop(f"char_mgmt_initialized_{project_path}", None)
 
                 st.success(f"✅ 적용 완료! 씬 {len(result.get('scenes', []))}개가 로드되었습니다.")
                 st.balloons()
@@ -2297,7 +2457,15 @@ with tab2:
                         if deleted_files:
                             st.toast(f"🗑️ 삭제됨: {', '.join(deleted_files)}")
                         print(f"[씬 분석] 새로운 분석 모드 - 기존 파일 삭제: {deleted_files}", flush=True)
-                        # existing_scenes_dict, existing_characters는 빈 상태 유지
+
+                        # ⭐ v3.80: 전체 SRT 씬을 기본으로 로드 (선택된 씬만 분석하되 나머지도 유지)
+                        status.text("전체 SRT 씬 기본 구조 생성 중...")
+                        all_srt_analysis_scenes = convert_srt_to_scene_structure(srt_scenes)
+                        for scene in all_srt_analysis_scenes:
+                            sid = scene.get("scene_id")
+                            if sid:
+                                existing_scenes_dict[sid] = scene
+                        print(f"[씬 분석] 새로운 분석 모드 - 전체 SRT {len(existing_scenes_dict)}개 씬 기본 구조 생성", flush=True)
 
                     elif analysis_mode == "overwrite":
                         # 📝 덮어쓰기 모드: 기존 분석 결과 로드 (병합용)
@@ -2338,6 +2506,27 @@ with tab2:
                             model_display = model_info.name if model_info else selected_model
                             provider_display = model_info.provider.value if model_info else "unknown"
 
+                            # ═══════════════════════════════════════════════════════════
+                            # v3.73: Claude Code 모델 여부 확인 및 세션 상태 초기화
+                            # ═══════════════════════════════════════════════════════════
+                            is_claude_code_model = (
+                                selected_model == "claude_code" or
+                                "Claude Code" in str(selected_model) or
+                                "claude_code" in str(selected_model).lower()
+                            )
+
+                            # Claude Code가 아닌 모델 선택 시 Claude Code 관련 세션 상태 초기화
+                            if not is_claude_code_model:
+                                if st.session_state.get('claude_code_auto_execution'):
+                                    st.session_state['claude_code_auto_execution'] = False
+                                if st.session_state.get('claude_code_agent_mode'):
+                                    st.session_state['claude_code_agent_mode'] = False
+                                # 기타 Claude Code 관련 상태도 초기화
+                                for key in ['claude_code_prompt_file', 'claude_code_batch_file',
+                                           'claude_code_scenes_path', 'claude_code_prompt_text']:
+                                    if key in st.session_state:
+                                        del st.session_state[key]
+
                             # 묶음 분석: 대표 씬만 분석
                             primary_scenes = get_bundle_primary_scenes(analysis_scenes)
                             total_bundles = len(primary_scenes)
@@ -2362,18 +2551,38 @@ with tab2:
                             # 새로운 속도 개선 분석기 사용 (멀티 프로바이더 지원)
                             # ⭐ v3.27: prompt_id 직접 전달!
                             # ⭐ v3.60: Claude Code 파라미터 추가
+                            # ⭐ v13.7: selected_scene_ids 추가 (씬 범위 선택 버그 수정)
                             cc_kwargs = {}
+                            # ⭐ v13.14: Claude Code용 씬 데이터 분기 처리
+                            scenes_for_analysis = primary_scenes  # 기본값: Gemini 등은 대표 씬만
+
                             if selected_model == "claude_code" or "Claude Code" in str(selected_model):
+                                # ⭐ v13.14 핵심 수정: Claude Code는 전체 씬 전달!
+                                # 문제: 대표 씬만 저장 → Bundle 병합 시 멤버 씬 없음 → 프롬프트 누락
+                                # 해결: 전체 씬 저장, Claude Code가 대표 씬만 분석 (프롬프트에서 지시)
+                                scenes_for_analysis = analysis_scenes  # 전체 씬 (대표 + 멤버)
+
+                                # 전체 씬 ID 추출 (Bundle 포함)
+                                all_scene_ids = [s.get('scene_id', s.get('id', i+1)) for i, s in enumerate(analysis_scenes)]
+                                # 대표 씬 ID만 추출 (분석 대상)
+                                primary_scene_ids = [s.get('scene_id', s.get('id', i+1)) for i, s in enumerate(primary_scenes)]
+
+                                print(f"[씬분석UI] ⭐ v13.14: Claude Code 전체 씬 전달!")
+                                print(f"[씬분석UI] 📋 전체 씬: {len(all_scene_ids)}개 (ID: {min(all_scene_ids)} ~ {max(all_scene_ids)})")
+                                print(f"[씬분석UI] 🎯 대표 씬 (분석 대상): {len(primary_scene_ids)}개 (ID: {primary_scene_ids})")
+
                                 cc_kwargs = {
                                     'project_path': str(project_path),
                                     'scenes_json_path': str(existing_scenes_path) if existing_scenes_path.exists() else str(analysis_dir / "scenes.json"),
                                     'timeout': st.session_state.get("srt_claude_code_timeout", st.session_state.get("claude_code_timeout", 600)),
                                     'bundle_mode': st.session_state.get("srt_claude_code_bundle_mode", st.session_state.get("claude_code_bundle_mode", True)),
-                                    'custom_instructions': st.session_state.get("srt_claude_code_custom_instructions", st.session_state.get("claude_code_custom_instructions", ""))
+                                    'custom_instructions': st.session_state.get("srt_claude_code_custom_instructions", st.session_state.get("claude_code_custom_instructions", "")),
+                                    'selected_scene_ids': primary_scene_ids,  # v13.14: 대표 씬 ID만 (분석 대상)
+                                    'all_scene_ids': all_scene_ids  # v13.14: 전체 씬 ID (Bundle 포함)
                                 }
 
                             analyzed_primary = analyze_scenes_with_mode(
-                                scenes=primary_scenes,
+                                scenes=scenes_for_analysis,  # v13.14: Claude Code는 전체 씬, Gemini 등은 대표 씬
                                 mode=processing_mode,
                                 model=selected_model,
                                 progress_callback=lambda p: progress.progress(p * 0.7),  # 70%까지
@@ -2383,9 +2592,152 @@ with tab2:
                             )
 
                             # ═══════════════════════════════════════════════════════════
-                            # v3.71: 에이전트 모드 감지 및 UI 표시
+                            # v3.72/v3.73: 자동 실행 모드 감지 (새 CMD 창에서 실행 중)
+                            # v3.73: Claude Code 모델인 경우에만 UI 표시
                             # ═══════════════════════════════════════════════════════════
-                            if st.session_state.get('claude_code_agent_mode'):
+                            if is_claude_code_model and st.session_state.get('claude_code_auto_execution'):
+                                progress.progress(0.9)
+                                status.text("🚀 새 CMD 창에서 Claude Code 실행 중...")
+
+                                st.success("🚀 **Claude Code가 새 CMD 창에서 실행 중입니다!**")
+
+                                # ═══════════════════════════════════════════════════════════
+                                # 실시간 진행률 UI (v13.6)
+                                # ═══════════════════════════════════════════════════════════
+                                from utils.claude_code_runner import (
+                                    get_claude_code_progress,
+                                    check_claude_code_completion,
+                                    cleanup_claude_code_files
+                                )
+
+                                scenes_path = st.session_state.get('claude_code_scenes_path', str(project_path / "analysis" / "scenes.json"))
+                                total_scenes_count = len(primary_scenes) if 'primary_scenes' in dir() else 30
+
+                                # 시작 시간 기록
+                                if 'claude_code_start_time' not in st.session_state:
+                                    st.session_state['claude_code_start_time'] = time.time()
+
+                                start_time = st.session_state.get('claude_code_start_time', time.time())
+                                elapsed = int(time.time() - start_time)
+
+                                st.markdown("---")
+                                st.subheader("📊 분석 진행률")
+
+                                # 완료 체크
+                                is_complete = check_claude_code_completion(str(project_path))
+
+                                if is_complete:
+                                    st.progress(1.0)
+                                    st.success("✅ **분석이 완료되었습니다!**")
+
+                                    # 자동으로 결과 로드
+                                    try:
+                                        with open(scenes_path, 'r', encoding='utf-8') as f:
+                                            loaded_scenes = json.load(f)
+
+                                        if isinstance(loaded_scenes, dict):
+                                            loaded_scenes = loaded_scenes.get('scenes', loaded_scenes)
+
+                                        if loaded_scenes:
+                                            analyzed_count = sum(1 for s in loaded_scenes if s.get('background_prompt_en'))
+                                            st.success(f"📥 {len(loaded_scenes)}개 씬 로드 완료! ({analyzed_count}개 분석됨)")
+
+                                            # session_state 동기화
+                                            st.session_state['scenes'] = loaded_scenes
+                                            st.session_state['scenes_data'] = loaded_scenes
+                                            st.session_state['analysis_scenes'] = loaded_scenes
+                                            st.session_state['analysis_complete'] = True
+
+                                            # 파일 정리
+                                            cleanup_claude_code_files(str(project_path))
+
+                                            # 상태 리셋
+                                            st.session_state['claude_code_auto_execution'] = False
+                                            if 'claude_code_start_time' in st.session_state:
+                                                del st.session_state['claude_code_start_time']
+
+                                            st.balloons()
+                                            time.sleep(2)
+                                            st.rerun()
+                                    except Exception as e:
+                                        st.error(f"결과 로드 실패: {e}")
+                                        st.session_state['claude_code_auto_execution'] = False
+                                else:
+                                    # 진행률 읽기
+                                    progress_data = get_claude_code_progress(str(project_path))
+
+                                    if progress_data:
+                                        p_status = progress_data.get('status', 'running')
+                                        p_current = progress_data.get('current', 0)
+                                        p_total = progress_data.get('total', total_scenes_count)
+                                        p_message = progress_data.get('message', '')
+
+                                        pct = min(p_current / p_total, 0.99) if p_total > 0 else 0
+                                        st.progress(pct)
+
+                                        # 상태 정보 (3열)
+                                        col1, col2, col3 = st.columns(3)
+                                        with col1:
+                                            st.metric("진행", f"{p_current} / {p_total} 씬")
+                                        with col2:
+                                            st.metric("완료율", f"{pct*100:.0f}%")
+                                        with col3:
+                                            st.metric("경과 시간", f"{elapsed}초")
+
+                                        if p_message:
+                                            st.info(f"💬 {p_message}")
+                                        else:
+                                            st.info(f"🔄 분석 진행 중... ({p_current}/{p_total})")
+                                    else:
+                                        st.progress(0.0)
+                                        col1, col2 = st.columns(2)
+                                        with col1:
+                                            st.metric("상태", "시작 대기 중...")
+                                        with col2:
+                                            st.metric("경과 시간", f"{elapsed}초")
+                                        st.warning("⏳ Claude Code 시작 대기 중...")
+
+                                    st.markdown("---")
+
+                                    # 자동 새로고침 옵션
+                                    auto_refresh = st.checkbox(
+                                        "🔄 자동 새로고침 (2초마다)",
+                                        value=True,
+                                        key="auto_refresh_claude_progress"
+                                    )
+
+                                    if auto_refresh:
+                                        # 타임아웃 체크 (10분)
+                                        if elapsed > 600:
+                                            st.error("❌ 타임아웃 (10분 초과)")
+                                            st.session_state['claude_code_auto_execution'] = False
+                                        else:
+                                            time.sleep(2)
+                                            st.rerun()
+                                    else:
+                                        # 수동 버튼
+                                        col1, col2, col3 = st.columns(3)
+                                        with col1:
+                                            if st.button("🔄 새로고침", use_container_width=True, key="manual_refresh_progress"):
+                                                st.rerun()
+                                        with col2:
+                                            if st.button("📥 결과 확인", type="primary", use_container_width=True, key="check_auto_result_batch"):
+                                                st.session_state['claude_code_auto_execution'] = False
+                                                st.rerun()
+                                        with col3:
+                                            if st.button("❌ 취소", use_container_width=True, key="cancel_auto_batch"):
+                                                st.session_state['claude_code_auto_execution'] = False
+                                                if 'claude_code_start_time' in st.session_state:
+                                                    del st.session_state['claude_code_start_time']
+                                                st.rerun()
+
+                                st.stop()
+
+                            # ═══════════════════════════════════════════════════════════
+                            # v3.71/v3.73: 에이전트 모드 감지 및 UI 표시
+                            # v3.73: Claude Code 모델인 경우에만 UI 표시
+                            # ═══════════════════════════════════════════════════════════
+                            if is_claude_code_model and st.session_state.get('claude_code_agent_mode'):
                                 progress.progress(1.0)
                                 status.text("🤖 에이전트 모드: 프롬프트 복사 필요")
 
@@ -2419,7 +2771,7 @@ with tab2:
                             # 캐릭터용 모델 선택 (같은 프로바이더의 빠른 모델 우선)
                             char_model = "claude-3-5-haiku-20241022"  # 기본값
                             if model_info and model_info.provider.value == "google":
-                                char_model = "gemini-2.0-flash-exp"
+                                char_model = "gemini-2.5-flash"
                             elif model_info and model_info.provider.value == "openai":
                                 char_model = "gpt-4o-mini"
 
@@ -2501,6 +2853,10 @@ with tab2:
                                 existing_char_names.add(char.get('name'))
                         all_characters = existing_characters
 
+                    # 🔴 저장 전 검증 및 자동 수정 (background_prompt_en 불일치 해결)
+                    if analysis_scenes and SCENE_VALIDATOR_AVAILABLE:
+                        analysis_scenes = validate_scenes_before_save(analysis_scenes, verbose=True)
+
                     result = {
                         "scenes": analysis_scenes,
                         "characters": all_characters,
@@ -2523,11 +2879,27 @@ with tab2:
                         "was_merged": analysis_mode == "overwrite" and len(existing_scenes_dict) > 0
                     }
 
+                    # character_prompt -> characters 후처리 동기화
+                    try:
+                        from utils.character_sync import sync_all_scenes_characters, update_characters_json
+                        analysis_scenes, _sync_cnt = sync_all_scenes_characters(analysis_scenes)
+                        if _sync_cnt > 0:
+                            print(f"[후처리] {_sync_cnt}개 씬 characters 배열 동기화")
+                    except Exception as _e:
+                        print(f"[후처리] 동기화 오류 (무시): {_e}")
+
                     with open(analysis_dir / "scenes.json", "w", encoding="utf-8") as f:
                         json.dump(analysis_scenes, f, ensure_ascii=False, indent=2)
 
                     with open(analysis_dir / "characters.json", "w", encoding="utf-8") as f:
                         json.dump(all_characters, f, ensure_ascii=False, indent=2)
+
+                    # characters.json에 씬 기반 캐릭터 추가
+                    try:
+                        from utils.character_sync import update_characters_json as _update_cj
+                        _update_cj(analysis_scenes, analysis_dir / "characters.json")
+                    except Exception:
+                        pass
 
                     with open(analysis_dir / "full_analysis.json", "w", encoding="utf-8") as f:
                         json.dump(result, f, ensure_ascii=False, indent=2)
@@ -2558,6 +2930,8 @@ with tab2:
 
                     # 다른 페이지 캐시 클리어 (Problem 56)
                     clear_scene_cache(str(project_path))
+                    # 캐릭터 관리 페이지 동기화 플래그 리셋 (재방문 시 재동기화)
+                    st.session_state.pop(f"char_mgmt_initialized_{project_path}", None)
 
                     status.empty()
 
@@ -2932,15 +3306,13 @@ with tab2:
 
                                         if auto_result.success:
                                             st.success("✅ Claude Code가 새 창에서 실행되었습니다!")
-                                            st.info(f"""
-                                            **다음 단계:**
-                                            1. 새로 열린 CMD 창에서 Claude Code 실행을 확인하세요
-                                            2. 완료되면 아래 **"결과 확인"** 버튼을 클릭하세요
-                                            """)
 
                                             # 세션에 실행 정보 저장
                                             st.session_state['claude_code_auto_executed'] = True
                                             st.session_state['claude_code_batch_file'] = auto_result.batch_file
+                                            st.session_state['claude_code_running'] = True
+                                            st.session_state['claude_code_start_time'] = time.time()
+                                            st.rerun()  # 진행률 표시를 위해 리런
                                         else:
                                             st.error(f"❌ 실행 오류: {auto_result.error}")
 
@@ -2973,6 +3345,104 @@ with tab2:
                                     except Exception as e:
                                         st.error(f"파일 로드 실패: {e}")
 
+                            # ═══════════════════════════════════════════════════════════
+                            # 실시간 진행률 표시 (Claude Code 실행 중일 때)
+                            # ═══════════════════════════════════════════════════════════
+                            if st.session_state.get('claude_code_running', False):
+                                st.markdown("---")
+                                st.markdown("### 📊 실시간 진행률")
+
+                                progress_container = st.empty()
+                                status_container = st.empty()
+                                time_container = st.empty()
+                                action_container = st.empty()
+
+                                # 진행률 파일 읽기
+                                from utils.claude_code_runner import get_claude_code_progress, check_claude_code_completion
+
+                                progress_data = get_claude_code_progress(str(project_path))
+                                is_complete = check_claude_code_completion(str(project_path))
+
+                                if is_complete:
+                                    # 완료됨 - 자동 로드
+                                    progress_container.progress(1.0)
+                                    status_container.success("✅ **분석 완료!** 결과를 로드합니다...")
+
+                                    # 결과 로드
+                                    try:
+                                        with open(scenes_json_path, 'r', encoding='utf-8') as f:
+                                            data = json.load(f)
+                                        reload_scenes = data.get('scenes', data) if isinstance(data, dict) else data
+
+                                        if reload_scenes:
+                                            stats = check_scenes_analysis_status(reload_scenes)
+                                            st.session_state['scenes'] = reload_scenes
+                                            st.session_state['_agent_analysis_stats'] = stats
+                                            st.session_state['claude_code_running'] = False
+
+                                            # 파일 정리
+                                            from utils.claude_code_runner import cleanup_claude_code_files
+                                            cleanup_claude_code_files(str(project_path))
+
+                                            st.balloons()
+                                            time.sleep(1)
+                                            st.rerun()
+                                    except Exception as e:
+                                        status_container.error(f"결과 로드 실패: {e}")
+                                        st.session_state['claude_code_running'] = False
+
+                                elif progress_data:
+                                    # 진행 중 - 상태 표시
+                                    status = progress_data.get('status', 'unknown')
+                                    current = progress_data.get('current', 0)
+                                    total = progress_data.get('total', 1)
+                                    message = progress_data.get('message', '')
+
+                                    pct = min(current / total, 0.99) if total > 0 else 0
+
+                                    progress_container.progress(pct)
+
+                                    if status == 'running':
+                                        status_container.info(f"🔄 **분석 중...** ({current}/{total} 씬)")
+                                    elif status == 'starting':
+                                        status_container.info("🚀 **Claude Code 시작 중...**")
+                                    else:
+                                        status_container.info(f"⏳ 상태: {status}")
+
+                                    if message:
+                                        time_container.caption(message)
+
+                                    # 경과 시간
+                                    start_time = st.session_state.get('claude_code_start_time', time.time())
+                                    elapsed = int(time.time() - start_time)
+                                    time_container.caption(f"⏱️ 경과 시간: {elapsed}초")
+
+                                    # 자동 새로고침 (2초마다)
+                                    time.sleep(2)
+                                    st.rerun()
+
+                                else:
+                                    # 진행률 파일 없음 - 대기 중
+                                    progress_container.progress(0.0)
+                                    status_container.info("⏳ **Claude Code 대기 중...**")
+
+                                    start_time = st.session_state.get('claude_code_start_time', time.time())
+                                    elapsed = int(time.time() - start_time)
+                                    time_container.caption(f"⏱️ 경과 시간: {elapsed}초")
+
+                                    # 타임아웃 체크 (10분)
+                                    if elapsed > 600:
+                                        status_container.error("❌ 타임아웃 (10분 초과)")
+                                        st.session_state['claude_code_running'] = False
+                                    else:
+                                        time.sleep(2)
+                                        st.rerun()
+
+                                # 취소 버튼
+                                if action_container.button("🛑 진행률 모니터링 중지", key="stop_progress_monitor"):
+                                    st.session_state['claude_code_running'] = False
+                                    st.rerun()
+
                             # ─────────────────────────────────────────────────────────
                             # 수동 실행 옵션 (접힌 상태)
                             # ─────────────────────────────────────────────────────────
@@ -3000,21 +3470,57 @@ with tab2:
                                             st.error(f"복사 실패: {e}")
 
                                 with manual_col2:
-                                    if st.button("🔄 결과 확인", use_container_width=True, key="check_result_manual"):
+                                    if st.button("🔄 결과 확인 + Bundle 병합", use_container_width=True, key="check_result_manual"):
                                         try:
-                                            with open(scenes_json_path, 'r', encoding='utf-8') as f:
-                                                data = json.load(f)
-                                            reload_scenes = data.get('scenes', data) if isinstance(data, dict) else data
-                                            if reload_scenes:
-                                                stats = check_scenes_analysis_status(reload_scenes)
-                                                if stats['background_prompt_en'] > 0:
-                                                    st.success(f"✅ {stats['background_prompt_en']}/{stats['total']} 씬 완료")
-                                                    st.session_state['scenes'] = reload_scenes
-                                                    st.rerun()
+                                            # v13.13: Bundle 병합 적용
+                                            from utils.claude_code_runner import sync_claude_code_results_with_bundle_merge
+                                            video_path = str(Path(scenes_json_path).parent.parent)
+
+                                            with st.spinner("Bundle 병합 적용 중..."):
+                                                merge_result = sync_claude_code_results_with_bundle_merge(video_path)
+
+                                            if merge_result.get('success'):
+                                                reload_scenes = merge_result.get('scenes', [])
+                                                merged_count = merge_result.get('merged_count', 0)
+
+                                                if reload_scenes:
+                                                    stats = check_scenes_analysis_status(reload_scenes)
+                                                    if stats['background_prompt_en'] > 0:
+                                                        st.success(f"✅ {stats['background_prompt_en']}/{stats['total']} 씬 완료 (Bundle 병합: {merged_count}개)")
+
+                                                        # session_state 업데이트
+                                                        sync_data = merge_result.get('sync_data', {})
+                                                        for key, value in sync_data.items():
+                                                            st.session_state[key] = value
+
+                                                        st.session_state['scenes'] = reload_scenes
+                                                        st.balloons()
+                                                        time.sleep(0.5)
+                                                        st.rerun()
+                                                    else:
+                                                        st.warning("아직 분석 결과가 없습니다.")
                                                 else:
-                                                    st.warning("아직 분석 결과가 없습니다.")
+                                                    st.warning("scenes.json이 비어있습니다.")
+                                            else:
+                                                st.error(f"Bundle 병합 실패: {merge_result.get('error', '알 수 없는 오류')}")
+                                        except ImportError:
+                                            # 폴백: 기존 방식
+                                            try:
+                                                with open(scenes_json_path, 'r', encoding='utf-8') as f:
+                                                    data = json.load(f)
+                                                reload_scenes = data.get('scenes', data) if isinstance(data, dict) else data
+                                                if reload_scenes:
+                                                    stats = check_scenes_analysis_status(reload_scenes)
+                                                    if stats['background_prompt_en'] > 0:
+                                                        st.success(f"✅ {stats['background_prompt_en']}/{stats['total']} 씬 완료")
+                                                        st.session_state['scenes'] = reload_scenes
+                                                        st.rerun()
+                                                    else:
+                                                        st.warning("아직 분석 결과가 없습니다.")
+                                            except Exception as e:
+                                                st.error(f"파일 로드 실패: {e}")
                                         except Exception as e:
-                                            st.error(f"파일 로드 실패: {e}")
+                                            st.error(f"Bundle 병합 오류: {e}")
 
                                 with manual_col3:
                                     if st.button("📂", help="폴더 열기", key="open_folder_agent_mode"):
@@ -3035,16 +3541,92 @@ with tab2:
                             st.stop()
 
                         elif agent_result.success:
-                            # scenes.json 다시 로드
-                            with open(scenes_json_path, 'r', encoding='utf-8') as f:
-                                scenes_data = json.load(f)
-                            success = True
-                            message = f"분석 완료 ({agent_result.scenes_analyzed}개 씬)"
+                            # ═══════════════════════════════════════════════════════════
+                            # v3.90: 'running' 상태 처리 - 실제 완료까지 대기
+                            # ═══════════════════════════════════════════════════════════
+                            fields_info = agent_result.fields_generated or {}
 
-                            # 분석 통계 표시
-                            if agent_result.fields_generated:
-                                stats_msg = ", ".join([f"{k}: {v}" for k, v in agent_result.fields_generated.items()])
-                                progress.info(f"📊 생성된 필드: {stats_msg}")
+                            if fields_info.get('status') == 'running':
+                                # CMD 창이 열렸지만 아직 분석 진행 중
+                                progress.update(3, "Claude Code 분석 진행 중...")
+
+                                st.info("🖥️ **새 CMD 창에서 Claude Code가 실행 중입니다.**")
+                                st.warning("분석이 완료될 때까지 기다려주세요. 완료 후 자동으로 결과를 로드합니다.")
+
+                                # 세션에 실행 정보 저장
+                                st.session_state['claude_code_running'] = True
+                                st.session_state['claude_code_start_time'] = time.time()
+                                st.session_state['claude_code_batch_file'] = fields_info.get('batch_file', '')
+                                st.session_state['claude_code_scenes_path'] = str(scenes_json_path)
+
+                                # 실시간 폴링 UI
+                                from utils.claude_code_runner import get_claude_code_progress, check_claude_code_completion, clear_completion_flag
+
+                                # 기존 완료 플래그 삭제 (stale flag 방지)
+                                clear_completion_flag(str(project_path))
+
+                                progress_placeholder = st.empty()
+                                status_placeholder = st.empty()
+                                time_placeholder = st.empty()
+
+                                # 폴링 루프 (최대 10분)
+                                max_wait = 600  # 10분
+                                poll_interval = 2  # 2초마다 확인
+                                wait_elapsed = 0
+
+                                while wait_elapsed < max_wait:
+                                    is_complete = check_claude_code_completion(str(project_path))
+                                    progress_data = get_claude_code_progress(str(project_path))
+
+                                    if is_complete:
+                                        progress_placeholder.progress(1.0)
+                                        status_placeholder.success("✅ **분석이 완료되었습니다!**")
+                                        st.session_state['claude_code_running'] = False
+
+                                        # 결과 로드
+                                        with open(scenes_json_path, 'r', encoding='utf-8') as f:
+                                            scenes_data = json.load(f)
+                                        success = True
+                                        message = f"분석 완료"
+
+                                        # 분석 통계 확인
+                                        reload_scenes = scenes_data.get('scenes', scenes_data) if isinstance(scenes_data, dict) else scenes_data
+                                        if reload_scenes:
+                                            stats = check_scenes_analysis_status(reload_scenes)
+                                            message = f"분석 완료 ({stats.get('background_prompt_en', 0)}/{stats.get('total', 0)} 씬)"
+                                        break
+                                    else:
+                                        # 진행률 표시
+                                        if progress_data:
+                                            pct = progress_data.get('progress', 0)
+                                            status_msg = progress_data.get('status', '분석 중...')
+                                            progress_placeholder.progress(min(pct / 100, 0.99))
+                                            status_placeholder.info(f"📝 {status_msg}")
+                                        else:
+                                            progress_placeholder.progress(min(wait_elapsed / max_wait, 0.5))
+                                            status_placeholder.info("📝 Claude Code 분석 중...")
+
+                                        time_placeholder.caption(f"⏱️ 경과 시간: {int(wait_elapsed)}초")
+                                        time.sleep(poll_interval)
+                                        wait_elapsed += poll_interval
+
+                                if wait_elapsed >= max_wait:
+                                    # 타임아웃
+                                    success = False
+                                    message = "분석 타임아웃 (10분 초과)"
+                                    scenes_data = None
+                                    st.session_state['claude_code_running'] = False
+                            else:
+                                # 기존 레거시 처리 (status가 없는 경우)
+                                with open(scenes_json_path, 'r', encoding='utf-8') as f:
+                                    scenes_data = json.load(f)
+                                success = True
+                                message = f"분석 완료 ({agent_result.scenes_analyzed}개 씬)"
+
+                                # 분석 통계 표시
+                                if agent_result.fields_generated:
+                                    stats_msg = ", ".join([f"{k}: {v}" for k, v in agent_result.fields_generated.items()])
+                                    progress.info(f"📊 생성된 필드: {stats_msg}")
                         else:
                             success = False
                             message = agent_result.error
@@ -3078,14 +3660,30 @@ with tab2:
                             "estimated_duration": sum(s.get("duration_estimate", 0) for s in scenes_data)
                         }
 
-                        # 캐릭터 추출
-                        all_characters = set()
-                        for scene in scenes_data:
-                            for char in scene.get("characters", []):
-                                if char and isinstance(char, str):
-                                    all_characters.add(char)
+                        # character_prompt -> characters 후처리 동기화
+                        try:
+                            from utils.character_sync import sync_all_scenes_characters, extract_all_characters_from_scenes
+                            scenes_data, _sync_cnt = sync_all_scenes_characters(scenes_data)
+                            if _sync_cnt > 0:
+                                print(f"[후처리] {_sync_cnt}개 씬 characters 배열 동기화")
+                                result["scenes"] = scenes_data
+                        except Exception as _e:
+                            print(f"[후처리] 동기화 오류 (무시): {_e}")
 
-                        result["characters"] = [{"name": c} for c in all_characters]
+                        # 캐릭터 추출 (dict/string 모두 지원)
+                        try:
+                            from utils.character_sync import extract_all_characters_from_scenes
+                            extracted_chars = extract_all_characters_from_scenes(scenes_data)
+                            result["characters"] = extracted_chars
+                        except Exception:
+                            all_characters = set()
+                            for scene in scenes_data:
+                                for char in scene.get("characters", []):
+                                    if isinstance(char, str) and char:
+                                        all_characters.add(char)
+                                    elif isinstance(char, dict) and char.get("name"):
+                                        all_characters.add(char["name"])
+                            result["characters"] = [{"name": c} for c in all_characters]
 
                         # 파일 저장
                         analysis_dir = project_path / "analysis"
@@ -3105,6 +3703,8 @@ with tab2:
 
                         # 캐시 클리어
                         clear_scene_cache(str(project_path))
+                        # 캐릭터 관리 페이지 동기화 플래그 리셋 (재방문 시 재동기화)
+                        st.session_state.pop(f"char_mgmt_initialized_{project_path}", None)
 
                         progress.update(4, "완료!")
                         progress.complete(f"Claude Code: 씬 {len(scenes)}개, 캐릭터 {len(characters)}명 추출 완료!")
@@ -3209,11 +3809,34 @@ with tab2:
                     analysis_dir = project_path / "analysis"
                     analysis_dir.mkdir(parents=True, exist_ok=True)
 
+                    # 🔴 저장 전 검증 및 자동 수정 (background_prompt_en 불일치 해결)
+                    scenes_to_save = result.get("scenes", [])
+                    if scenes_to_save and SCENE_VALIDATOR_AVAILABLE:
+                        scenes_to_save = validate_scenes_before_save(scenes_to_save, verbose=True)
+                        result["scenes"] = scenes_to_save
+
+                    # character_prompt -> characters 후처리 동기화
+                    try:
+                        from utils.character_sync import sync_all_scenes_characters, update_characters_json
+                        scenes_to_save, _sync_cnt = sync_all_scenes_characters(scenes_to_save)
+                        if _sync_cnt > 0:
+                            print(f"[후처리] {_sync_cnt}개 씬 characters 배열 동기화")
+                            result["scenes"] = scenes_to_save
+                    except Exception as _e:
+                        print(f"[후처리] 동기화 오류 (무시): {_e}")
+
                     with open(analysis_dir / "scenes.json", "w", encoding="utf-8") as f:
-                        json.dump(result.get("scenes", []), f, ensure_ascii=False, indent=2)
+                        json.dump(scenes_to_save, f, ensure_ascii=False, indent=2)
 
                     with open(analysis_dir / "characters.json", "w", encoding="utf-8") as f:
                         json.dump(result.get("characters", []), f, ensure_ascii=False, indent=2)
+
+                    # characters.json에 씬 기반 캐릭터 추가
+                    try:
+                        from utils.character_sync import update_characters_json as _update_cj
+                        _update_cj(scenes_to_save, analysis_dir / "characters.json")
+                    except Exception:
+                        pass
 
                     with open(analysis_dir / "full_analysis.json", "w", encoding="utf-8") as f:
                         json.dump(result, f, ensure_ascii=False, indent=2)
@@ -3231,6 +3854,8 @@ with tab2:
 
                     # 다른 페이지 캐시 클리어 (Problem 56)
                     clear_scene_cache(str(project_path))
+                    # 캐릭터 관리 페이지 동기화 플래그 리셋 (재방문 시 재동기화)
+                    st.session_state.pop(f"char_mgmt_initialized_{project_path}", None)
 
                     print(f"[씬 분석 페이지] 세션 저장 완료: 씬 {len(scenes)}개, 캐릭터 {len(characters)}개")
 
@@ -3243,7 +3868,7 @@ with tab2:
                     # 사용량 기록 (provider에 따른 모델 ID 결정)
                     model_id_map = {
                         "anthropic": "claude-sonnet-4-20250514",
-                        "google": "gemini-2.0-flash-exp",
+                        "google": "gemini-2.5-flash",
                         "openai": "gpt-4o"
                     }
                     record_model_id = model_id_map.get(provider, "claude-sonnet-4-20250514")
@@ -3343,7 +3968,7 @@ with tab2:
                 # 에러 기록 (provider에 따른 모델 ID 결정)
                 model_id_map = {
                     "anthropic": "claude-sonnet-4-20250514",
-                    "google": "gemini-2.0-flash-exp",
+                    "google": "gemini-2.5-flash",
                     "openai": "gpt-4o"
                 }
                 record_model_id = model_id_map.get(provider, "claude-sonnet-4-20250514")
@@ -3383,11 +4008,15 @@ with tab2:
             scenes = saved_analysis.get("scenes", [])
             characters = saved_analysis.get("characters", [])
 
+            # v3.36: script_ko 우선 체크 추가
+            def get_script(s):
+                return s.get("script_ko") or s.get("script_text", "")
+
             # 통계 계산
-            total_chars = sum(len(s.get("script_text", "")) for s in scenes) if scenes else 0
+            total_chars = sum(len(get_script(s)) for s in scenes) if scenes else 0
             avg_chars = total_chars // len(scenes) if scenes else 0
-            max_chars = max(len(s.get("script_text", "")) for s in scenes) if scenes else 0
-            over_250_count = sum(1 for s in scenes if len(s.get("script_text", "")) > 250)
+            max_chars = max(len(get_script(s)) for s in scenes) if scenes else 0
+            over_250_count = sum(1 for s in scenes if len(get_script(s)) > 250)
 
             col1, col2, col3, col4 = st.columns(4)
             with col1:
@@ -3414,7 +4043,8 @@ with tab2:
 
             for i, scene in enumerate(scenes):
                 scene_id = scene.get('scene_id', i+1)
-                script_text = scene.get('script_text', '')
+                # v3.36: script_ko 우선 체크 (위에서 정의한 get_script 사용)
+                script_text = get_script(scene)
                 script_preview = script_text[:50]
                 char_count = len(script_text)
 
@@ -3521,96 +4151,246 @@ with tab2:
 with tab3:
     st.subheader("👤 추출된 캐릭터")
 
-    characters_path = project_path / "analysis" / "characters.json"
-    if characters_path.exists():
-        with open(characters_path, "r", encoding="utf-8") as f:
-            characters = json.load(f)
+    # ═══════════════════════════════════════════════════════════════════
+    # 캐릭터 동기화 상태 표시 및 수동 동기화
+    # ═══════════════════════════════════════════════════════════════════
+    _sync_scenes_path = project_path / "analysis" / "scenes.json"
+    if _sync_scenes_path.exists():
+        try:
+            from utils.character_sync import get_sync_status, sync_all_scenes_characters, update_characters_json
 
-        if characters:
-            st.success(f"{len(characters)}명의 캐릭터가 추출되었습니다.")
+            with open(_sync_scenes_path, "r", encoding="utf-8") as _sf:
+                _sync_scenes = json.load(_sf)
 
-            for i, char in enumerate(characters):
-                # === 캐릭터 데이터 정규화 (문자열/딕셔너리 모두 처리) ===
-                if isinstance(char, str):
-                    # 문자열인 경우: 이름만 있는 것으로 처리
-                    char_data = {
-                        "name": char,
-                        "name_ko": char,
-                        "name_en": "",
-                        "role": "등장인물",
-                        "nationality": "",
-                        "era": "",
-                        "description": "",
-                        "appearance": "",
-                        "character_prompt": "",
-                        "visual_prompt": ""
-                    }
-                elif isinstance(char, dict):
-                    # 딕셔너리인 경우: 필드 추출 (다양한 키 이름 처리)
-                    char_data = {
-                        "name": char.get("name", char.get("name_ko", "Unknown")),
-                        "name_ko": char.get("name_ko", char.get("name", "")),
-                        "name_en": char.get("name_en", ""),
-                        "role": char.get("role", "등장인물"),
-                        "nationality": char.get("nationality", ""),
-                        "era": char.get("era", char.get("age_era", "")),
-                        "description": char.get("description", ""),
-                        "appearance": char.get("appearance", ""),
-                        "character_prompt": char.get("character_prompt", char.get("visual_prompt", char.get("prompt", ""))),
-                        "visual_prompt": char.get("visual_prompt", char.get("character_prompt", char.get("prompt", "")))
-                    }
-                else:
-                    # 기타 형식: 문자열로 변환
-                    char_data = {
-                        "name": str(char),
-                        "name_ko": str(char),
-                        "name_en": "",
-                        "role": "등장인물",
-                        "nationality": "",
-                        "era": "",
-                        "description": "",
-                        "appearance": "",
-                        "character_prompt": "",
-                        "visual_prompt": ""
-                    }
+            _sync_status = get_sync_status(_sync_scenes)
 
-                char_name = char_data["name"]
-                char_name_en = char_data["name_en"]
+            if _sync_status["needs_sync"] > 0:
+                with st.expander(f"🔄 캐릭터 동기화 필요 ({_sync_status['needs_sync']}개 씬)", expanded=True):
+                    _sc1, _sc2, _sc3, _sc4 = st.columns(4)
+                    with _sc1:
+                        st.metric("총 씬", _sync_status["total"])
+                    with _sc2:
+                        st.metric("character_prompt", _sync_status["has_prompt"])
+                    with _sc3:
+                        st.metric("characters 배열", _sync_status["has_array"])
+                    with _sc4:
+                        st.metric("동기화 필요", _sync_status["needs_sync"])
 
-                # 표시 이름 생성
-                display_name = f"👤 {char_name}"
-                if char_name_en:
-                    display_name += f" ({char_name_en})"
-
-                with st.expander(display_name, expanded=False):
-                    col1, col2 = st.columns([1, 2])
-
-                    with col1:
-                        st.markdown("**역할**")
-                        st.write(char_data["role"] or "정보 없음")
-
-                        if char_data["nationality"] or char_data["era"]:
-                            st.markdown("**국적/시대**")
-                            st.write(f"{char_data['nationality']} / {char_data['era']}")
-
-                    with col2:
-                        if char_data["description"]:
-                            st.markdown("**설명**")
-                            st.write(char_data["description"])
-
-                        if char_data["appearance"]:
-                            st.markdown("**외모 특징**")
-                            st.write(char_data["appearance"])
-
-                    if char_data["character_prompt"]:
-                        st.markdown("**🎨 캐릭터 프롬프트**")
-                        st.code(char_data["character_prompt"], language=None)
+                    if _sync_status["needs_sync"] <= 20:
+                        st.caption(f"불일치 씬: {_sync_status['mismatch_scenes']}")
                     else:
-                        st.info("캐릭터 프롬프트가 없습니다. 캐릭터 관리에서 생성할 수 있습니다.")
-        else:
-            st.info("추출된 캐릭터가 없습니다. 씬 분석을 먼저 실행하세요.")
+                        st.caption(f"불일치 씬 예시: {_sync_status['mismatch_scenes'][:20]}... 외 {_sync_status['needs_sync'] - 20}개")
+
+                    if st.button("🔄 캐릭터 동기화 실행", type="primary", key="sync_characters_btn"):
+                        _sync_scenes, _synced = sync_all_scenes_characters(_sync_scenes)
+                        with open(_sync_scenes_path, "w", encoding="utf-8") as _sf:
+                            json.dump(_sync_scenes, _sf, ensure_ascii=False, indent=2)
+                        _chars_path = _sync_scenes_path.parent / "characters.json"
+                        _added = update_characters_json(_sync_scenes, _chars_path)
+                        st.success(f"✅ {_synced}개 씬 동기화 완료! (캐릭터 {_added}명 추가)")
+                        time.sleep(0.5)
+                        st.rerun()
+            else:
+                if _sync_status["has_prompt"] > 0:
+                    st.caption(f"✅ 캐릭터 동기화 완료 (prompt: {_sync_status['has_prompt']}개, 배열: {_sync_status['has_array']}개)")
+        except Exception as _e:
+            print(f"[캐릭터 탭] 동기화 상태 확인 오류: {_e}")
+
+    # ═══════════════════════════════════════════════════════════════════
+    # v13.16: 다중 소스에서 캐릭터 로드 (characters.json → scenes.json → session_state)
+    # ═══════════════════════════════════════════════════════════════════
+    characters = None
+    data_source = ""
+
+    characters_path = project_path / "analysis" / "characters.json"
+    scenes_path = project_path / "analysis" / "scenes.json"
+
+    # 1순위: characters.json 파일
+    if characters_path.exists():
+        try:
+            with open(characters_path, "r", encoding="utf-8") as f:
+                characters = json.load(f)
+            if characters:
+                data_source = "📁 characters.json"
+        except Exception as e:
+            print(f"[캐릭터 탭] characters.json 로드 실패: {e}")
+
+    # 2순위: scenes.json에서 추출
+    if not characters and scenes_path.exists():
+        try:
+            with open(scenes_path, "r", encoding="utf-8-sig") as f:
+                content = f.read()
+                if content.startswith('\ufeff'):
+                    content = content[1:]
+                scenes_data = json.loads(content)
+
+            # scenes.json에서 캐릭터 추출
+            from utils.claude_code_runner import extract_characters_from_scenes
+            characters = extract_characters_from_scenes(scenes_data)
+
+            if characters:
+                data_source = "🎬 scenes.json에서 추출"
+                # characters.json에 저장 (다음 로드 시 빠르게)
+                try:
+                    with open(characters_path, 'w', encoding='utf-8') as f:
+                        json.dump(characters, f, ensure_ascii=False, indent=2)
+                    print(f"[캐릭터 탭] ✅ characters.json 자동 생성: {len(characters)}개")
+                except:
+                    pass
+        except Exception as e:
+            print(f"[캐릭터 탭] scenes.json 캐릭터 추출 실패: {e}")
+
+    # 3순위: session_state
+    if not characters:
+        characters = st.session_state.get("scene_characters", [])
+        if characters:
+            data_source = "💾 세션 캐시"
+
+    # 캐릭터 표시
+    if characters:
+        st.success(f"{len(characters)}명의 캐릭터가 추출되었습니다.")
+        st.caption(f"📂 데이터 소스: {data_source}")
+
+        for i, char in enumerate(characters):
+            # === 캐릭터 데이터 정규화 (문자열/딕셔너리 모두 처리) ===
+            if isinstance(char, str):
+                # 문자열인 경우: 이름만 있는 것으로 처리
+                char_data = {
+                    "name": char,
+                    "name_ko": char,
+                    "name_en": "",
+                    "role": "등장인물",
+                    "nationality": "",
+                    "era": "",
+                    "description": "",
+                    "appearance": "",
+                    "character_prompt": "",
+                    "visual_prompt": ""
+                }
+            elif isinstance(char, dict):
+                # 딕셔너리인 경우: 필드 추출 (다양한 키 이름 처리)
+                char_data = {
+                    "name": char.get("name", char.get("name_ko", "Unknown")),
+                    "name_ko": char.get("name_ko", char.get("name", "")),
+                    "name_en": char.get("name_en", ""),
+                    "role": char.get("role", "등장인물"),
+                    "nationality": char.get("nationality", ""),
+                    "era": char.get("era", char.get("age_era", "")),
+                    "description": char.get("description", ""),
+                    "appearance": char.get("appearance", ""),
+                    "character_prompt": char.get("character_prompt", char.get("visual_prompt", char.get("prompt", ""))),
+                    "visual_prompt": char.get("visual_prompt", char.get("character_prompt", char.get("prompt", "")))
+                }
+            else:
+                # 기타 형식: 문자열로 변환
+                char_data = {
+                    "name": str(char),
+                    "name_ko": str(char),
+                    "name_en": "",
+                    "role": "등장인물",
+                    "nationality": "",
+                    "era": "",
+                    "description": "",
+                    "appearance": "",
+                    "character_prompt": "",
+                    "visual_prompt": ""
+                }
+
+            char_name = char_data["name"]
+            char_name_en = char_data["name_en"]
+
+            # 표시 이름 생성
+            display_name = f"👤 {char_name}"
+            if char_name_en:
+                display_name += f" ({char_name_en})"
+
+            with st.expander(display_name, expanded=False):
+                col1, col2 = st.columns([1, 2])
+
+                with col1:
+                    st.markdown("**역할**")
+                    st.write(char_data["role"] or "정보 없음")
+
+                    if char_data["nationality"] or char_data["era"]:
+                        st.markdown("**국적/시대**")
+                        st.write(f"{char_data['nationality']} / {char_data['era']}")
+
+                with col2:
+                    if char_data["description"]:
+                        st.markdown("**설명**")
+                        st.write(char_data["description"])
+
+                    if char_data["appearance"]:
+                        st.markdown("**외모 특징**")
+                        st.write(char_data["appearance"])
+
+                if char_data["character_prompt"]:
+                    st.markdown("**🎨 캐릭터 프롬프트**")
+                    st.code(char_data["character_prompt"], language=None)
+                else:
+                    st.info("캐릭터 프롬프트가 없습니다. 캐릭터 관리에서 생성할 수 있습니다.")
     else:
-        st.info("씬 분석을 먼저 실행하세요.")
+        # ═══════════════════════════════════════════════════════════════
+        # v13.16: 캐릭터 없는 경우 - 씬 분석 유무에 따라 다른 메시지
+        # ═══════════════════════════════════════════════════════════════
+        scenes_path_check = project_path / "analysis" / "scenes.json"
+        if scenes_path_check.exists():
+            st.info("이 영상에서 추출된 캐릭터가 없습니다.")
+            st.caption("💡 씬 분석은 완료되었지만 캐릭터 정보가 포함되지 않았습니다.")
+
+            # 새로고침 버튼
+            _retry_col1, _retry_col2 = st.columns(2)
+            with _retry_col1:
+                if st.button("🔄 캐릭터 다시 추출 시도", key="retry_char_extract"):
+                    try:
+                        with open(scenes_path_check, "r", encoding="utf-8-sig") as f:
+                            content = f.read()
+                            if content.startswith('\ufeff'):
+                                content = content[1:]
+                            scenes_reload = json.loads(content)
+
+                        from utils.claude_code_runner import extract_characters_from_scenes
+                        chars_reload = extract_characters_from_scenes(scenes_reload)
+
+                        if chars_reload:
+                            st.session_state['scene_characters'] = chars_reload
+                            # characters.json 저장
+                            chars_path = project_path / "analysis" / "characters.json"
+                            with open(chars_path, 'w', encoding='utf-8') as f:
+                                json.dump(chars_reload, f, ensure_ascii=False, indent=2)
+                            st.success(f"✅ {len(chars_reload)}개 캐릭터 추출 완료!")
+                            time.sleep(0.5)
+                            st.rerun()
+                        else:
+                            st.warning("씬 데이터에 캐릭터 정보가 없습니다.")
+                    except Exception as e:
+                        st.error(f"추출 실패: {e}")
+            with _retry_col2:
+                if st.button("🔄 character_prompt에서 동기화", key="retry_char_sync"):
+                    try:
+                        with open(scenes_path_check, "r", encoding="utf-8-sig") as f:
+                            content = f.read()
+                            if content.startswith('\ufeff'):
+                                content = content[1:]
+                            scenes_reload = json.loads(content)
+
+                        from utils.character_sync import sync_all_scenes_characters, update_characters_json
+                        scenes_reload, synced = sync_all_scenes_characters(scenes_reload)
+                        if synced > 0:
+                            with open(scenes_path_check, "w", encoding="utf-8") as f:
+                                json.dump(scenes_reload, f, ensure_ascii=False, indent=2)
+                            chars_path = scenes_path_check.parent / "characters.json"
+                            update_characters_json(scenes_reload, chars_path)
+                            st.success(f"✅ {synced}개 씬 동기화 완료!")
+                            time.sleep(0.5)
+                            st.rerun()
+                        else:
+                            st.warning("동기화할 데이터가 없습니다 (character_prompt가 비어있음).")
+                    except Exception as e:
+                        st.error(f"동기화 실패: {e}")
+        else:
+            st.info("씬 분석을 먼저 실행하세요.")
+            st.caption("💡 '분석' 탭에서 씬 분석을 실행한 후 캐릭터가 자동 추출됩니다.")
 
     # 다음 단계 안내
     st.divider()
@@ -3624,23 +4404,160 @@ with tab4:
     scenes_path = project_path / "analysis" / "scenes.json"
     characters_path = project_path / "analysis" / "characters.json"
 
+    # ═══════════════════════════════════════════════════════════════════════════
+    # ⭐ v13.15: Claude Code 결과 확인 UI (핵심 추가!)
+    # Claude Code가 scenes.json을 업데이트한 후 UI에 반영하기 위한 기능
+    # ═══════════════════════════════════════════════════════════════════════════
+    st.markdown("---")
+    st.markdown("#### 🔄 Claude Code 결과 확인")
+
+    result_check_col1, result_check_col2, result_check_col3 = st.columns([2, 1, 1])
+
+    with result_check_col1:
+        if st.button("🔄 결과 확인 및 UI 갱신", use_container_width=True, key="check_result_tab4",
+                     type="primary", help="Claude Code 분석 완료 후 클릭하여 결과를 UI에 반영"):
+            if scenes_path.exists():
+                try:
+                    # 1. Bundle 병합 적용 시도
+                    from utils.claude_code_runner import sync_claude_code_results_with_bundle_merge
+
+                    with st.spinner("Bundle 병합 및 결과 로드 중..."):
+                        video_path = str(project_path)
+                        merge_result = sync_claude_code_results_with_bundle_merge(video_path)
+
+                    if merge_result.get('success'):
+                        reload_scenes = merge_result.get('scenes', [])
+                        merged_count = merge_result.get('merged_count', 0)
+
+                        if reload_scenes:
+                            # 분석 상태 확인
+                            analyzed_count = sum(1 for s in reload_scenes if s.get('background_prompt_en'))
+
+                            # 세션 업데이트
+                            st.session_state['scenes'] = reload_scenes
+                            st.session_state['analysis_complete'] = True
+                            st.session_state['force_reload_scenes'] = False
+
+                            # sync_data 적용
+                            sync_data = merge_result.get('sync_data', {})
+                            for key, value in sync_data.items():
+                                st.session_state[key] = value
+
+                            # v13.16: 캐릭터 캐시 무효화 (다른 페이지에서 새 데이터 로드)
+                            if 'char_load_logged' in st.session_state:
+                                del st.session_state['char_load_logged']
+                            st.session_state['characters_need_refresh'] = True
+
+                            # v13.16: 캐릭터 수 표시
+                            char_count = sync_data.get('characters_count', 0)
+                            success_msg = f"✅ 로드 완료! {analyzed_count}/{len(reload_scenes)} 씬 분석됨"
+                            if merged_count > 0:
+                                success_msg += f" (Bundle 병합: {merged_count}개)"
+                            if char_count > 0:
+                                success_msg += f" / 캐릭터: {char_count}명"
+
+                            st.success(success_msg)
+                            time.sleep(0.3)
+                            st.rerun()
+                        else:
+                            st.warning("씬 데이터가 비어있습니다.")
+                    else:
+                        # 폴백: 직접 파일 로드
+                        st.warning(f"Bundle 병합 실패, 직접 로드 시도... ({merge_result.get('error', '')})")
+                        with open(scenes_path, 'r', encoding='utf-8-sig') as f:
+                            content = f.read()
+                            if content.startswith('\ufeff'):
+                                content = content[1:]
+                            reload_scenes = json.loads(content)
+
+                        if reload_scenes:
+                            analyzed_count = sum(1 for s in reload_scenes if s.get('background_prompt_en'))
+                            st.session_state['scenes'] = reload_scenes
+                            st.session_state['analysis_complete'] = True
+                            st.success(f"✅ 직접 로드 완료! {analyzed_count}/{len(reload_scenes)} 씬")
+                            time.sleep(0.3)
+                            st.rerun()
+
+                except ImportError as ie:
+                    # claude_code_runner 없으면 직접 로드
+                    try:
+                        with open(scenes_path, 'r', encoding='utf-8-sig') as f:
+                            content = f.read()
+                            if content.startswith('\ufeff'):
+                                content = content[1:]
+                            reload_scenes = json.loads(content)
+
+                        if reload_scenes:
+                            analyzed_count = sum(1 for s in reload_scenes if s.get('background_prompt_en'))
+                            st.session_state['scenes'] = reload_scenes
+                            st.session_state['analysis_complete'] = True
+                            st.success(f"✅ {analyzed_count}/{len(reload_scenes)} 씬 로드됨")
+                            time.sleep(0.3)
+                            st.rerun()
+                    except Exception as e:
+                        st.error(f"파일 로드 실패: {e}")
+
+                except Exception as e:
+                    st.error(f"오류 발생: {e}")
+                    import traceback
+                    st.code(traceback.format_exc())
+            else:
+                st.error("❌ scenes.json 파일이 없습니다.")
+
+    with result_check_col2:
+        # 파일 수정 시간 표시
+        if scenes_path.exists():
+            mtime = os.path.getmtime(scenes_path)
+            mtime_str = time.strftime('%H:%M:%S', time.localtime(mtime))
+            st.caption(f"📅 수정: {mtime_str}")
+
+    with result_check_col3:
+        if st.button("🔃 새로고침", use_container_width=True, key="refresh_result_tab4"):
+            st.rerun()
+
+    st.markdown("---")
+    # ═══════════════════════════════════════════════════════════════════════════
+
     # ⭐ 데이터 로드 - 세션 스테이트 우선 (v3.17)
     scenes_data = []
     characters_data = []
     full_result = None
     data_source = "file"  # 데이터 소스 추적
 
+    # v13.15: 파일 수정 시간 확인하여 자동 리로드
+    _should_reload = False
+    if scenes_path.exists():
+        file_mtime = os.path.getmtime(scenes_path)
+        cache_mtime = st.session_state.get('_scenes_loaded_at', 0)
+        if file_mtime > cache_mtime:
+            _should_reload = True
+            print(f"[Result Tab] 📁 파일이 수정됨, 리로드 필요 (file: {file_mtime}, cache: {cache_mtime})")
+
     # 1. 세션 스테이트에서 먼저 확인 (가장 최신 데이터)
-    if st.session_state.get("scenes") and st.session_state.get("analysis_complete"):
+    if st.session_state.get("scenes") and st.session_state.get("analysis_complete") and not _should_reload:
         scenes_data = st.session_state["scenes"]
         characters_data = st.session_state.get("characters", [])
         full_result = st.session_state.get("scene_analysis_result")
         data_source = "session"
-    # 2. 파일에서 로드 (폴백)
+    # 2. 파일에서 로드 (폴백 또는 리로드 필요시)
     else:
         if scenes_path.exists():
-            with open(scenes_path, "r", encoding="utf-8") as f:
-                scenes_data = json.load(f)
+            try:
+                with open(scenes_path, "r", encoding="utf-8-sig") as f:
+                    content = f.read()
+                    if content.startswith('\ufeff'):
+                        content = content[1:]
+                    scenes_data = json.loads(content)
+                # 캐시 시간 업데이트
+                st.session_state['_scenes_loaded_at'] = time.time()
+                st.session_state['scenes'] = scenes_data
+                data_source = "file (fresh)"
+                print(f"[Result Tab] ✅ scenes.json 로드: {len(scenes_data)}개 씬")
+            except Exception as e:
+                print(f"[Result Tab] ❌ scenes.json 로드 실패: {e}")
+                # 폴백: 기존 방식
+                with open(scenes_path, "r", encoding="utf-8") as f:
+                    scenes_data = json.load(f)
 
         if characters_path.exists():
             with open(characters_path, "r", encoding="utf-8") as f:
@@ -3753,7 +4670,8 @@ with tab4:
 
                 for scene in scenes_data:
                     scene_id = scene.get("scene_id", "?")
-                    script_text = get_prompt(scene, "script_text") or scene.get("narration", "")
+                    # v3.36: script_ko 우선 체크 추가
+                    script_text = scene.get("script_ko") or get_prompt(scene, "script_text") or scene.get("narration", "")
                     preview = script_text[:80] + "..." if len(script_text) > 80 else script_text
 
                     # ⭐ 최근 분석된 씬 하이라이트
@@ -4222,9 +5140,9 @@ with tab6:
     with col4:
         # AI 모델 옵션 (Claude Agent 추가)
         ai_model_options = {
-            "gemini-2.0-flash-exp": "Gemini 2.0 Flash (빠름)",
+            "gemini-2.5-flash": "Gemini 2.5 Flash (빠름)",
             "gemini-1.5-flash": "Gemini 1.5 Flash",
-            "gemini-1.5-pro": "Gemini 1.5 Pro (고품질)",
+            "gemini-2.5-flash-lite": "Gemini 2.5 Flash Lite (초고속)",
             "claude-agent": "Claude Agent (씬분할+교정)"
         }
         # v1.0: 설정 영속성 - persistent_selectbox 사용
@@ -4653,10 +5571,49 @@ with tab6:
 
 # 다음 단계 안내
 st.divider()
-if (project_path / "analysis" / "scenes.json").exists():
-    st.success("씬 분석이 완료되었습니다!")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.page_link("pages/3.6_👤_캐릭터_관리.py", label="👤 3.6단계: 캐릭터 관리", icon="➡️")
-    with col2:
-        st.page_link("pages/4_🎤_TTS_생성.py", label="🎤 4단계: TTS 생성", icon="➡️")
+
+# v3.77: 실제 분석 상태 확인 (파일 존재 여부만 확인하지 않음)
+scenes_json_path = project_path / "analysis" / "scenes.json"
+if scenes_json_path.exists():
+    # scenes.json 내용 확인
+    try:
+        import json
+        with open(scenes_json_path, 'r', encoding='utf-8') as f:
+            scenes_data = json.load(f)
+
+        total_scenes = len(scenes_data)
+        analyzed_scenes = sum(1 for s in scenes_data if s.get('background_prompt_en'))
+
+        # 분석 완료 판정: 분석 결과가 있고, 세션에 analysis_complete 플래그가 있거나 30% 이상 분석됨
+        analysis_complete_flag = st.session_state.get("analysis_complete", False)
+        if analyzed_scenes > 0 and (analysis_complete_flag or analyzed_scenes >= total_scenes * 0.3):
+            pct = analyzed_scenes / total_scenes * 100 if total_scenes > 0 else 0
+            if pct >= 80:
+                st.success(f"씬 분석이 완료되었습니다! ({analyzed_scenes}/{total_scenes}개 씬 분석됨)")
+            else:
+                st.warning(f"씬 분석 부분 완료 ({analyzed_scenes}/{total_scenes}개, {pct:.0f}%) - 일부 씬의 프롬프트가 비어있을 수 있습니다.")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.page_link("pages/3.6_👤_캐릭터_관리.py", label="👤 3.6단계: 캐릭터 관리", icon="➡️")
+            with col2:
+                st.page_link("pages/4_🎤_TTS_생성.py", label="🎤 4단계: TTS 생성", icon="➡️")
+        elif analyzed_scenes > 0:
+            st.warning(f"씬 분석 진행 중... ({analyzed_scenes}/{total_scenes}개 완료)")
+        else:
+            # Claude Code 상태 확인
+            from utils.claude_code_ui_helpers import get_analysis_status_st
+            status = get_analysis_status_st(str(project_path))
+
+            if status['status'] == 'error':
+                st.error(f"분석 오류: {status['message']}")
+            elif status['status'] == 'no_scenes':
+                st.error(f"씬 ID 불일치 오류: {status['message']}")
+                st.info("💡 SRT 파싱 결과가 scenes.json에 올바르게 저장되었는지 확인하세요.")
+            elif status['status'] == 'running':
+                st.info(f"분석 진행 중: {status['message']}")
+            else:
+                st.info("씬 분석을 시작해주세요.")
+    except Exception as e:
+        st.warning(f"scenes.json 확인 중 오류: {e}")
+else:
+    st.info("씬 분석을 시작해주세요. (scenes.json 파일이 없습니다)")

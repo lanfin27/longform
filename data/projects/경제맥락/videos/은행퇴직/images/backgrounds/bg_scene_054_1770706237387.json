@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-10T15:43:51.220296",
+  "image_file": "bg_scene_052_1770705831219.png",
+  "scene_id": 52,
+  "prompts": {
+    "original": "Symbolic empty bank counter with a modern AI banker kiosk positioned behind it, representing the replacement of human staff by AI. The teller's chair is empty, while the AI kiosk screen is active and ready to serve customers. Dramatic lighting emphasizes the contrast between past human work and present AI automation. Subtle bank logo visible on the kiosk, clean and somewhat stark atmosphere, medium shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Symbolic empty bank counter with a modern AI banker kiosk positioned behind it, representing the replacement of human staff by AI. The teller's chair is empty, while the AI kiosk screen is active and ready to serve customers. Dramatic lighting emphasizes the contrast between past human work and present AI automation. Subtle bank logo visible on the kiosk, clean and somewhat stark atmosphere, medium shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 244098051
+  },
+  "scene_number": 54,
+  "copied_from": {
+    "scene_number": 52,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\backgrounds\\bg_scene_052_1770705831219.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-10T15:50:37.389597"
+}

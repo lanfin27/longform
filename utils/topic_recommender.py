@@ -33,7 +33,7 @@ try:
     _fallback_api_key = os.getenv("GOOGLE_API_KEY")
     if _fallback_api_key:
         genai.configure(api_key=_fallback_api_key)
-        _gemini_fallback_client = genai.GenerativeModel("gemini-2.0-flash-exp")
+        _gemini_fallback_client = genai.GenerativeModel("gemini-2.5-flash")
         GEMINI_FALLBACK_AVAILABLE = True
         print("[TopicRecommender] ✅ Gemini 폴백 클라이언트 준비 완료")
 except Exception as e:
@@ -253,7 +253,7 @@ class TopicRecommender:
             api_key = self.api_key or os.getenv("GOOGLE_API_KEY")
             if api_key:
                 genai.configure(api_key=api_key)
-                self.client = genai.GenerativeModel(self.model or "gemini-2.0-flash-exp")
+                self.client = genai.GenerativeModel(self.model or "gemini-2.5-flash")
                 print(f"[TopicRecommender] Gemini 클라이언트 초기화 완료")
             else:
                 print(f"[TopicRecommender] GOOGLE_API_KEY 없음")
@@ -355,7 +355,7 @@ class TopicRecommender:
 
         # 응답 파싱
         data = self._parse_response(response.text)
-        model_name = self.model or "gemini-2.0-flash-exp"
+        model_name = self.model or "gemini-2.5-flash"
         result = self._build_result(data, "google", model_name)
 
         print(f"[TopicRecommender] Gemini 추천 완료: {len(result.recommendations)}개")
@@ -435,7 +435,7 @@ class TopicRecommender:
                     data = self._parse_response(response.text)
 
                     result = self._build_result(data, "gemini_fallback")
-                    result.model_used = "gemini-2.0-flash-exp (폴백)"
+                    result.model_used = "gemini-2.5-flash (폴백)"
                     print(f"[TopicRecommender] ✅ Gemini 폴백 추천 완료: {len(result.recommendations)}개")
                     return result
 
@@ -446,7 +446,7 @@ class TopicRecommender:
                         trend_analysis=f"Gemini 폴백 오류: {str(e)}",
                         common_keywords=[],
                         provider_used="gemini_fallback",
-                        model_used="gemini-2.0-flash-exp"
+                        model_used="gemini-2.5-flash"
                     )
 
         # 모든 제공자 실패

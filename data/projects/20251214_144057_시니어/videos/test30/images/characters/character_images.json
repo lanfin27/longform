@@ -1,0 +1,50 @@
+{
+  "비즈니스맨들": {
+    "success": true,
+    "character_name": "비즈니스맨들",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_비즈니스맨들_standing_1769829699529.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_비즈니스맨들_standing_1769829699529.png",
+    "prompt": "Full body character, centered composition, Western 2D animated series style, clean commercial animation aesthetic\nBold black outlines 2-3px thick on all elements, flat cel-shaded coloring with no gradients, solid color fills without any texture, crisp vector-like lineart, clean sharp edges\n\nBody proportions: approximately 6-7 heads tall, slim athletic build, elongated torso, long proportional limbs, simplified hands with basic finger shapes, feet as simple rounded shapes\nHead shape: elongated oval head, prominent angular chin and jawline, large simplified ears positioned mid-head level, smooth curved skull\nFace style: simple dot eyes with small black pupils, thin minimal eyebrows as simple curved lines, small subtle nose as single curved bump, mouth as clean curved line, completely smooth flat skin with single solid color, no shading on face, no wrinkles or details\nFlat solid color blocking, muted desaturated color palette, warm beige skin tones, no shadows no highlights no gradients anywhere on character, plain white or light neutral background, no environmental details, Diverse businesspeople, professional attire, confused and animated expressions, discussing in a modern office, full body character, standing pose, front view, neutral expression, simple solid light gray background, no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "seed": 1838698207,
+    "generation_time": 6.291366338729858,
+    "api_provider": "Google ImageFX"
+  },
+  "운전자": {
+    "success": true,
+    "character_name": "운전자",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_운전자_standing_1769829703755.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_운전자_standing_1769829703755.png",
+    "prompt": "Full body character, centered composition, Western 2D animated series style, clean commercial animation aesthetic\nBold black outlines 2-3px thick on all elements, flat cel-shaded coloring with no gradients, solid color fills without any texture, crisp vector-like lineart, clean sharp edges\n\nBody proportions: approximately 6-7 heads tall, slim athletic build, elongated torso, long proportional limbs, simplified hands with basic finger shapes, feet as simple rounded shapes\nHead shape: elongated oval head, prominent angular chin and jawline, large simplified ears positioned mid-head level, smooth curved skull\nFace style: simple dot eyes with small black pupils, thin minimal eyebrows as simple curved lines, small subtle nose as single curved bump, mouth as clean curved line, completely smooth flat skin with single solid color, no shading on face, no wrinkles or details\nFlat solid color blocking, muted desaturated color palette, warm beige skin tones, no shadows no highlights no gradients anywhere on character, plain white or light neutral background, no environmental details, A driver, potentially a middle-aged Asian man, seated in the driver's seat, looking at the display with a focused and comfortable expression, hands on the steering wheel, full body character, standing pose, front view, neutral expression, simple solid light gray background, no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "seed": 1305271224,
+    "generation_time": 9.515471935272217,
+    "api_provider": "Google ImageFX"
+  },
+  "핵심 인력들": {
+    "success": true,
+    "character_name": "핵심 인력들",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_핵심_인력들_standing_1769829703218.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_핵심_인력들_standing_1769829703218.png",
+    "prompt": "Full body character, centered composition, Western 2D animated series style, clean commercial animation aesthetic\nBold black outlines 2-3px thick on all elements, flat cel-shaded coloring with no gradients, solid color fills without any texture, crisp vector-like lineart, clean sharp edges\n\nBody proportions: approximately 6-7 heads tall, slim athletic build, elongated torso, long proportional limbs, simplified hands with basic finger shapes, feet as simple rounded shapes\nHead shape: elongated oval head, prominent angular chin and jawline, large simplified ears positioned mid-head level, smooth curved skull\nFace style: simple dot eyes with small black pupils, thin minimal eyebrows as simple curved lines, small subtle nose as single curved bump, mouth as clean curved line, completely smooth flat skin with single solid color, no shading on face, no wrinkles or details\nFlat solid color blocking, muted desaturated color palette, warm beige skin tones, no shadows no highlights no gradients anywhere on character, plain white or light neutral background, no environmental details, business professionals, looking worried or stressed, in formal business attire, conveying deep concern, full body character, standing pose, front view, neutral expression, simple solid light gray background, no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "seed": 50565671,
+    "generation_time": 8.478171110153198,
+    "api_provider": "Google ImageFX"
+  },
+  "유튜버": {
+    "success": true,
+    "character_name": "유튜버",
+    "image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_유튜버_standing_1769829708190.png",
+    "image_url": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test30\\images\\characters\\char_유튜버_standing_1769829708190.png",
+    "prompt": "Full body character, centered composition, Western 2D animated series style, clean commercial animation aesthetic\nBold black outlines 2-3px thick on all elements, flat cel-shaded coloring with no gradients, solid color fills without any texture, crisp vector-like lineart, clean sharp edges\n\nBody proportions: approximately 6-7 heads tall, slim athletic build, elongated torso, long proportional limbs, simplified hands with basic finger shapes, feet as simple rounded shapes\nHead shape: elongated oval head, prominent angular chin and jawline, large simplified ears positioned mid-head level, smooth curved skull\nFace style: simple dot eyes with small black pupils, thin minimal eyebrows as simple curved lines, small subtle nose as single curved bump, mouth as clean curved line, completely smooth flat skin with single solid color, no shading on face, no wrinkles or details\nFlat solid color blocking, muted desaturated color palette, warm beige skin tones, no shadows no highlights no gradients anywhere on character, plain white or light neutral background, no environmental details, Smiling presenter, friendly expression, making a gesture suggesting subscribe and like, looking directly at the camera, professional yet approachable, full body character, standing pose, front view, neutral expression, simple solid light gray background, no shadows on background, clean edges suitable for compositing, centered in frame, single character only",
+    "pose": "standing",
+    "background": "solid_gray",
+    "seed": 982608733,
+    "generation_time": 6.656865358352661,
+    "api_provider": "Google ImageFX"
+  }
+}

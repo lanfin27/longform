@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-11T20:10:56.141394",
+  "image_file": "bg_scene_124_1770808256140.png",
+  "scene_id": 124,
+  "prompts": {
+    "original": "A world map with Estonia highlighted, adjacent to it, a miniature model of the K239 Chunmoo MLRS with the number '6' prominently displayed, set against a backdrop of a signed contract or agreement, symbolizing the defense deal, in one corner, a futuristic digital calendar interface subtly showing 'December 2025' and a hint of Poland, creating a sense of ongoing strategic developments, detailed and informative composition, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A world map with Estonia highlighted, adjacent to it, a miniature model of the K239 Chunmoo MLRS with the number '6' prominently displayed, set against a backdrop of a signed contract or agreement, symbolizing the defense deal, in one corner, a futuristic digital calendar interface subtly showing 'December 2025' and a hint of Poland, creating a sense of ongoing strategic developments, detailed and informative composition, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1677578375
+  },
+  "scene_number": 125,
+  "copied_from": {
+    "scene_number": 124,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\backgrounds\\bg_scene_124_1770808256140.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-11T20:14:39.073100"
+}

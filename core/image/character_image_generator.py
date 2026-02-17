@@ -180,6 +180,10 @@ class CharacterImageGenerator:
         # v3.32: 익명화 필터 적용 시 원본 이름 우선 사용 (결과 데이터/로깅용)
         char_name = character.get("_original_name") or character.get("name", "unknown")
 
+        # v2.0: 익명화 상태 확인 및 로깅
+        is_anonymized = character.get("_prompt_was_anonymized", False)
+        is_name_anonymized = character.get("_name_was_anonymized", False)
+
         # visual_prompt 또는 character_prompt 가져오기
         visual_prompt = (
             character.get("visual_prompt") or
@@ -187,6 +191,23 @@ class CharacterImageGenerator:
             character.get("prompt") or
             ""
         )
+
+        # v2.0: 프롬프트 출처 확인 로깅
+        prompt_source = "unknown"
+        if character.get("visual_prompt"):
+            prompt_source = "visual_prompt"
+        elif character.get("character_prompt"):
+            prompt_source = "character_prompt (fallback)"
+        elif character.get("prompt"):
+            prompt_source = "prompt (fallback)"
+
+        if is_anonymized or is_name_anonymized:
+            print(f"[CharacterImageGenerator] 🛡️ 익명화된 캐릭터 감지")
+            print(f"  이름 익명화: {is_name_anonymized}, 프롬프트 익명화: {is_anonymized}")
+            print(f"  프롬프트 출처: {prompt_source}")
+            print(f"  원본 이름: {character.get('_original_name', 'N/A')}")
+            print(f"  사용 이름: {character.get('name', 'N/A')}")
+            print(f"  프롬프트 전체 ({len(visual_prompt)}자):\n  {visual_prompt}")
 
         if not visual_prompt:
             return {
@@ -212,7 +233,8 @@ class CharacterImageGenerator:
         print(f"  스타일: {config.style}")
         print(f"  포즈: {config.pose} -> \"{pose_text}\"")
         print(f"  배경: {config.background}")
-        print(f"  프롬프트 미리보기: ...{pose_text}, {self.BACKGROUND_OPTIONS.get(config.background, '')}...")
+        print(f"  프롬프트 출처: {prompt_source}")
+        print(f"  최종 프롬프트 ({len(prompt)}자):\n  {prompt}")
 
         # 출력 디렉토리 설정
         if output_dir is None and self.project_path:

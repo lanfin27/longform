@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-08T14:41:34.224903",
+  "image_file": "bg_scene_142_1770529294224.png",
+  "scene_id": 142,
+  "prompts": {
+    "original": "Two advanced technology pillars slowly converging, symbolizing a narrowing technological gap, with subtle digital time-lapse effects subtly flowing around, hinting at the passage of time. Simultaneously, on one side, an overheating semiconductor chip or a complex power grid glows with intense red light, visually emphasizing severe power consumption issues. A contrasting composition expressing both an uncertain future and new challenges, with a futuristic and analytical mood, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Two advanced technology pillars slowly converging, symbolizing a narrowing technological gap, with subtle digital time-lapse effects subtly flowing around, hinting at the passage of time. Simultaneously, on one side, an overheating semiconductor chip or a complex power grid glows with intense red light, visually emphasizing severe power consumption issues. A contrasting composition expressing both an uncertain future and new challenges, with a futuristic and analytical mood, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 227837313
+  }
+}

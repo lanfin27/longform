@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-01T16:46:48.366625",
+  "image_file": "bg_scene_025_1769932008365.png",
+  "scene_id": 25,
+  "prompts": {
+    "original": "A hand confidently holding a high-performance NVIDIA GPU card with the NVIDIA logo clearly visible, juxtaposed against a complex overlay of dynamic currency exchange rate charts in the background. Visual representation of dollar ($) and Korean Won (₩) symbols interacting, creating an atmosphere of financial inquiry and highlighting the connection between tech investment and currency. Dynamic and thought-provoking composition, subtle glowing effect from the GPU, close-up shot emphasizing detail and interaction, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A hand confidently holding a high-performance NVIDIA GPU card with the NVIDIA logo clearly visible, juxtaposed against a complex overlay of dynamic currency exchange rate charts in the background. Visual representation of dollar ($) and Korean Won (₩) symbols interacting, creating an atmosphere of financial inquiry and highlighting the connection between tech investment and currency. Dynamic and thought-provoking composition, subtle glowing effect from the GPU, close-up shot emphasizing detail and interaction, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1127712726
+  }
+}

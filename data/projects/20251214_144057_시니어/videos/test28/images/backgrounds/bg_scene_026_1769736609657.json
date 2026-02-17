@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-30T10:30:09.658512",
+  "image_file": "bg_scene_026_1769736609657.png",
+  "scene_id": 26,
+  "prompts": {
+    "original": "Modern luxury car interior from the driver's perspective, featuring a large, seamlessly integrated digital dashboard and infotainment screen displaying both navigation maps and a music player interface, a subtle Harman logo visible on the display or speaker grille, futuristic and sleek automotive design, ambient interior lighting, high-resolution screen graphics, wide-angle shot of the sophisticated cockpit, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Modern luxury car interior from the driver's perspective, featuring a large, seamlessly integrated digital dashboard and infotainment screen displaying both navigation maps and a music player interface, a subtle Harman logo visible on the display or speaker grille, futuristic and sleek automotive design, ambient interior lighting, high-resolution screen graphics, wide-angle shot of the sophisticated cockpit, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 806726999
+  }
+}

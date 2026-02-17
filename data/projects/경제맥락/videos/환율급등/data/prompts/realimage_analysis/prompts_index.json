@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "prompts": {
+    "default": {
+      "name": "기본 분석",
+      "description": "표준 실사이미지 대체 가능성 분석 프롬프트",
+      "file": "default.md",
+      "is_system": true,
+      "created_at": "2026-02-01T18:55:51.313614",
+      "updated_at": "2026-02-01T18:55:51.313621"
+    },
+    "strict": {
+      "name": "엄격 분석",
+      "description": "높은 정확도 기준으로 신중하게 분석",
+      "file": "strict.md",
+      "is_system": true,
+      "created_at": "2026-02-01T18:55:51.314949",
+      "updated_at": "2026-02-01T18:55:51.314954"
+    },
+    "lenient": {
+      "name": "관대 분석",
+      "description": "더 많은 씬을 실사 대체 가능으로 판단",
+      "file": "lenient.md",
+      "is_system": true,
+      "created_at": "2026-02-01T18:55:51.316731",
+      "updated_at": "2026-02-01T18:55:51.316736"
+    }
+  },
+  "created_at": "2026-02-01T18:55:51.312376",
+  "updated_at": "2026-02-01T18:55:51.316739"
+}

@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-08T14:39:39.747840",
+  "image_file": "bg_scene_094_1770529179747.png",
+  "scene_id": 94,
+  "prompts": {
+    "original": "Abstract digital circuit board visualizing ultra-high-speed data flow, glowing streaks of light emanating from HBM chips symbolizing an overwhelming speed of 11.7Gbps, with a subtle representation of a slower 8Gbps flow for comparison, strong contrast of blue and purple hues, dynamic composition emphasizing speed and innovation, futuristic technological aesthetic, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Abstract digital circuit board visualizing ultra-high-speed data flow, glowing streaks of light emanating from HBM chips symbolizing an overwhelming speed of 11.7Gbps, with a subtle representation of a slower 8Gbps flow for comparison, strong contrast of blue and purple hues, dynamic composition emphasizing speed and innovation, futuristic technological aesthetic, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 581379847
+  },
+  "scene_number": 95,
+  "copied_from": {
+    "scene_number": 94,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\HBM4\\images\\backgrounds\\bg_scene_094_1770529179747.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-08T14:42:28.882743"
+}

@@ -1,0 +1,45 @@
+[
+  {
+    "name": "임원들",
+    "name_ko": "임원들",
+    "role": "등장인물",
+    "visual_prompt": "Corporate executives in a meeting, diverse expressions",
+    "description": "",
+    "appearance_scenes": [
+      45,
+      46
+    ]
+  },
+  {
+    "name": "이재용 회장",
+    "name_ko": "이재용 회장",
+    "role": "등장인물",
+    "visual_prompt": "Lee Jae-yong with determined expression",
+    "description": "",
+    "appearance_scenes": [
+      45,
+      46
+    ]
+  },
+  {
+    "name": "이재용 부회장",
+    "name_ko": "이재용 부회장",
+    "role": "등장인물",
+    "visual_prompt": "Lee Jae-yong with sharp gaze and analytical expression",
+    "description": "",
+    "appearance_scenes": [
+      47,
+      48
+    ]
+  },
+  {
+    "name": "노동자",
+    "name_ko": "노동자",
+    "role": "등장인물",
+    "visual_prompt": "Workers assembling automobiles on the assembly line, period clothing and atmosphere reflecting the era, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      80
+    ]
+  }
+]

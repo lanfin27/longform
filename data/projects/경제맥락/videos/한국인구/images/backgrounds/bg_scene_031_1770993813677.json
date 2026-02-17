@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-13T23:43:33.678134",
+  "image_file": "bg_scene_031_1770993813677.png",
+  "scene_id": 31,
+  "prompts": {
+    "original": "A clear and simple graph illustrating the declining birth rate in South Korea from the 1970s to the 1980s, with a distinct highlight on the point where it dropped below 2.1 children per woman in 1983, subtle retro color palette and design reflecting the era, strong visual emphasis on the downward trend, clean and informative presentation, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A clear and simple graph illustrating the declining birth rate in South Korea from the 1970s to the 1980s, with a distinct highlight on the point where it dropped below 2.1 children per woman in 1983, subtle retro color palette and design reflecting the era, strong visual emphasis on the downward trend, clean and informative presentation, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 516852074
+  }
+}

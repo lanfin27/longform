@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "prompts": {
+    "default": {
+      "name": "기본 분석",
+      "description": "표준 인포그래픽 대체 가능성 분석 프롬프트",
+      "file": "default.md",
+      "is_system": true,
+      "created_at": "2026-02-08T14:42:54.946119",
+      "updated_at": "2026-02-08T14:42:54.946124"
+    },
+    "data_focused": {
+      "name": "데이터 중심",
+      "description": "숫자/통계 데이터 추출에 집중하는 프롬프트",
+      "file": "data_focused.md",
+      "is_system": true,
+      "created_at": "2026-02-08T14:42:54.947950",
+      "updated_at": "2026-02-08T14:42:54.947955"
+    },
+    "comparison": {
+      "name": "비교 분석",
+      "description": "비교/대조 요소 추출에 집중하는 프롬프트",
+      "file": "comparison.md",
+      "is_system": true,
+      "created_at": "2026-02-08T14:42:54.949436",
+      "updated_at": "2026-02-08T14:42:54.949441"
+    },
+    "timeline": {
+      "name": "타임라인 분석",
+      "description": "시간순/단계별 프로세스 추출에 집중하는 프롬프트",
+      "file": "timeline.md",
+      "is_system": true,
+      "created_at": "2026-02-08T14:42:54.950942",
+      "updated_at": "2026-02-08T14:42:54.950946"
+    }
+  },
+  "created_at": "2026-02-08T14:42:54.944345",
+  "updated_at": "2026-02-08T14:42:54.950948"
+}

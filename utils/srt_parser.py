@@ -620,6 +620,10 @@ def create_bundles(scenes: List[Dict], bundle_size: int = 2) -> List[Dict]:
     if not scenes:
         return []
 
+    # ⭐ v3.30: scene_id 순으로 정렬 (필수! 정렬되지 않으면 bundle 생성 순서가 잘못됨)
+    scenes = sorted(scenes, key=lambda s: s.get('scene_id', s.get('id', 0)))
+    print(f"[Bundle] 씬 정렬 완료: {[s.get('scene_id') for s in scenes[:10]]}...")
+
     # bundle_size 범위 제한
     bundle_size = max(1, min(5, bundle_size))
 
@@ -705,6 +709,21 @@ def apply_bundle_analysis_result(scenes: List[Dict], analyzed_primary: Dict) -> 
         print(f"[Bundle 적용] ⚠️ bundle_id가 None - 스킵됨 (씬 {primary_scene_id})")
         return
 
+    # ⭐ v3.30: scene_id 검증 - 분석 결과의 scene_id가 묶음의 실제 primary와 일치하는지 확인
+    matching_scenes_list = [s for s in scenes if s.get('bundle_id') == bundle_id]
+    if matching_scenes_list:
+        # 묶음 내 실제 primary 씬 찾기
+        actual_primary = next(
+            (s for s in matching_scenes_list if s.get('is_bundle_primary')),
+            min(matching_scenes_list, key=lambda s: s.get('scene_id', 0))  # fallback: 가장 작은 scene_id
+        )
+        actual_primary_id = actual_primary.get('scene_id')
+
+        if primary_scene_id != actual_primary_id:
+            print(f"[Bundle 적용] ⚠️ scene_id 불일치 감지! 분석결과={primary_scene_id}, 실제 primary={actual_primary_id}")
+            print(f"[Bundle 적용] → 묶음의 원본 스크립트 확인 필요. 분석 결과가 잘못된 씬에 적용될 수 있음!")
+            # 경고만 출력하고 계속 진행 (bundle_id 기준으로 적용)
+
     # 분석 결과 필드들 (⭐ v3.28: background_prompt_en 추가!)
     analysis_fields = [
         'image_prompt', 'image_prompt_en',
@@ -719,11 +738,9 @@ def apply_bundle_analysis_result(scenes: List[Dict], analyzed_primary: Dict) -> 
     # 동일 묶음의 모든 씬에 결과 적용
     applied_count = 0
 
-    # v3.29: 전체 씬 bundle_id 현황 로깅
-    all_bundle_ids = [s.get('bundle_id') for s in scenes]
-    print(f"[Bundle 적용] 전체 씬의 bundle_id 분포: {all_bundle_ids}")
-    matching_scenes = [s.get('scene_id') for s in scenes if s.get('bundle_id') == bundle_id]
-    print(f"[Bundle 적용] bundle_id={bundle_id}인 씬들: {matching_scenes}")
+    # v3.30: 정렬된 scene_id 목록으로 로깅 개선
+    matching_scenes = sorted([s.get('scene_id') for s in scenes if s.get('bundle_id') == bundle_id])
+    print(f"[Bundle 적용] bundle_id={bundle_id}인 씬들 (정렬됨): {matching_scenes}")
 
     for scene in scenes:
         if scene.get('bundle_id') == bundle_id:

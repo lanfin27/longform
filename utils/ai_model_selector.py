@@ -166,6 +166,8 @@ def render_model_selector(
         model_info = get_model(selected_model_id)
         if model_info:
             st.caption(f"{model_info.description}")
+            if model_info.rpm > 0:
+                st.caption(f"API 제한: 분당 {model_info.rpm}회, 일 {model_info.rpd:,}회")
 
     return selected_model_id
 
@@ -181,7 +183,8 @@ def _create_model_options(models: dict) -> dict:
         if model_id == "claude_code":
             label = f"{provider_icon} {model.name} 🆓"
         else:
-            label = f"{provider_icon} {model.name} {speed_icon}"
+            rpm_tag = f" [{model.rpm}RPM]" if model.rpm > 0 else ""
+            label = f"{provider_icon} {model.name} {speed_icon}{rpm_tag}"
 
         options[label] = model_id
     return options
@@ -285,7 +288,7 @@ def render_processing_mode_selector(key: str = "processing_mode") -> str:
         index=list(mode_options.keys()).index(current_label),
         key=f"{key}_select",
         horizontal=True,
-        help="병렬 처리가 가장 빠르지만 API 제한에 걸릴 수 있습니다"
+        help="병렬 처리가 가장 빠르지만 무료 API는 분당 10~15회 제한이 있습니다"
     )
 
     selected_mode = mode_options[selected_label]

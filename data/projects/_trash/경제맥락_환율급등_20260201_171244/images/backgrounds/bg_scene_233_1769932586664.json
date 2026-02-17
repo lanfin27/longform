@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-01T16:56:07.683566",
+  "image_file": "bg_scene_232_1769932567682.png",
+  "scene_id": 232,
+  "prompts": {
+    "original": "A futuristic cityscape of Korea, vibrant and dynamic, with glowing holographic projections and advanced architectural structures symbolizing AI, biotechnology, and robotics seamlessly integrated into the urban skyline. The scene conveys an optimistic and innovative vision of transforming crisis into opportunity, with bright, energetic lighting and a sense of boundless potential, panoramic wide-angle view, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A futuristic cityscape of Korea, vibrant and dynamic, with glowing holographic projections and advanced architectural structures symbolizing AI, biotechnology, and robotics seamlessly integrated into the urban skyline. The scene conveys an optimistic and innovative vision of transforming crisis into opportunity, with bright, energetic lighting and a sense of boundless potential, panoramic wide-angle view, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1663761392
+  },
+  "scene_number": 233,
+  "copied_from": {
+    "scene_number": 232,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\환율급등\\images\\backgrounds\\bg_scene_232_1769932567682.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-02-01T16:56:26.674553"
+}

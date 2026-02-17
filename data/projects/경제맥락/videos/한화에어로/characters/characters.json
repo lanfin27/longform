@@ -1,0 +1,182 @@
+[
+  {
+    "id": "char_0",
+    "name": "한화 비즈니스맨",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "business professional in a sharp business suit, confident expression, shaking hands",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_한화_비즈니스맨_standing_1770807699368.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_한화_비즈니스맨_standing_1770807699368.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-11T19:59:05.754917",
+    "updated_at": "2026-02-11T20:02:06.661715"
+  },
+  {
+    "id": "char_1",
+    "name": "노르웨이 관계자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "business professional in a sharp business suit, focused expression, shaking hands",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_노르웨이_관계자_standing_1770807704945.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_노르웨이_관계자_standing_1770807704945.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-11T19:59:05.756334",
+    "updated_at": "2026-02-11T20:02:06.682388"
+  },
+  {
+    "id": "char_2",
+    "name": "강훈식 대통령 비서실장",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "distinguished Asian Chief of Staff to the President, middle-aged, sharp dark suit, determined and serious expression, walking across an airport tarmac, holding a formal diplomatic brief",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_강훈식_대통령_비서실장_standing_1770807703223.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_강훈식_대통령_비서실장_standing_1770807703223.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-11T19:59:05.757685",
+    "updated_at": "2026-02-11T20:02:06.718934"
+  },
+  {
+    "id": "char_3",
+    "name": "강훈식 대통령 비서실장 (대표)",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "high-ranking Asian diplomat, middle-aged, formal dark suit, serious and collaborative expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_강훈식_대통령_비서실장__대표__standing_1770807704689.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_강훈식_대통령_비서실장__대표__standing_1770807704689.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-11T19:59:05.760552",
+    "updated_at": "2026-02-11T20:02:06.755957"
+  },
+  {
+    "id": "char_4",
+    "name": "노르웨이 총리",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "distinguished European politician, middle-aged, formal suit, engaged in diplomatic discussion",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_노르웨이_총리_standing_1770807718317.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_노르웨이_총리_standing_1770807718317.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-11T19:59:05.761585",
+    "updated_at": "2026-02-11T20:02:06.796482"
+  },
+  {
+    "id": "char_5",
+    "name": "노르웨이 국방부 장관",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "European defense official, middle-aged, formal suit, attentive and serious expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_노르웨이_국방부_장관_standing_1770807712416.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_노르웨이_국방부_장관_standing_1770807712416.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-11T19:59:05.762396",
+    "updated_at": "2026-02-11T20:02:06.832784"
+  },
+  {
+    "id": "char_6",
+    "name": "정비사",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "seen from behind, holding a tablet and checking parts, wearing professional work attire, focused posture",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_정비사_standing_1770807715550.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_정비사_standing_1770807715550.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-11T19:59:05.762943",
+    "updated_at": "2026-02-11T20:02:06.871569"
+  },
+  {
+    "id": "char_7",
+    "name": "한화에어로스페이스 대표",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "a professional Asian man in a dark suit, confident expression, shaking hands",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_한화에어로스페이스_대표_standing_1770807726630.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_한화에어로스페이스_대표_standing_1770807726630.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-11T19:59:05.763713",
+    "updated_at": "2026-02-11T20:02:06.920678"
+  },
+  {
+    "id": "char_8",
+    "name": "노르웨이 국방부 대표",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "a professional European man in a dark suit, confident expression, shaking hands",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_노르웨이_국방부_대표_standing_1770807724742.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\한화에어로\\images\\characters\\char_노르웨이_국방부_대표_standing_1770807724742.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-11T19:59:05.764710",
+    "updated_at": "2026-02-11T20:02:06.965042"
+  }
+]

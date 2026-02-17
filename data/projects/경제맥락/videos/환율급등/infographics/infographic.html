@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>환율급등 경제 인포그래픽</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --canvas-width: 1280px;
+            --canvas-height: 720px;
+            --bg: #ffffff;
+            --text: #222222;
+            --red: #ef4444;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --yellow: #facc15;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --gray: #555555;
+            --light-gray: #f5f5f5;
+            --light-pink: #fce4ec;
+            --light-blue: #dbeafe;
+            --light-green: #dcfce7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Nanum Pen Script', cursive;
+            overflow: hidden;
+        }
+
+        #video-canvas {
+            width: var(--canvas-width);
+            height: var(--canvas-height);
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+
+        .scene {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+            background: #ffffff;
+            position: absolute;
+            top: 0; left: 0;
+        }
+        .scene.active { display: flex; }
+
+        /* 타이포그래피 */
+        h1 { font-size: 80px; line-height: 1.2; margin-bottom: 20px; }
+        h2 { font-size: 60px; line-height: 1.3; margin-bottom: 15px; }
+        p { font-size: 48px; line-height: 1.5; }
+        .text-sm { font-size: 44px; }
+        .text-xs { font-size: 40px; }
+
+        /* 박스 스타일 */
+        .box, .box-gray, .box-pink, .box-blue, .box-green {
+            border: 3px solid var(--text);
+            border-radius: 15px;
+            padding: 30px 45px;
+            filter: url(#rough-edge);
+            white-space: nowrap;
+            width: auto;
+            min-width: fit-content;
+            max-width: 90%;
+            font-size: 52px;
+            background: white;
+            margin: 10px;
+        }
+        .box-gray { background: var(--light-gray); }
+        .box-pink { background: var(--light-pink); }
+        .box-blue { background: var(--light-blue); }
+        .box-green { background: var(--light-green); }
+        
+        .hl-yellow { background: var(--yellow); padding: 5px 15px; border-radius: 8px; }
+
+        /* 애니메이션 */
+        @keyframes bounce-subtle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes pulse-red { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+        @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(10px, -10px); } }
+        
+        .animate-subtle { animation: bounce-subtle 4s ease-in-out infinite; }
+        .animate-pulse-red { animation: pulse-red 2s infinite; }
+        .animate-float { animation: float 5s ease-in-out infinite; }
+
+        /* 차트 요소 */
+        .bar { border: 3px solid var(--text); border-radius: 8px; filter: url(#rough-strong); }
+        .gauge-track { width: 100%; height: 50px; background: var(--light-gray); border: 3px solid var(--text); border-radius: 25px; overflow: hidden; }
+        .gauge-fill { height: 100%; filter: url(#rough-strong); }
+        
+        /* 컨트롤러 UI */
+        #controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: #333;
+            padding: 10px 30px;
+            border-radius: 50px;
+            color: white;
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+        button {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #progress-container { width: 300px; height: 10px; background: #555; border-radius: 5px; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: var(--blue); transition: width 0.3s; }
+        .scene-id-tag { color: var(--yellow); font-weight: bold; margin-left: 10px; }
+    </style>
+</head>
+<body>
+
+<svg style="position: absolute; width: 0; height: 0;">
+    <filter id="rough-edge">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+    </filter>
+    <filter id="rough-strong">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+    </filter>
+</svg>
+
+<div id="video-canvas">
+
+    <!-- 씬 4: 위기 전후의 대비 -->
+    <div class="scene active" id="scene4">
+        <h2 style="margin-bottom: 40px;">조용한 폭풍의 시작</h2>
+        <div style="display: flex; width: 95%; height: 400px; border: 4px solid #222; border-radius: 20px; overflow: hidden; filter: url(#rough-edge);">
+            <div style="flex: 1; background: var(--light-blue); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px;">
+                <i class="fa-solid fa-earth-americas" style="font-size: 100px; color: var(--blue); margin-bottom: 20px;"></i>
+                <p style="font-size: 56px;">평온한 세계 경제</p>
+                <p class="text-sm text-gray">외견상 문제없음</p>
+            </div>
+            <div style="width: 4px; background: #222;"></div>
+            <div style="flex: 1; background: var(--light-pink); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px;">
+                <div style="width: 100%; height: 150px; overflow: hidden; position: relative; border-bottom: 3px solid #222;">
+                    <svg width="100%" height="100%">
+                        <polyline points="20,130 150,110 300,80 450,20" stroke="var(--red)" stroke-width="8" fill="none" class="animate-pulse-red" />
+                    </svg>
+                </div>
+                <p style="font-size: 56px; color: var(--red); margin-top: 20px;">치솟는 환율</p>
+                <p class="text-sm">숨겨진 위기의 신호</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 씬 12: 복잡한 구조적 문제 -->
+    <div class="scene" id="scene12">
+        <h2 style="margin-bottom: 30px;">뒤엉킨 경제 시스템</h2>
+        <div style="display: flex; gap: 40px; align-items: center; margin-bottom: 40px;">
+            <div class="animate-float" style="position: relative; width: 300px; height: 300px;">
+                <i class="fa-solid fa-network-wired" style="font-size: 200px; color: var(--gray); opacity: 0.3; position: absolute; top: 0; left: 0;"></i>
+                <i class="fa-solid fa-circle-nodes" style="font-size: 150px; color: var(--blue); position: absolute; bottom: 20px; right: 20px;"></i>
+                <i class="fa-solid fa-bolt" style="font-size: 100px; color: var(--orange); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>
+            </div>
+            <div style="text-align: left;">
+                <div class="box-pink"><p>거대한 구조적 결함</p></div>
+                <div class="box-gray" style="margin-top: 20px;"><p>통제 불가능한 복잡성</p></div>
+            </div>
+        </div>
+        <p class="hl-yellow">단순한 현상이 아닌 시스템의 비명</p>
+    </div>
+
+    <!-- 씬 30: 원화의 달러 환전 및 유출 -->
+    <div class="scene" id="scene30">
+        <h2 style="margin-bottom: 50px;">빠져나가는 자금의 흐름</h2>
+        <div style="display: flex; align-items: center; gap: 30px;">
+            <div class="box" style="background: #e0f2fe; padding: 40px;">
+                <i class="fa-solid fa-won-sign" style="font-size: 80px; margin-bottom: 10px;"></i>
+                <p>한국 원화</p>
+            </div>
+            <i class="fa-solid fa-arrow-right-arrow-left" style="font-size: 60px; color: var(--gray);"></i>
+            <div class="box-pink" style="padding: 40px; border-style: dashed;">
+                <i class="fa-solid fa-dollar-sign" style="font-size: 80px; margin-bottom: 10px; color: var(--red);"></i>
+                <p>달러 환전</p>
+            </div>
+            <span style="font-size: 100px; color: var(--red);">→</span>
+            <div class="box-gray" style="padding: 40px;">
+                <i class="fa-solid fa-plane-departure" style="font-size: 80px; margin-bottom: 10px;"></i>
+                <p>해외 유출</p>
+            </div>
+        </div>
+        <p style="margin-top: 40px;" class="text-red">국내 달러 공급의 급격한 감소</p>
+    </div>
+
+    <!-- 씬 57: 해외 투자 자금 급유출 -->
+    <div class="scene" id="scene57">
+        <h2 style="margin-bottom: 40px;">긴박한 자본 유출</h2>
+        <div style="width: 80%; display: flex; flex-direction: column; gap: 30px;">
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <div style="width: 150px; font-size: 44px;">국내 투자</div>
+                <div class="gauge-track" style="flex: 1;"><div class="gauge-fill" style="width: 30%; background: var(--blue);"></div></div>
+                <div style="width: 100px; font-size: 44px;">30%</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <div style="width: 150px; font-size: 44px; color: var(--red);">해외 유출</div>
+                <div class="gauge-track" style="flex: 1;"><div class="gauge-fill animate-pulse-red" style="width: 85%; background: var(--red);"></div></div>
+                <div style="width: 100px; font-size: 44px; color: var(--red);">85%</div>
+            </div>
+        </div>
+        <div style="margin-top: 50px; display: flex; gap: 40px;">
+            <div class="box-gray"><i class="fa-solid fa-city"></i> 서울 금융지구</div>
+            <i class="fa-solid fa-person-running" style="font-size: 60px; color: var(--orange);"></i>
+            <div class="box-pink">해외 시장</div>
+        </div>
+    </div>
+
+    <!-- 씬 82: 한국 경제의 구조적 약화 -->
+    <div class="scene" id="scene82">
+        <h2 style="margin-bottom: 30px;">기초 체력의 약화</h2>
+        <div style="position: relative; width: 600px; height: 300px; border-left: 4px solid #222; border-bottom: 4px solid #222; overflow: hidden; margin-bottom: 30px;">
+            <svg width="100%" height="100%">
+                <polyline points="30,50 150,80 300,180 450,220 570,280" stroke="var(--red)" stroke-width="8" fill="none" />
+                <line x1="150" y1="80" x2="160" y2="120" stroke="#ccc" stroke-width="2" />
+                <line x1="300" y1="180" x2="320" y2="210" stroke="#ccc" stroke-width="2" />
+            </svg>
+            <p style="position: absolute; left: 40px; top: 20px; font-size: 40px;">성장 잠재력</p>
+        </div>
+        <div style="display: flex; gap: 30px;">
+            <div class="box-gray"><i class="fa-solid fa-house-crack"></i> 구조적 균열</div>
+            <div class="box-pink"><i class="fa-solid fa-arrow-down-long"></i> 하락 압력</div>
+        </div>
+    </div>
+
+    <!-- 씬 83: 신뢰의 붕괴 -->
+    <div class="scene" id="scene83">
+        <h2 style="margin-bottom: 40px;">신뢰의 붕괴</h2>
+        <div style="display: flex; gap: 60px; align-items: center;">
+            <div style="text-align: center; opacity: 0.5;">
+                <i class="fa-solid fa-building-columns" style="font-size: 150px; color: var(--blue);"></i>
+                <p style="margin-top: 20px;">과거의 견고함</p>
+            </div>
+            <span style="font-size: 80px; color: var(--gray);">→</span>
+            <div style="text-align: center;" class="animate-subtle">
+                <div style="position: relative;">
+                    <i class="fa-solid fa-building-columns" style="font-size: 150px; color: var(--red);"></i>
+                    <i class="fa-solid fa-burst" style="font-size: 100px; color: var(--orange); position: absolute; top: -20px; right: -20px;"></i>
+                </div>
+                <p style="margin-top: 20px; color: var(--red);">현재의 구조적 위기</p>
+            </div>
+        </div>
+        <p style="margin-top: 40px;" class="hl-yellow">내부에서부터 시작된 균열</p>
+    </div>
+
+    <!-- 씬 84: 데이터로 보는 하락 -->
+    <div class="scene" id="scene84">
+        <div class="box-pink" style="padding: 50px;">
+            <p class="text-gray">국가 경쟁력 지표</p>
+            <h1 style="font-size: 180px; color: var(--red);">-15.8%</h1>
+            <p style="font-size: 56px;">구조적 하락세 진입</p>
+        </div>
+        <div style="margin-top: 30px; display: flex; gap: 20px;">
+            <span class="box-gray text-xs">잠재 성장률 저하</span>
+            <span class="box-gray text-xs">인구 구조 악화</span>
+            <span class="box-gray text-xs">부채 비중 급증</span>
+        </div>
+    </div>
+
+    <!-- 씬 112: 글로벌 보호무역의 파고 -->
+    <div class="scene" id="scene112">
+        <h2 style="margin-bottom: 30px;">관세 전쟁의 시작</h2>
+        <div style="position: relative; width: 800px; height: 350px; background: #f8fafc; border: 3px solid #ddd; border-radius: 30px; display: flex; justify-content: center; align-items: center;">
+            <i class="fa-solid fa-globe" style="font-size: 250px; color: #cbd5e1;"></i>
+            <i class="fa-solid fa-bomb animate-pulse-red" style="font-size: 60px; color: var(--red); position: absolute; top: 50px; left: 150px;"></i>
+            <i class="fa-solid fa-bomb animate-pulse-red" style="font-size: 60px; color: var(--red); position: absolute; bottom: 80px; right: 200px;"></i>
+            <i class="fa-solid fa-bomb animate-pulse-red" style="font-size: 60px; color: var(--red); position: absolute; top: 100px; right: 100px;"></i>
+            <p style="position: absolute; font-size: 72px; font-weight: bold; background: rgba(255,255,255,0.8); padding: 10px 30px; border-radius: 15px;">TARIFF BOMB</p>
+        </div>
+        <p style="margin-top: 30px;">전 세계를 타격하는 보호무역주의</p>
+    </div>
+
+    <!-- 씬 113: 무역 장벽의 높이 -->
+    <div class="scene" id="scene113">
+        <h2 style="margin-bottom: 40px;">높아지는 무역 장벽</h2>
+        <div style="display: flex; align-items: flex-end; gap: 40px; height: 300px;">
+            <div style="text-align: center;">
+                <div class="bar" style="width: 120px; height: 100px; background: var(--blue);"></div>
+                <p style="margin-top: 15px;">기존 관세</p>
+            </div>
+            <i class="fa-solid fa-arrow-up" style="font-size: 60px; color: var(--red); margin-bottom: 120px;"></i>
+            <div style="text-align: center;">
+                <div class="bar animate-pulse-red" style="width: 120px; height: 250px; background: var(--red);"></div>
+                <p style="margin-top: 15px; color: var(--red);">보호무역 관세</p>
+            </div>
+            <div class="box-pink" style="margin-bottom: 50px;"><p>수출 비용 <span class="text-red">2.5배</span> 증가</p></div>
+        </div>
+    </div>
+
+    <!-- 씬 124: 법인세 인하와 관세의 저울 -->
+    <div class="scene" id="scene124">
+        <h2 style="margin-bottom: 40px;">엇갈린 정책의 저울</h2>
+        <div style="position: relative; width: 700px; height: 300px; display: flex; flex-direction: column; align-items: center;">
+            <div style="width: 600px; height: 10px; background: #333; transform: rotate(-10deg); filter: url(#rough-edge);"></div>
+            <div style="display: flex; justify-content: space-between; width: 650px; margin-top: -30px;">
+                <div style="text-align: center; transform: translateY(-30px);">
+                    <div class="box-green" style="padding: 20px;"><i class="fa-solid fa-arrow-down" style="color: var(--green);"></i><p>법인세 인하</p></div>
+                    <p class="text-sm">세수 감소</p>
+                </div>
+                <div style="text-align: center; transform: translateY(30px);">
+                    <div class="box-pink" style="padding: 20px;"><i class="fa-solid fa-arrow-up" style="color: var(--red);"></i><p>관세 부과</p></div>
+                    <p class="text-sm">비용 전가</p>
+                </div>
+            </div>
+            <div style="width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 80px solid #333; margin-top: 20px;"></div>
+        </div>
+        <p style="margin-top: 20px;">세금 깎아주고 관세로 뺏는 형국</p>
+    </div>
+
+    <!-- 씬 125: 정책의 악순환 -->
+    <div class="scene" id="scene125">
+        <h2 style="margin-bottom: 40px;">정책의 악순환</h2>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div style="text-align: center;">
+                <i class="fa-solid fa-building" style="font-size: 80px; color: var(--gray);"></i>
+                <div class="box-green" style="font-size: 36px; padding: 15px;">법인세 감면</div>
+            </div>
+            <span style="font-size: 40px;">→</span>
+            <div style="text-align: center;">
+                <i class="fa-solid fa-ship" style="font-size: 80px; color: var(--blue);"></i>
+                <div class="box-pink" style="font-size: 36px; padding: 15px;">관세 비용 상승</div>
+            </div>
+            <span style="font-size: 40px;">→</span>
+            <div style="text-align: center;">
+                <i class="fa-solid fa-scale-unbalanced" style="font-size: 80px; color: var(--red);"></i>
+                <div class="box-gray" style="font-size: 36px; padding: 15px;">경제 불균형</div>
+            </div>
+        </div>
+        <div class="box-pink" style="margin-top: 50px; padding: 40px;"><p>서로를 상쇄하는 모순된 경제 정책</p></div>
+    </div>
+
+</div>
+
+<div id="controls">
+    <button onclick="move(-1)">이전 (Left)</button>
+    <div id="progress-container"><div id="progress-bar"></div></div>
+    <span>Scene <span id="current-scene-id">4</span></span>
+    <span style="margin-left: 10px; opacity: 0.6;">(<span id="current-num">1</span> / <span id="total-scenes">11</span>)</span>
+    <button onclick="move(1)">다음 (Right)</button>
+</div>
+
+<script>
+    let currentIdx = 0;
+    const scenes = document.querySelectorAll('.scene');
+    const progressBar = document.getElementById('progress-bar');
+    const sceneIdDisplay = document.getElementById('current-scene-id');
+    const numDisplay = document.getElementById('current-num');
+    const totalText = document.getElementById('total-scenes');
+
+    if (totalText) totalText.innerText = scenes.length;
+
+    function update() {
+        scenes.forEach((s, i) => {
+            s.classList.toggle('active', i === currentIdx);
+        });
+        
+        const activeScene = scenes[currentIdx];
+        // id="scene125" 에서 125만 추출
+        const activeId = activeScene.id.replace('scene', '');
+        
+        progressBar.style.width = ((currentIdx + 1) / scenes.length * 100) + '%';
+        sceneIdDisplay.innerText = activeId;
+        numDisplay.innerText = currentIdx + 1;
+    }
+
+    function move(n) {
+        currentIdx += n;
+        if (currentIdx < 0) currentIdx = 0;
+        if (currentIdx >= scenes.length) currentIdx = scenes.length - 1;
+        update();
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') move(1);
+        if (e.key === 'ArrowLeft') move(-1);
+    });
+
+    update();
+</script>
+
+</body>
+</html>

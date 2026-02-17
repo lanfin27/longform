@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-07T12:38:32.659293",
+  "image_file": "bg_scene_136_1770435512658.png",
+  "scene_id": 136,
+  "prompts": {
+    "original": "A dynamic split-screen composition depicting a stock market crash with a rapidly plummeting red candlestick chart on one side, showing a dramatic 50% drop, juxtaposed with a steadily rising gold price chart in shimmering gold on the other side. The background is a dark, turbulent economic landscape, conveying financial instability and a sense of historical comparison. Dramatic lighting highlights the contrasting movements, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A dynamic split-screen composition depicting a stock market crash with a rapidly plummeting red candlestick chart on one side, showing a dramatic 50% drop, juxtaposed with a steadily rising gold price chart in shimmering gold on the other side. The background is a dark, turbulent economic landscape, conveying financial instability and a sense of historical comparison. Dramatic lighting highlights the contrasting movements, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 1847708024
+  }
+}

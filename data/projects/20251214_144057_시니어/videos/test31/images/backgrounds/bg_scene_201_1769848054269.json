@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-31T17:21:36.825271",
+  "image_file": "bg_scene_199_1769847696824.png",
+  "scene_id": 199,
+  "prompts": {
+    "original": "A complex corporate integration process visualized as tangled, fragmented architectural structures struggling to merge, symbolizing \"growing pains\" after an acquisition. Disjointed team members depicted as blurred figures in the background, with a hazy product development roadmap projected, conveying potential \"personnel leaving\" and \"product development delays.\" The atmosphere is tense and uncertain, emphasizing the risks and challenges of corporate integration. Dramatic, slightly dark lighting with subtle warning tones. no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A complex corporate integration process visualized as tangled, fragmented architectural structures struggling to merge, symbolizing \"growing pains\" after an acquisition. Disjointed team members depicted as blurred figures in the background, with a hazy product development roadmap projected, conveying potential \"personnel leaving\" and \"product development delays.\" The atmosphere is tense and uncertain, emphasizing the risks and challenges of corporate integration. Dramatic, slightly dark lighting with subtle warning tones. no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 2004135977
+  },
+  "scene_number": 201,
+  "copied_from": {
+    "scene_number": 199,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test31\\images\\backgrounds\\bg_scene_199_1769847696824.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-01-31T17:27:34.271561"
+}

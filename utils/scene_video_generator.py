@@ -8,6 +8,7 @@ utils/scene_video_generator.py
 2. 비디오 프롬프트 조합
 3. 생성 결과 저장
 4. ⭐ v3.22: SRT/TTS 기반 비디오 길이 자동 추천
+5. ⭐ v3.23: 묶음 비디오 길이 캐싱 (중복 계산 방지)
 """
 
 import os
@@ -157,6 +158,132 @@ def get_recommended_video_duration(
                 None,
                 f"추정 {estimated:.1f}초 → {long_duration}초 (TTS 없음)"
             )
+
+
+# ============================================================
+# ⭐ v3.24: 묶음(Bundle) 기반 최적화 비디오 길이 계산
+# ============================================================
+
+def calculate_bundle_srt_duration(bundle_scenes: List[Dict]) -> float:
+    """
+    묶음 내 모든 씬의 총 SRT/TTS 길이 계산
+
+    Args:
+        bundle_scenes: 같은 묶음에 속한 씬들의 리스트
+
+    Returns:
+        총 길이 (초)
+    """
+    total_duration = 0.0
+
+    for scene in bundle_scenes:
+        # 실제 TTS/SRT duration 우선
+        scene_dur = get_scene_srt_duration(scene)
+
+        if scene_dur is not None:
+            total_duration += scene_dur
+        else:
+            # 폴백: duration 또는 duration_estimate 사용
+            fallback_dur = scene.get('duration', scene.get('duration_estimate', 0))
+            if isinstance(fallback_dur, (int, float)):
+                total_duration += float(fallback_dur)
+
+    return total_duration
+
+
+# ⭐ v1.1: 묶음 비디오 길이 캐싱 (중복 계산 방지)
+_bundle_video_dur_cache: Dict[str, Tuple[float, float, str]] = {}
+
+
+def get_optimal_bundle_video_duration(
+    bundle_scenes: List[Dict],
+    buffer: float = 0.5,
+    min_duration: float = 2.0,
+    max_duration: float = 10.0
+) -> Tuple[float, float, str]:
+    """
+    API 비용 최적화를 위한 묶음 비디오 생성 길이 계산
+
+    규칙: 비디오 길이 = 묶음 SRT 총 길이 + 버퍼(0.5초)
+
+    v1.1: 캐싱 추가 - 동일 씬 조합에 대해 재계산 방지
+
+    Args:
+        bundle_scenes: 같은 묶음에 속한 씬들의 리스트
+        buffer: 추가 버퍼 시간 (기본 0.5초)
+        min_duration: 최소 비디오 길이 (기본 2.0초)
+        max_duration: 최대 비디오 길이 (기본 10.0초)
+
+    Returns:
+        (최적화_비디오_길이, 묶음_SRT_길이, 설명)
+    """
+    global _bundle_video_dur_cache
+
+    # v1.1: 캐시 키 생성 (씬 ID 조합)
+    scene_ids = tuple(sorted(s.get('scene_id', s.get('id', 0)) for s in bundle_scenes))
+    cache_key = f"{scene_ids}_{buffer}_{min_duration}_{max_duration}"
+
+    # 캐시 히트
+    if cache_key in _bundle_video_dur_cache:
+        return _bundle_video_dur_cache[cache_key]
+
+    # 묶음 SRT 총 길이 계산
+    srt_duration = calculate_bundle_srt_duration(bundle_scenes)
+
+    # 비디오 길이 = SRT + 버퍼
+    video_duration = srt_duration + buffer
+
+    # 소수점 첫째자리까지 반올림
+    video_duration = round(video_duration, 1)
+
+    # 최소/최대 범위 적용
+    original_video_duration = video_duration
+    video_duration = max(min_duration, min(max_duration, video_duration))
+
+    # 설명 생성
+    if original_video_duration != video_duration:
+        if original_video_duration < min_duration:
+            reason = f"SRT {srt_duration:.1f}초 + {buffer}초 → {video_duration}초 (최소값 적용)"
+        else:
+            reason = f"SRT {srt_duration:.1f}초 + {buffer}초 → {video_duration}초 (최대값 적용)"
+    else:
+        reason = f"SRT {srt_duration:.1f}초 + {buffer}초 = {video_duration}초"
+
+    # v1.1: 최초 계산 시에만 로그 출력
+    print(f"[BundleVideoDur] 씬 {list(scene_ids)}: SRT={srt_duration:.1f}초 → {video_duration}초")
+
+    # 캐시 저장
+    result = (video_duration, srt_duration, reason)
+    _bundle_video_dur_cache[cache_key] = result
+
+    return result
+
+
+def get_bundle_scenes_by_id(
+    scenes: List[Dict],
+    bundle_id: int
+) -> List[Dict]:
+    """
+    묶음 ID로 해당 묶음의 모든 씬 가져오기
+
+    Args:
+        scenes: 전체 씬 리스트
+        bundle_id: 묶음 ID
+
+    Returns:
+        해당 묶음의 씬 리스트 (scene_id 순 정렬)
+    """
+    bundle_scenes = []
+
+    for scene in scenes:
+        bid = scene.get('bundle_id', scene.get('scene_id', scene.get('id', 0)))
+        if bid == bundle_id:
+            bundle_scenes.append(scene)
+
+    # scene_id 순 정렬
+    bundle_scenes.sort(key=lambda s: s.get('scene_id', s.get('id', 0)))
+
+    return bundle_scenes
 
 
 def get_batch_duration_info(
@@ -334,6 +461,13 @@ def generate_scene_video(
     print(f"[SceneVideoGen] 출력 파일: {output_path}")
 
     try:
+        # Duration 검증 및 보정 (모델별 허용 값으로 스냅)
+        from utils.video_api.config import validate_video_duration
+        validated_duration = validate_video_duration(duration, platform, model_key)
+        if validated_duration != duration:
+            print(f"[SceneVideoGen] Duration 보정: {duration}초 → {validated_duration}초")
+        duration = validated_duration
+
         print(f"[SceneVideoGen] Video API 호출 중...")
         # Video API 호출
         result = generate_video_sync(
@@ -447,20 +581,22 @@ def get_video_prompt_for_scene(
 
 
 def get_scene_image_path(scene: Dict, project_path: str = None) -> Optional[str]:
-    """씬의 이미지 경로 추출 (v2.3: 실사 이미지 우선)"""
+    """씬의 이미지 경로 추출 (v2.4: Step3 실사 대체 이미지 지원 강화)"""
 
-    # ⭐ v2.3: 실사 이미지 경로 필드 우선 확인
+    # ⭐ v2.4: Step3 실사 대체 이미지 경로 필드 우선 확인
     real_image_path = (
-        scene.get("real_image_path") or
+        scene.get("real_image_path") or           # Step3에서 설정
         scene.get("replaced_image_path") or
+        scene.get("composited_image_path") or     # Step3에서 설정
         None
     )
     if real_image_path and Path(real_image_path).exists():
         return str(real_image_path)
 
-    # 다양한 이미지 경로 필드 확인
+    # 다양한 이미지 경로 필드 확인 (v2.5: nano_composite_image, composite_image_path 추가)
     image_path = (
-        scene.get("composited_image_path") or
+        scene.get("nano_composite_image") or       # Step1/Step2 생성 이미지
+        scene.get("composite_image_path") or       # 합성 이미지
         scene.get("image_path") or
         scene.get("background_image_path") or
         scene.get("scene_image_path") or
@@ -504,6 +640,7 @@ def get_scene_image_path(scene: Dict, project_path: str = None) -> Optional[str]
         search_dirs = [
             project / "images" / "real",  # ⭐ v2.3: 실사 이미지 폴더 추가
             project / "images" / "composited",
+            project / "images" / "korean_text",    # ⭐ v2.5: 한글 텍스트 이미지 폴더 추가
             project / "images" / "backgrounds",
             project / "images" / "scenes",
         ]
@@ -513,9 +650,9 @@ def get_scene_image_path(scene: Dict, project_path: str = None) -> Optional[str]
             if not search_dir.exists():
                 continue
 
-            # ⭐ v2.3: real_scene_* 패턴 추가
-            # bg_scene_017_*, scene_017_*, 017_scene*, real_scene_017* 패턴 검색
-            for pattern in [f"real_scene_{scene_id:03d}*", f"*scene_{scene_id:03d}_*.png", f"*_{scene_id:03d}_*.png", f"{scene_id:03d}_scene*"]:
+            # ⭐ v2.4: Step3 실사 대체 패턴 추가 (composited_XXX_timestamp.ext)
+            # composited_046_*, real_scene_*, bg_scene_017_*, scene_017_*, 017_scene* 패턴 검색
+            for pattern in [f"composited_{scene_id:03d}_*", f"real_scene_{scene_id:03d}*", f"korean_text_scene_{scene_id:03d}_*", f"*scene_{scene_id:03d}_*.png", f"*_{scene_id:03d}_*.png", f"{scene_id:03d}_scene*"]:
                 for img in search_dir.glob(pattern):
                     try:
                         mtime = img.stat().st_mtime

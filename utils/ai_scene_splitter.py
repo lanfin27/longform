@@ -182,7 +182,7 @@ class AISceneMerger:
     def __init__(
         self,
         provider: str = "google",
-        model: str = "gemini-2.0-flash-exp",
+        model: str = "gemini-2.5-flash",
         api_key: str = None
     ):
         # ⭐ v6.0: AI 클라이언트를 생성하지 않음!
@@ -864,7 +864,7 @@ _merger_instance: Optional[AISceneMerger] = None
 
 def get_scene_merger(
     provider: str = "google",
-    model: str = "gemini-2.0-flash-exp"
+    model: str = "gemini-2.5-flash"
 ) -> AISceneMerger:
     """씬 병합기 싱글톤"""
     global _merger_instance
@@ -876,7 +876,7 @@ def get_scene_merger(
 
 
 # v4 호환성
-def get_segment_merger(provider: str = "google", model: str = "gemini-2.0-flash-exp") -> AISceneMerger:
+def get_segment_merger(provider: str = "google", model: str = "gemini-2.5-flash") -> AISceneMerger:
     return get_scene_merger(provider, model)
 
 
@@ -903,7 +903,7 @@ class AISceneSplitter:
     def __init__(
         self,
         provider: str = "google",
-        model: str = "gemini-2.0-flash-exp",
+        model: str = "gemini-2.5-flash",
         api_key: str = None
     ):
         self.provider = provider
@@ -1094,7 +1094,7 @@ def get_prompt_manager() -> HybridPromptManager:
 _splitter = None
 
 
-def get_ai_splitter(provider: str = "google", model: str = "gemini-2.0-flash-exp") -> AISceneSplitter:
+def get_ai_splitter(provider: str = "google", model: str = "gemini-2.5-flash") -> AISceneSplitter:
     global _splitter
     if _splitter is None:
         _splitter = AISceneSplitter(provider=provider, model=model)

@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "channels": {
+    "default": {
+      "infographic_analysis": {
+        "model": "gemini-2.5-flash",
+        "prompt_id": "default",
+        "auto_apply_threshold": 0.6,
+        "style": "modern_dark",
+        "color_scheme": "auto",
+        "updated_at": "2026-02-01T19:45:14.808635"
+      }
+    }
+  },
+  "global_defaults": {
+    "infographic_analysis": {
+      "model": "gemini-2.5-flash",
+      "prompt_id": "default",
+      "auto_apply_threshold": 0.6,
+      "style": "modern_dark",
+      "color_scheme": "auto"
+    }
+  }
+}

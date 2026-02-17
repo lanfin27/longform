@@ -1,0 +1,18 @@
+[
+  {
+    "name": "이재용",
+    "name_ko": "이재용",
+    "name_en": "",
+    "description": "",
+    "description_en": "",
+    "visual_prompt": "Lee Jae-yong, Samsung Chairman, confident visionary expression, business formal attire, contemplative leadership pose",
+    "character_prompt": "Lee Jae-yong, Samsung Chairman, confident visionary expression, business formal attire, contemplative leadership pose",
+    "role": "등장인물",
+    "scenes": [
+      46,
+      47,
+      48
+    ],
+    "appearance_count": 3
+  }
+]

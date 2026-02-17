@@ -50,9 +50,9 @@ class CharacterActionGenerator:
     def __init__(self, model_id: str = None):
         """
         Args:
-            model_id: AI 모델 ID (예: "gemini-2.0-flash-exp", "claude-sonnet-4-20250514")
+            model_id: AI 모델 ID (예: "gemini-2.5-flash", "claude-sonnet-4-20250514")
         """
-        self.model_id = model_id or "gemini-2.0-flash-exp"
+        self.model_id = model_id or "gemini-2.5-flash"
         self._client = None
 
     def _get_client(self) -> UnifiedAIClient:
@@ -483,8 +483,8 @@ def create_action_generator(model_id: str = None) -> CharacterActionGenerator:
 def get_available_models() -> List[Dict]:
     """사용 가능한 AI 모델 목록"""
     return [
-        {"id": "gemini-2.0-flash-exp", "name": "Gemini 2.0 Flash Exp (추천)", "provider": "Google"},
-        {"id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash (빠름)", "provider": "Google"},
+        {"id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash (추천)", "provider": "Google"},
+        {"id": "gemini-2.5-flash-lite", "name": "Gemini 2.5 Flash Lite (초고속)", "provider": "Google"},
         {"id": "claude-sonnet-4-20250514", "name": "Claude Sonnet 4", "provider": "Anthropic"},
         {"id": "gpt-4o-mini", "name": "GPT-4o Mini (빠름)", "provider": "OpenAI"},
         {"id": "gpt-4o", "name": "GPT-4o (고품질)", "provider": "OpenAI"},

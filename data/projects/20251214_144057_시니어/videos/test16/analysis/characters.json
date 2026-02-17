@@ -1,0 +1,86 @@
+[
+  {
+    "name": "삼성 임원",
+    "name_ko": "삼성 임원",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged businessman in a suit, confident expression",
+    "description": "",
+    "appearance_scenes": [
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "name": "ZF 임원",
+    "name_ko": "ZF 임원",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged businessman in a suit, confident expression",
+    "description": "",
+    "appearance_scenes": [
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "name": "이재용",
+    "name_ko": "이재용",
+    "role": "등장인물",
+    "visual_prompt": "Lee Jae-yong, determined expression, strategic decision-making",
+    "description": "",
+    "appearance_scenes": [
+      55,
+      56,
+      57
+    ]
+  },
+  {
+    "name": "리서처",
+    "name_ko": "리서처",
+    "role": "등장인물",
+    "visual_prompt": "Bewildered researcher with glasses",
+    "description": "",
+    "appearance_scenes": [
+      148,
+      149,
+      150
+    ]
+  },
+  {
+    "name": "분석가",
+    "name_ko": "분석가",
+    "role": "등장인물",
+    "visual_prompt": "Confused analyst gesturing with questioning hands, perplexed facial expression conveying skepticism and doubt, wearing professional business attire, middle-aged, looking directly at the viewer, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      151,
+      152,
+      153
+    ]
+  },
+  {
+    "name": "발표자",
+    "name_ko": "발표자",
+    "role": "등장인물",
+    "visual_prompt": "Excited presenter gesturing towards screen displaying Samsung and BMW logos, confident smile conveying enthusiasm for partnership, wearing professional business attire, standing on stage with spotlights, addressing audience, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      154,
+      155,
+      156
+    ]
+  },
+  {
+    "name": "비즈니스 리더",
+    "name_ko": "비즈니스 리더",
+    "role": "등장인물",
+    "visual_prompt": "confident business leader wearing professional attire, sitting at negotiation table, engaging in deal",
+    "description": "",
+    "appearance_scenes": [
+      253,
+      254,
+      255
+    ]
+  }
+]

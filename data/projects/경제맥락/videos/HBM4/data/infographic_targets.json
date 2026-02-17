@@ -1,0 +1,474 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-08T16:17:57.594350",
+  "total_scenes": 51,
+  "sources": {
+    "remaining_scenes": [
+      1,
+      2,
+      3,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      88,
+      89,
+      90,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      112,
+      113,
+      114,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162
+    ],
+    "manual_selection": [
+      7,
+      8,
+      26,
+      27,
+      29,
+      30,
+      42,
+      43,
+      44,
+      47,
+      48,
+      52,
+      53,
+      58,
+      59
+    ]
+  },
+  "final_targets": [
+    1,
+    2,
+    3,
+    7,
+    8,
+    26,
+    27,
+    29,
+    30,
+    42,
+    43,
+    44,
+    47,
+    48,
+    52,
+    53,
+    58,
+    59,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    88,
+    89,
+    90,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    112,
+    113,
+    114,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    157,
+    158,
+    159,
+    160,
+    161,
+    162
+  ],
+  "scene_details": [
+    {
+      "scene_id": 1,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "여러분은 반도체 하면 뭐가 떠오르세요?"
+    },
+    {
+      "scene_id": 2,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "삼성? SK? 아니면 엔비디아?"
+    },
+    {
+      "scene_id": 3,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "근데요, 지금 이 회사들이 목숨 걸고 싸우는 게 뭔지 아세요?"
+    },
+    {
+      "scene_id": 7,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "2026년, 이 시장 규모가 얼마냐면요."
+    },
+    {
+      "scene_id": 8,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "무려 78조 원이에요."
+    },
+    {
+      "scene_id": 26,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "그래서 2013년에 업계가 뭘 했냐면요."
+    },
+    {
+      "scene_id": 27,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "DRAM 칩을 옆으로 늘리지 말고, 위로 쌓자."
+    },
+    {
+      "scene_id": 29,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "칩을 8개, 12개, 16개씩 수직으로 쌓아서"
+    },
+    {
+      "scene_id": 30,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "한 번에 엄청난 데이터를 주고받는 거죠."
+    },
+    {
+      "scene_id": 42,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "기존 HBM3E까지는 인터페이스 폭이 1024비트였어요."
+    },
+    {
+      "scene_id": 43,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "근데 HBM4는요?"
+    },
+    {
+      "scene_id": 44,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "2048비트예요."
+    },
+    {
+      "scene_id": 47,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "고속도로 차선을 4차선에서 8차선으로 늘린 거랑 같아요."
+    },
+    {
+      "scene_id": 48,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "같은 시간에 두 배 많은 차가 지나갈 수 있는 거죠."
+    },
+    {
+      "scene_id": 52,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "2테라바이트였거든요."
+    },
+    {
+      "scene_id": 53,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "무려 3테라바이트까지 가요."
+    },
+    {
+      "scene_id": 58,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "근데 HBM4부터는 여기에 4나노 공정 로직 칩이 들어가요."
+    },
+    {
+      "scene_id": 59,
+      "source": "manual",
+      "previous_state": "korean_text",
+      "previous_state_label": "🔤 한글",
+      "script_ko": "메모리가 스스로 생각하기 시작한다는 거예요."
+    },
+    {
+      "scene_id": 73,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "이게 뭐냐면요,"
+    },
+    {
+      "scene_id": 74,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "칩을 쌓을 때 사이사이에 특수한 보호재를 넣어서 열을 확 빼주는 거예요."
+    },
+    {
+      "scene_id": 75,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "칩을 많이 쌓으면 열이 엄청 나거든요"
+    },
+    {
+      "scene_id": 76,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "그걸 잡아주는 기술이에요."
+    },
+    {
+      "scene_id": 77,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "이거 덕분에 SK하이닉스가 수율도 좋고, 품질도 좋은 거예요."
+    },
+    {
+      "scene_id": 78,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "그래서 엔비디아가 SK하이닉스를 엄청 좋아해요."
+    },
+    {
+      "scene_id": 88,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "아니에요."
+    },
+    {
+      "scene_id": 89,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "삼성이 반격을 시작했어요."
+    },
+    {
+      "scene_id": 90,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "삼성이 뭘 들고나왔냐면요."
+    },
+    {
+      "scene_id": 103,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "패키징도 삼성."
+    },
+    {
+      "scene_id": 104,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "전부 다 자기가 하는 거예요."
+    },
+    {
+      "scene_id": 105,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "이러면 뭐가 좋으냐."
+    },
+    {
+      "scene_id": 106,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "외부 의존도가 없어요"
+    },
+    {
+      "scene_id": 107,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "설계 최적화도 빠르고요."
+    },
+    {
+      "scene_id": 108,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "비용도 줄일 수 있어요."
+    },
+    {
+      "scene_id": 112,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "근데 하이브리드 본딩은요,"
+    },
+    {
+      "scene_id": 113,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "구리끼리 직접 붙여버려요."
+    },
+    {
+      "scene_id": 114,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "이러면 칩 사이 간격이 확 줄어들어서"
+    },
+    {
+      "scene_id": 130,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "자, 그러면 앞으로 어떻게 될까요?"
+    },
+    {
+      "scene_id": 131,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "솔직히 말씀드리면요,"
+    },
+    {
+      "scene_id": 132,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "아직 모릅니다."
+    },
+    {
+      "scene_id": 133,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "SK하이닉스가 엔비디아랑 너무 찰떡이에요."
+    },
+    {
+      "scene_id": 134,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "검증된 기술로 안정적으로 공급하고 있거든요."
+    },
+    {
+      "scene_id": 135,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "근데 삼성도 만만치 않아요."
+    },
+    {
+      "scene_id": 136,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "수직 계열화 무기가"
+    },
+    {
+      "scene_id": 137,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "장기전에서는 엄청난 강점이거든요."
+    },
+    {
+      "scene_id": 138,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "그리고 리스크도 있어요."
+    },
+    {
+      "scene_id": 157,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "삼성은 수직 계열화랑"
+    },
+    {
+      "scene_id": 158,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "커스텀 HBM으로 반격 중이고요"
+    },
+    {
+      "scene_id": 159,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "결국 이 싸움은요"
+    },
+    {
+      "scene_id": 160,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "누가 더 좋은 기술을 가졌냐의 문제가 아니에요"
+    },
+    {
+      "scene_id": 161,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "누가 시스템 전체를 장악하느냐의 싸움이에요"
+    },
+    {
+      "scene_id": 162,
+      "source": "remaining",
+      "previous_state": "unprocessed",
+      "previous_state_label": "⬜ 미처리",
+      "script_ko": "여러분은 어떻게 생각하세요?"
+    }
+  ]
+}

@@ -1,0 +1,422 @@
+[
+  {
+    "id": "char_0",
+    "name": "40대 은행원들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "40s male and female bank employees in sharp business suits, carrying briefcases, walking out of a bank with determined or thoughtful expressions, symbolizing voluntary departure",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_은행원들_standing_1770705506422.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_은행원들_standing_1770705506422.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.639962",
+    "updated_at": "2026-02-10T15:39:46.989616"
+  },
+  {
+    "id": "char_1",
+    "name": "은행 직원들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "several bank employees, seen from the back, carrying boxes of personal belongings, walking towards an exit in a corporate office, conveying a sense of departure",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_직원들_standing_1770705508063.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.641139",
+    "updated_at": "2026-02-10T15:39:47.007870"
+  },
+  {
+    "id": "char_2",
+    "name": "은행 경영진",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "silhouettes of senior bank executives, high up in a glass-walled office, shaking hands with cheerful expressions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_경영진_standing_1770705507677.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행_경영진_standing_1770705507677.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.642530",
+    "updated_at": "2026-02-10T15:39:47.048250"
+  },
+  {
+    "id": "char_3",
+    "name": "50대 후반 비즈니스맨",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "late 50s Asian businessman, wearing a dark suit, with a shocked and somber expression, looking down",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_50대_후반_비즈니스맨_standing_1770705518486.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_50대_후반_비즈니스맨_standing_1770705518486.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.643528",
+    "updated_at": "2026-02-10T15:39:47.081969"
+  },
+  {
+    "id": "char_4",
+    "name": "40대 초반 비즈니스맨",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "early 40s Asian businessman, wearing a dark suit, with a surprised and worried expression, staring at a screen",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_초반_비즈니스맨_standing_1770705526935.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_초반_비즈니스맨_standing_1770705526935.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.644660",
+    "updated_at": "2026-02-10T15:39:47.122124"
+  },
+  {
+    "id": "char_5",
+    "name": "동료들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "faintly visible colleagues in the background with uneasy expressions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_동료들_standing_1770705520606.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_동료들_standing_1770705520606.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.645417",
+    "updated_at": "2026-02-10T15:39:47.159481"
+  },
+  {
+    "id": "char_6",
+    "name": "40대 책임자급 비즈니스맨",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "early 40s Asian manager in professional attire, with a calm but poignant expression, packing personal items at his desk, symbolizing a significant departure",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_책임자급_비즈니스맨_standing_1770705518267.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_책임자급_비즈니스맨_standing_1770705518267.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.646124",
+    "updated_at": "2026-02-10T15:39:47.196805"
+  },
+  {
+    "id": "char_7",
+    "name": "노동조합 대표",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "confident and assertive person, seated at a negotiation table",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_노동조합_대표_standing_1770705527956.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_노동조합_대표_standing_1770705527956.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.646939",
+    "updated_at": "2026-02-10T15:39:47.231206"
+  },
+  {
+    "id": "char_8",
+    "name": "회사 관계자들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "professional businesspeople, looking surprised, seated at a negotiation table",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_회사_관계자들_standing_1770705531681.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_회사_관계자들_standing_1770705531681.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.648212",
+    "updated_at": "2026-02-10T15:39:47.263335"
+  },
+  {
+    "id": "char_9",
+    "name": "시니어 직원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "successful and confident Asian person, luxurious business suit, satisfied smile",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_시니어_직원_standing_1770705533870.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_시니어_직원_standing_1770705533870.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.649155",
+    "updated_at": "2026-02-10T15:39:47.295219"
+  },
+  {
+    "id": "char_10",
+    "name": "젊은 직원들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "young professional employees, engaged in serious discussion with thoughtful and contemplative expressions, wearing business casual attire, standing or sitting around a conference table",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_젊은_직원들_standing_1770705537996.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_젊은_직원들_standing_1770705537996.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.650592",
+    "updated_at": "2026-02-10T15:39:47.327282"
+  },
+  {
+    "id": "char_11",
+    "name": "중년 비즈니스맨들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "middle-aged businessmen, wearing suits, with somber and contemplative expressions, tidying documents or sitting in a conference room",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_중년_비즈니스맨들_standing_1770705543403.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_중년_비즈니스맨들_standing_1770705543403.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.651426",
+    "updated_at": "2026-02-10T15:39:47.364157"
+  },
+  {
+    "id": "char_12",
+    "name": "젊은 세대 실루엣",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "silhouette of a young, digitally-savvy individual, standing thoughtfully, posing a question about new roles",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_젊은_세대_실루엣_standing_1770705544876.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_젊은_세대_실루엣_standing_1770705544876.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.652448",
+    "updated_at": "2026-02-10T15:39:47.394826"
+  },
+  {
+    "id": "char_13",
+    "name": "은행원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "serious-faced bank employee, professional attire, looking at the glowing AI interface with apprehension and hope",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행원_standing_1770705547813.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_은행원_standing_1770705547813.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.653675",
+    "updated_at": "2026-02-10T15:39:47.427427"
+  },
+  {
+    "id": "char_14",
+    "name": "데이터 사이언티스트 및 클라우드 아키텍트",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Diverse professionals, focused and actively collaborating on technical concepts, coding on computers, wearing smart casual attire",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_데이터_사이언티스트_및_클라우드_아키텍트_standing_1770705552635.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_데이터_사이언티스트_및_클라우드_아키텍트_standing_1770705552635.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.654718",
+    "updated_at": "2026-02-10T15:39:47.457943"
+  },
+  {
+    "id": "char_15",
+    "name": "AI 전문가들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "energetic, bright human figures, moving dynamically away from a traditional bank building, symbolizing their preference for other sectors",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_AI_전문가들_standing_1770705556963.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_AI_전문가들_standing_1770705556963.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.656039",
+    "updated_at": "2026-02-10T15:39:47.487359"
+  },
+  {
+    "id": "char_16",
+    "name": "테크 기업 직원들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "employees in casual attire, symbolizing flexibility and innovation",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_테크_기업_직원들_standing_1770705560536.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_테크_기업_직원들_standing_1770705560536.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.657725",
+    "updated_at": "2026-02-10T15:39:47.512334"
+  },
+  {
+    "id": "char_17",
+    "name": "AI 인력 실루엣",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "silhouettes of individuals, moving away, symbolizing talent outflow",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_AI_인력_실루엣_standing_1770705566513.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_AI_인력_실루엣_standing_1770705566513.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.659096",
+    "updated_at": "2026-02-10T15:39:47.546373"
+  },
+  {
+    "id": "char_18",
+    "name": "정부 관계자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "lone, thoughtful figure, a government official or policy maker, seen from behind, looking out at the city, conveying awareness of the 'jobless growth' problem, dressed in professional attire",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_정부_관계자_standing_1770705569111.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_정부_관계자_standing_1770705569111.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.660770",
+    "updated_at": "2026-02-10T15:39:47.583266"
+  },
+  {
+    "id": "char_19",
+    "name": "고객",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "a person dressed in modern casual attire, interacting with a sleek, glowing digital kiosk, focused expression, using touch gestures on the screen",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_고객_standing_1770705574102.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_고객_standing_1770705574102.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.661729",
+    "updated_at": "2026-02-10T15:39:47.613246"
+  },
+  {
+    "id": "char_20",
+    "name": "40대 은행원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "melancholic 40s Asian banker, dressed in a business suit, holding a briefcase, walking out of a modern bank entrance, looking back with a wistful expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_은행원_standing_1770705586940.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\은행퇴직\\images\\characters\\char_40대_은행원_standing_1770705586940.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-10T15:30:15.663223",
+    "updated_at": "2026-02-10T15:39:47.645514"
+  }
+]

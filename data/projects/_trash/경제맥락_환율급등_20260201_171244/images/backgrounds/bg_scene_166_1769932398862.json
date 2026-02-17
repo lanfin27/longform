@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-01T16:53:18.862900",
+  "image_file": "bg_scene_166_1769932398862.png",
+  "scene_id": 166,
+  "prompts": {
+    "original": "Dynamic visualization of a massive trade surplus flowing from South Korea to the United States, represented by large upward-trending arrows and abstract economic data streams, a colossal golden numerical block subtly indicating '52 Billion USD' (without readable text, just symbolic magnitude), the year '2023' faintly visible in the background, clear and informative data visualization style, bright and analytical lighting, wide angle shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Dynamic visualization of a massive trade surplus flowing from South Korea to the United States, represented by large upward-trending arrows and abstract economic data streams, a colossal golden numerical block subtly indicating '52 Billion USD' (without readable text, just symbolic magnitude), the year '2023' faintly visible in the background, clear and informative data visualization style, bright and analytical lighting, wide angle shot, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 673918401
+  }
+}

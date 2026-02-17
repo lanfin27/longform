@@ -1,10 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-한글 프롬프트 씬 선택 유틸리티 (v1.5)
+한글 프롬프트 씬 선택 유틸리티 (v1.8)
 
 한글 텍스트가 포함된 이미지를 생성할 씬을 자동으로 선택
 - 랜덤 샘플링 (비율, 구간 텀, 혼합 모드)
 - AI 추천 (Gemini, Claude 지원)
+
+v1.8 변경사항:
+- 🔧 묶음 확장 로그 최소화: 34회 개별 로그 → 1회 요약 로그
+- ⚡ 로그 출력 최적화로 콘솔 부하 감소
+
+v1.7 변경사항:
+- ⭐ 묶음 최적화: 대표 씬만 AI 분석 후 묶음 전체로 확장
+- ⭐ 프롬프트 전달 검증 로깅 추가
+- ⭐ 상세 로깅으로 디버깅 용이성 향상
+
+v1.6 변경사항:
+- ⭐ selection_mode 추가 ("ratio_limit" / "select_all")
 
 v1.5 변경사항:
 - ⭐ AIPromptManager 통합 (다중 프롬프트 관리)
@@ -32,7 +44,7 @@ import json
 import re
 from pathlib import Path
 from datetime import datetime
-from typing import List, Set, Dict, Any, Optional
+from typing import List, Set, Dict, Any, Optional, Tuple
 
 # ⭐ v1.5: AIPromptManager 통합
 try:
@@ -40,6 +52,174 @@ try:
     PROMPT_MANAGER_AVAILABLE = True
 except ImportError:
     PROMPT_MANAGER_AVAILABLE = False
+
+# ⭐ v1.7: bundle_utils 통합
+try:
+    from utils.bundle_utils import get_bundle_map, select_bundle_representatives
+    BUNDLE_UTILS_AVAILABLE = True
+except ImportError:
+    BUNDLE_UTILS_AVAILABLE = False
+
+
+# ============================================================
+# ⭐ v1.7: 묶음 최적화 함수
+# ============================================================
+
+def get_primary_scenes_for_analysis(
+    scenes: List[Dict],
+    use_bundle_optimization: bool = True
+) -> Tuple[List[Dict], Dict[int, List[int]], bool]:
+    """
+    묶음별 대표 씬만 추출 (AI 분석 최적화)
+
+    묶음 분석된 프로젝트에서 각 묶음의 대표 씬만 AI에 전달하여
+    토큰 사용량을 줄이고 효율성을 높임
+
+    Args:
+        scenes: 전체 씬 목록
+        use_bundle_optimization: 묶음 최적화 사용 여부
+
+    Returns:
+        (primary_scenes, bundle_mapping, optimization_applied)
+        - primary_scenes: 대표 씬 목록 (AI 분석용)
+        - bundle_mapping: {대표_scene_id: [묶음_내_모든_scene_ids]}
+        - optimization_applied: 최적화가 실제로 적용되었는지 여부
+    """
+    if not scenes:
+        return [], {}, False
+
+    # 묶음 최적화 미사용 시 전체 씬 반환
+    if not use_bundle_optimization:
+        print(f"[KoreanSceneSelector] 📋 묶음 최적화 비활성화 - 전체 {len(scenes)}개 씬 사용", flush=True)
+        # 각 씬이 자기 자신만 포함하는 매핑 생성
+        simple_mapping = {
+            s.get('scene_id', i+1): [s.get('scene_id', i+1)]
+            for i, s in enumerate(scenes)
+        }
+        return scenes, simple_mapping, False
+
+    # bundle_utils 사용 불가 시 폴백
+    if not BUNDLE_UTILS_AVAILABLE:
+        print(f"[KoreanSceneSelector] ⚠️ bundle_utils 없음 - 전체 {len(scenes)}개 씬 사용", flush=True)
+        simple_mapping = {
+            s.get('scene_id', i+1): [s.get('scene_id', i+1)]
+            for i, s in enumerate(scenes)
+        }
+        return scenes, simple_mapping, False
+
+    # 묶음 그룹화
+    bundle_map = get_bundle_map(scenes)
+
+    # 묶음이 없거나 모든 묶음이 1개씩인 경우 최적화 불필요
+    if len(bundle_map) == len(scenes):
+        print(f"[KoreanSceneSelector] ℹ️ 묶음 없음 (씬당 1묶음) - 전체 {len(scenes)}개 씬 사용", flush=True)
+        simple_mapping = {
+            s.get('scene_id', i+1): [s.get('scene_id', i+1)]
+            for i, s in enumerate(scenes)
+        }
+        return scenes, simple_mapping, False
+
+    # 대표 씬 추출 (첫 번째 씬 사용)
+    primary_scenes = []
+    bundle_mapping = {}  # {대표_scene_id: [묶음_내_모든_scene_ids]}
+
+    for bundle_id in sorted(bundle_map.keys()):
+        bundle_scenes = bundle_map[bundle_id]
+
+        if not bundle_scenes:
+            continue
+
+        # 첫 번째 씬을 대표로 선택
+        primary_scene = bundle_scenes[0]
+        primary_id = primary_scene.get('scene_id', 0)
+
+        # 묶음 내 모든 씬 ID 수집
+        all_ids_in_bundle = [
+            s.get('scene_id', 0) for s in bundle_scenes
+        ]
+
+        # combined_script가 있으면 대표 씬에 추가 (묶음 전체 내용 반영)
+        if len(bundle_scenes) > 1:
+            combined_script = _get_combined_script_for_bundle(bundle_scenes)
+            if combined_script:
+                primary_scene = dict(primary_scene)  # 복사본 생성
+                primary_scene['_combined_script'] = combined_script
+
+        primary_scenes.append(primary_scene)
+        bundle_mapping[primary_id] = all_ids_in_bundle
+
+    print(f"[KoreanSceneSelector] ✅ 묶음 최적화 적용:", flush=True)
+    print(f"   - 전체 씬: {len(scenes)}개", flush=True)
+    print(f"   - 묶음 수: {len(bundle_map)}개", flush=True)
+    print(f"   - 대표 씬: {len(primary_scenes)}개 (AI 분석용)", flush=True)
+    print(f"   - 압축률: {100 - (len(primary_scenes) / len(scenes) * 100):.1f}% 감소", flush=True)
+
+    return primary_scenes, bundle_mapping, True
+
+
+def _get_combined_script_for_bundle(bundle_scenes: List[Dict]) -> str:
+    """묶음 내 씬들의 스크립트를 결합"""
+    scripts = []
+    for scene in bundle_scenes:
+        # 다양한 스크립트 필드 확인
+        script = (
+            scene.get('narration') or
+            scene.get('script_text') or
+            scene.get('script') or
+            scene.get('combined_script') or
+            ''
+        )
+        if script:
+            scripts.append(script.strip())
+
+    return ' '.join(scripts) if scripts else ''
+
+
+def expand_selection_to_bundles(
+    selected_primary_ids: Set[int],
+    bundle_mapping: Dict[int, List[int]]
+) -> Set[int]:
+    """
+    대표 씬 선택 결과를 묶음 전체로 확장
+
+    AI가 대표 씬을 선택하면, 해당 묶음의 모든 씬을 선택 결과에 포함
+
+    Args:
+        selected_primary_ids: AI가 선택한 대표 씬 ID 집합
+        bundle_mapping: {대표_scene_id: [묶음_내_모든_scene_ids]}
+
+    Returns:
+        확장된 씬 ID 집합 (묶음 내 모든 씬 포함)
+    """
+    expanded_ids = set()
+    expanded_bundles = 0
+    expanded_details = []  # v1.8: 로그 최소화용
+
+    for primary_id in selected_primary_ids:
+        if primary_id in bundle_mapping:
+            # 묶음 내 모든 씬 추가
+            bundle_scene_ids = bundle_mapping[primary_id]
+            expanded_ids.update(bundle_scene_ids)
+            expanded_bundles += 1
+
+            # v1.8: 개별 로그 대신 리스트에 추가 (로그 최소화)
+            if len(bundle_scene_ids) > 1:
+                expanded_details.append(f"{primary_id}→{len(bundle_scene_ids)}")
+        else:
+            # 매핑에 없으면 단일 씬으로 추가
+            expanded_ids.add(primary_id)
+
+    # v1.8: 요약 로그만 출력 (개별 34회 → 1회)
+    print(f"[KoreanSceneSelector] ✅ 묶음 확장 완료:", flush=True)
+    print(f"   - AI 선택: {len(selected_primary_ids)}개 → 확장 후: {len(expanded_ids)}개", flush=True)
+    if expanded_details:
+        # 최대 5개만 표시
+        sample = expanded_details[:5]
+        if len(expanded_details) > 5:
+            sample.append(f"... 외 {len(expanded_details) - 5}개")
+        print(f"   - 확장 예시: {', '.join(sample)}", flush=True)
+
+    return expanded_ids
 
 
 # ============================================================
@@ -305,7 +485,7 @@ def _get_scene_analyzer_gemini_model():
         # SceneAnalyzer 인스턴스 생성 (이미 검증된 API 키 사용)
         analyzer = SceneAnalyzer(
             provider='google',
-            model_name='gemini-2.0-flash-exp',
+            model_name='gemini-2.5-flash',
             max_output_tokens=8192
         )
 
@@ -524,29 +704,48 @@ async def recommend_korean_scenes_with_ai(
     api_key: str = None,
     analysis_basis: str = "original",
     custom_prompt: str = None,  # ⭐ v1.4: 사용자 정의 프롬프트 파라미터 추가
-    selection_mode: str = "ratio_limit"  # ⭐ v1.6: "ratio_limit" 또는 "select_all"
+    selection_mode: str = "ratio_limit",  # ⭐ v1.6: "ratio_limit" 또는 "select_all"
+    use_bundle_optimization: bool = True  # ⭐ v1.7: 묶음 최적화 사용 여부
 ) -> Dict[str, Any]:
     """AI를 사용하여 한글 프롬프트 적합 씬 추천 (통합 인터페이스)
 
     Args:
         scenes: 씬 데이터 리스트
-        model_name: 모델 ID (gemini-2.0-flash, claude-3-5-sonnet-20241022 등)
+        model_name: 모델 ID (gemini-2.5-flash, claude-3-5-sonnet-20241022 등)
         target_ratio: 목표 선택 비율 (%) - selection_mode가 "ratio_limit"일 때만 사용
         api_key: API 키 (없으면 설정에서 로드)
         analysis_basis: "original" (원본프롬프트) 또는 "korean" (한글프롬프트)
         custom_prompt: 사용자 정의 프롬프트 (None이면 기본 프롬프트 사용)
         selection_mode: "ratio_limit" (비율 제한) 또는 "select_all" (전체 선택)
+        use_bundle_optimization: 묶음 최적화 사용 여부 (True면 대표 씬만 분석 후 확장)
 
     Returns:
         {
             "selected_scenes": [...],
             "total_selected": 32,
-            "model_used": "gemini-2.0-flash",
+            "model_used": "gemini-2.5-flash",
             "selection_summary": "...",
             "prompt_used": "custom" | "default",
-            "selection_mode": "ratio_limit" | "select_all"
+            "selection_mode": "ratio_limit" | "select_all",
+            "bundle_optimization": {...}  # v1.7: 묶음 최적화 정보
         }
     """
+    print("\n" + "=" * 70, flush=True)
+    print("[KoreanSceneSelector] 🚀 AI 추천 시작", flush=True)
+    print("=" * 70, flush=True)
+
+    # ⭐ v1.7: 묶음 최적화 적용
+    primary_scenes, bundle_mapping, optimization_applied = get_primary_scenes_for_analysis(
+        scenes, use_bundle_optimization
+    )
+
+    bundle_optimization_info = {
+        "enabled": use_bundle_optimization,
+        "applied": optimization_applied,
+        "original_scenes": len(scenes),
+        "analyzed_scenes": len(primary_scenes),
+        "bundle_count": len(bundle_mapping)
+    }
 
     # ⭐ v1.5: 프롬프트 매니저에서 프롬프트 가져오기
     prompt_source = "default"
@@ -565,29 +764,48 @@ async def recommend_korean_scenes_with_ai(
             effective_prompt = selected.get("content", "")
             prompt_source = "manager"
             prompt_name = selected.get("name", "선택된 프롬프트")
-            print(f"[KoreanSceneSelector] 프롬프트 매니저 사용: '{prompt_name}'", flush=True)
         except Exception as e:
-            print(f"[KoreanSceneSelector] 프롬프트 매니저 오류: {e}", flush=True)
+            print(f"[KoreanSceneSelector] ⚠️ 프롬프트 매니저 오류: {e}", flush=True)
             effective_prompt = None
     else:
         effective_prompt = None
 
-    print(f"[KoreanSceneSelector] AI 추천 시작 (분석 기준: {analysis_basis}, 선택 모드: {selection_mode}, 프롬프트 소스: {prompt_source})", flush=True)
+    # ⭐ v1.7: 상세 로깅 - 프롬프트 전달 검증
+    print("\n📋 [프롬프트 전달 검증]", flush=True)
+    print(f"   - 프롬프트 소스: {prompt_source}", flush=True)
+    print(f"   - 프롬프트 이름: {prompt_name}", flush=True)
+    if effective_prompt:
+        prompt_preview = effective_prompt[:100].replace('\n', ' ')
+        print(f"   - 프롬프트 미리보기: {prompt_preview}...", flush=True)
+        print(f"   - 프롬프트 길이: {len(effective_prompt)}자", flush=True)
+    else:
+        print(f"   - 프롬프트: (기본 내장 프롬프트 사용)", flush=True)
 
+    print(f"\n📊 [분석 설정]", flush=True)
+    print(f"   - 분석 기준: {analysis_basis}", flush=True)
+    print(f"   - 선택 모드: {selection_mode}", flush=True)
+    print(f"   - 목표 비율: {target_ratio}%", flush=True)
+    print(f"   - 모델: {model_name}", flush=True)
+    print(f"   - 묶음 최적화: {'✅ 적용됨' if optimization_applied else '❌ 미적용'}", flush=True)
+
+    # ⭐ v1.7: 분석 대상은 primary_scenes (묶음 최적화된 씬 목록)
     # ⭐ v1.4: 분석 기준에 따른 씬 필터링 및 프롬프트 생성
     if analysis_basis == "korean":
-        # 한글프롬프트 기준: 한글 있는 씬만 필터링
-        target_scenes = _filter_scenes_with_korean_prompt(scenes)
-        print(f"[KoreanSceneSelector] 한글프롬프트 있는 씬: {len(target_scenes)}개 / 전체 {len(scenes)}개", flush=True)
+        # 한글프롬프트 기준: 한글 있는 씬만 필터링 (대표 씬에서)
+        target_scenes = _filter_scenes_with_korean_prompt(primary_scenes)
+        print(f"\n🔍 [씬 필터링]", flush=True)
+        print(f"   - 필터 기준: 한글프롬프트", flush=True)
+        print(f"   - 대표 씬 중 한글프롬프트 있는 씬: {len(target_scenes)}개 / {len(primary_scenes)}개", flush=True)
 
         if not target_scenes:
             return {
                 "error": "한글프롬프트가 있는 씬이 없습니다.",
                 "selected_scenes": [],
-                "model_used": model_name
+                "model_used": model_name,
+                "bundle_optimization": bundle_optimization_info
             }
 
-        # 씬 목록 텍스트 생성
+        # 씬 목록 텍스트 생성 (대표 씬만 포함)
         scenes_text = _build_korean_prompt_scenes_text(target_scenes)
 
         # ⭐ v1.5/v1.6: 프롬프트 매니저 또는 커스텀 프롬프트 사용 (선택 모드 지원)
@@ -609,11 +827,13 @@ async def recommend_korean_scenes_with_ai(
             )
             prompt_type = "builtin"
     else:
-        # 원본프롬프트 기준: 전체 씬 대상
-        target_scenes = scenes
-        print(f"[KoreanSceneSelector] 전체 씬 대상: {len(target_scenes)}개", flush=True)
+        # 원본프롬프트 기준: 대표 씬 대상 (묶음 최적화)
+        target_scenes = primary_scenes
+        print(f"\n🔍 [씬 필터링]", flush=True)
+        print(f"   - 필터 기준: 원본프롬프트", flush=True)
+        print(f"   - 분석 대상 씬: {len(target_scenes)}개 (대표 씬)", flush=True)
 
-        # 씬 목록 텍스트 생성
+        # 씬 목록 텍스트 생성 (대표 씬만 포함)
         scenes_text = _build_original_prompt_scenes_text(target_scenes)
 
         # ⭐ v1.5/v1.6: 프롬프트 매니저 또는 커스텀 프롬프트 사용 (선택 모드 지원)
@@ -635,25 +855,27 @@ async def recommend_korean_scenes_with_ai(
             )
             prompt_type = "builtin"
 
+    # ⭐ v1.7: 최종 프롬프트 로깅
+    print(f"\n📝 [최종 프롬프트]", flush=True)
+    print(f"   - 프롬프트 타입: {prompt_type}", flush=True)
+    print(f"   - 분석 대상 씬 수: {len(target_scenes)}개", flush=True)
+    print(f"   - 프롬프트 총 길이: {len(prompt)}자", flush=True)
+
+    # ⭐ v1.7: AI 호출 및 결과 처리
+    print(f"\n🤖 [AI 호출]", flush=True)
+    print(f"   - 모델: {model_name}", flush=True)
+
     if "gemini" in model_name.lower():
         result = await _call_gemini_with_prompt(
             prompt=prompt,
             model=model_name
         )
-        result["prompt_used"] = prompt_type
-        result["prompt_name"] = prompt_name
-        result["selection_mode"] = selection_mode  # ⭐ v1.6
-        return result
     elif "claude" in model_name.lower():
         result = await _call_claude_with_prompt(
             prompt=prompt,
             model=model_name,
             api_key=api_key
         )
-        result["prompt_used"] = prompt_type
-        result["prompt_name"] = prompt_name
-        result["selection_mode"] = selection_mode  # ⭐ v1.6
-        return result
     else:
         return {
             "error": f"지원하지 않는 모델: {model_name}",
@@ -661,8 +883,82 @@ async def recommend_korean_scenes_with_ai(
             "prompt_used": prompt_type,
             "prompt_name": prompt_name,
             "model_used": model_name,
-            "selection_mode": selection_mode  # ⭐ v1.6
+            "selection_mode": selection_mode,
+            "bundle_optimization": bundle_optimization_info
         }
+
+    # ⭐ v1.7: AI 결과에 메타 정보 추가
+    result["prompt_used"] = prompt_type
+    result["prompt_name"] = prompt_name
+    result["selection_mode"] = selection_mode
+
+    # ⭐ v1.7: AI 결과 로깅
+    ai_selected = result.get("selected_scenes", [])
+    print(f"\n✅ [AI 응답]", flush=True)
+    print(f"   - 선택된 대표 씬: {len(ai_selected)}개", flush=True)
+    if ai_selected:
+        selected_ids = [s.get("scene_number") for s in ai_selected[:5]]
+        print(f"   - 선택된 씬 ID (처음 5개): {selected_ids}", flush=True)
+
+    # ⭐ v1.7: 묶음 확장 (대표 씬 → 묶음 전체)
+    if optimization_applied and ai_selected:
+        # AI가 선택한 대표 씬 ID 추출
+        selected_primary_ids = set(
+            s.get("scene_number") for s in ai_selected if s.get("scene_number")
+        )
+
+        # 묶음 전체로 확장
+        print(f"\n🔄 [묶음 확장]", flush=True)
+        expanded_ids = expand_selection_to_bundles(selected_primary_ids, bundle_mapping)
+
+        # 확장된 씬 정보로 업데이트
+        result["original_selected_scenes"] = ai_selected  # 원본 AI 선택
+        result["expanded_scene_ids"] = sorted(list(expanded_ids))
+        result["total_selected_before_expansion"] = len(ai_selected)
+        result["total_selected"] = len(expanded_ids)
+
+        # selected_scenes에 확장된 씬 정보 추가 (기존 형식 유지)
+        expanded_scenes = []
+        for scene_id in sorted(expanded_ids):
+            # 원본 AI 선택에서 해당 묶음의 reason 찾기
+            primary_id = None
+            for pid, bundle_ids in bundle_mapping.items():
+                if scene_id in bundle_ids:
+                    primary_id = pid
+                    break
+
+            # AI 선택에서 해당 대표 씬의 정보 찾기
+            original_info = None
+            if primary_id:
+                for s in ai_selected:
+                    if s.get("scene_number") == primary_id:
+                        original_info = s
+                        break
+
+            expanded_scene = {
+                "scene_number": scene_id,
+                "reason": original_info.get("reason", "묶음 확장") if original_info else "묶음 확장",
+                "suggested_korean_text": original_info.get("suggested_korean_text", "") if original_info else "",
+                "expanded_from": primary_id if primary_id != scene_id else None
+            }
+            expanded_scenes.append(expanded_scene)
+
+        result["selected_scenes"] = expanded_scenes
+
+    # 묶음 최적화 정보 추가
+    result["bundle_optimization"] = bundle_optimization_info
+
+    # 최종 결과 로깅
+    print(f"\n" + "=" * 70, flush=True)
+    print(f"📊 [최종 결과]", flush=True)
+    print(f"   - AI 분석 대상: {len(target_scenes)}개 (대표 씬)", flush=True)
+    print(f"   - AI 선택: {len(ai_selected)}개", flush=True)
+    if optimization_applied:
+        print(f"   - 묶음 확장 후: {result.get('total_selected', len(ai_selected))}개", flush=True)
+    print(f"   - 프롬프트: {prompt_name} ({prompt_type})", flush=True)
+    print("=" * 70 + "\n", flush=True)
+
+    return result
 
 
 # ============================================================
@@ -765,8 +1061,12 @@ def _get_original_prompt(scene: dict) -> str:
     return ''
 
 
-def _build_korean_prompt_scenes_text(scenes: List[dict], max_scenes: int = 100) -> str:
-    """한글프롬프트 기준 씬 목록 텍스트 생성"""
+def _build_korean_prompt_scenes_text(scenes: List[dict], max_scenes: int = 200) -> str:
+    """
+    한글프롬프트 기준 씬 목록 텍스트 생성
+
+    ⭐ v1.7: 묶음 최적화 시 combined_script 사용
+    """
     lines = []
     step = max(1, len(scenes) // max_scenes) if len(scenes) > max_scenes else 1
 
@@ -776,15 +1076,31 @@ def _build_korean_prompt_scenes_text(scenes: List[dict], max_scenes: int = 100) 
 
         scene_num = scene.get("scene_id") or scene.get("scene_num") or (i + 1)
         korean_prompt = _get_korean_prompt(scene)[:200]
-        narration = scene.get("narration", scene.get("script_text", ""))[:80]
 
-        lines.append(f"씬 {scene_num}:\n  한글프롬프트: {korean_prompt}\n  나레이션: {narration}")
+        # ⭐ v1.7: combined_script 우선 사용 (묶음 전체 내용 반영)
+        narration = (
+            scene.get("_combined_script") or
+            scene.get("combined_script") or
+            scene.get("narration") or
+            scene.get("script_text") or
+            ""
+        )[:150]
+
+        # 묶음 정보 추가
+        bundle_id = scene.get("bundle_id")
+        bundle_info = f" [묶음 {bundle_id}]" if bundle_id else ""
+
+        lines.append(f"씬 {scene_num}{bundle_info}:\n  한글프롬프트: {korean_prompt}\n  나레이션: {narration}")
 
     return "\n\n".join(lines)
 
 
-def _build_original_prompt_scenes_text(scenes: List[dict], max_scenes: int = 100) -> str:
-    """원본프롬프트 기준 씬 목록 텍스트 생성"""
+def _build_original_prompt_scenes_text(scenes: List[dict], max_scenes: int = 200) -> str:
+    """
+    원본프롬프트 기준 씬 목록 텍스트 생성
+
+    ⭐ v1.7: 묶음 최적화 시 combined_script 사용
+    """
     lines = []
     step = max(1, len(scenes) // max_scenes) if len(scenes) > max_scenes else 1
 
@@ -794,11 +1110,24 @@ def _build_original_prompt_scenes_text(scenes: List[dict], max_scenes: int = 100
 
         scene_num = scene.get("scene_id") or scene.get("scene_num") or (i + 1)
         original_prompt = _get_original_prompt(scene)[:200]
-        narration = scene.get("narration", scene.get("script_text", ""))[:80]
+
+        # ⭐ v1.7: combined_script 우선 사용 (묶음 전체 내용 반영)
+        narration = (
+            scene.get("_combined_script") or
+            scene.get("combined_script") or
+            scene.get("narration") or
+            scene.get("script_text") or
+            ""
+        )[:150]
 
         # 원본프롬프트가 없으면 나레이션 사용
         prompt_text = original_prompt if original_prompt else narration[:150]
-        lines.append(f"Scene {scene_num}:\n  Prompt: {prompt_text}\n  Narration: {narration}")
+
+        # 묶음 정보 추가
+        bundle_id = scene.get("bundle_id")
+        bundle_info = f" [Bundle {bundle_id}]" if bundle_id else ""
+
+        lines.append(f"Scene {scene_num}{bundle_info}:\n  Prompt: {prompt_text}\n  Narration: {narration}")
 
     return "\n\n".join(lines)
 

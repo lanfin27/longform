@@ -1,0 +1,110 @@
+[
+  {
+    "name": "Executive 1",
+    "name_ko": "Executive 1",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged businessman in a dark suit, confident expression, shaking hands firmly",
+    "description": "",
+    "appearance_scenes": [
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "name": "Executive 2",
+    "name_ko": "Executive 2",
+    "role": "등장인물",
+    "visual_prompt": "Middle-aged businessman in a gray suit, smiling, holding the contract",
+    "description": "",
+    "appearance_scenes": [
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "name": "사람들",
+    "name_ko": "사람들",
+    "role": "등장인물",
+    "visual_prompt": "People with questioning expressions",
+    "description": "",
+    "appearance_scenes": [
+      43,
+      44,
+      45
+    ]
+  },
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "role": "등장인물",
+    "visual_prompt": "A male driver showing signs of fatigue, such as drooping eyelids and a slight slouch, inside a modern car.",
+    "description": "",
+    "appearance_scenes": [
+      112,
+      113,
+      114
+    ]
+  },
+  {
+    "name": "뉴스 앵커",
+    "name_ko": "뉴스 앵커",
+    "role": "등장인물",
+    "visual_prompt": "News anchor with serious and concerned expression, wearing professional attire, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      142,
+      143,
+      144
+    ]
+  },
+  {
+    "name": "혼란스러워하는 사람",
+    "name_ko": "혼란스러워하는 사람",
+    "role": "등장인물",
+    "visual_prompt": "Perplexed facial expression reflecting surprise and concern, showing signs of unease and ambiguity, no text, no logos on clothing, no name tags",
+    "description": "",
+    "appearance_scenes": [
+      148,
+      149,
+      150
+    ]
+  },
+  {
+    "name": "발표자",
+    "name_ko": "발표자",
+    "role": "등장인물",
+    "visual_prompt": "person with a confused expression, questioning automotive strategy",
+    "description": "",
+    "appearance_scenes": [
+      151,
+      152,
+      153
+    ]
+  },
+  {
+    "name": "삼성 임원",
+    "name_ko": "삼성 임원",
+    "role": "등장인물",
+    "visual_prompt": "Samsung executive shaking hands with automotive manufacturer executive, confident expression, wearing suit",
+    "description": "",
+    "appearance_scenes": [
+      253,
+      254,
+      255
+    ]
+  },
+  {
+    "name": "자동차 제조사 임원",
+    "name_ko": "자동차 제조사 임원",
+    "role": "등장인물",
+    "visual_prompt": "Automotive manufacturer executive shaking hands with Samsung executive, professional attire",
+    "description": "",
+    "appearance_scenes": [
+      253,
+      254,
+      255
+    ]
+  }
+]

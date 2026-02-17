@@ -72,7 +72,7 @@ class AIFallbackManager:
             api_key = os.getenv("GOOGLE_API_KEY")
             if api_key:
                 genai.configure(api_key=api_key)
-                self._gemini_client = genai.GenerativeModel("gemini-2.0-flash-exp")
+                self._gemini_client = genai.GenerativeModel("gemini-2.5-flash")
                 print(f"[AIFallbackManager] ✅ Gemini 폴백 준비 완료")
             else:
                 print(f"[AIFallbackManager] ⚠️ GOOGLE_API_KEY 없음 - Gemini 폴백 불가")
@@ -139,7 +139,7 @@ class AIFallbackManager:
                 return AIResponse(
                     success=True,
                     output=response.text,
-                    provider_used="gemini-2.0-flash-exp",
+                    provider_used="gemini-2.5-flash",
                     was_fallback=True
                 )
 

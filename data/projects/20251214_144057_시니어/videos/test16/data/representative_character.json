@@ -1,0 +1,17 @@
+{
+  "character": {
+    "id": "char_001",
+    "name": "경제학똑돌이2",
+    "description": "",
+    "base_prompt": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, plain white background, full body shot, front facing view, standing pose, business man",
+    "style_preset": "재훍_영상툰",
+    "style_suffix": "",
+    "negative_prompt": "no outlines, missing lineart, gradient only no lines, realistic photograph, 3D render, photorealistic, anime big eyes, chibi, super deformed, western cartoon style, disney style, pixar style, painterly watercolor, sketchy rough lines, soft airbrush shading, complex detailed shading, hyper detailed features, bright saturated colors, blurry lines, thick gradients, cropped, cut off feet",
+    "base_images": {},
+    "created_at": "2026-01-26T22:41:01.124437",
+    "updated_at": "2026-01-26T22:41:01.124580",
+    "is_active": true
+  },
+  "scene_actions": [],
+  "saved_at": "2026-01-26T22:41:01.124604"
+}

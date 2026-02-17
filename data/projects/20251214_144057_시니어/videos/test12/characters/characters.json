@@ -1,0 +1,20 @@
+[
+  {
+    "id": "char_0",
+    "name": "이재용",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Lee Jae-yong, Samsung Chairman, deep in thought with confident expression, formal business attire, mature Korean businessman",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test12\\images\\characters\\char_이재용_standing_1769350260572.png"
+    ],
+    "appearance_scenes": [],
+    "created_at": "2026-01-25T23:09:57.012889",
+    "updated_at": "2026-01-25T23:10:47.067147"
+  }
+]

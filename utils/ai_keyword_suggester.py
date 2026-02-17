@@ -96,7 +96,7 @@ class AIKeywordSuggester:
             import google.generativeai as genai
 
             genai.configure(api_key=self.gemini_api_key)
-            model = genai.GenerativeModel('gemini-2.0-flash-exp')
+            model = genai.GenerativeModel('gemini-2.5-flash')
 
             prompt = self._build_prompt(keyword, count, context)
 

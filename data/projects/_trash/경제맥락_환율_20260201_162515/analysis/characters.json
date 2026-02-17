@@ -1,0 +1,187 @@
+[
+  {
+    "name": "젊은 투자자",
+    "name_ko": "젊은 투자자",
+    "role": "등장인물",
+    "visual_prompt": "young Asian investor, modern attire, focused on a laptop or smartphone screen, symbolizing active foreign stock investment, thoughtful and engaged expression",
+    "description": "",
+    "scenes": [
+      19,
+      20,
+      21
+    ],
+    "appearance_scenes": [
+      19,
+      20,
+      21
+    ]
+  },
+  {
+    "name": "투자자",
+    "name_ko": "투자자",
+    "role": "등장인물",
+    "visual_prompt": "modern Asian investor, holding an NVIDIA GPU card, with a curious and questioning expression, engaged in financial thought",
+    "description": "",
+    "scenes": [
+      25,
+      26,
+      27
+    ],
+    "appearance_scenes": [
+      19,
+      20,
+      21
+    ]
+  },
+  {
+    "name": "뉴스 앵커",
+    "name_ko": "뉴스 앵커",
+    "role": "등장인물",
+    "visual_prompt": "serious expression, seated in a modern news studio, professional attire",
+    "description": "",
+    "scenes": [
+      88,
+      89,
+      90
+    ],
+    "appearance_scenes": [
+      88,
+      89,
+      90
+    ]
+  },
+  {
+    "name": "도널드 트럼프",
+    "name_ko": "도널드 트럼프",
+    "role": "등장인물",
+    "visual_prompt": "powerful and enigmatic figure, under a dramatic spotlight, with shadows emphasizing his impactful presence",
+    "description": "",
+    "scenes": [
+      106,
+      107,
+      108,
+      121,
+      122,
+      123
+    ],
+    "appearance_scenes": [
+      106,
+      107,
+      108,
+      121,
+      122,
+      123
+    ]
+  },
+  {
+    "name": "도널드 트럼프 대통령",
+    "name_ko": "도널드 트럼프 대통령",
+    "role": "등장인물",
+    "visual_prompt": "powerful and determined former president, wearing a dark suit, walking purposefully",
+    "description": "",
+    "scenes": [
+      109,
+      110,
+      111,
+      112,
+      113,
+      114
+    ],
+    "appearance_scenes": [
+      106,
+      107,
+      108,
+      121,
+      122,
+      123
+    ]
+  },
+  {
+    "name": "사람들",
+    "name_ko": "사람들",
+    "role": "등장인물",
+    "visual_prompt": "anxious people with worried expressions, looking overwhelmed by economic pressure, dressed in everyday clothes",
+    "description": "",
+    "scenes": [
+      118,
+      119,
+      120
+    ],
+    "appearance_scenes": [
+      118,
+      119,
+      120
+    ]
+  },
+  {
+    "name": "도널드 트럼프 전 대통령",
+    "name_ko": "도널드 트럼프 전 대통령",
+    "role": "등장인물",
+    "visual_prompt": "powerful and imposing silhouette, holding a colossal 'Tariff' stamp, conveying authority",
+    "description": "",
+    "scenes": [
+      130,
+      131,
+      132
+    ],
+    "appearance_scenes": [
+      106,
+      107,
+      108,
+      121,
+      122,
+      123
+    ]
+  },
+  {
+    "name": "오건영 단장",
+    "name_ko": "오건영 단장",
+    "role": "등장인물",
+    "visual_prompt": "A professional Asian financial expert, middle-aged, wearing a sharp business suit, presenting confidently with an authoritative expression",
+    "description": "",
+    "scenes": [
+      193,
+      194,
+      195
+    ],
+    "appearance_scenes": [
+      193,
+      194,
+      195
+    ]
+  },
+  {
+    "name": "한국인 비즈니스맨",
+    "name_ko": "한국인 비즈니스맨",
+    "role": "등장인물",
+    "visual_prompt": "exhausted Korean businessman, middle-aged, dark suit, deeply troubled and pensive expression, symbolizing the struggling economy",
+    "description": "",
+    "scenes": [
+      214,
+      215,
+      216
+    ],
+    "appearance_scenes": [
+      214,
+      215,
+      216
+    ]
+  },
+  {
+    "name": "한 사람",
+    "name_ko": "한 사람",
+    "role": "등장인물",
+    "visual_prompt": "seen from the back, standing on a winding road, contemplating the unknown, dressed in modern, understated attire, conveying a sense of exploration and uncertainty",
+    "description": "",
+    "scenes": [
+      229,
+      230,
+      231
+    ],
+    "appearance_scenes": [
+      229,
+      230,
+      231
+    ]
+  }
+]

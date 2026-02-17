@@ -8,6 +8,10 @@
     "appearance_scenes": [
       128,
       134
+    ],
+    "scenes": [
+      128,
+      134
     ]
   },
   {
@@ -19,6 +23,10 @@
     "appearance_scenes": [
       19,
       20
+    ],
+    "scenes": [
+      19,
+      20
     ]
   },
   {
@@ -28,6 +36,10 @@
     "visual_prompt": "Young adult, raising hand, inquisitive expression, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      19,
+      20
+    ],
+    "scenes": [
       19,
       20
     ]
@@ -103,7 +115,10 @@
     "name_ko": "CEO",
     "role": "등장인물",
     "visual_prompt": "A CEO (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features) in a suit, confident and professional, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      80
+    ]
   },
   {
     "name": "사람들",
@@ -113,6 +128,10 @@
     "description": "",
     "appearance_scenes": [
       41
+    ],
+    "scenes": [
+      60,
+      108
     ]
   },
   {
@@ -122,6 +141,9 @@
     "visual_prompt": "A person (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features) with a serious and thoughtful expression, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      41
+    ],
+    "scenes": [
       41
     ]
   },
@@ -189,6 +211,12 @@
     "visual_prompt": "Engineer (stylized Western cartoon character design with slightly large heads and compact rounded bodies, 3-4 head tall proportions, clean bold outlines, soft shading, expressive features) in a clean suit, observing the robotic arms, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      84,
+      133,
+      137,
+      162
+    ],
+    "scenes": [
       84,
       133,
       137,
@@ -389,6 +417,11 @@
       16,
       17,
       18
+    ],
+    "scenes": [
+      16,
+      17,
+      18
     ]
   },
   {
@@ -472,6 +505,9 @@
     "description": "",
     "appearance_scenes": [
       21
+    ],
+    "scenes": [
+      21
     ]
   },
   {
@@ -479,14 +515,20 @@
     "name_ko": "wego 로고",
     "role": "등장인물",
     "visual_prompt": "Modern and clean logo, bright colors, conveys trust and reliability, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      22
+    ]
   },
   {
     "name": "프로판 가스통 아이콘",
     "name_ko": "프로판 가스통 아이콘",
     "role": "등장인물",
     "visual_prompt": "Simple and clean icon of a propane gas tank, bright colors, represents energy, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      23
+    ]
   },
   {
     "name": "1등 깃발",
@@ -495,6 +537,9 @@
     "visual_prompt": "Flag with the number one, bright colors, symbolizing victory, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      24
+    ],
+    "scenes": [
       24
     ]
   },
@@ -506,6 +551,9 @@
     "description": "",
     "appearance_scenes": [
       25
+    ],
+    "scenes": [
+      25
     ]
   },
   {
@@ -515,6 +563,12 @@
     "visual_prompt": "Construction worker wearing a safety helmet, serious expression, no text, no logos...",
     "description": "",
     "appearance_scenes": [
+      28,
+      73,
+      77,
+      106
+    ],
+    "scenes": [
       28,
       73,
       77,
@@ -530,6 +584,10 @@
     "appearance_scenes": [
       49,
       79
+    ],
+    "scenes": [
+      49,
+      79
     ]
   },
   {
@@ -539,6 +597,9 @@
     "visual_prompt": "Young Caucasian woman, wearing business casual attire, attentive expression, no text, no logos on clothing, no name tags",
     "description": "",
     "appearance_scenes": [
+      49
+    ],
+    "scenes": [
       49
     ]
   },
@@ -550,6 +611,9 @@
     "description": "",
     "appearance_scenes": [
       49
+    ],
+    "scenes": [
+      49
     ]
   },
   {
@@ -557,14 +621,22 @@
     "name_ko": "손",
     "role": "등장인물",
     "visual_prompt": "Multiple hands of different people, diverse skin tones, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      52,
+      107,
+      135
+    ]
   },
   {
     "name": "젊은 직장인",
     "name_ko": "젊은 직장인",
     "role": "등장인물",
     "visual_prompt": "Young office worker, determined expression, professional attire, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      56
+    ]
   },
   {
     "name": "직원들",
@@ -573,6 +645,9 @@
     "visual_prompt": "Diverse group of employees, collaborating, professional attire, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      58
+    ],
+    "scenes": [
       58
     ]
   },
@@ -584,6 +659,9 @@
     "description": "",
     "appearance_scenes": [
       68
+    ],
+    "scenes": [
+      68
     ]
   },
   {
@@ -594,6 +672,9 @@
     "description": "",
     "appearance_scenes": [
       41
+    ],
+    "scenes": [
+      69
     ]
   },
   {
@@ -604,6 +685,9 @@
     "description": "",
     "appearance_scenes": [
       41
+    ],
+    "scenes": [
+      70
     ]
   },
   {
@@ -613,6 +697,9 @@
     "visual_prompt": "A woman in her 30s, anxious expression, slightly disheveled hair, wearing casual clothes, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      71
+    ],
+    "scenes": [
       71
     ]
   },
@@ -624,6 +711,9 @@
     "description": "",
     "appearance_scenes": [
       49
+    ],
+    "scenes": [
+      78
     ]
   },
   {
@@ -634,6 +724,9 @@
     "description": "",
     "appearance_scenes": [
       49
+    ],
+    "scenes": [
+      78
     ]
   },
   {
@@ -644,6 +737,9 @@
     "description": "",
     "appearance_scenes": [
       79
+    ],
+    "scenes": [
+      79
     ]
   },
   {
@@ -651,7 +747,10 @@
     "name_ko": "VIP",
     "role": "등장인물",
     "visual_prompt": "Elderly woman, elegant attire, smiling, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      80
+    ]
   },
   {
     "name": "팀원 1",
@@ -660,6 +759,10 @@
     "visual_prompt": "Young Asian woman, wearing casual business attire, smiling",
     "description": "",
     "appearance_scenes": [
+      91,
+      121
+    ],
+    "scenes": [
       91,
       121
     ]
@@ -673,6 +776,10 @@
     "appearance_scenes": [
       91,
       121
+    ],
+    "scenes": [
+      91,
+      121
     ]
   },
   {
@@ -682,6 +789,9 @@
     "visual_prompt": "Middle-aged woman, business attire, confident expression, no text, no logos...",
     "description": "",
     "appearance_scenes": [
+      100
+    ],
+    "scenes": [
       100
     ]
   },
@@ -693,6 +803,9 @@
     "description": "",
     "appearance_scenes": [
       100
+    ],
+    "scenes": [
+      100
     ]
   },
   {
@@ -702,6 +815,9 @@
     "visual_prompt": "Clean-cut office worker in a business suit, focused and professional, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      106
+    ],
+    "scenes": [
       106
     ]
   },
@@ -714,6 +830,10 @@
     "appearance_scenes": [
       109,
       149
+    ],
+    "scenes": [
+      109,
+      149
     ]
   },
   {
@@ -721,7 +841,10 @@
     "name_ko": "등반가",
     "role": "등장인물",
     "visual_prompt": "Climber on top of a mountain, filled with satisfaction and accomplishment, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      110
+    ]
   },
   {
     "name": "익명의 개발자",
@@ -730,6 +853,9 @@
     "visual_prompt": "Silhouette of a person hunched over a computer, focused on coding, late at night, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      123
+    ],
+    "scenes": [
       123
     ]
   },
@@ -740,6 +866,9 @@
     "visual_prompt": "Silhouette of a person sketching on a tablet, brainstorming ideas, surrounded by empty coffee cups, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      123
+    ],
+    "scenes": [
       123
     ]
   },
@@ -752,6 +881,10 @@
     "appearance_scenes": [
       131,
       132
+    ],
+    "scenes": [
+      131,
+      132
     ]
   },
   {
@@ -759,21 +892,30 @@
     "name_ko": "KET 로고",
     "role": "등장인물",
     "visual_prompt": "KET logo, simple design, clean lines, corporate identity, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      156
+    ]
   },
   {
     "name": "사업가",
     "name_ko": "사업가",
     "role": "등장인물",
     "visual_prompt": "Businessman wearing a suit, confident smile, shaking hands, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      164
+    ]
   },
   {
     "name": "다른 사업가",
     "name_ko": "다른 사업가",
     "role": "등장인물",
     "visual_prompt": "Another businessman wearing a suit, smiling, shaking hands, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      164
+    ]
   },
   {
     "name": "에너지 구체",
@@ -782,6 +924,9 @@
     "visual_prompt": "Energy sphere with a Taegeuk pattern, glowing blue and red, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      211
+    ],
+    "scenes": [
       211
     ]
   },
@@ -793,6 +938,9 @@
     "description": "",
     "appearance_scenes": [
       212
+    ],
+    "scenes": [
+      212
     ]
   },
   {
@@ -802,6 +950,9 @@
     "visual_prompt": "City skyline at night, silhouetted buildings, soft lighting, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      213
+    ],
+    "scenes": [
       213
     ]
   },
@@ -813,6 +964,9 @@
     "description": "",
     "appearance_scenes": [
       214
+    ],
+    "scenes": [
+      214
     ]
   },
   {
@@ -822,6 +976,9 @@
     "visual_prompt": "Metal gears, interlocking, rotating, clean and efficient, no text, no logos",
     "description": "",
     "appearance_scenes": [
+      215
+    ],
+    "scenes": [
       215
     ]
   },
@@ -861,6 +1018,269 @@
     "name_ko": "분석가",
     "role": "등장인물",
     "visual_prompt": "Male analyst in a suit, looking curious and questioning, short dark hair, clean-shaven, no text, no logos",
-    "description": ""
+    "description": "",
+    "scenes": [
+      1,
+      2,
+      3,
+      13,
+      14,
+      15
+    ]
+  },
+  {
+    "name": "없음",
+    "name_en": "N/A",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      26,
+      27,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      46,
+      47,
+      48,
+      50,
+      51,
+      53,
+      54,
+      55,
+      57,
+      59,
+      66,
+      67,
+      76,
+      81,
+      82,
+      83,
+      85,
+      96,
+      97,
+      98,
+      99,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      126,
+      127,
+      129,
+      130,
+      136,
+      138,
+      139,
+      140,
+      146,
+      147,
+      148,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      161,
+      163,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      206,
+      207,
+      208,
+      209,
+      210
+    ]
+  },
+  {
+    "name": "등장인물 없음",
+    "name_en": "No characters present",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      92,
+      93,
+      94,
+      95
+    ]
+  },
+  {
+    "name": "없음 (추상적인 이미지)",
+    "name_en": "N/A",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      122,
+      124
+    ]
+  },
+  {
+    "name": "침체된 분위기의 꺾은선 그래프",
+    "name_en": "A declining line graph representing poor performance",
+    "description": "dark colors, stagnant feel",
+    "visual_prompt": "dark colors, stagnant feel",
+    "scenes": [
+      42
+    ]
+  },
+  {
+    "name": "어둠 속에서 빛나는 별",
+    "name_en": "Brightly shining star in a dark night sky",
+    "description": "hopeful and resilient",
+    "visual_prompt": "hopeful and resilient",
+    "scenes": [
+      43
+    ]
+  },
+  {
+    "name": "척박한 땅에서 자라는 작은 싹",
+    "name_en": "A small sprout emerging from barren land",
+    "description": "fragile but determined",
+    "visual_prompt": "fragile but determined",
+    "scenes": [
+      44
+    ]
+  },
+  {
+    "name": "울창한 숲을 이루는 거대한 나무",
+    "name_en": "A giant tree dominating a lush forest",
+    "description": "strong and fruitful",
+    "visual_prompt": "strong and fruitful",
+    "scenes": [
+      45
+    ]
+  },
+  {
+    "name": "사업가들의 손",
+    "name_en": "Hands of business people",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      86
+    ]
+  },
+  {
+    "name": "성공을 축하하는 사업가들",
+    "name_en": "Business people celebrating success",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      87
+    ]
+  },
+  {
+    "name": "UGPS 로고",
+    "name_en": "UGPS logo",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      88
+    ]
+  },
+  {
+    "name": "에너지 흐름",
+    "name_en": "Energy flow",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      89
+    ]
+  },
+  {
+    "name": "산업과 지역 사회",
+    "name_en": "Industry and local community",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      90
+    ]
+  },
+  {
+    "name": "없음 (과정 묘사)",
+    "name_en": "N/A",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      125
+    ]
+  },
+  {
+    "name": "차가운 느낌의 항구 풍경",
+    "name_en": "Cold",
+    "description": "industrial harbor landscape",
+    "visual_prompt": "industrial harbor landscape",
+    "scenes": [
+      157
+    ]
+  },
+  {
+    "name": "거대한 LNG 탱크",
+    "name_en": "Giant LNG tank",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      158
+    ]
+  },
+  {
+    "name": "복잡한 배관 시스템",
+    "name_en": "Intricate piping system",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      159
+    ]
+  },
+  {
+    "name": "기능적인 산업 설비",
+    "name_en": "Functional industrial equipment",
+    "description": "",
+    "visual_prompt": "",
+    "scenes": [
+      160
+    ]
   }
 ]

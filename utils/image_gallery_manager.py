@@ -63,12 +63,15 @@ class ImageGalleryManager:
     # 이미지 스캔
     # ============================================================
 
-    def scan_all_images(self, include_global: bool = True) -> List[ImageInfo]:
+    def scan_all_images(self, include_global: bool = False) -> List[ImageInfo]:
         """
         모든 이미지 스캔
 
+        v2.1: 기본값 include_global=False로 변경
+             글로벌 폴더는 모든 영상의 이미지가 혼합되어 있어 기본적으로 제외
+
         Args:
-            include_global: 글로벌 폴더(data/images/imagefx 등) 포함 여부
+            include_global: 글로벌 폴더(data/images/imagefx 등) 포함 여부 (기본: False)
 
         Returns:
             이미지 정보 목록
@@ -108,7 +111,7 @@ class ImageGalleryManager:
         return images
 
     def _scan_folder(self, folder: Path, image_type: str) -> List[ImageInfo]:
-        """폴더 내 이미지 스캔"""
+        """폴더 내 이미지 스캔 (v2.0 - 메타데이터 지원)"""
 
         images = []
 
@@ -116,10 +119,18 @@ class ImageGalleryManager:
             for f in folder.glob(ext):
                 try:
                     stat = f.stat()
+
+                    # 1단계: 파일명에서 scene_id 추출
+                    scene_id = self._extract_scene_id(f.name)
+
+                    # 2단계: scene_id가 "0"이면 메타데이터 JSON에서 시도
+                    if scene_id == "0":
+                        scene_id = self._get_scene_id_from_metadata(f)
+
                     images.append(ImageInfo(
                         path=str(f),
                         filename=f.name,
-                        scene_id=self._extract_scene_id(f.name),
+                        scene_id=scene_id,
                         image_type=image_type,
                         created=stat.st_mtime,
                         size_bytes=stat.st_size
@@ -130,22 +141,95 @@ class ImageGalleryManager:
         return images
 
     def _extract_scene_id(self, filename: str) -> str:
-        """파일명에서 씬 ID 추출"""
+        """파일명에서 씬 ID 추출 (v2.0 - 다양한 패턴 지원)"""
 
-        # scene_001, scene-001, scene001
-        match = re.search(r'scene[_\-]?(\d+)', filename, re.IGNORECASE)
-        if match:
-            return match.group(1)
+        if not filename:
+            return "0"
 
-        # composited_001, background_001
-        match = re.search(r'(?:composited|background)[_\-]?(\d+)', filename, re.IGNORECASE)
-        if match:
-            return match.group(1)
+        # 다양한 패턴 시도 (우선순위 순)
+        patterns = [
+            # 1. 명시적 scene 패턴: scene_049, scene-049, scene049
+            r'scene[_\-]?(\d{1,3})',
 
-        # 001_xxx.png
-        match = re.search(r'^(\d+)[_\-]', filename)
+            # 2. 접두사 패턴: composited_049, bg_049, background_049, char_049
+            r'(?:composited|bg|background|char|character)[_\-](\d{1,3})',
+
+            # 3. nano_banana 패턴: nano_banana_scene_049_xxx
+            r'nano_banana_scene[_\-]?(\d{1,3})',
+
+            # 4. 중간 숫자 패턴: _049_, -049-
+            r'[_\-](\d{3})[_\-\.]',
+
+            # 5. 앞 숫자 패턴: 049_background.png
+            r'^(\d{2,3})[_\-]',
+
+            # 6. 한글 패턴: 씬49, 씬_49, 씬 49
+            r'씬[_\s]?(\d{1,3})',
+
+            # 7. 축약 패턴: s049
+            r'\bs(\d{2,3})\b',
+
+            # 8. scene 중간 패턴: xxx_scene_049_xxx
+            r'[_\-]scene[_\-]?(\d{1,3})[_\-]',
+
+            # 9. 폴백: _049., -049.
+            r'[_\-](\d{2,3})(?:[_\-\.]|$)',
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, filename, re.IGNORECASE)
+            if match:
+                scene_num = match.group(1)
+                # 숫자만 추출 (앞의 0 유지)
+                return scene_num.lstrip('0') or '0'
+
+        # 최후의 폴백: 파일명에서 아무 연속 숫자 찾기
+        match = re.search(r'(\d{1,3})', filename)
         if match:
-            return match.group(1)
+            return match.group(1).lstrip('0') or '0'
+
+        return "0"
+
+    def _get_scene_id_from_metadata(self, image_path: Path) -> str:
+        """
+        메타데이터 JSON에서 scene_id 추출 (v2.0)
+
+        이미지 파일과 동일한 이름의 .json 파일에서 scene_id를 읽음
+        """
+        try:
+            import json
+
+            # 이미지와 같은 경로에 .json 파일 확인
+            json_path = image_path.with_suffix('.json')
+            if json_path.exists():
+                with open(json_path, 'r', encoding='utf-8') as f:
+                    metadata = json.load(f)
+
+                # list인 경우 첫 번째 요소 사용
+                if isinstance(metadata, list) and len(metadata) > 0:
+                    metadata = metadata[0]
+
+                if isinstance(metadata, dict):
+                    scene_id = metadata.get('scene_id')
+                    if scene_id is not None:
+                        return str(int(scene_id))
+
+            # _meta.json 형식 시도
+            meta_path = image_path.with_name(image_path.stem + "_meta.json")
+            if meta_path.exists():
+                with open(meta_path, 'r', encoding='utf-8') as f:
+                    metadata = json.load(f)
+
+                if isinstance(metadata, list) and len(metadata) > 0:
+                    metadata = metadata[0]
+
+                if isinstance(metadata, dict):
+                    scene_id = metadata.get('scene_id')
+                    if scene_id is not None:
+                        return str(int(scene_id))
+
+        except Exception as e:
+            print(f"[ImageGalleryManager] 메타데이터 읽기 실패: {image_path.name} - {e}")
 
         return "0"
 

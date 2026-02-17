@@ -3,7 +3,7 @@
   "page_name": "scene_analysis",
   "version": "1.0",
   "settings": {
-    "hybrid_ai_model": "gemini-2.0-flash-exp",
+    "hybrid_ai_model": "gemini-2.5-flash",
     "srt_bundle_size": 2
   }
 }

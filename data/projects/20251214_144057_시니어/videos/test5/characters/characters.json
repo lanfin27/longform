@@ -1,0 +1,85 @@
+[
+  {
+    "id": "char_0",
+    "name": "임원들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Corporate executives in a meeting, diverse expressions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png"
+    ],
+    "appearance_scenes": [
+      45,
+      46
+    ],
+    "created_at": "2026-01-25T13:40:13.952575",
+    "updated_at": "2026-01-25T14:39:05.599787"
+  },
+  {
+    "id": "char_1",
+    "name": "이재용 회장",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Lee Jae-yong with determined expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_회장_standing_1769316083784.png"
+    ],
+    "appearance_scenes": [
+      45,
+      46
+    ],
+    "created_at": "2026-01-25T13:40:13.954446",
+    "updated_at": "2026-01-25T14:39:05.599871"
+  },
+  {
+    "id": "char_2",
+    "name": "이재용 부회장",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Lee Jae-yong with sharp gaze and analytical expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png"
+    ],
+    "appearance_scenes": [
+      47,
+      48
+    ],
+    "created_at": "2026-01-25T13:40:13.955761",
+    "updated_at": "2026-01-25T14:39:05.600013"
+  },
+  {
+    "id": "char_3",
+    "name": "노동자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Workers assembling automobiles on the assembly line, period clothing and atmosphere reflecting the era, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ],
+    "appearance_scenes": [
+      80
+    ],
+    "created_at": "2026-01-25T14:28:05.018096",
+    "updated_at": "2026-01-25T14:39:05.599201"
+  }
+]

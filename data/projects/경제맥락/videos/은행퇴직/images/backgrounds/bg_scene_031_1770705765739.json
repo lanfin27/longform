@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-10T15:42:45.740150",
+  "image_file": "bg_scene_031_1770705765739.png",
+  "scene_id": 31,
+  "prompts": {
+    "original": "A complex data visualization symbolizing shrinking interest margins with a downward trending graph, a subtle silhouette of a bank building in the background, economic charts representing the need for fixed cost reduction, rendered in cool blue and grey tones, conveying financial market tension and strategic decision-making, a close-up shot emphasizing economic pressure, bank logo (visual only, no text) overlaid with a downward arrow, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A complex data visualization symbolizing shrinking interest margins with a downward trending graph, a subtle silhouette of a bank building in the background, economic charts representing the need for fixed cost reduction, rendered in cool blue and grey tones, conveying financial market tension and strategic decision-making, a close-up shot emphasizing economic pressure, bank logo (visual only, no text) overlaid with a downward arrow, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 2040725903
+  }
+}

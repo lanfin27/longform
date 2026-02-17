@@ -1,0 +1,1478 @@
+[
+  {
+    "scene_id": 45,
+    "scene_number": 45,
+    "start_time": "00:01:40,259",
+    "end_time": "00:01:41,378",
+    "start_seconds": 100.259,
+    "end_seconds": 101.378,
+    "duration": 1.119,
+    "duration_estimate": 1,
+    "narration": "이런 반응이었거든요.",
+    "script_text": "이런 반응이었거든요.",
+    "char_count": 11,
+    "image_prompt": "회의에 참석한 기업 임원들의 다양한 표정을 담은 이미지. 일부는 놀라움을, 일부는 회의적인 시각을 드러냄. 이재용 회장의 결연한 표정이 대비를 이룸.",
+    "image_prompt_en": "Diverse expressions of corporate executives in a meeting, some showing surprise, others skepticism, contrasting with Lee Jae-yong's determined expression, modern boardroom setting with glass table and city view, subtle Samsung logos integrated into the scene, emphasizing the contrasting reactions to a pivotal decision, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "회의에 참석한 기업 임원들, 이재용 회장",
+    "character_prompt_en": "Corporate executives in a meeting, some showing surprise, others skepticism, contrasting with Lee Jae-yong's determined expression, no text, no logos on clothing, no name tags",
+    "visual_elements": [
+      "회의실",
+      "임원",
+      "이재용",
+      "다양한 표정",
+      "결단"
+    ],
+    "direction_guide": "이재용 회장의 결연한 표정과 임원들의 다양한 반응을 대비시켜 보여주세요. 삼성 로고를 은은하게 배치하여 브랜드 이미지를 강화하세요.",
+    "camera_suggestion": "",
+    "video_prompt_character": "Camera focuses on Lee Jae-yong's determined expression, then pans across executives with diverse reactions",
+    "video_prompt_full": "Camera pans across modern boardroom, highlighting executives with diverse expressions, contrasting with Lee Jae-yong's determined look",
+    "characters": [
+      {
+        "name": "임원들",
+        "pose": "standing",
+        "emotion": "neutral",
+        "visual_prompt": "Corporate executives in a meeting, diverse expressions"
+      },
+      {
+        "name": "이재용 회장",
+        "pose": "standing",
+        "emotion": "neutral",
+        "visual_prompt": "Lee Jae-yong with determined expression"
+      }
+    ],
+    "location": "현대적인 회의실",
+    "mood": "진지하고 결연한",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 1,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      45,
+      46
+    ],
+    "bundle_text": "이런 반응이었거든요. 근데요, 이재용 회장 생각은 달랐어요.",
+    "bundle_start_time": "00:01:40,259",
+    "bundle_end_time": "00:01:43,878",
+    "bundle_start_seconds": 100.259,
+    "bundle_end_seconds": 103.878,
+    "bundle_duration": 3.6189999999999998,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "Modern boardroom, executives with diverse expressions, CEO with determined look, headline text in Korean reading \"달랐던 생각\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"이재용 회장의 결단\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "회의실, 유리 테이블, 도시 전경, 임원들의 다양한 표정",
+    "background_prompt_en": "Modern boardroom setting with glass table and city view, emphasizing the contrasting reactions to a pivotal decision, subtle Samsung logos integrated into the scene, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "Modern boardroom, executives with diverse expressions, CEO with determined look, headline text in Korean reading \"달랐던 생각\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"이재용 회장의 결단\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png",
+        "name": "임원들",
+        "is_representative": true,
+        "match_type": "generated_images"
+      },
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_회장_standing_1769316083784.png",
+        "name": "이재용 회장",
+        "is_representative": true,
+        "match_type": "generated_images"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_회장_standing_1769316083784.png"
+    ]
+  },
+  {
+    "scene_id": 46,
+    "scene_number": 46,
+    "start_time": "00:01:41,378",
+    "end_time": "00:01:43,878",
+    "start_seconds": 101.378,
+    "end_seconds": 103.878,
+    "duration": 2.5,
+    "duration_estimate": 2,
+    "narration": "근데요, 이재용 회장 생각은 달랐어요.",
+    "script_text": "근데요, 이재용 회장 생각은 달랐어요.",
+    "char_count": 21,
+    "image_prompt": "회의에 참석한 기업 임원들의 다양한 표정을 담은 이미지. 일부는 놀라움을, 일부는 회의적인 시각을 드러냄. 이재용 회장의 결연한 표정이 대비를 이룸.",
+    "image_prompt_en": "Diverse expressions of corporate executives in a meeting, some showing surprise, others skepticism, contrasting with Lee Jae-yong's determined expression, modern boardroom setting with glass table and city view, subtle Samsung logos integrated into the scene, emphasizing the contrasting reactions to a pivotal decision, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "회의에 참석한 기업 임원들, 이재용 회장",
+    "character_prompt_en": "Corporate executives in a meeting, some showing surprise, others skepticism, contrasting with Lee Jae-yong's determined expression, no text, no logos on clothing, no name tags",
+    "visual_elements": [
+      "회의실",
+      "임원",
+      "이재용",
+      "다양한 표정",
+      "결단"
+    ],
+    "direction_guide": "이재용 회장의 결연한 표정과 임원들의 다양한 반응을 대비시켜 보여주세요. 삼성 로고를 은은하게 배치하여 브랜드 이미지를 강화하세요.",
+    "camera_suggestion": "",
+    "video_prompt_character": "Camera focuses on Lee Jae-yong's determined expression, then pans across executives with diverse reactions",
+    "video_prompt_full": "Camera pans across modern boardroom, highlighting executives with diverse expressions, contrasting with Lee Jae-yong's determined look",
+    "characters": [
+      {
+        "name": "임원들",
+        "pose": "standing",
+        "emotion": "neutral",
+        "visual_prompt": "Corporate executives in a meeting, diverse expressions"
+      },
+      {
+        "name": "이재용 회장",
+        "pose": "standing",
+        "emotion": "neutral",
+        "visual_prompt": "Lee Jae-yong with determined expression"
+      }
+    ],
+    "location": "현대적인 회의실",
+    "mood": "진지하고 결연한",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 1,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      45,
+      46
+    ],
+    "bundle_text": "이런 반응이었거든요. 근데요, 이재용 회장 생각은 달랐어요.",
+    "bundle_start_time": "00:01:40,259",
+    "bundle_end_time": "00:01:43,878",
+    "bundle_start_seconds": 100.259,
+    "bundle_end_seconds": 103.878,
+    "bundle_duration": 3.6189999999999998,
+    "is_bundle_primary": false,
+    "image_prompt_korean_text": "Modern boardroom, executives with diverse expressions, CEO with determined look, headline text in Korean reading \"달랐던 생각\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"이재용 회장의 결단\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "회의실, 유리 테이블, 도시 전경, 임원들의 다양한 표정",
+    "background_prompt_en": "Modern boardroom setting with glass table and city view, emphasizing the contrasting reactions to a pivotal decision, subtle Samsung logos integrated into the scene, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png",
+        "name": "임원들",
+        "is_representative": true,
+        "match_type": "generated_images"
+      },
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_회장_standing_1769316083784.png",
+        "name": "이재용 회장",
+        "is_representative": true,
+        "match_type": "generated_images"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_임원들_standing_1769316034336.png",
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_회장_standing_1769316083784.png"
+    ]
+  },
+  {
+    "scene_id": 47,
+    "scene_number": 47,
+    "start_time": "00:01:43,878",
+    "end_time": "00:01:45,878",
+    "start_seconds": 103.878,
+    "end_seconds": 105.878,
+    "duration": 2.0,
+    "duration_estimate": 2,
+    "narration": "당시 이재용 부회장이었는데,",
+    "script_text": "당시 이재용 부회장이었는데,",
+    "char_count": 15,
+    "image_prompt": "이재용 부회장이 스피커가 아닌 자동차의 핵심 부품을 들여다보는 모습. 날카로운 눈빛과 분석적인 표정으로 미래를 예측하려는 의지를 드러냄.",
+    "image_prompt_en": "Lee Jae-yong, then vice-chairman, examining core automotive components instead of a speaker, sharp gaze and analytical expression conveying his determination to foresee the future, modern automotive lab setting with advanced equipment and prototypes, subtle Samsung logos integrated, emphasizing his visionary approach, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "이재용 부회장",
+    "character_prompt_en": "Lee Jae-yong with sharp gaze and analytical expression, no text, no logos on clothing, no name tags",
+    "visual_elements": [
+      "이재용",
+      "자동차 부품",
+      "연구소",
+      "분석적인 표정",
+      "미래 예측"
+    ],
+    "direction_guide": "이재용 부회장의 날카로운 눈빛과 자동차 부품을 분석하는 모습을 클로즈업하여 미래를 예측하려는 의지를 강조하세요. 삼성 로고를 은은하게 배치하여 브랜드 이미지를 강화하세요.",
+    "camera_suggestion": "",
+    "video_prompt_character": "Camera zooms in on Lee Jae-yong's sharp gaze, then pans to automotive components",
+    "video_prompt_full": "Camera moves through modern automotive lab, highlighting Lee Jae-yong examining core components with analytical expression",
+    "characters": [
+      {
+        "name": "이재용 부회장",
+        "pose": "standing",
+        "emotion": "neutral",
+        "visual_prompt": "Lee Jae-yong with sharp gaze and analytical expression"
+      }
+    ],
+    "location": "현대적인 자동차 연구소",
+    "mood": "진지하고 분석적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 2,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      47,
+      48
+    ],
+    "bundle_text": "당시 이재용 부회장이었는데, 이 사람이 본 건 스피커가 아니었어요.",
+    "bundle_start_time": "00:01:43,878",
+    "bundle_end_time": "00:01:47,680",
+    "bundle_start_seconds": 103.878,
+    "bundle_end_seconds": 107.68,
+    "bundle_duration": 3.8020000000000067,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "Lee Jae-yong examining automotive components in lab, sharp gaze, analytical expression, headline text in Korean reading \"스피커가 아닌\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"자동차의 핵심을 보다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "자동차 연구소, 핵심 부품, 첨단 장비, 이재용의 분석적인 표정",
+    "background_prompt_en": "Modern automotive lab setting with advanced equipment and prototypes, subtle Samsung logos integrated, emphasizing his visionary approach, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "Lee Jae-yong examining automotive components in lab, sharp gaze, analytical expression, headline text in Korean reading \"스피커가 아닌\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"자동차의 핵심을 보다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png",
+        "name": "이재용 부회장",
+        "is_representative": true,
+        "match_type": "generated_images"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png"
+    ]
+  },
+  {
+    "scene_id": 48,
+    "scene_number": 48,
+    "start_time": "00:01:45,878",
+    "end_time": "00:01:47,680",
+    "start_seconds": 105.878,
+    "end_seconds": 107.68,
+    "duration": 1.802,
+    "duration_estimate": 1,
+    "narration": "이 사람이 본 건 스피커가 아니었어요.",
+    "script_text": "이 사람이 본 건 스피커가 아니었어요.",
+    "char_count": 21,
+    "image_prompt": "이재용 부회장이 스피커가 아닌 자동차의 핵심 부품을 들여다보는 모습. 날카로운 눈빛과 분석적인 표정으로 미래를 예측하려는 의지를 드러냄.",
+    "image_prompt_en": "Lee Jae-yong, then vice-chairman, examining core automotive components instead of a speaker, sharp gaze and analytical expression conveying his determination to foresee the future, modern automotive lab setting with advanced equipment and prototypes, subtle Samsung logos integrated, emphasizing his visionary approach, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "이재용 부회장",
+    "character_prompt_en": "Lee Jae-yong with sharp gaze and analytical expression, no text, no logos on clothing, no name tags",
+    "visual_elements": [
+      "이재용",
+      "자동차 부품",
+      "연구소",
+      "분석적인 표정",
+      "미래 예측"
+    ],
+    "direction_guide": "이재용 부회장의 날카로운 눈빛과 자동차 부품을 분석하는 모습을 클로즈업하여 미래를 예측하려는 의지를 강조하세요. 삼성 로고를 은은하게 배치하여 브랜드 이미지를 강화하세요.",
+    "camera_suggestion": "",
+    "video_prompt_character": "Camera zooms in on Lee Jae-yong's sharp gaze, then pans to automotive components",
+    "video_prompt_full": "Camera moves through modern automotive lab, highlighting Lee Jae-yong examining core components with analytical expression",
+    "characters": [
+      {
+        "name": "이재용 부회장",
+        "pose": "standing",
+        "emotion": "neutral",
+        "visual_prompt": "Lee Jae-yong with sharp gaze and analytical expression"
+      }
+    ],
+    "location": "현대적인 자동차 연구소",
+    "mood": "진지하고 분석적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 2,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      47,
+      48
+    ],
+    "bundle_text": "당시 이재용 부회장이었는데, 이 사람이 본 건 스피커가 아니었어요.",
+    "bundle_start_time": "00:01:43,878",
+    "bundle_end_time": "00:01:47,680",
+    "bundle_start_seconds": 103.878,
+    "bundle_end_seconds": 107.68,
+    "bundle_duration": 3.8020000000000067,
+    "is_bundle_primary": false,
+    "image_prompt_korean_text": "Lee Jae-yong examining automotive components in lab, sharp gaze, analytical expression, headline text in Korean reading \"스피커가 아닌\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"자동차의 핵심을 보다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "자동차 연구소, 핵심 부품, 첨단 장비, 이재용의 분석적인 표정",
+    "background_prompt_en": "Modern automotive lab setting with advanced equipment and prototypes, subtle Samsung logos integrated, emphasizing his visionary approach, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png",
+        "name": "이재용 부회장",
+        "is_representative": true,
+        "match_type": "generated_images"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_이재용_부회장_standing_1769316086164.png"
+    ]
+  },
+  {
+    "scene_id": 49,
+    "scene_number": 49,
+    "start_time": "00:01:48,200",
+    "end_time": "00:01:49,299",
+    "start_seconds": 108.2,
+    "end_seconds": 109.299,
+    "duration": 1.099,
+    "duration_estimate": 1,
+    "narration": "자동차의 미래를 본 거예요.",
+    "script_text": "자동차의 미래를 본 거예요.",
+    "char_count": 15,
+    "image_prompt": "미래 자동차 디자인 컨셉을 보여주는 홀로그램 이미지. 자동차의 혁신적인 변화와 이재용 회장의 선견지명을 상징함. 삼성과 하만 로고를 함께 배치하여 협력 관계를 강조.",
+    "image_prompt_en": "Holographic image showcasing future automotive design concepts, symbolizing innovative transformation of cars and Lee Jae-yong's visionary insight, modern tech presentation setting with sleek interfaces and advanced displays, Samsung and Harman logos placed together emphasizing collaborative partnership, conveying a sense of technological advancement and forward-thinking leadership, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "홀로그램",
+      "미래 자동차",
+      "혁신",
+      "삼성 로고",
+      "하만 로고"
+    ],
+    "direction_guide": "미래 자동차 디자인 컨셉을 홀로그램으로 보여주고, 삼성과 하만 로고를 함께 배치하여 협력 관계와 혁신적인 비전을 강조하세요.",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans across holographic image of future car design, highlighting innovative features and technology, Samsung and Harman logos displayed together",
+    "characters": [],
+    "location": "현대적인 기술 발표 공간",
+    "mood": "혁신적이고 미래지향적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 3,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      49,
+      50
+    ],
+    "bundle_text": "자동차의 미래를 본 거예요. 그때 이미 자동차 산업이 어떻게 바뀔지 읽은 거죠.",
+    "bundle_start_time": "00:01:48,200",
+    "bundle_end_time": "00:01:52,560",
+    "bundle_start_seconds": 108.2,
+    "bundle_end_seconds": 112.56,
+    "bundle_duration": 4.359999999999999,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "Holographic image of future car design, Samsung and Harman logos, innovative technology, headline text in Korean reading \"자동차의 미래\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"선견지명\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "홀로그램, 미래 자동차 디자인, 첨단 기술, 삼성 로고, 하만 로고",
+    "background_prompt_en": "Holographic image showcasing future automotive design concepts, symbolizing innovative transformation of cars and Lee Jae-yong's visionary insight, modern tech presentation setting with sleek interfaces and advanced displays, Samsung and Harman logos placed together emphasizing collaborative partnership, conveying a sense of technological advancement and forward-thinking leadership, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "Holographic image of future car design, Samsung and Harman logos, innovative technology, headline text in Korean reading \"자동차의 미래\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"선견지명\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ],
+    "nano_composite_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\korean_text\\korean_text_scene_049_1769319392304.png",
+    "last_image_update": "2026-01-25 14:36:50",
+    "composite_info": {
+      "used_prompt": "",
+      "model": "",
+      "reference_strength": 0,
+      "timestamp": "",
+      "background_path": "",
+      "character_path": ""
+    }
+  },
+  {
+    "scene_id": 50,
+    "scene_number": 50,
+    "start_time": "00:01:49,750",
+    "end_time": "00:01:52,560",
+    "start_seconds": 109.75,
+    "end_seconds": 112.56,
+    "duration": 2.81,
+    "duration_estimate": 2,
+    "narration": "그때 이미 자동차 산업이 어떻게 바뀔지 읽은 거죠.",
+    "script_text": "그때 이미 자동차 산업이 어떻게 바뀔지 읽은 거죠.",
+    "char_count": 28,
+    "image_prompt": "미래 자동차 디자인 컨셉을 보여주는 홀로그램 이미지. 자동차의 혁신적인 변화와 이재용 회장의 선견지명을 상징함. 삼성과 하만 로고를 함께 배치하여 협력 관계를 강조.",
+    "image_prompt_en": "Holographic image showcasing future automotive design concepts, symbolizing innovative transformation of cars and Lee Jae-yong's visionary insight, modern tech presentation setting with sleek interfaces and advanced displays, Samsung and Harman logos placed together emphasizing collaborative partnership, conveying a sense of technological advancement and forward-thinking leadership, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "홀로그램",
+      "미래 자동차",
+      "혁신",
+      "삼성 로고",
+      "하만 로고"
+    ],
+    "direction_guide": "미래 자동차 디자인 컨셉을 홀로그램으로 보여주고, 삼성과 하만 로고를 함께 배치하여 협력 관계와 혁신적인 비전을 강조하세요.",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans across holographic image of future car design, highlighting innovative features and technology, Samsung and Harman logos displayed together",
+    "characters": [],
+    "location": "현대적인 기술 발표 공간",
+    "mood": "혁신적이고 미래지향적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 3,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      49,
+      50
+    ],
+    "bundle_text": "자동차의 미래를 본 거예요. 그때 이미 자동차 산업이 어떻게 바뀔지 읽은 거죠.",
+    "bundle_start_time": "00:01:48,200",
+    "bundle_end_time": "00:01:52,560",
+    "bundle_start_seconds": 108.2,
+    "bundle_end_seconds": 112.56,
+    "bundle_duration": 4.359999999999999,
+    "is_bundle_primary": false,
+    "image_prompt_korean_text": "Holographic image of future car design, Samsung and Harman logos, innovative technology, headline text in Korean reading \"자동차의 미래\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"선견지명\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "홀로그램, 미래 자동차 디자인, 첨단 기술, 삼성 로고, 하만 로고",
+    "background_prompt_en": "Holographic image showcasing future automotive design concepts, symbolizing innovative transformation of cars and Lee Jae-yong's visionary insight, modern tech presentation setting with sleek interfaces and advanced displays, Samsung and Harman logos placed together emphasizing collaborative partnership, conveying a sense of technological advancement and forward-thinking leadership, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 51,
+    "scene_number": 51,
+    "start_time": "00:01:52,950",
+    "end_time": "00:01:55,259",
+    "start_seconds": 112.95,
+    "end_seconds": 115.259,
+    "duration": 2.309,
+    "duration_estimate": 2,
+    "narration": "앞으로 자동차는 그냥 굴러가는 기계가 아니라,",
+    "script_text": "앞으로 자동차는 그냥 굴러가는 기계가 아니라,",
+    "char_count": 25,
+    "image_prompt": "자동차를 바퀴 달린 컴퓨터로 표현한 컨셉 이미지. 미래 자동차 기술의 핵심인 AI, 디지털 인터페이스, 홀로그램 디스플레이를 강조. 삼성 로고를 은은하게 배치.",
+    "image_prompt_en": "Concept image of a car as a computer on wheels, symbolizing the future of automotive technology, sleek futuristic vehicle design with advanced digital interfaces, holographic displays and AI integration, vibrant and dynamic composition showcasing technological innovation, modern urban environment in background, evoking a sense of progress and transformation, subtle Samsung logos integrated into design, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "미래 자동차",
+      "디지털 인터페이스",
+      "AI",
+      "홀로그램",
+      "도시"
+    ],
+    "direction_guide": "미래 자동차를 바퀴 달린 컴퓨터로 시각화하고, AI, 디지털 인터페이스, 홀로그램 디스플레이를 강조하여 혁신적인 이미지를 전달하세요.",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans around futuristic car, highlighting digital interfaces, holographic displays, and AI integration",
+    "characters": [],
+    "location": "미래 도시 환경",
+    "mood": "혁신적이고 미래지향적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 4,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      51,
+      52
+    ],
+    "bundle_text": "앞으로 자동차는 그냥 굴러가는 기계가 아니라, 바퀴 달린 컴퓨터가 된다.",
+    "bundle_start_time": "00:01:52,950",
+    "bundle_end_time": "00:01:57,239",
+    "bundle_start_seconds": 112.95,
+    "bundle_end_seconds": 117.239,
+    "bundle_duration": 4.2890000000000015,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "Futuristic car design, digital interfaces, AI integration, headline text in Korean reading \"바퀴 달린 컴퓨터\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"미래 자동차의 핵심\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "미래 자동차, 디지털 인터페이스, AI, 홀로그램 디스플레이, 도시 환경",
+    "background_prompt_en": "Concept image of a car as a computer on wheels, symbolizing the future of automotive technology, sleek futuristic vehicle design with advanced digital interfaces, holographic displays and AI integration, vibrant and dynamic composition showcasing technological innovation, modern urban environment in background, evoking a sense of progress and transformation, subtle Samsung logos integrated into design, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "Futuristic car design, digital interfaces, AI integration, headline text in Korean reading \"바퀴 달린 컴퓨터\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"미래 자동차의 핵심\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 52,
+    "scene_number": 52,
+    "start_time": "00:01:55,259",
+    "end_time": "00:01:57,239",
+    "start_seconds": 115.259,
+    "end_seconds": 117.239,
+    "duration": 1.98,
+    "duration_estimate": 1,
+    "narration": "바퀴 달린 컴퓨터가 된다.",
+    "script_text": "바퀴 달린 컴퓨터가 된다.",
+    "char_count": 14,
+    "image_prompt": "자동차를 바퀴 달린 컴퓨터로 표현한 컨셉 이미지. 미래 자동차 기술의 핵심인 AI, 디지털 인터페이스, 홀로그램 디스플레이를 강조. 삼성 로고를 은은하게 배치.",
+    "image_prompt_en": "Concept image of a car as a computer on wheels, symbolizing the future of automotive technology, sleek futuristic vehicle design with advanced digital interfaces, holographic displays and AI integration, vibrant and dynamic composition showcasing technological innovation, modern urban environment in background, evoking a sense of progress and transformation, subtle Samsung logos integrated into design, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "미래 자동차",
+      "디지털 인터페이스",
+      "AI",
+      "홀로그램",
+      "도시"
+    ],
+    "direction_guide": "미래 자동차를 바퀴 달린 컴퓨터로 시각화하고, AI, 디지털 인터페이스, 홀로그램 디스플레이를 강조하여 혁신적인 이미지를 전달하세요.",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans around futuristic car, highlighting digital interfaces, holographic displays, and AI integration",
+    "characters": [],
+    "location": "미래 도시 환경",
+    "mood": "혁신적이고 미래지향적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 4,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      51,
+      52
+    ],
+    "bundle_text": "앞으로 자동차는 그냥 굴러가는 기계가 아니라, 바퀴 달린 컴퓨터가 된다.",
+    "bundle_start_time": "00:01:52,950",
+    "bundle_end_time": "00:01:57,239",
+    "bundle_start_seconds": 112.95,
+    "bundle_end_seconds": 117.239,
+    "bundle_duration": 4.2890000000000015,
+    "is_bundle_primary": false,
+    "image_prompt_korean_text": "Futuristic car design, digital interfaces, AI integration, headline text in Korean reading \"바퀴 달린 컴퓨터\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"미래 자동차의 핵심\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "미래 자동차, 디지털 인터페이스, AI, 홀로그램 디스플레이, 도시 환경",
+    "background_prompt_en": "Concept image of a car as a computer on wheels, symbolizing the future of automotive technology, sleek futuristic vehicle design with advanced digital interfaces, holographic displays and AI integration, vibrant and dynamic composition showcasing technological innovation, modern urban environment in background, evoking a sense of progress and transformation, subtle Samsung logos integrated into design, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 53,
+    "scene_number": 53,
+    "start_time": "00:01:57,239",
+    "end_time": "00:01:58,759",
+    "start_seconds": 117.239,
+    "end_seconds": 118.759,
+    "duration": 1.52,
+    "duration_estimate": 1,
+    "narration": "그리고 그 컴퓨터의 두뇌와",
+    "script_text": "그리고 그 컴퓨터의 두뇌와",
+    "char_count": 14,
+    "image_prompt": "자동차의 두뇌와 신경망을 만드는 회사를 상징하는 추상적인 이미지. 복잡한 회로망과 데이터 스트림을 통해 연결성을 강조하고, 삼성과 하만 로고를 통합하여 시너지 효과를 나타냄.",
+    "image_prompt_en": "Abstract image symbolizing a company creating the brain and neural network of a car, intricate network of circuits and data streams emphasizing connectivity, Samsung and Harman logos integrated representing synergy, vibrant and dynamic composition conveying technological leadership and innovation, modern tech environment in background, evoking a sense of progress and transformation, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "회로망",
+      "데이터 스트림",
+      "연결성",
+      "삼성 로고",
+      "하만 로고"
+    ],
+    "direction_guide": "자동차의 두뇌와 신경망을 시각적으로 표현하고, 삼성과 하만 로고를 통합하여 시너지 효과와 기술 리더십을 강조하세요.",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans across intricate network of circuits and data streams, highlighting Samsung and Harman logos",
+    "characters": [],
+    "location": "현대적인 기술 환경",
+    "mood": "혁신적이고 연결된",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 5,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      53,
+      54
+    ],
+    "bundle_text": "그리고 그 컴퓨터의 두뇌와 신경망을 만드는 회사가",
+    "bundle_start_time": "00:01:57,239",
+    "bundle_end_time": "00:02:00,358",
+    "bundle_start_seconds": 117.239,
+    "bundle_end_seconds": 120.358,
+    "bundle_duration": 3.1189999999999998,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "Intricate network of circuits and data streams, Samsung and Harman logos, technological leadership, headline text in Korean reading \"두뇌와 신경망\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"자동차의 미래를 만들다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "회로망, 데이터 스트림, 연결성, 삼성 로고, 하만 로고",
+    "background_prompt_en": "Abstract image symbolizing a company creating the brain and neural network of a car, intricate network of circuits and data streams emphasizing connectivity, Samsung and Harman logos integrated representing synergy, vibrant and dynamic composition conveying technological leadership and innovation, modern tech environment in background, evoking a sense of progress and transformation, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "Intricate network of circuits and data streams, Samsung and Harman logos, technological leadership, headline text in Korean reading \"두뇌와 신경망\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"자동차의 미래를 만들다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ],
+    "nano_composite_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\korean_text\\korean_text_scene_053_1769319353003.png",
+    "last_image_update": "2026-01-25 14:36:10",
+    "composite_info": {
+      "used_prompt": "",
+      "model": "",
+      "reference_strength": 0,
+      "timestamp": "",
+      "background_path": "",
+      "character_path": ""
+    }
+  },
+  {
+    "scene_id": 54,
+    "scene_number": 54,
+    "start_time": "00:01:58,759",
+    "end_time": "00:02:00,358",
+    "start_seconds": 118.759,
+    "end_seconds": 120.358,
+    "duration": 1.599,
+    "duration_estimate": 1,
+    "narration": "신경망을 만드는 회사가",
+    "script_text": "신경망을 만드는 회사가",
+    "char_count": 12,
+    "image_prompt": "자동차의 두뇌와 신경망을 만드는 회사를 상징하는 추상적인 이미지. 복잡한 회로망과 데이터 스트림을 통해 연결성을 강조하고, 삼성과 하만 로고를 통합하여 시너지 효과를 나타냄.",
+    "image_prompt_en": "Abstract image symbolizing a company creating the brain and neural network of a car, intricate network of circuits and data streams emphasizing connectivity, Samsung and Harman logos integrated representing synergy, vibrant and dynamic composition conveying technological leadership and innovation, modern tech environment in background, evoking a sense of progress and transformation, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "회로망",
+      "데이터 스트림",
+      "연결성",
+      "삼성 로고",
+      "하만 로고"
+    ],
+    "direction_guide": "자동차의 두뇌와 신경망을 시각적으로 표현하고, 삼성과 하만 로고를 통합하여 시너지 효과와 기술 리더십을 강조하세요.",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans across intricate network of circuits and data streams, highlighting Samsung and Harman logos",
+    "characters": [],
+    "location": "현대적인 기술 환경",
+    "mood": "혁신적이고 연결된",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 5,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      53,
+      54
+    ],
+    "bundle_text": "그리고 그 컴퓨터의 두뇌와 신경망을 만드는 회사가",
+    "bundle_start_time": "00:01:57,239",
+    "bundle_end_time": "00:02:00,358",
+    "bundle_start_seconds": 117.239,
+    "bundle_end_seconds": 120.358,
+    "bundle_duration": 3.1189999999999998,
+    "is_bundle_primary": false,
+    "image_prompt_korean_text": "Intricate network of circuits and data streams, Samsung and Harman logos, technological leadership, headline text in Korean reading \"두뇌와 신경망\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"자동차의 미래를 만들다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "회로망, 데이터 스트림, 연결성, 삼성 로고, 하만 로고",
+    "background_prompt_en": "Abstract image symbolizing a company creating the brain and neural network of a car, intricate network of circuits and data streams emphasizing connectivity, Samsung and Harman logos integrated representing synergy, vibrant and dynamic composition conveying technological leadership and innovation, modern tech environment in background, evoking a sense of progress and transformation, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 55,
+    "scene_number": 55,
+    "start_time": "00:02:00,358",
+    "end_time": "00:02:02,019",
+    "start_seconds": 120.358,
+    "end_seconds": 122.019,
+    "duration": 1.661,
+    "duration_estimate": 1,
+    "narration": "미래의 강자가 된다.",
+    "script_text": "미래의 강자가 된다.",
+    "char_count": 11,
+    "image_prompt": "역동적인 빛과 그림자가 있는 미래 도시 풍경, 고층 빌딩과 날아다니는 차량, 기술적 진보와 잠재력을 상징",
+    "image_prompt_en": "Futuristic cityscape with dynamic interplay of light and shadow, towering skyscrapers and flying vehicles, symbolizing technological advancement and potential for future dominance, vibrant and energetic composition, dramatic perspective emphasizing scale and innovation, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "미래 도시",
+      "고층 빌딩",
+      "날아다니는 차량",
+      "역동적인 빛"
+    ],
+    "direction_guide": "미래의 기술적 진보와 가능성을 시각적으로 강조하는 역동적인 도시 풍경",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans across futuristic cityscape with dynamic light and shadow, flying vehicles move through towering skyscrapers, technological advancement",
+    "characters": [],
+    "location": "미래 도시",
+    "mood": "역동적이고 진취적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 6,
+    "bundle_size": 1,
+    "bundle_scenes": [
+      55
+    ],
+    "bundle_text": "미래의 강자가 된다.",
+    "bundle_start_time": "00:02:00,358",
+    "bundle_end_time": "00:02:02,019",
+    "bundle_start_seconds": 120.358,
+    "bundle_end_seconds": 122.019,
+    "bundle_duration": 1.6610000000000014,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "Futuristic cityscape with dynamic light and shadow, towering skyscrapers, vibrant composition, headline text in Korean reading \"미래의 강자\" at the top in handwritten pen script style with casual brush strokes, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "역동적인 빛과 그림자가 있는 미래 도시 풍경, 고층 빌딩과 날아다니는 차량",
+    "background_prompt_en": "Futuristic cityscape with dynamic interplay of light and shadow, towering skyscrapers and flying vehicles, symbolizing technological advancement and potential for future dominance, vibrant and energetic composition, dramatic perspective emphasizing scale and innovation, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "Futuristic cityscape with dynamic light and shadow, towering skyscrapers, vibrant composition, headline text in Korean reading \"미래의 강자\" at the top in handwritten pen script style with casual brush strokes, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 70,
+    "scene_number": 70,
+    "start_time": "00:02:34,759",
+    "end_time": "00:02:36,680",
+    "start_seconds": 154.759,
+    "end_seconds": 156.68,
+    "duration": 1.921,
+    "duration_estimate": 1,
+    "narration": "차가 세상을 봐야 한다고요.",
+    "script_text": "차가 세상을 봐야 한다고요.",
+    "char_count": 15,
+    "image_prompt": "자율 주행차의 센서 시스템 개념 이미지, 차량 외부에 장착된 카메라, 레이더, 센서, 미래 지향적인 도시 배경",
+    "image_prompt_en": "Concept image of a car equipped with advanced sensor systems for autonomous driving, showcasing cameras, radar, and lidar sensors, futuristic vehicle design seamlessly integrated with exterior sensors, clean and modern urban environment in the background, representing the future of automotive technology, emphasis on safety and awareness, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "자율 주행차",
+      "센서 시스템",
+      "카메라",
+      "레이더",
+      "센서",
+      "미래 도시"
+    ],
+    "direction_guide": "미래 지향적인 자율 주행차의 센서 시스템을 강조, 카메라, 레이더, 센서의 위치와 기능을 시각적으로 명확하게",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans around a futuristic car showcasing its sensor system, highlighting cameras, radar, and lidar sensors, modern urban environment in the background",
+    "characters": [],
+    "location": "미래 도시",
+    "mood": "미래 지향적이고 기술적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 1,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      70,
+      71
+    ],
+    "bundle_text": "차가 세상을 봐야 한다고요. 카메라, 레이더, 센서. 이런 것들이 필요한 거죠.",
+    "bundle_start_time": "00:02:34,759",
+    "bundle_end_time": "00:02:40,120",
+    "bundle_start_seconds": 154.759,
+    "bundle_end_seconds": 160.12,
+    "bundle_duration": 5.361000000000018,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "Concept image of a car equipped with advanced sensor systems for autonomous driving, futuristic vehicle, modern urban environment, headline text in Korean reading \"차가 세상을 본다\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"카메라, 레이더, 센서\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "자율 주행차의 센서 시스템, 차량 외부에 장착된 카메라, 레이더, 센서, 미래 지향적인 도시 배경",
+    "background_prompt_en": "Concept image of a car equipped with advanced sensor systems for autonomous driving, showcasing cameras, radar, and lidar sensors, futuristic vehicle design seamlessly integrated with exterior sensors, clean and modern urban environment in the background, representing the future of automotive technology, emphasis on safety and awareness, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "Concept image of a car equipped with advanced sensor systems for autonomous driving, futuristic vehicle, modern urban environment, headline text in Korean reading \"차가 세상을 본다\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"카메라, 레이더, 센서\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_070_1769318479511.png",
+    "background_updated_at": "2026-01-25T14:21:19.516353",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 71,
+    "scene_number": 71,
+    "start_time": "00:02:36,680",
+    "end_time": "00:02:40,120",
+    "start_seconds": 156.68,
+    "end_seconds": 160.12,
+    "duration": 3.44,
+    "duration_estimate": 3,
+    "narration": "카메라, 레이더, 센서. 이런 것들이 필요한 거죠.",
+    "script_text": "카메라, 레이더, 센서. 이런 것들이 필요한 거죠.",
+    "char_count": 28,
+    "image_prompt": "자율 주행차의 센서 시스템 개념 이미지, 차량 외부에 장착된 카메라, 레이더, 센서, 미래 지향적인 도시 배경",
+    "image_prompt_en": "Concept image of a car equipped with advanced sensor systems for autonomous driving, showcasing cameras, radar, and lidar sensors, futuristic vehicle design seamlessly integrated with exterior sensors, clean and modern urban environment in the background, representing the future of automotive technology, emphasis on safety and awareness, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "자율 주행차",
+      "센서 시스템",
+      "카메라",
+      "레이더",
+      "센서",
+      "미래 도시"
+    ],
+    "direction_guide": "미래 지향적인 자율 주행차의 센서 시스템을 강조, 카메라, 레이더, 센서의 위치와 기능을 시각적으로 명확하게",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans around a futuristic car showcasing its sensor system, highlighting cameras, radar, and lidar sensors, modern urban environment in the background",
+    "characters": [],
+    "location": "미래 도시",
+    "mood": "미래 지향적이고 기술적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 1,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      70,
+      71
+    ],
+    "bundle_text": "차가 세상을 봐야 한다고요. 카메라, 레이더, 센서. 이런 것들이 필요한 거죠.",
+    "bundle_start_time": "00:02:34,759",
+    "bundle_end_time": "00:02:40,120",
+    "bundle_start_seconds": 154.759,
+    "bundle_end_seconds": 160.12,
+    "bundle_duration": 5.361000000000018,
+    "is_bundle_primary": false,
+    "image_prompt_korean_text": "Concept image of a car equipped with advanced sensor systems for autonomous driving, futuristic vehicle, modern urban environment, headline text in Korean reading \"차가 세상을 본다\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"카메라, 레이더, 센서\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "자율 주행차의 센서 시스템, 차량 외부에 장착된 카메라, 레이더, 센서, 미래 지향적인 도시 배경",
+    "background_prompt_en": "Concept image of a car equipped with advanced sensor systems for autonomous driving, showcasing cameras, radar, and lidar sensors, futuristic vehicle design seamlessly integrated with exterior sensors, clean and modern urban environment in the background, representing the future of automotive technology, emphasis on safety and awareness, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_071_1769318524525.png",
+    "background_updated_at": "2026-01-25T14:22:04.529369",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 72,
+    "scene_number": 72,
+    "start_time": "00:02:40,120",
+    "end_time": "00:02:41,658",
+    "start_seconds": 160.12,
+    "end_seconds": 161.658,
+    "duration": 1.538,
+    "duration_estimate": 1,
+    "narration": "근데 하만은 이게 없었어요.",
+    "script_text": "근데 하만은 이게 없었어요.",
+    "char_count": 15,
+    "image_prompt": "하만 오디오 시스템이 장착된 자동차 내부, 고급스러운 인테리어, 운전석 시점에서 바라본 전방 시야, 차량 외부에 센서가 없는 모습",
+    "image_prompt_en": "Luxury car interior equipped with Harman Kardon audio system, showcasing high-end speakers and sleek dashboard design, driver's perspective view of the road ahead, clear emphasis on the in-cabin experience, absence of external sensors or cameras, representing Harman's focus on interior technology, ambient lighting accentuating the premium feel, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "자동차 내부",
+      "하만 카돈 오디오",
+      "스피커",
+      "운전석",
+      "고급 인테리어"
+    ],
+    "direction_guide": "하만 카돈 오디오 시스템이 장착된 고급 자동차 내부를 강조, 운전석 시점에서 바라본 전방 시야를 통해 차량 외부 센서의 부재를 부각",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera focuses on the interior of a luxury car equipped with a Harman Kardon audio system, showcasing the high-end speakers and dashboard design, driver's perspective view of the road ahead",
+    "characters": [],
+    "location": "자동차 내부",
+    "mood": "고급스럽고 편안한",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 2,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      72,
+      73
+    ],
+    "bundle_text": "근데 하만은 이게 없었어요. 차 안쪽은 잘 보는데, 차 바깥쪽을 못 보는 거예요.",
+    "bundle_start_time": "00:02:40,120",
+    "bundle_end_time": "00:02:44,718",
+    "bundle_start_seconds": 160.12,
+    "bundle_end_seconds": 164.718,
+    "bundle_duration": 4.597999999999985,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "Luxury car interior with Harman Kardon audio system, driver's perspective, no external sensors, headline text in Korean reading \"하만의 약점\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"차 바깥쪽을 못 본다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "하만 오디오 시스템이 장착된 자동차 내부, 고급스러운 인테리어, 운전석 시점, 차량 외부 센서 없음",
+    "background_prompt_en": "Luxury car interior equipped with Harman Kardon audio system, showcasing high-end speakers and sleek dashboard design, driver's perspective view of the road ahead, clear emphasis on the in-cabin experience, absence of external sensors or cameras, representing Harman's focus on interior technology, ambient lighting accentuating the premium feel, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "Luxury car interior with Harman Kardon audio system, driver's perspective, no external sensors, headline text in Korean reading \"하만의 약점\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"차 바깥쪽을 못 본다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_072_1769318487595.png",
+    "background_updated_at": "2026-01-25T14:21:27.606876",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 73,
+    "scene_number": 73,
+    "start_time": "00:02:41,658",
+    "end_time": "00:02:44,718",
+    "start_seconds": 161.658,
+    "end_seconds": 164.718,
+    "duration": 3.06,
+    "duration_estimate": 3,
+    "narration": "차 안쪽은 잘 보는데, 차 바깥쪽을 못 보는 거예요.",
+    "script_text": "차 안쪽은 잘 보는데, 차 바깥쪽을 못 보는 거예요.",
+    "char_count": 29,
+    "image_prompt": "하만 오디오 시스템이 장착된 자동차 내부, 고급스러운 인테리어, 운전석 시점에서 바라본 전방 시야, 차량 외부에 센서가 없는 모습",
+    "image_prompt_en": "Luxury car interior equipped with Harman Kardon audio system, showcasing high-end speakers and sleek dashboard design, driver's perspective view of the road ahead, clear emphasis on the in-cabin experience, absence of external sensors or cameras, representing Harman's focus on interior technology, ambient lighting accentuating the premium feel, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "자동차 내부",
+      "하만 카돈 오디오",
+      "스피커",
+      "운전석",
+      "고급 인테리어"
+    ],
+    "direction_guide": "하만 카돈 오디오 시스템이 장착된 고급 자동차 내부를 강조, 운전석 시점에서 바라본 전방 시야를 통해 차량 외부 센서의 부재를 부각",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera focuses on the interior of a luxury car equipped with a Harman Kardon audio system, showcasing the high-end speakers and dashboard design, driver's perspective view of the road ahead",
+    "characters": [],
+    "location": "자동차 내부",
+    "mood": "고급스럽고 편안한",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 2,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      72,
+      73
+    ],
+    "bundle_text": "근데 하만은 이게 없었어요. 차 안쪽은 잘 보는데, 차 바깥쪽을 못 보는 거예요.",
+    "bundle_start_time": "00:02:40,120",
+    "bundle_end_time": "00:02:44,718",
+    "bundle_start_seconds": 160.12,
+    "bundle_end_seconds": 164.718,
+    "bundle_duration": 4.597999999999985,
+    "is_bundle_primary": false,
+    "image_prompt_korean_text": "Luxury car interior with Harman Kardon audio system, driver's perspective, no external sensors, headline text in Korean reading \"하만의 약점\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"차 바깥쪽을 못 본다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "하만 오디오 시스템이 장착된 자동차 내부, 고급스러운 인테리어, 운전석 시점, 차량 외부 센서 없음",
+    "background_prompt_en": "Luxury car interior equipped with Harman Kardon audio system, showcasing high-end speakers and sleek dashboard design, driver's perspective view of the road ahead, clear emphasis on the in-cabin experience, absence of external sensors or cameras, representing Harman's focus on interior technology, ambient lighting accentuating the premium feel, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_073_1769318524534.png",
+    "background_updated_at": "2026-01-25T14:22:04.548190",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 74,
+    "scene_number": 74,
+    "start_time": "00:02:44,718",
+    "end_time": "00:02:46,579",
+    "start_seconds": 164.718,
+    "end_seconds": 166.579,
+    "duration": 1.861,
+    "duration_estimate": 1,
+    "narration": "그래서 삼성이 뭘 했냐.",
+    "script_text": "그래서 삼성이 뭘 했냐.",
+    "char_count": 13,
+    "image_prompt": "삼성 로고가 있는 건물과 ZF 로고가 있는 건물이 합쳐지는 모습, M&A를 상징하는 이미지, 계약서에 서명하는 손",
+    "image_prompt_en": "Visual representation of Samsung logo merging with ZF logo, symbolizing a potential merger and acquisition, handshake and contract signing, sleek and modern corporate environment, representing strategic partnership and business expansion, dynamic composition showcasing collaboration, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "삼성 로고",
+      "ZF 로고",
+      "M&A",
+      "계약서",
+      "악수"
+    ],
+    "direction_guide": "삼성과 ZF의 로고가 합쳐지는 모습을 통해 M&A를 시각적으로 표현, 계약서에 서명하는 손을 클로즈업하여 협력과 합의를 강조",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Animation showing Samsung logo merging with ZF logo, symbolizing a potential merger and acquisition, camera focuses on handshake and contract signing",
+    "characters": [],
+    "location": "가상 공간",
+    "mood": "전략적이고 협력적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 3,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      74,
+      75
+    ],
+    "bundle_text": "그래서 삼성이 뭘 했냐. ZF를 노린 거예요.",
+    "bundle_start_time": "00:02:44,718",
+    "bundle_end_time": "00:02:47,860",
+    "bundle_start_seconds": 164.718,
+    "bundle_end_seconds": 167.86,
+    "bundle_duration": 3.1420000000000243,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "Samsung and ZF logos merging, handshake and contract signing, headline text in Korean reading \"삼성의 큰 그림\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"ZF를 노리다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "삼성 로고가 있는 건물, ZF 로고가 있는 건물, M&A 상징, 계약서 서명",
+    "background_prompt_en": "Visual representation of Samsung logo merging with ZF logo, symbolizing a potential merger and acquisition, handshake and contract signing, sleek and modern corporate environment, representing strategic partnership and business expansion, dynamic composition showcasing collaboration, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "Samsung and ZF logos merging, handshake and contract signing, headline text in Korean reading \"삼성의 큰 그림\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"ZF를 노리다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_074_1769318495993.png",
+    "background_updated_at": "2026-01-25T14:21:36.003691",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 75,
+    "scene_number": 75,
+    "start_time": "00:02:47,098",
+    "end_time": "00:02:47,860",
+    "start_seconds": 167.098,
+    "end_seconds": 167.86,
+    "duration": 0.762,
+    "duration_estimate": 0,
+    "narration": "ZF를 노린 거예요.",
+    "script_text": "ZF를 노린 거예요.",
+    "char_count": 11,
+    "image_prompt": "삼성 로고가 있는 건물과 ZF 로고가 있는 건물이 합쳐지는 모습, M&A를 상징하는 이미지, 계약서에 서명하는 손",
+    "image_prompt_en": "Visual representation of Samsung logo merging with ZF logo, symbolizing a potential merger and acquisition, handshake and contract signing, sleek and modern corporate environment, representing strategic partnership and business expansion, dynamic composition showcasing collaboration, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "삼성 로고",
+      "ZF 로고",
+      "M&A",
+      "계약서",
+      "악수"
+    ],
+    "direction_guide": "삼성과 ZF의 로고가 합쳐지는 모습을 통해 M&A를 시각적으로 표현, 계약서에 서명하는 손을 클로즈업하여 협력과 합의를 강조",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Animation showing Samsung logo merging with ZF logo, symbolizing a potential merger and acquisition, camera focuses on handshake and contract signing",
+    "characters": [],
+    "location": "가상 공간",
+    "mood": "전략적이고 협력적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 3,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      74,
+      75
+    ],
+    "bundle_text": "그래서 삼성이 뭘 했냐. ZF를 노린 거예요.",
+    "bundle_start_time": "00:02:44,718",
+    "bundle_end_time": "00:02:47,860",
+    "bundle_start_seconds": 164.718,
+    "bundle_end_seconds": 167.86,
+    "bundle_duration": 3.1420000000000243,
+    "is_bundle_primary": false,
+    "image_prompt_korean_text": "Samsung and ZF logos merging, handshake and contract signing, headline text in Korean reading \"삼성의 큰 그림\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"ZF를 노리다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "삼성 로고가 있는 건물, ZF 로고가 있는 건물, M&A 상징, 계약서 서명",
+    "background_prompt_en": "Visual representation of Samsung logo merging with ZF logo, symbolizing a potential merger and acquisition, handshake and contract signing, sleek and modern corporate environment, representing strategic partnership and business expansion, dynamic composition showcasing collaboration, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_075_1769318524553.png",
+    "background_updated_at": "2026-01-25T14:22:04.563942",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 76,
+    "scene_number": 76,
+    "start_time": "00:02:48,158",
+    "end_time": "00:02:50,800",
+    "start_seconds": 168.158,
+    "end_seconds": 170.8,
+    "duration": 2.642,
+    "duration_estimate": 2,
+    "narration": "자, ZF가 뭔지 설명해드릴게요.",
+    "script_text": "자, ZF가 뭔지 설명해드릴게요.",
+    "char_count": 18,
+    "image_prompt": "ZF 프리드리히스하펜 본사 건물, 독일 자동차 부품 회사, 현대적인 건축 양식",
+    "image_prompt_en": "ZF Friedrichshafen headquarters building, showcasing modern architecture and corporate identity, German automotive parts company, sleek and professional design, representing innovation and engineering excellence, clear visual of the company's headquarters, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "ZF 본사",
+      "독일 회사",
+      "자동차 부품",
+      "현대 건축"
+    ],
+    "direction_guide": "ZF 프리드리히스하펜 본사 건물을 명확하게 보여주어 회사의 규모와 전문성을 강조, 현대적인 건축 양식을 통해 혁신적인 이미지를 전달",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans across the ZF Friedrichshafen headquarters building, showcasing its modern architecture and corporate identity",
+    "characters": [],
+    "location": "ZF 프리드리히스하펜 본사",
+    "mood": "전문적이고 혁신적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 4,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      76,
+      77
+    ],
+    "bundle_text": "자, ZF가 뭔지 설명해드릴게요. ZF 프리드리히스하펜.",
+    "bundle_start_time": "00:02:48,158",
+    "bundle_end_time": "00:02:53,098",
+    "bundle_start_seconds": 168.158,
+    "bundle_end_seconds": 173.098,
+    "bundle_duration": 4.940000000000026,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "ZF Friedrichshafen headquarters building, modern architecture, German automotive parts company, headline text in Korean reading \"ZF를 아십니까?\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"ZF 프리드리히스하펜\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "ZF 프리드리히스하펜 본사 건물, 독일 자동차 부품 회사, 현대적인 건축 양식",
+    "background_prompt_en": "ZF Friedrichshafen headquarters building, showcasing modern architecture and corporate identity, German automotive parts company, sleek and professional design, representing innovation and engineering excellence, clear visual of the company's headquarters, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "ZF Friedrichshafen headquarters building, modern architecture, German automotive parts company, headline text in Korean reading \"ZF를 아십니까?\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"ZF 프리드리히스하펜\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_076_1769318504629.png",
+    "background_updated_at": "2026-01-25T14:21:44.631603",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 77,
+    "scene_number": 77,
+    "start_time": "00:02:51,300",
+    "end_time": "00:02:53,098",
+    "start_seconds": 171.3,
+    "end_seconds": 173.098,
+    "duration": 1.798,
+    "duration_estimate": 1,
+    "narration": "ZF 프리드리히스하펜.",
+    "script_text": "ZF 프리드리히스하펜.",
+    "char_count": 12,
+    "image_prompt": "ZF 프리드리히스하펜 본사 건물, 독일 자동차 부품 회사, 현대적인 건축 양식",
+    "image_prompt_en": "ZF Friedrichshafen headquarters building, showcasing modern architecture and corporate identity, German automotive parts company, sleek and professional design, representing innovation and engineering excellence, clear visual of the company's headquarters, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "ZF 본사",
+      "독일 회사",
+      "자동차 부품",
+      "현대 건축"
+    ],
+    "direction_guide": "ZF 프리드리히스하펜 본사 건물을 명확하게 보여주어 회사의 규모와 전문성을 강조, 현대적인 건축 양식을 통해 혁신적인 이미지를 전달",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera pans across the ZF Friedrichshafen headquarters building, showcasing its modern architecture and corporate identity",
+    "characters": [],
+    "location": "ZF 프리드리히스하펜 본사",
+    "mood": "전문적이고 혁신적인",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 4,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      76,
+      77
+    ],
+    "bundle_text": "자, ZF가 뭔지 설명해드릴게요. ZF 프리드리히스하펜.",
+    "bundle_start_time": "00:02:48,158",
+    "bundle_end_time": "00:02:53,098",
+    "bundle_start_seconds": 168.158,
+    "bundle_end_seconds": 173.098,
+    "bundle_duration": 4.940000000000026,
+    "is_bundle_primary": false,
+    "image_prompt_korean_text": "ZF Friedrichshafen headquarters building, modern architecture, German automotive parts company, headline text in Korean reading \"ZF를 아십니까?\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"ZF 프리드리히스하펜\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "ZF 프리드리히스하펜 본사 건물, 독일 자동차 부품 회사, 현대적인 건축 양식",
+    "background_prompt_en": "ZF Friedrichshafen headquarters building, showcasing modern architecture and corporate identity, German automotive parts company, sleek and professional design, representing innovation and engineering excellence, clear visual of the company's headquarters, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_077_1769318524566.png",
+    "background_updated_at": "2026-01-25T14:22:04.582307",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 78,
+    "scene_number": 78,
+    "start_time": "00:02:53,438",
+    "end_time": "00:02:54,438",
+    "start_seconds": 173.438,
+    "end_seconds": 174.438,
+    "duration": 1.0,
+    "duration_estimate": 1,
+    "narration": "독일 회사예요.",
+    "script_text": "독일 회사예요.",
+    "char_count": 8,
+    "image_prompt": "ZF 로고가 있는 자동차 부품, 변속기, 서스펜션, 자동차 산업의 명가, 독일 엔지니어링",
+    "image_prompt_en": "High-quality automotive parts with the ZF logo, including transmissions and suspension systems, representing the excellence of German engineering in the automotive industry, detailed view of precision-engineered components, showcasing innovation and reliability, professional automotive photography, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "ZF 로고",
+      "자동차 부품",
+      "변속기",
+      "서스펜션",
+      "독일 엔지니어링"
+    ],
+    "direction_guide": "ZF 로고가 있는 자동차 부품을 클로즈업하여 독일 엔지니어링의 우수성을 강조, 변속기와 서스펜션 등 주요 부품을 시각적으로 명확하게",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera focuses on high-quality automotive parts with the ZF logo, showcasing transmissions and suspension systems, representing the excellence of German engineering",
+    "characters": [],
+    "location": "자동차 부품 제조 시설",
+    "mood": "전문적이고 신뢰할 수 있는",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 5,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      78,
+      79
+    ],
+    "bundle_text": "독일 회사예요. 자동차 부품 분야에서는 진짜 명가 중의 명가거든요.",
+    "bundle_start_time": "00:02:53,438",
+    "bundle_end_time": "00:02:57,680",
+    "bundle_start_seconds": 173.438,
+    "bundle_end_seconds": 177.68,
+    "bundle_duration": 4.242000000000019,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "High-quality automotive parts with ZF logo, transmissions and suspension systems, German engineering, headline text in Korean reading \"자동차 부품 명가\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"독일 회사 ZF\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "ZF 로고가 있는 자동차 부품, 변속기, 서스펜션, 자동차 산업",
+    "background_prompt_en": "High-quality automotive parts with the ZF logo, including transmissions and suspension systems, representing the excellence of German engineering in the automotive industry, detailed view of precision-engineered components, showcasing innovation and reliability, professional automotive photography, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "High-quality automotive parts with ZF logo, transmissions and suspension systems, German engineering, headline text in Korean reading \"자동차 부품 명가\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"독일 회사 ZF\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_078_1769318514356.png",
+    "background_updated_at": "2026-01-25T14:21:54.365872",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 79,
+    "scene_number": 79,
+    "start_time": "00:02:54,438",
+    "end_time": "00:02:57,680",
+    "start_seconds": 174.438,
+    "end_seconds": 177.68,
+    "duration": 3.242,
+    "duration_estimate": 3,
+    "narration": "자동차 부품 분야에서는 진짜 명가 중의 명가거든요.",
+    "script_text": "자동차 부품 분야에서는 진짜 명가 중의 명가거든요.",
+    "char_count": 28,
+    "image_prompt": "ZF 로고가 있는 자동차 부품, 변속기, 서스펜션, 자동차 산업의 명가, 독일 엔지니어링",
+    "image_prompt_en": "High-quality automotive parts with the ZF logo, including transmissions and suspension systems, representing the excellence of German engineering in the automotive industry, detailed view of precision-engineered components, showcasing innovation and reliability, professional automotive photography, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "",
+    "character_prompt_en": "",
+    "visual_elements": [
+      "ZF 로고",
+      "자동차 부품",
+      "변속기",
+      "서스펜션",
+      "독일 엔지니어링"
+    ],
+    "direction_guide": "ZF 로고가 있는 자동차 부품을 클로즈업하여 독일 엔지니어링의 우수성을 강조, 변속기와 서스펜션 등 주요 부품을 시각적으로 명확하게",
+    "camera_suggestion": "",
+    "video_prompt_character": "",
+    "video_prompt_full": "Camera focuses on high-quality automotive parts with the ZF logo, showcasing transmissions and suspension systems, representing the excellence of German engineering",
+    "characters": [],
+    "location": "자동차 부품 제조 시설",
+    "mood": "전문적이고 신뢰할 수 있는",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 5,
+    "bundle_size": 2,
+    "bundle_scenes": [
+      78,
+      79
+    ],
+    "bundle_text": "독일 회사예요. 자동차 부품 분야에서는 진짜 명가 중의 명가거든요.",
+    "bundle_start_time": "00:02:53,438",
+    "bundle_end_time": "00:02:57,680",
+    "bundle_start_seconds": 173.438,
+    "bundle_end_seconds": 177.68,
+    "bundle_duration": 4.242000000000019,
+    "is_bundle_primary": false,
+    "image_prompt_korean_text": "High-quality automotive parts with ZF logo, transmissions and suspension systems, German engineering, headline text in Korean reading \"자동차 부품 명가\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"독일 회사 ZF\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "ZF 로고가 있는 자동차 부품, 변속기, 서스펜션, 자동차 산업",
+    "background_prompt_en": "High-quality automotive parts with the ZF logo, including transmissions and suspension systems, representing the excellence of German engineering in the automotive industry, detailed view of precision-engineered components, showcasing innovation and reliability, professional automotive photography, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_079_1769318524586.png",
+    "background_updated_at": "2026-01-25T14:22:04.603783",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "fallback_representative"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  },
+  {
+    "scene_id": 80,
+    "scene_number": 80,
+    "start_time": "00:02:58,240",
+    "end_time": "00:03:00,240",
+    "start_seconds": 178.24,
+    "end_seconds": 180.24,
+    "duration": 2.0,
+    "duration_estimate": 2,
+    "narration": "설립이 1915년이에요.",
+    "script_text": "설립이 1915년이에요.",
+    "char_count": 13,
+    "image_prompt": "빈티지 스타일의 사진, 1915년의 오래된 자동차 공장 내부, 노동자들이 자동차를 조립하는 모습, 시대적 배경을 반영하는 의상과 분위기, 공장의 활기찬 모습과 초기의 기술적인 경이로움을 담아냄",
+    "image_prompt_en": "Vintage-style photograph of an old car factory interior from 1915, workers assembling automobiles on the assembly line, period clothing and atmosphere reflecting the era, capturing the bustling activity of the factory and the early technological marvels of the time, sepia-toned image with a sense of historical significance, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "character_prompt": "자동차를 조립하는 노동자들, 시대적 배경을 반영하는 의상",
+    "character_prompt_en": "Workers assembling automobiles on the assembly line, period clothing and atmosphere reflecting the era, no text, no logos on clothing, no name tags",
+    "visual_elements": [
+      "1915년 자동차 공장",
+      "자동차 조립 라인",
+      "빈티지 의상",
+      "노동자",
+      "옛날 자동차"
+    ],
+    "direction_guide": "1915년의 자동차 공장 내부를 빈티지 스타일로 촬영, 노동자들이 자동차를 조립하는 모습과 시대적 분위기를 강조",
+    "camera_suggestion": "",
+    "video_prompt_character": "Camera pans across the factory floor showing workers in period clothing assembling automobiles, vintage style and atmosphere",
+    "video_prompt_full": "Camera pans across the vintage car factory floor showing workers assembling automobiles, sepia tone and historical atmosphere of 1915",
+    "characters": [
+      {
+        "name": "노동자",
+        "pose": "standing",
+        "emotion": "neutral",
+        "visual_prompt": "Workers assembling automobiles on the assembly line, period clothing and atmosphere reflecting the era, no text, no logos on clothing, no name tags"
+      }
+    ],
+    "location": "1915년 자동차 공장",
+    "mood": "역사적이고 활기찬",
+    "source": "srt",
+    "needs_analysis": false,
+    "bundle_id": 6,
+    "bundle_size": 1,
+    "bundle_scenes": [
+      80
+    ],
+    "bundle_text": "설립이 1915년이에요.",
+    "bundle_start_time": "00:02:58,240",
+    "bundle_end_time": "00:03:00,240",
+    "bundle_start_seconds": 178.24,
+    "bundle_end_seconds": 180.24,
+    "bundle_duration": 2.0,
+    "is_bundle_primary": true,
+    "image_prompt_korean_text": "Vintage car factory interior from 1915, workers assembling automobiles, period clothing, sepia tone, headline text in Korean reading \"1915년 설립\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"역사가 시작되다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_prompt": "빈티지 스타일의 사진, 1915년의 오래된 자동차 공장 내부, 노동자들이 자동차를 조립하는 모습, 시대적 배경을 반영하는 의상과 분위기",
+    "background_prompt_en": "Vintage-style photograph of an old car factory interior from 1915, workers assembling automobiles on the assembly line, period clothing and atmosphere reflecting the era, capturing the bustling activity of the factory and the early technological marvels of the time, sepia-toned image with a sense of historical significance, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "korean_text": "Vintage car factory interior from 1915, workers assembling automobiles, period clothing, sepia tone, headline text in Korean reading \"1915년 설립\" at the top in handwritten pen script style with casual brush strokes, subtitle text in Korean reading \"역사가 시작되다\" in the upper area in informal handwritten font style, all Korean text in natural hand-drawn pen calligraphy style with slight irregularity, text positioned harmoniously within the upper 70% of the image avoiding the bottom subtitle area",
+    "background_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\backgrounds\\bg_scene_080_1769318523338.png",
+    "background_updated_at": "2026-01-25T14:22:03.348592",
+    "character_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "character_image": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+    "linked_characters": [
+      {
+        "path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png",
+        "name": "노동자",
+        "is_representative": true,
+        "match_type": "generated_images"
+      }
+    ],
+    "character_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test5\\images\\characters\\char_노동자_standing_1769318918578.png"
+    ]
+  }
+]

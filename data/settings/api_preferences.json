@@ -6,7 +6,7 @@
     "style": "animation",
     "api_interval": 1.0,
     "celebrity_replacement": true,
-    "celebrity_ai_model": "gemini-2.0-flash-exp",
+    "celebrity_ai_model": "gemini-2.5-flash",
     "rembg_enabled": false,
     "auto_save_storyboard": false,
     "imagefx_model": "IMAGEN_4",
@@ -36,7 +36,7 @@
   },
   "scene_analysis": {
     "ai_provider": "google",
-    "ai_model": "gemini-2.0-flash-exp",
+    "ai_model": "gemini-2.5-flash",
     "language": "ko",
     "srt_bundle_size": 3
   },

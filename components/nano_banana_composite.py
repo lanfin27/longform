@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-components/nano_banana_composite.py
+components/nano_banana_composite.py (v3.39)
 나노바나나 배경+캐릭터 합성 이미지 생성 컴포넌트
 
 워크플로우:
@@ -10,6 +10,27 @@ components/nano_banana_composite.py
 4. 합성 이미지 생성 (image_prompt_en + 배경/캐릭터 레퍼런스)
 
 작성: 2026-01
+
+v3.39: 👥 다중 캐릭터 레퍼런스 지원
+    - get_all_character_images_for_scene(): 씬의 모든 캐릭터 이미지 조회
+    - get_primary_character_image(): 주요 캐릭터 이미지 반환
+    - CharacterImageManager 연동으로 appearance_scenes 기반 자동 매칭
+
+v3.38: 🔴 묶음(Bundle) 최적화 추가
+    - 배치 합성 시 같은 묶음 내 대표 씬만 API 호출
+    - 묶음 내 다른 씬은 대표 씬 이미지 복사 (API 비용 절약)
+    - 예: 묶음 [47,48]에서 씬 47만 API 호출, 씬 48은 복사
+    - Bundle Copy 로깅 및 scenes.json 업데이트
+
+v3.37: 배경 이미지 glob 패턴 검색 추가
+    - get_scene_image_paths()에서 타임스탬프 파일 지원
+    - bg_scene_049*.png 패턴으로 bg_scene_049_1768007xxx.png 찾기
+    - 최신 파일 자동 선택 (수정 시간 기준)
+
+v3.36: custom_prompt 매개변수 추가
+    - generate_composite_image()에 custom_prompt 매개변수 추가
+    - custom_prompt가 제공되면 씬 프롬프트 대신 사용
+    - step2_character.py와의 호환성 문제 해결
 """
 
 import streamlit as st
@@ -18,6 +39,7 @@ from typing import List, Dict, Optional, Callable, Tuple, Set
 import time
 import json
 import os
+import shutil
 
 from utils.gemini_image_generator import (
     GeminiImageGenerator,
@@ -308,22 +330,44 @@ def get_scene_image_paths(scene: Dict, project_path: str, use_cache: bool = True
 
     project = Path(project_path)
 
-    # 배경 이미지 경로 확인
+    # ═══════════════════════════════════════════════════════════════
+    # v2.1: 배경 이미지 경로 확인 - glob 패턴으로 타임스탬프 파일 지원
+    # ═══════════════════════════════════════════════════════════════
     background_path = scene.get('background_image_path') or scene.get('background_image')
     if background_path and Path(background_path).exists():
         background_path = str(background_path)
     else:
-        # 가능한 경로들 확인
-        possible_bg_paths = [
-            project / "images" / "backgrounds" / f"bg_scene_{scene_id:03d}.png",
-            project / "images" / "backgrounds" / f"background_{scene_id:03d}.png",
-            project / "images" / f"scene_{scene_id:03d}_bg.png",
-        ]
         background_path = None
-        for p in possible_bg_paths:
-            if p.exists():
-                background_path = str(p)
-                break
+        bg_folder = project / "images" / "backgrounds"
+
+        # v2.1: glob 패턴으로 타임스탬프가 붙은 파일도 찾기
+        if bg_folder.exists():
+            # 패턴: bg_scene_049*.png, bg_scene_49*.png (3자리/2자리 모두 지원)
+            patterns = [
+                f"bg_scene_{scene_id:03d}*.png",  # bg_scene_049*.png
+                f"bg_scene_{scene_id}*.png",      # bg_scene_49*.png (0 없이)
+            ]
+
+            found_files = []
+            for pattern in patterns:
+                found_files.extend(list(bg_folder.glob(pattern)))
+
+            if found_files:
+                # 최신 파일 사용 (수정 시간 기준)
+                latest_file = max(found_files, key=lambda f: f.stat().st_mtime)
+                background_path = str(latest_file)
+
+        # 폴백: 정확한 경로 확인 (기존 로직)
+        if not background_path:
+            possible_bg_paths = [
+                project / "images" / "backgrounds" / f"bg_scene_{scene_id:03d}.png",
+                project / "images" / "backgrounds" / f"background_{scene_id:03d}.png",
+                project / "images" / f"scene_{scene_id:03d}_bg.png",
+            ]
+            for p in possible_bg_paths:
+                if p.exists():
+                    background_path = str(p)
+                    break
 
     # ═══════════════════════════════════════════════════════════════
     # v3.34: 캐릭터 이미지 - CharacterImageManager 자동 연동 우선
@@ -412,6 +456,141 @@ def can_generate_composite(scene: Dict, project_path: str) -> Tuple[bool, str]:
         return False, f"필요: {', '.join(missing)}"
 
     return True, "합성 가능"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# v3.39: 다중 캐릭터 레퍼런스 지원
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def get_all_character_images_for_scene(scene: Dict, project_path: str) -> List[Dict]:
+    """
+    씬에 등장하는 모든 캐릭터 이미지 조회 (v3.39)
+
+    기존 get_scene_image_paths()는 첫 번째 캐릭터 이미지만 반환했으나,
+    이 함수는 씬에 등장하는 모든 캐릭터의 이미지를 반환합니다.
+
+    Args:
+        scene: 씬 데이터 (characters 필드 포함)
+        project_path: 프로젝트 경로
+
+    Returns:
+        캐릭터 이미지 정보 리스트
+        [
+            {
+                "name": "캐릭터 이름",
+                "path": "이미지 경로",
+                "exists": bool
+            },
+            ...
+        ]
+
+    사용 예:
+        char_images = get_all_character_images_for_scene(scene, project_path)
+        for char in char_images:
+            if char["exists"]:
+                print(f"{char['name']}: {char['path']}")
+    """
+    results = []
+    scene_id = get_scene_number(scene)
+
+    # 1. CharacterImageManager 활용 (v3.34 방식)
+    try:
+        from utils.character_image_manager import CharacterImageManager
+        char_manager = CharacterImageManager.get_instance(project_path)
+
+        # appearance_scenes 기반으로 모든 캐릭터 이미지 조회
+        char_images = char_manager.get_all_characters_for_scene(scene)
+        if char_images:
+            for char_info in char_images:
+                char_name = char_info.get('name', 'Unknown')
+                img_path = char_info.get('path')
+                exists = img_path and Path(img_path).exists()
+
+                results.append({
+                    "name": char_name,
+                    "path": img_path if exists else None,
+                    "exists": exists,
+                    "source": "character_manager"
+                })
+
+            if results:
+                names = [r["name"] for r in results if r["exists"]]
+                print(f"[MultiChar] 씬 {scene_id}: {len(results)}개 캐릭터 이미지 ({', '.join(names)})")
+                return results
+
+    except Exception as e:
+        print(f"[MultiChar] CharacterImageManager 조회 실패: {e}")
+
+    # 2. 폴백: 씬 데이터의 characters 필드에서 직접 조회
+    characters = scene.get('characters', [])
+    if characters:
+        project = Path(project_path)
+        char_folder = project / "images" / "characters"
+
+        for char in characters:
+            if isinstance(char, dict):
+                char_name = char.get('name', '')
+            elif isinstance(char, str):
+                char_name = char
+            else:
+                continue
+
+            if not char_name:
+                continue
+
+            # 캐릭터 이미지 경로 검색
+            char_path = None
+            if char_folder.exists():
+                # 캐릭터 이름으로 이미지 찾기
+                safe_name = char_name.replace(' ', '_').replace('/', '_')
+                patterns = [
+                    f"{safe_name}*.png",
+                    f"*{safe_name}*.png",
+                    f"char_{safe_name}*.png"
+                ]
+
+                for pattern in patterns:
+                    found = list(char_folder.glob(pattern))
+                    if found:
+                        char_path = str(max(found, key=lambda f: f.stat().st_mtime))
+                        break
+
+            results.append({
+                "name": char_name,
+                "path": char_path,
+                "exists": char_path is not None,
+                "source": "scene_characters"
+            })
+
+    # 3. 최종 폴백: 기존 get_scene_image_paths 활용
+    if not results:
+        paths = get_scene_image_paths(scene, project_path, use_cache=True)
+        if paths.get("character"):
+            results.append({
+                "name": "캐릭터",
+                "path": paths["character"],
+                "exists": True,
+                "source": "fallback"
+            })
+
+    return results
+
+
+def get_primary_character_image(scene: Dict, project_path: str) -> Optional[str]:
+    """
+    씬의 주요 캐릭터 이미지 경로 반환 (v3.39)
+
+    다중 캐릭터가 있는 경우 첫 번째 캐릭터 이미지 반환.
+    get_scene_image_paths()["character"]와 호환됩니다.
+
+    Returns:
+        캐릭터 이미지 경로 또는 None
+    """
+    char_images = get_all_character_images_for_scene(scene, project_path)
+    for char in char_images:
+        if char.get("exists") and char.get("path"):
+            return char["path"]
+    return None
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -726,10 +905,11 @@ def generate_composite_image(
     character_path: str,
     model_key: str = "gemini_nano_banana",
     prompt_type: str = "english",
-    reference_strength: float = 0.8
+    reference_strength: float = 0.8,
+    custom_prompt: Optional[str] = None
 ) -> Tuple[bool, Optional[str], str, Optional[Dict]]:
     """
-    배경 + 캐릭터 합성 이미지 생성 (v3.35: 상세 로깅 + composite_info 반환)
+    배경 + 캐릭터 합성 이미지 생성 (v3.36: custom_prompt 지원)
 
     Args:
         scene: 씬 데이터
@@ -740,6 +920,7 @@ def generate_composite_image(
         model_key: 모델 키
         prompt_type: "english" 또는 "korean"
         reference_strength: 레퍼런스 강도 (0.0 ~ 1.0)
+        custom_prompt: 사용자 정의 프롬프트 (None이면 씬에서 자동 추출)
 
     Returns:
         (success, image_path, error_message, composite_info)
@@ -766,8 +947,14 @@ def generate_composite_image(
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
     }
 
-    # 전체 프롬프트 사용 (배경 + 캐릭터가 함께 있는 씬)
-    prompt = prompts["full_en"] if prompt_type == "english" else prompts["full_ko"]
+    # v3.36: custom_prompt 우선 사용, 없으면 씬에서 추출
+    if custom_prompt and custom_prompt.strip():
+        prompt = custom_prompt.strip()
+        print(f"[NanoComposite] 📝 사용자 정의 프롬프트 사용 (custom_prompt)")
+    else:
+        # 전체 프롬프트 사용 (배경 + 캐릭터가 함께 있는 씬)
+        prompt = prompts["full_en"] if prompt_type == "english" else prompts["full_ko"]
+
     if not prompt.strip():
         return False, None, "전체 프롬프트 없음", composite_info
 
@@ -1652,8 +1839,122 @@ def _render_batch_composite_tab(
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# v3.36: 배치 합성 전용 실행 함수
+# v3.38: 배치 합성 전용 실행 함수 (묶음 최적화 포함)
 # ═══════════════════════════════════════════════════════════════════════════════
+
+def _get_bundle_optimization_info(
+    selected_scene_nums: List[int],
+    all_scenes: List[Dict]
+) -> Tuple[List[int], List[Dict]]:
+    """
+    v3.38: 묶음 최적화를 위한 대표 씬 및 복사 대상 분류
+
+    Args:
+        selected_scene_nums: 선택된 씬 번호 리스트
+        all_scenes: 전체 씬 목록 (bundle_id 포함)
+
+    Returns:
+        (scenes_to_generate, scenes_to_copy)
+        - scenes_to_generate: API 호출 대상 씬 번호 리스트
+        - scenes_to_copy: 복사 대상 [{"scene_id": X, "source_scene_id": Y, "bundle_id": Z}, ...]
+    """
+    from collections import defaultdict
+
+    # 선택된 씬 집합
+    selected_set = set(selected_scene_nums)
+
+    # 전체 씬에서 bundle_id 맵 생성
+    scene_to_bundle = {}  # scene_id → bundle_id
+    bundle_to_scenes = defaultdict(list)  # bundle_id → [scene_id, ...]
+
+    for scene in all_scenes:
+        scene_id = get_scene_number(scene)
+        bundle_id = scene.get('bundle_id', scene_id)  # 없으면 scene_id를 bundle_id로
+        scene_to_bundle[scene_id] = bundle_id
+        bundle_to_scenes[bundle_id].append(scene_id)
+
+    # 각 bundle의 씬을 정렬 (scene_id 순)
+    for bundle_id in bundle_to_scenes:
+        bundle_to_scenes[bundle_id] = sorted(bundle_to_scenes[bundle_id])
+
+    # 선택된 씬을 묶음별로 분류
+    selected_by_bundle = defaultdict(list)  # bundle_id → [scene_ids in selected]
+    for scene_num in selected_scene_nums:
+        bundle_id = scene_to_bundle.get(scene_num, scene_num)
+        selected_by_bundle[bundle_id].append(scene_num)
+
+    # 대표 씬(API 호출) vs 복사 대상 분류
+    scenes_to_generate = []  # API 호출 대상
+    scenes_to_copy = []      # 복사 대상
+
+    for bundle_id, scene_nums in selected_by_bundle.items():
+        scene_nums_sorted = sorted(scene_nums)
+
+        # 첫 번째 씬 = 대표 씬 (API 호출)
+        representative_id = scene_nums_sorted[0]
+        scenes_to_generate.append(representative_id)
+
+        # 나머지 씬 = 복사 대상
+        for scene_id in scene_nums_sorted[1:]:
+            scenes_to_copy.append({
+                "scene_id": scene_id,
+                "source_scene_id": representative_id,
+                "bundle_id": bundle_id
+            })
+
+    # 로그 출력
+    print(f"\n[배치합성] ═══════════════════════════════════════════════════════")
+    print(f"[배치합성] 📦 묶음 최적화 분석 완료 (v3.38)")
+    print(f"[배치합성] 선택된 전체 씬: {len(selected_scene_nums)}개")
+    print(f"[배치합성] API 생성 대상 (묶음 대표): {len(scenes_to_generate)}개 → {scenes_to_generate}")
+    print(f"[배치합성] 복사 대상: {len(scenes_to_copy)}개")
+    for copy_info in scenes_to_copy:
+        print(f"[배치합성]    씬 {copy_info['scene_id']} ← 씬 {copy_info['source_scene_id']} (묶음 {copy_info['bundle_id']})")
+    print(f"[배치합성] 💰 API 절약: {len(scenes_to_copy)}회")
+    print(f"[배치합성] ═══════════════════════════════════════════════════════\n")
+
+    return scenes_to_generate, scenes_to_copy
+
+
+def _copy_composite_image_for_bundle(
+    source_path: str,
+    target_scene_id: int,
+    project_path: str
+) -> Optional[str]:
+    """
+    v3.38: 묶음 내 복사 - 합성 이미지를 다른 씬으로 복사
+
+    Args:
+        source_path: 원본 합성 이미지 경로
+        target_scene_id: 대상 씬 번호
+        project_path: 프로젝트 경로
+
+    Returns:
+        복사된 이미지 경로 (실패 시 None)
+    """
+    if not source_path or not os.path.exists(source_path):
+        print(f"[배치합성] ❌ Bundle Copy 실패: 원본 파일 없음 - {source_path}")
+        return None
+
+    try:
+        # 출력 경로 생성
+        output_dir = Path(project_path) / "images" / "nano_composite"
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        timestamp = int(time.time() * 1000)
+        target_path = output_dir / f"composite_scene_{target_scene_id:03d}_{timestamp}.png"
+
+        # 파일 복사
+        shutil.copy2(source_path, target_path)
+
+        print(f"[배치합성] 📋 Bundle Copy: 씬 {target_scene_id} ← {Path(source_path).name}")
+
+        return str(target_path)
+
+    except Exception as e:
+        print(f"[배치합성] ❌ Bundle Copy 에러 (씬 {target_scene_id}): {e}")
+        return None
+
 
 def _execute_batch_composite_only(
     selected_scene_nums: List[int],
@@ -1667,9 +1968,10 @@ def _execute_batch_composite_only(
     on_complete: Callable = None
 ) -> Dict:
     """
-    배치 합성 전용 실행 (v3.36)
+    배치 합성 전용 실행 (v3.38: 묶음 최적화 포함)
 
     배경+캐릭터 이미지가 모두 있는 씬만 대상으로 합성만 실행합니다.
+    v3.38: 같은 묶음 내 씬은 대표 씬만 API 호출, 나머지는 이미지 복사
 
     Args:
         selected_scene_nums: 선택된 씬 번호 리스트
@@ -1683,23 +1985,45 @@ def _execute_batch_composite_only(
         on_complete: 완료 콜백
 
     Returns:
-        {'success': [], 'failed': [], 'skipped': []}
+        {'success': [], 'failed': [], 'skipped': [], 'copied': []}
     """
     results = {
         'success': [],
         'failed': [],
-        'skipped': []
+        'skipped': [],
+        'copied': []  # v3.38: 복사된 씬 추적
     }
 
     # 씬 번호 → 씬 데이터 맵
     scene_map = {get_scene_number(s): s for s in character_scenes}
+    all_scene_map = {get_scene_number(s): s for s in all_scenes}
 
     total = len(selected_scene_nums)
     if total == 0:
         st.warning("선택된 씬이 없습니다.")
         return results
 
+    # ═══════════════════════════════════════════════════════════════════════════
+    # v3.38: 묶음 최적화 - 대표 씬과 복사 대상 분류
+    # ═══════════════════════════════════════════════════════════════════════════
+    scenes_to_generate, scenes_to_copy = _get_bundle_optimization_info(
+        selected_scene_nums, all_scenes
+    )
+
+    total_generate = len(scenes_to_generate)
+    total_copy = len(scenes_to_copy)
+    total_operations = total_generate + total_copy
+
     st.markdown("### 🎨 배치 합성 진행")
+
+    # v3.38: 묶음 최적화 정보 표시
+    if total_copy > 0:
+        st.info(f"""
+            **📦 묶음 최적화 적용**
+            - API 생성: **{total_generate}개** 씬 (묶음 대표만)
+            - 이미지 복사: **{total_copy}개** 씬 (같은 묶음 내)
+            - 💰 API 절약: **{total_copy}회**
+        """)
 
     # UI 요소
     progress_bar = st.progress(0)
@@ -1707,14 +2031,22 @@ def _execute_batch_composite_only(
     current_image_container = st.empty()
     result_container = st.container()
 
+    # 생성된 이미지 경로 저장 (복사용)
+    generated_paths = {}  # scene_id → result_path
+
     try:
         generator = GeminiImageGenerator()
 
-        for idx, scene_num in enumerate(selected_scene_nums):
+        # ═══════════════════════════════════════════════════════════════════════
+        # Phase 1: API 호출로 대표 씬 합성
+        # ═══════════════════════════════════════════════════════════════════════
+        st.markdown("#### 🎨 1단계: API 합성 (묶음 대표 씬)")
+
+        for idx, scene_num in enumerate(scenes_to_generate):
             # 진행 상황 업데이트
-            progress = (idx + 1) / total
+            progress = (idx + 1) / total_operations
             progress_bar.progress(progress)
-            status_text.markdown(f"**🎨 씬 {scene_num} 합성 중... ({idx + 1}/{total})**")
+            status_text.markdown(f"**🎨 씬 {scene_num} 합성 중... ({idx + 1}/{total_generate})**")
 
             # 씬 데이터 찾기
             scene = scene_map.get(scene_num)
@@ -1741,7 +2073,7 @@ def _execute_batch_composite_only(
 
             # 합성 실행
             try:
-                print(f"[배치합성] 🎨 씬 {scene_num} 합성 시작...")
+                print(f"[배치합성] 🎨 씬 {scene_num} API 합성 시작...")
 
                 success, result_path, error, composite_info = generate_composite_image(
                     scene=scene,
@@ -1759,10 +2091,11 @@ def _execute_batch_composite_only(
                     update_scene_image_path(scene, "composite", result_path, all_scenes, project_path, composite_info)
 
                     results['success'].append(scene_num)
-                    print(f"[배치합성] ✅ 씬 {scene_num} 완료: {result_path}")
+                    generated_paths[scene_num] = result_path  # 복사용 저장
+                    print(f"[배치합성] ✅ 씬 {scene_num} API 완료: {result_path}")
 
                     # 결과 이미지 미리보기
-                    current_image_container.image(result_path, caption=f"씬 {scene_num} 합성 완료", width=400)
+                    current_image_container.image(result_path, caption=f"씬 {scene_num} 합성 완료 (API)", width=400)
                 else:
                     results['failed'].append({'scene': scene_num, 'reason': error or '이미지 생성 실패'})
                     print(f"[배치합성] ❌ 씬 {scene_num} 실패: {error}")
@@ -1772,10 +2105,80 @@ def _execute_batch_composite_only(
                 print(f"[배치합성] ❌ 씬 {scene_num} 에러: {e}")
 
             # API 레이트 리밋 방지
-            if idx < total - 1:
+            if idx < total_generate - 1:
                 time.sleep(delay_seconds)
 
-        # 완료
+        # ═══════════════════════════════════════════════════════════════════════
+        # Phase 2: 묶음 내 이미지 복사
+        # ═══════════════════════════════════════════════════════════════════════
+        if scenes_to_copy:
+            st.markdown("#### 📋 2단계: 묶음 내 이미지 복사")
+
+            for idx, copy_info in enumerate(scenes_to_copy):
+                scene_id = copy_info['scene_id']
+                source_scene_id = copy_info['source_scene_id']
+                bundle_id = copy_info['bundle_id']
+
+                # 진행 상황 업데이트
+                progress = (total_generate + idx + 1) / total_operations
+                progress_bar.progress(progress)
+                status_text.markdown(f"**📋 씬 {scene_id} 복사 중... (묶음 {bundle_id}에서 씬 {source_scene_id} 복사)**")
+
+                # 원본 경로 확인
+                source_path = generated_paths.get(source_scene_id)
+                if not source_path:
+                    results['skipped'].append({
+                        'scene': scene_id,
+                        'reason': f'원본 씬 {source_scene_id} 이미지 없음'
+                    })
+                    print(f"[배치합성] ⏭️ 씬 {scene_id} 스킵: 원본 씬 {source_scene_id} 이미지 없음")
+                    continue
+
+                # 이미지 복사
+                copied_path = _copy_composite_image_for_bundle(
+                    source_path, scene_id, project_path
+                )
+
+                if copied_path:
+                    # 씬 데이터 업데이트
+                    target_scene = all_scene_map.get(scene_id)
+                    if target_scene:
+                        # composite_info 생성 (복사 정보 포함)
+                        copy_composite_info = {
+                            "used_prompt": "[Bundle Copy]",
+                            "model": model_key,
+                            "reference_strength": ref_strength,
+                            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                            "bundle_copy_source": source_scene_id,
+                            "bundle_id": bundle_id
+                        }
+                        update_scene_image_path(
+                            target_scene, "composite", copied_path,
+                            all_scenes, project_path, copy_composite_info
+                        )
+
+                    results['copied'].append({
+                        'scene': scene_id,
+                        'source': source_scene_id,
+                        'bundle_id': bundle_id
+                    })
+                    print(f"[배치합성] ✅ 씬 {scene_id} 복사 완료 (← 씬 {source_scene_id})")
+
+                    # 결과 이미지 미리보기
+                    current_image_container.image(
+                        copied_path,
+                        caption=f"씬 {scene_id} 복사 완료 (← 씬 {source_scene_id})",
+                        width=400
+                    )
+                else:
+                    results['failed'].append({
+                        'scene': scene_id,
+                        'reason': f'복사 실패 (원본: 씬 {source_scene_id})'
+                    })
+
+        # ═══════════════════════════════════════════════════════════════════════
+        # 완료 및 결과 표시
+        # ═══════════════════════════════════════════════════════════════════════
         progress_bar.progress(1.0)
         status_text.markdown("**✅ 배치 합성 완료!**")
         current_image_container.empty()
@@ -1784,18 +2187,29 @@ def _execute_batch_composite_only(
         with result_container:
             st.markdown("### 📊 결과 요약")
 
-            col1, col2, col3 = st.columns(3)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
-                st.metric("✅ 성공", len(results['success']))
+                st.metric("✅ API 성공", len(results['success']))
             with col2:
-                st.metric("❌ 실패", len(results['failed']))
+                st.metric("📋 복사 완료", len(results['copied']))
             with col3:
+                st.metric("❌ 실패", len(results['failed']))
+            with col4:
                 st.metric("⏭️ 스킵", len(results['skipped']))
+
+            # v3.38: API 절약 정보
+            if results['copied']:
+                st.success(f"💰 **묶음 최적화로 API {len(results['copied'])}회 절약!**")
 
             # 상세 정보
             if results['success']:
-                with st.expander(f"✅ 성공한 씬 ({len(results['success'])}개)", expanded=False):
+                with st.expander(f"✅ API 성공 씬 ({len(results['success'])}개)", expanded=False):
                     st.write(f"씬 번호: {results['success']}")
+
+            if results['copied']:
+                with st.expander(f"📋 복사된 씬 ({len(results['copied'])}개)", expanded=False):
+                    for item in results['copied']:
+                        st.write(f"- 씬 {item['scene']} ← 씬 {item['source']} (묶음 {item['bundle_id']})")
 
             if results['failed']:
                 with st.expander(f"❌ 실패한 씬 ({len(results['failed'])}개)", expanded=True):
@@ -1944,11 +2358,12 @@ def _execute_batch_generation(
 
 def auto_link_characters_to_scenes(scenes: List[Dict], project_path: str) -> Dict:
     """
-    모든 씬에 캐릭터 이미지 자동 연동 (v3.34)
+    모든 씬에 캐릭터 이미지 자동 연동 (v3.35)
 
     - 캐릭터 관리에서 생성된 이미지를 각 씬에 자동 연동
     - characters.json의 appearance_scenes 기반 매핑
     - 페이지 로드 시 한 번 호출하여 씬 데이터 업데이트
+    - v3.35: 캐릭터 데이터 정규화 및 에러 핸들링 강화
 
     Args:
         scenes: 씬 목록
@@ -1958,17 +2373,19 @@ def auto_link_characters_to_scenes(scenes: List[Dict], project_path: str) -> Dic
         {
             "linked_count": 연동된 씬 수,
             "total_characters": 연동된 총 캐릭터 수,
-            "scenes_updated": [업데이트된 씬 ID 목록]
+            "scenes_updated": [업데이트된 씬 ID 목록],
+            "errors": 에러 발생 씬 수
         }
     """
     result = {
         "linked_count": 0,
         "total_characters": 0,
-        "scenes_updated": []
+        "scenes_updated": [],
+        "errors": 0
     }
 
     try:
-        from utils.character_image_manager import CharacterImageManager
+        from utils.character_image_manager import CharacterImageManager, normalize_character_data
         char_manager = CharacterImageManager(project_path)
     except ImportError:
         print("[NanoComposite] ⚠️ CharacterImageManager import 실패")
@@ -1979,13 +2396,24 @@ def auto_link_characters_to_scenes(scenes: List[Dict], project_path: str) -> Dic
     for scene in scenes:
         scene_id = get_scene_number(scene)
 
-        # 이미 연동된 캐릭터가 있고 파일이 존재하면 스킵
-        existing_path = scene.get('character_image_path') or scene.get('character_image')
-        if existing_path and Path(existing_path).exists():
-            continue
+        try:
+            # v3.35: 씬의 캐릭터 데이터 정규화
+            raw_characters = scene.get('characters', [])
+            if raw_characters:
+                scene['characters'] = normalize_character_data(raw_characters)
 
-        # CharacterImageManager로 이 씬에 등장하는 캐릭터 찾기
-        char_images = char_manager.get_all_characters_for_scene(scene)
+            # 이미 연동된 캐릭터가 있고 파일이 존재하면 스킵
+            existing_path = scene.get('character_image_path') or scene.get('character_image')
+            if existing_path and Path(existing_path).exists():
+                continue
+
+            # CharacterImageManager로 이 씬에 등장하는 캐릭터 찾기
+            char_images = char_manager.get_all_characters_for_scene(scene)
+
+        except Exception as e:
+            print(f"[NanoComposite] ❌ 씬 {scene_id} 캐릭터 연동 오류: {e}")
+            result["errors"] += 1
+            continue
 
         if char_images:
             # 첫 번째 캐릭터 이미지를 대표로 설정

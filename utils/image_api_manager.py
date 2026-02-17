@@ -192,140 +192,22 @@ class ImageAPIManager:
     @staticmethod
     def _sanitize_prompt_for_imagefx(prompt: str) -> str:
         """
-        ImageFX 안전성 필터를 위한 프롬프트 전처리
+        ImageFX 안전성 필터를 위한 프롬프트 전처리 (v7.0 패스스루)
 
-        v6.4: PUBLIC_ERROR_UNSAFE_GENERATION 방지
-        v6.5: PUBLIC_ERROR_PROMINENT_PEOPLE_FILTER 방지 (기업명/직책 일반화)
-        - 민족/국적 관련 키워드 대체
-        - 실제 인물로 오인될 수 있는 표현 수정
-        - 실제 기업명을 일반적인 표현으로 대체
+        v7.0: 하드코딩 제거. 공백 정리만 수행.
+        실질적 정제는 imagefx_client.py → imagefx_prompt_sanitizer.py →
+        prominent_people_sanitizer.py 체인에서 AI 기반으로 처리.
         """
         import re
 
-        sanitized = prompt
-        changes_made = []
+        # 공백 정리만 수행
+        sanitized = re.sub(r'\s+', ' ', prompt).strip()
 
-        # ═══════════════════════════════════════════════════════════════
-        # v6.5: 기업명/직책 일반화 (PROMINENT_PEOPLE_FILTER 방지)
-        # ═══════════════════════════════════════════════════════════════
-
-        # 한국 대기업명 → 일반적 표현
-        korean_company_patterns = [
-            (r'삼성전자\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'large electronics company executive'),
-            (r'삼성\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'large tech company executive'),
-            (r'현대자동차\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'automotive company executive'),
-            (r'현대차\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'automotive company executive'),
-            (r'현대\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'large industrial company executive'),
-            (r'LG전자\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'electronics company executive'),
-            (r'LG\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'large conglomerate executive'),
-            (r'SK하이닉스\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'semiconductor company executive'),
-            (r'SK\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'large conglomerate executive'),
-            (r'롯데\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'retail company executive'),
-            (r'카카오\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'tech company executive'),
-            (r'네이버\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'internet company executive'),
-            (r'쿠팡\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'e-commerce company executive'),
-            (r'기아\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'automotive company executive'),
-            (r'포스코\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'steel company executive'),
-            (r'한화\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'industrial company executive'),
-            (r'CJ\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'entertainment company executive'),
-            (r'두산\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'industrial company executive'),
-            (r'신세계\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'retail company executive'),
-            (r'GS\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'energy company executive'),
-        ]
-
-        # 글로벌 기업명 → 일반적 표현
-        global_company_patterns = [
-            (r'\bTesla\s*(CEO|executive|director|manager|employee)?', 'electric vehicle company executive'),
-            (r'\b테슬라\s*(CEO|임원|대표|사장|회장|직원)?', 'electric vehicle company executive'),
-            (r'\bApple\s*(CEO|executive|director|manager|employee)?', 'tech company executive'),
-            (r'\b애플\s*(CEO|임원|대표|사장|회장|직원)?', 'tech company executive'),
-            (r'\bGoogle\s*(CEO|executive|director|manager|employee)?', 'tech company executive'),
-            (r'\b구글\s*(CEO|임원|대표|사장|회장|직원)?', 'tech company executive'),
-            (r'\bMicrosoft\s*(CEO|executive|director|manager|employee)?', 'software company executive'),
-            (r'\bAmazon\s*(CEO|executive|director|manager|employee)?', 'e-commerce company executive'),
-            (r'\bMeta\s*(CEO|executive|director|manager|employee)?', 'social media company executive'),
-            (r'\bFacebook\s*(CEO|executive|director|manager|employee)?', 'social media company executive'),
-            (r'\b페이스북\s*(CEO|임원|대표|사장|회장|직원)?', 'social media company executive'),
-            (r'\bNVIDIA\s*(CEO|executive|director|manager|employee)?', 'chip company executive'),
-            (r'\bIntel\s*(CEO|executive|director|manager|employee)?', 'semiconductor company executive'),
-            (r'\bSamsung\s*(CEO|executive|director|manager|employee)?', 'electronics company executive'),
-            (r'\bHyundai\s*(CEO|executive|director|manager|employee)?', 'automotive company executive'),
-            (r'\bSony\s*(CEO|executive|director|manager|employee)?', 'electronics company executive'),
-            (r'\bToyota\s*(CEO|executive|director|manager|employee)?', 'automotive company executive'),
-            (r'\bBMW\s*(CEO|executive|director|manager|employee)?', 'automotive company executive'),
-            (r'\bMercedes\s*(CEO|executive|director|manager|employee)?', 'automotive company executive'),
-            (r'\bBosch\s*(CEO|executive|director|manager|employee)?', 'automotive parts company executive'),
-            (r'\bZF\s*(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원|CEO|executive)?', 'automotive parts company executive'),
-            (r'\bZF\s+(독일\s*)?(임원|대표|사장|회장|부회장|전무|상무|이사|팀장|직원)?', 'German automotive parts company executive'),
-            (r'\bSpaceX\s*(CEO|executive|director|manager|employee)?', 'aerospace company executive'),
-            (r'\bOpenAI\s*(CEO|executive|director|manager|employee)?', 'AI company executive'),
-        ]
-
-        # 기업명만 단독으로 나오는 경우 (직책 없이)
-        company_only_patterns = [
-            (r'\b삼성전자\b', 'large electronics company'),
-            (r'\b삼성\b', 'large tech company'),
-            (r'\b현대자동차\b', 'automotive company'),
-            (r'\b현대차\b', 'automotive company'),
-            (r'\bLG전자\b', 'electronics company'),
-            (r'\bSK하이닉스\b', 'semiconductor company'),
-            (r'\b테슬라\b', 'electric vehicle company'),
-            (r'\bTesla\b', 'electric vehicle company'),
-            (r'\bApple\b(?!\s+(?:pie|juice|tree|fruit|cider))', 'tech company'),
-            (r'\bGoogle\b', 'tech company'),
-            (r'\bZF\b', 'automotive parts company'),
-        ]
-
-        # 한국 기업 + 직책 패턴 적용
-        for pattern, replacement in korean_company_patterns:
-            original_sanitized = sanitized
-            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
-            if sanitized != original_sanitized:
-                changes_made.append(f"기업+직책: {pattern}")
-
-        # 글로벌 기업 + 직책 패턴 적용
-        for pattern, replacement in global_company_patterns:
-            original_sanitized = sanitized
-            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
-            if sanitized != original_sanitized:
-                changes_made.append(f"글로벌 기업: {pattern}")
-
-        # 기업명만 단독으로 나오는 경우 (직책이 없어도 대체)
-        for pattern, replacement in company_only_patterns:
-            original_sanitized = sanitized
-            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
-            if sanitized != original_sanitized:
-                changes_made.append(f"기업명 단독: {pattern}")
-
-        # ═══════════════════════════════════════════════════════════════
-        # 민족/국적 관련 키워드 대체 (안전성 필터 트리거 방지)
-        # ═══════════════════════════════════════════════════════════════
-        nationality_patterns = [
-            (r'\bKorean\s+webtoon\b', 'webtoon'),
-            (r'\bKorean\s+manhwa\b', 'manhwa'),
-            (r'\bKorean\s+style\b', 'Asian-inspired style'),
-            (r'\bKorean\s+', ''),  # 기타 Korean + 명사 조합
-            (r'\bJapanese\s+anime\b', 'anime'),
-            (r'\bChinese\s+', ''),
-        ]
-
-        for pattern, replacement in nationality_patterns:
-            original_sanitized = sanitized
-            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
-            if sanitized != original_sanitized:
-                changes_made.append(f"국적: {pattern}")
-
-        # 연속 공백 정리
-        sanitized = re.sub(r'\s+', ' ', sanitized).strip()
-
-        # 변경 사항 로그
         if sanitized != prompt:
-            print(f"[ImageFX v6.5] 프롬프트 안전성 전처리 적용됨")
-            print(f"  적용된 패턴: {', '.join(changes_made[:5])}{'...' if len(changes_made) > 5 else ''}")
-            print(f"  변경 전: {prompt[:100]}...")
-            print(f"  변경 후: {sanitized[:100]}...")
+            print(f"[ImageFX v7.0] 프롬프트 공백 정리 적용")
         else:
-            print(f"[ImageFX v6.5] 프롬프트 안전성 전처리: 변경 없음 (안전한 프롬프트)")
+            print(f"[ImageFX v7.0] 프롬프트 전처리: 변경 없음")
+        print(f"  최종 프롬프트 (200자): {sanitized[:200]}...")
 
         return sanitized
 
@@ -812,6 +694,19 @@ class ImageAPIManager:
         negative_prompt: str = ""  # v1.2: 네거티브 프롬프트 지원 추가
     ) -> GenerationResult:
         """Google ImageFX (Imagen) 이미지 생성 (v6.0 - Node.js 래퍼)"""
+
+        # 매 호출 시 최신 쿠키 확인 (session_state > 파일 > 기존 캐시)
+        try:
+            import streamlit as _st
+            fresh_cookie = _st.session_state.get("imagefx_cookie", "")
+        except Exception:
+            fresh_cookie = ""
+        if not fresh_cookie:
+            fresh_cookie = self._load_imagefx_cookie()
+        if fresh_cookie and fresh_cookie != self.imagefx_cookie:
+            print(f"[ImageAPIManager] 쿠키 변경 감지 → 클라이언트 재초기화")
+            self.imagefx_cookie = fresh_cookie
+            self._imagefx_client = None
 
         # v6.0: 쿠키만 필요
         if not self.imagefx_cookie:

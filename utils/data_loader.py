@@ -465,17 +465,48 @@ def get_project_progress(project_path: Path) -> Dict:
 
 # === 씬/캐릭터 관련 함수 ===
 
-def load_scenes(project_path: Path) -> List[Dict]:
-    """씬 분석 결과 로드"""
+def load_scenes(project_path: Path, auto_sync: bool = True) -> List[Dict]:
+    """씬 분석 결과 로드 (character_prompt -> characters 자동 동기화 포함)"""
     scenes_path = Path(project_path) / "analysis" / "scenes.json"
-    if scenes_path.exists():
-        with open(scenes_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
+    if not scenes_path.exists():
+        return []
+
+    with open(scenes_path, "r", encoding="utf-8") as f:
+        scenes = json.load(f)
+
+    if auto_sync and scenes:
+        try:
+            from utils.character_sync import get_sync_status, sync_all_scenes_characters, update_characters_json
+            status = get_sync_status(scenes)
+            if status["needs_sync"] > 0:
+                print(f"[자동 동기화] {status['needs_sync']}개 씬 character_prompt -> characters 동기화")
+                scenes, synced_count = sync_all_scenes_characters(scenes)
+                if synced_count > 0:
+                    with open(scenes_path, "w", encoding="utf-8") as f:
+                        json.dump(scenes, f, ensure_ascii=False, indent=2)
+                    characters_path = scenes_path.parent / "characters.json"
+                    update_characters_json(scenes, characters_path)
+                    print(f"[자동 동기화] {synced_count}개 씬 업데이트 완료")
+        except Exception as e:
+            print(f"[자동 동기화] 오류 (무시): {e}")
+
+    return scenes
 
 
 def save_scenes(project_path: Path, scenes: List[Dict]):
-    """씬 분석 결과 저장"""
+    """씬 분석 결과 저장 (character_prompt -> characters 후처리 동기화 포함)"""
+    if scenes:
+        try:
+            from utils.character_sync import sync_all_scenes_characters, update_characters_json
+            scenes, synced_count = sync_all_scenes_characters(scenes)
+            if synced_count > 0:
+                print(f"[후처리] {synced_count}개 씬의 characters 배열 자동 동기화됨")
+            # characters.json 업데이트
+            characters_path = Path(project_path) / "analysis" / "characters.json"
+            update_characters_json(scenes, characters_path)
+        except Exception as e:
+            print(f"[후처리] 동기화 오류 (무시): {e}")
+
     save_json(scenes, Path(project_path) / "analysis" / "scenes.json")
 
 

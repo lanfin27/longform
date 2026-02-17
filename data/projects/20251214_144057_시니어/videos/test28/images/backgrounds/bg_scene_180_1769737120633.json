@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "created_at": "2026-01-30T10:34:25.655479",
+  "image_file": "bg_scene_176_1769736865654.png",
+  "scene_id": 176,
+  "prompts": {
+    "original": "Dramatic close-up of a sophisticated Tesla autonomous driving chip (conceptual representation of HW4 or HW5) with a subtle Tesla logo visible on its casing, intricate internal circuitry subtly revealing a Samsung logo integrated within, powerful futuristic lighting emphasizing the critical technological partnership, high-resolution and sharp focus on the chip's advanced design, conveying a sense of hidden power and surprising collaboration, dark and moody background with glowing elements, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Dramatic close-up of a sophisticated Tesla autonomous driving chip (conceptual representation of HW4 or HW5) with a subtle Tesla logo visible on its casing, intricate internal circuitry subtly revealing a Samsung logo integrated within, powerful futuristic lighting emphasizing the critical technological partnership, high-resolution and sharp focus on the chip's advanced design, conveying a sense of hidden power and surprising collaboration, dark and moody background with glowing elements, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 994573628
+  },
+  "scene_number": 180,
+  "copied_from": {
+    "scene_number": 176,
+    "original_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test28\\images\\backgrounds\\bg_scene_176_1769736865654.png"
+  },
+  "is_copied": true,
+  "copied_at": "2026-01-30T10:38:40.635759"
+}

@@ -1,0 +1,155 @@
+[
+  {
+    "name": "한화 비즈니스맨",
+    "name_ko": "한화 비즈니스맨",
+    "role": "등장인물",
+    "visual_prompt": "business professional in a sharp business suit, confident expression, shaking hands",
+    "description": "",
+    "scenes": [
+      76,
+      77,
+      78
+    ],
+    "appearance_scenes": [
+      76,
+      77,
+      78
+    ]
+  },
+  {
+    "name": "노르웨이 관계자",
+    "name_ko": "노르웨이 관계자",
+    "role": "등장인물",
+    "visual_prompt": "business professional in a sharp business suit, focused expression, shaking hands",
+    "description": "",
+    "scenes": [
+      76,
+      77,
+      78
+    ],
+    "appearance_scenes": [
+      76,
+      77,
+      78
+    ]
+  },
+  {
+    "name": "강훈식 대통령 비서실장",
+    "name_ko": "강훈식 대통령 비서실장",
+    "role": "등장인물",
+    "visual_prompt": "distinguished Asian Chief of Staff to the President, middle-aged, sharp dark suit, determined and serious expression, walking across an airport tarmac, holding a formal diplomatic brief",
+    "description": "",
+    "scenes": [
+      94,
+      95,
+      96
+    ],
+    "appearance_scenes": [
+      94,
+      95,
+      96
+    ]
+  },
+  {
+    "name": "강훈식 대통령 비서실장 (대표)",
+    "name_ko": "강훈식 대통령 비서실장 (대표)",
+    "role": "등장인물",
+    "visual_prompt": "high-ranking Asian diplomat, middle-aged, formal dark suit, serious and collaborative expression",
+    "description": "",
+    "scenes": [
+      97,
+      98,
+      99
+    ],
+    "appearance_scenes": [
+      94,
+      95,
+      96
+    ]
+  },
+  {
+    "name": "노르웨이 총리",
+    "name_ko": "노르웨이 총리",
+    "role": "등장인물",
+    "visual_prompt": "distinguished European politician, middle-aged, formal suit, engaged in diplomatic discussion",
+    "description": "",
+    "scenes": [
+      97,
+      98,
+      99
+    ],
+    "appearance_scenes": [
+      97,
+      98,
+      99
+    ]
+  },
+  {
+    "name": "노르웨이 국방부 장관",
+    "name_ko": "노르웨이 국방부 장관",
+    "role": "등장인물",
+    "visual_prompt": "European defense official, middle-aged, formal suit, attentive and serious expression",
+    "description": "",
+    "scenes": [
+      97,
+      98,
+      99
+    ],
+    "appearance_scenes": [
+      97,
+      98,
+      99
+    ]
+  },
+  {
+    "name": "정비사",
+    "name_ko": "정비사",
+    "role": "등장인물",
+    "visual_prompt": "seen from behind, holding a tablet and checking parts, wearing professional work attire, focused posture",
+    "description": "",
+    "scenes": [
+      142,
+      143,
+      144
+    ],
+    "appearance_scenes": [
+      142,
+      143,
+      144
+    ]
+  },
+  {
+    "name": "한화에어로스페이스 대표",
+    "name_ko": "한화에어로스페이스 대표",
+    "role": "등장인물",
+    "visual_prompt": "a professional Asian man in a dark suit, confident expression, shaking hands",
+    "description": "",
+    "scenes": [
+      190,
+      191,
+      192
+    ],
+    "appearance_scenes": [
+      190,
+      191,
+      192
+    ]
+  },
+  {
+    "name": "노르웨이 국방부 대표",
+    "name_ko": "노르웨이 국방부 대표",
+    "role": "등장인물",
+    "visual_prompt": "a professional European man in a dark suit, confident expression, shaking hands",
+    "description": "",
+    "scenes": [
+      190,
+      191,
+      192
+    ],
+    "appearance_scenes": [
+      190,
+      191,
+      192
+    ]
+  }
+]

@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 utils/external_launcher.py
-외부 프로젝트 실행 유틸리티 (v1.0)
+외부 프로젝트 실행 유틸리티 (v1.1)
+
+v1.1: NanoWater 로컬 HTTP 서버 지원 추가
+      - ES6 모듈 및 WASM은 file:// 프로토콜에서 작동하지 않음
+      - local_server 타입 추가: HTTP 서버 자동 시작 후 브라우저 열기
 
 기능:
 - Streamlit 프로젝트 실행
+- 로컬 HTTP 서버 기반 프로젝트 실행 (ES6/WASM)
 - 브라우저 확장 프로그램 폴더/파일 열기
 - 프로젝트 상태 확인
 """
@@ -14,6 +19,8 @@ import os
 import sys
 import socket
 import webbrowser
+import threading
+import time
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -30,13 +37,13 @@ EXTERNAL_PROJECTS = {
         "description": "Vrew 자동화 프로젝트"
     },
     "nanowater": {
-        "name": "Nanowater",
-        "icon": "💧",
+        "name": "NanoWater",
+        "icon": "🍌",
         "path": r"C:\Users\KIMJAEHEON\nanowater",
         "entry_point": "index.html",
-        "port": None,
-        "type": "browser_extension",
-        "description": "나노워터 크롬 확장 프로그램"
+        "port": 8765,
+        "type": "local_server",  # v1.1: ES6/WASM 지원을 위해 로컬 HTTP 서버 사용
+        "description": "나노바나나 워터마크 제거기 (LaMa AI 기반)"
     }
 }
 
@@ -71,26 +78,27 @@ def get_project_status(project_id: str) -> Dict:
             "error": "경로 없음"
         }
 
-    # Streamlit 프로젝트인 경우 포트 확인
-    if project["type"] == "streamlit":
-        port = project["port"]
-        running = is_port_in_use(port)
-        return {
-            "exists": True,
-            "running": running,
-            "port": port,
-            "url": f"http://localhost:{port}" if running else None,
-            "type": project["type"]
-        }
-    else:
-        # 브라우저 확장 프로그램 등
-        return {
-            "exists": True,
-            "running": False,
-            "port": None,
-            "url": None,
-            "type": project["type"]
-        }
+    # Streamlit 또는 로컬 서버 프로젝트인 경우 포트 확인
+    if project["type"] in ("streamlit", "local_server"):
+        port = project.get("port")
+        if port:
+            running = is_port_in_use(port)
+            return {
+                "exists": True,
+                "running": running,
+                "port": port,
+                "url": f"http://localhost:{port}" if running else None,
+                "type": project["type"]
+            }
+
+    # 브라우저 확장 프로그램 등
+    return {
+        "exists": True,
+        "running": False,
+        "port": None,
+        "url": None,
+        "type": project["type"]
+    }
 
 
 def launch_streamlit_project(project_id: str, new_terminal: bool = True) -> Dict:
@@ -287,6 +295,123 @@ def launch_browser_extension(project_id: str) -> Dict:
     }
 
 
+def launch_local_server_project(project_id: str) -> Dict:
+    """
+    v1.1: 로컬 HTTP 서버 기반 프로젝트 실행
+
+    ES6 모듈 및 WASM을 사용하는 프로젝트는 file:// 프로토콜에서 작동하지 않음.
+    로컬 HTTP 서버를 시작하고 브라우저를 열어야 함.
+
+    Args:
+        project_id: 프로젝트 ID
+
+    Returns:
+        결과 딕셔너리
+    """
+    if project_id not in EXTERNAL_PROJECTS:
+        return {
+            "success": False,
+            "message": f"알 수 없는 프로젝트: {project_id}"
+        }
+
+    project = EXTERNAL_PROJECTS[project_id]
+    project_path = Path(project["path"])
+    port = project.get("port", 8765)
+
+    if not project_path.exists():
+        return {
+            "success": False,
+            "message": f"프로젝트 경로가 존재하지 않습니다: {project_path}"
+        }
+
+    url = f"http://localhost:{port}"
+
+    # 이미 서버가 실행 중인지 확인
+    if is_port_in_use(port):
+        # 이미 실행 중이면 브라우저만 열기
+        open_in_browser(url)
+        return {
+            "success": True,
+            "message": f"{project['name']} 이미 실행 중 - 브라우저 열림",
+            "port": port,
+            "url": url,
+            "already_running": True
+        }
+
+    # launch.py 스크립트가 있으면 사용
+    launch_script = project_path / "launch.py"
+    if launch_script.exists():
+        try:
+            if sys.platform == "win32":
+                # Windows: 새 터미널 창에서 실행
+                terminal_cmd = f'start "{project["name"]}" cmd /k "cd /d {project_path} && python launch.py"'
+                subprocess.Popen(terminal_cmd, shell=True)
+            else:
+                # 백그라운드 실행
+                subprocess.Popen(
+                    [sys.executable, str(launch_script)],
+                    cwd=str(project_path),
+                    start_new_session=True
+                )
+
+            return {
+                "success": True,
+                "message": f"{project['name']} 서버 시작됨",
+                "port": port,
+                "url": url
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"launch.py 실행 오류: {str(e)}",
+                "port": port,
+                "url": None
+            }
+
+    # launch.py가 없으면 기본 HTTP 서버 시작
+    try:
+        def start_http_server():
+            import http.server
+            import socketserver
+            os.chdir(str(project_path))
+
+            class QuietHandler(http.server.SimpleHTTPRequestHandler):
+                def log_message(self, format, *args):
+                    pass  # 로그 숨김
+
+                def end_headers(self):
+                    # CORS 헤더 추가
+                    self.send_header('Cross-Origin-Opener-Policy', 'same-origin')
+                    self.send_header('Cross-Origin-Embedder-Policy', 'require-corp')
+                    super().end_headers()
+
+            with socketserver.TCPServer(("localhost", port), QuietHandler) as httpd:
+                httpd.serve_forever()
+
+        server_thread = threading.Thread(target=start_http_server, daemon=True)
+        server_thread.start()
+
+        # 서버 시작 대기
+        time.sleep(0.5)
+
+        # 브라우저 열기
+        open_in_browser(url)
+
+        return {
+            "success": True,
+            "message": f"{project['name']} 서버 시작됨 (기본 HTTP 서버)",
+            "port": port,
+            "url": url
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"HTTP 서버 시작 오류: {str(e)}",
+            "port": port,
+            "url": None
+        }
+
+
 def launch_project(project_id: str) -> Dict:
     """
     프로젝트 타입에 따라 적절한 방식으로 실행
@@ -308,6 +433,9 @@ def launch_project(project_id: str) -> Dict:
 
     if project_type == "streamlit":
         return launch_streamlit_project(project_id)
+    elif project_type == "local_server":
+        # v1.1: ES6/WASM 프로젝트용 로컬 HTTP 서버
+        return launch_local_server_project(project_id)
     elif project_type == "browser_extension":
         return launch_browser_extension(project_id)
     else:

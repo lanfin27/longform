@@ -933,7 +933,12 @@ def check_and_clear_stale_style_cache(page_key: str = "default", clear_keys: boo
                 st.session_state[last_mtime_key] = file_mtime
 
         if is_stale:
-            print(f"[StyleManager] 📢 스타일 변경 감지 (페이지: {page_key})")
+            # ⭐ v2.3: 실제 파일 변경 시에만 로그 출력 (첫 방문은 제외)
+            if last_seen > 0 or last_mtime > 0:
+                print(f"[StyleManager] 📢 스타일 변경 감지 (페이지: {page_key})")
+            else:
+                # 첫 방문 시에는 로그 출력 안함
+                pass
 
             # 스타일 관련 세션 키 클리어 (요청 시)
             if clear_keys:

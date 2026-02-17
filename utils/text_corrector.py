@@ -41,7 +41,7 @@ try:
     _gemini_api_key = os.getenv("GOOGLE_API_KEY")
     if _gemini_api_key:
         genai.configure(api_key=_gemini_api_key)
-        _gemini_fallback_client = genai.GenerativeModel("gemini-2.0-flash-exp")
+        _gemini_fallback_client = genai.GenerativeModel("gemini-2.5-flash")
         GEMINI_FALLBACK_AVAILABLE = True
         print("[TextCorrector] ✅ Gemini 폴백 준비 완료")
 except Exception as e:
@@ -103,7 +103,7 @@ class TextCorrector:
     def __init__(
         self,
         provider: str = "google",
-        model: str = "gemini-2.0-flash-exp",
+        model: str = "gemini-2.5-flash",
         api_key: str = None
     ):
         self.provider = provider
@@ -765,7 +765,7 @@ class TextCorrectorV3:
     def __init__(
         self,
         provider: str = "google",
-        model: str = "gemini-2.0-flash-exp",
+        model: str = "gemini-2.5-flash",
         api_key: str = None
     ):
         self.provider = provider
@@ -1248,7 +1248,7 @@ _corrector_v3_instance: Optional[TextCorrectorV3] = None
 
 def get_text_corrector(
     provider: str = "google",
-    model: str = "gemini-2.0-flash-exp"
+    model: str = "gemini-2.5-flash"
 ) -> TextCorrector:
     """텍스트 교정기 싱글톤 (v5.1)"""
     global _corrector_instance
@@ -1261,7 +1261,7 @@ def get_text_corrector(
 
 def get_text_corrector_v3(
     provider: str = "google",
-    model: str = "gemini-2.0-flash-exp"
+    model: str = "gemini-2.5-flash"
 ) -> TextCorrectorV3:
     """텍스트 교정기 v3.0 싱글톤"""
     global _corrector_v3_instance

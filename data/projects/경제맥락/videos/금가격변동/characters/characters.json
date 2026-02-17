@@ -1,0 +1,120 @@
+[
+  {
+    "id": "char_0",
+    "name": "투자자들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "diverse group of determined and hopeful individuals, eagerly reaching out or gazing longingly towards the gold bars, professional attire",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\characters\\char_투자자들_standing_1770434684984.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\characters\\char_투자자들_standing_1770434684984.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-07T12:23:40.510275",
+    "updated_at": "2026-02-07T12:25:27.293783"
+  },
+  {
+    "id": "char_1",
+    "name": "한국은행 고위 관계자들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "professional individuals in suits, engaged in a serious and contemplative discussion, with focused expressions",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\characters\\char_한국은행_고위_관계자들_standing_1770434687705.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\characters\\char_한국은행_고위_관계자들_standing_1770434687705.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-07T12:23:40.510803",
+    "updated_at": "2026-02-07T12:25:27.311633"
+  },
+  {
+    "id": "char_2",
+    "name": "케빈 워시",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "confident and intelligent-looking man, wearing a business suit, thoughtful expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\characters\\char_케빈_워시_standing_1770434687263.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\characters\\char_케빈_워시_standing_1770434687263.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-07T12:23:40.511281",
+    "updated_at": "2026-02-07T12:25:27.350240"
+  },
+  {
+    "id": "char_3",
+    "name": "시장 참여자들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "diverse group of people, some in business attire, looking disappointed and concerned, gazing at a large vault door",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\characters\\char_시장_참여자들_standing_1770434687247.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\characters\\char_시장_참여자들_standing_1770434687247.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-07T12:23:40.511701",
+    "updated_at": "2026-02-07T12:25:27.381549"
+  },
+  {
+    "id": "char_4",
+    "name": "뉴스 앵커",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "A retro 1970s news anchor, male, serious expression, wearing a formal suit, delivering news",
+    "reference_urls": [],
+    "generated_images": [],
+    "appearance_scenes": [],
+    "selected_image_path": "",
+    "auto_select_latest": true,
+    "created_at": "2026-02-07T12:23:40.512065",
+    "updated_at": "2026-02-07T12:24:02.878648"
+  },
+  {
+    "id": "char_5",
+    "name": "강력한 비즈니스맨",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "powerful, confident Asian businessman, middle-aged, sharp dark suit, thoughtful expression, conveying influence over financial markets",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\characters\\char_강력한_비즈니스맨_standing_1770434696579.png"
+    ],
+    "appearance_scenes": [],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\경제맥락\\videos\\금가격변동\\images\\characters\\char_강력한_비즈니스맨_standing_1770434696579.png",
+    "auto_select_latest": true,
+    "created_at": "2026-02-07T12:23:40.512762",
+    "updated_at": "2026-02-07T12:25:27.430939"
+  }
+]

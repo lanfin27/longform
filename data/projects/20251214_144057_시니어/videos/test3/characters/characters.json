@@ -1,0 +1,20 @@
+[
+  {
+    "id": "char_0",
+    "name": "이재용",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Lee Jae-yong, determined expression, reviewing documents, wearing professional attire, confident posture, no text, no logos on clothing, no name tags",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test3\\images\\characters\\char_이재용_standing_1769265084659.png"
+    ],
+    "appearance_scenes": [],
+    "created_at": "2026-01-24T23:30:48.550216",
+    "updated_at": "2026-01-24T23:31:13.787051"
+  }
+]

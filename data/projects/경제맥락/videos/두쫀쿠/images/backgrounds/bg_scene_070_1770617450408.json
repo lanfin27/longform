@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-09T15:10:50.408821",
+  "image_file": "bg_scene_070_1770617450408.png",
+  "scene_id": 70,
+  "prompts": {
+    "original": "Elegant, affordably luxurious perfume bottle in a close-up, softly gleaming, juxtaposed with a subtle background element depicting a part of a high-end luxury handbag (e.g., delicate leather texture or a refined metal clasp, without specific brand logos), creating a contrast that symbolizes \"value for money\" or \"small luxury,\" a soft upward curve subtly visible in the blurred background implying 12.6% annual growth, delicate and sophisticated lighting, artistic composition, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, Elegant, affordably luxurious perfume bottle in a close-up, softly gleaming, juxtaposed with a subtle background element depicting a part of a high-end luxury handbag (e.g., delicate leather texture or a refined metal clasp, without specific brand logos), creating a contrast that symbolizes \"value for money\" or \"small luxury,\" a soft upward curve subtly visible in the blurred background implying 12.6% annual growth, delicate and sophisticated lighting, artistic composition, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 543031945
+  }
+}

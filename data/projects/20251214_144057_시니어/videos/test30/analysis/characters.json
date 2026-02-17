@@ -1,0 +1,105 @@
+[
+  {
+    "name": "비즈니스맨들",
+    "name_ko": "비즈니스맨들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse businesspeople, professional attire, confused and animated expressions, discussing in a modern office",
+    "description": "",
+    "scenes": [
+      43,
+      44,
+      45
+    ],
+    "appearance_scenes": [
+      43,
+      44,
+      45
+    ]
+  },
+  {
+    "name": "이재용 회장",
+    "name_ko": "이재용 회장",
+    "role": "등장인물",
+    "visual_prompt": "then Vice Chairman of Samsung, an Asian businessman in a sharp dark suit, with a thoughtful, visionary expression, gazing out of a window, conveying deep strategic contemplation",
+    "description": "",
+    "scenes": [
+      46,
+      47,
+      48
+    ],
+    "appearance_scenes": [
+      46,
+      47,
+      48
+    ]
+  },
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "role": "등장인물",
+    "visual_prompt": "A driver, potentially a middle-aged Asian man, seated in the driver's seat, looking at the display with a focused and comfortable expression, hands on the steering wheel",
+    "description": "",
+    "scenes": [
+      64,
+      65,
+      66,
+      103,
+      104,
+      105,
+      115,
+      116,
+      117,
+      244,
+      245,
+      246
+    ],
+    "appearance_scenes": [
+      64,
+      65,
+      66,
+      103,
+      104,
+      105,
+      115,
+      116,
+      117,
+      244,
+      245,
+      246
+    ]
+  },
+  {
+    "name": "핵심 인력들",
+    "name_ko": "핵심 인력들",
+    "role": "등장인물",
+    "visual_prompt": "business professionals, looking worried or stressed, in formal business attire, conveying deep concern",
+    "description": "",
+    "scenes": [
+      199,
+      200,
+      201
+    ],
+    "appearance_scenes": [
+      199,
+      200,
+      201
+    ]
+  },
+  {
+    "name": "유튜버",
+    "name_ko": "유튜버",
+    "role": "등장인물",
+    "visual_prompt": "Smiling presenter, friendly expression, making a gesture suggesting subscribe and like, looking directly at the camera, professional yet approachable",
+    "description": "",
+    "scenes": [
+      316,
+      317,
+      318
+    ],
+    "appearance_scenes": [
+      316,
+      317,
+      318
+    ]
+  }
+]

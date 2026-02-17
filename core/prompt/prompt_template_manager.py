@@ -117,6 +117,7 @@ class PromptTemplate:
     is_default: bool = True
     updated_at: str = ""
     prompt_type: str = "both"  # "single", "batch", "both" (v2.5 추가)
+    source_file: str = ""  # v2.6: 원본 파일 경로 (있으면 이 경로 사용)
 
     def __post_init__(self):
         if not self.updated_at:
@@ -1115,6 +1116,109 @@ JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하
     def get_templates_by_category(self, category: str) -> List[PromptTemplate]:
         """카테고리별 템플릿 목록 반환"""
         return [t for t in self.templates.values() if t.category == category]
+
+    # ═══════════════════════════════════════════════════════════════════
+    # v2.6: 프롬프트 템플릿 파일 경로 관리 (Claude Code용)
+    # ═══════════════════════════════════════════════════════════════════
+
+    @property
+    def templates_dir(self) -> Path:
+        """템플릿 파일 저장 디렉토리"""
+        return self._ROOT_DIR / "data" / "prompts" / "templates"
+
+    def get_template_file_path(self, template_id: str, force_update: bool = False) -> Optional[str]:
+        """
+        템플릿의 파일 경로 반환 (없으면 생성, 변경되면 갱신)
+
+        v2.6: 선택된 프롬프트의 원본 파일 경로를 Claude Code에 전달하기 위한 메서드
+        v2.7: 항상 내용 변경 확인 및 자동 갱신 (템플릿 수정 즉시 반영!)
+
+        Args:
+            template_id: 템플릿 ID
+            force_update: True면 파일 내용 강제 업데이트 (내용 비교 없이)
+
+        Returns:
+            템플릿 파일의 절대 경로 (없으면 None)
+        """
+        template = self.templates.get(template_id)
+        if not template:
+            _debug_log(f"get_template_file_path: 템플릿 '{template_id}' 없음")
+            return None
+
+        # 1. source_file이 지정되어 있고 존재하면 그대로 사용
+        if template.source_file:
+            source_path = Path(template.source_file)
+            # 상대 경로면 프로젝트 루트 기준으로 해석
+            if not source_path.is_absolute():
+                source_path = self._ROOT_DIR / source_path
+            if source_path.exists():
+                _debug_log(f"get_template_file_path: 원본 파일 사용: {source_path}")
+                return str(source_path)
+
+        # 2. 템플릿 파일 디렉토리 생성
+        self.templates_dir.mkdir(parents=True, exist_ok=True)
+
+        # 3. 템플릿 파일 경로 결정
+        # 카테고리와 ID를 조합하여 파일명 생성
+        safe_id = template_id.replace("/", "_").replace("\\", "_")
+        template_file = self.templates_dir / f"{safe_id}.md"
+
+        # 4. 새 내용 준비 (메타데이터 헤더 + 프롬프트)
+        header = f"""---
+template_id: {template_id}
+template_name: {template.name}
+category: {template.category}
+description: {template.description}
+updated_at: {template.updated_at}
+---
+
+"""
+        new_content = header + template.prompt
+
+        # 5. v2.7: 파일이 없거나, 내용이 변경되었거나, 강제 업데이트면 갱신
+        needs_update = force_update
+
+        if not template_file.exists():
+            needs_update = True
+            _debug_log(f"get_template_file_path: 파일 없음, 새로 생성")
+        elif not needs_update:
+            # 기존 파일 내용과 비교
+            try:
+                existing_content = template_file.read_text(encoding='utf-8-sig')
+                if existing_content != new_content:
+                    needs_update = True
+                    _debug_log(f"get_template_file_path: 내용 변경됨, 갱신 필요")
+                    print(f"[PromptTemplateManager] 템플릿 내용 변경 감지: {template_id}")
+            except Exception as e:
+                needs_update = True
+                _debug_log(f"get_template_file_path: 기존 파일 읽기 실패: {e}")
+
+        if needs_update:
+            template_file.write_text(new_content, encoding='utf-8-sig')
+            _debug_log(f"get_template_file_path: 템플릿 파일 생성/갱신: {template_file}")
+            print(f"[PromptTemplateManager] 템플릿 파일 저장: {template_file.name}")
+
+        return str(template_file)
+
+    def sync_all_template_files(self) -> dict:
+        """
+        모든 템플릿을 파일로 동기화
+
+        Returns:
+            {'synced': 동기화된 수, 'errors': 에러 목록}
+        """
+        synced = 0
+        errors = []
+
+        for template_id in self.templates:
+            try:
+                self.get_template_file_path(template_id, force_update=True)
+                synced += 1
+            except Exception as e:
+                errors.append(f"{template_id}: {e}")
+
+        print(f"[PromptTemplateManager] 템플릿 파일 동기화: {synced}개 완료, {len(errors)}개 에러")
+        return {'synced': synced, 'errors': errors}
 
     # ═══════════════════════════════════════════════════════════════════
     # SRT 분석 프롬프트 관련 헬퍼 메서드

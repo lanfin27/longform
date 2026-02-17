@@ -1,0 +1,23 @@
+[
+  {
+    "name": "다양한 사람들",
+    "name_ko": "다양한 사람들",
+    "role": "등장인물",
+    "visual_prompt": "Diverse group of people with puzzled or skeptical expressions, murmuring and looking confused, dressed in contemporary casual and business attire, various ages and ethnicities, representing public opinion.",
+    "description": ""
+  },
+  {
+    "name": "이재용",
+    "name_ko": "이재용",
+    "role": "등장인물",
+    "visual_prompt": "A confident Lee Jae-yong, middle-aged, with a visionary expression, dressed in a sharp, dark business suit, holding a sleek tablet or gesturing towards a holographic display, no text, no logos on clothing, no name tags",
+    "description": ""
+  },
+  {
+    "name": "운전자",
+    "name_ko": "운전자",
+    "role": "등장인물",
+    "visual_prompt": "A person driving a modern car, with subtle digital overlays on their face indicating detection of drowsiness, attention, and stress levels.",
+    "description": ""
+  }
+]

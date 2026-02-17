@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-11T20:05:16.793899",
+  "image_file": "bg_scene_007_1770807916793.png",
+  "scene_id": 7,
+  "prompts": {
+    "original": "A colossal digital display showcasing the Korean currency amount \"2조 8천억원\" (2.8 trillion KRW) in a bold, prominent font, dominating the frame, with advanced Hanwha Aerospace defense products like artillery systems or missile launchers dramatically silhouetted in the background, illuminated by strategic spotlights, conveying immense scale and significance, creating a sense of awe and prompting curiosity about its importance, sleek futuristic design, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text",
+    "final": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background, A colossal digital display showcasing the Korean currency amount \"2조 8천억원\" (2.8 trillion KRW) in a bold, prominent font, dominating the frame, with advanced Hanwha Aerospace defense products like artillery systems or missile launchers dramatically silhouetted in the background, illuminated by strategic spotlights, conveying immense scale and significance, creating a sense of awe and prompting curiosity about its importance, sleek futuristic design, no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, background scene only, no people, no human figures, no characters, no persons, empty scene, wide shot",
+    "negative": "realistic photograph, 3D render, photorealistic, watercolor, sketch, people, person, human, man, woman, boy, girl, child, figure, face, portrait, character, crowd"
+  },
+  "style": {
+    "id": "재훍_영상툰",
+    "name": "재훍 영상툰",
+    "prefix": "2D animation visual style, Western animated series aesthetic, clean bold black outlines 2-3px thick on all elements, flat cel-shaded coloring with minimal gradients, simplified cartoon shapes with clear silhouettes, solid color fills without texture, crisp vector-like lineart, clean commercial graphics aesthetic, muted desaturated color palette, teal-gray and warm beige neutral tones, simple solid background",
+    "suffix": ""
+  },
+  "generation": {
+    "api_provider": "Google ImageFX",
+    "model": "IMAGEN_4",
+    "model_name": "Imagen 4",
+    "width": 1280,
+    "height": 720
+  },
+  "extra": {
+    "seed": 5373314
+  }
+}

@@ -35,7 +35,7 @@ try:
     api_key = os.getenv("GOOGLE_API_KEY")
     if api_key:
         genai.configure(api_key=api_key)
-        _gemini_client = genai.GenerativeModel("gemini-2.0-flash-exp")
+        _gemini_client = genai.GenerativeModel("gemini-2.5-flash")
         GEMINI_AVAILABLE = True
         print("[ClaudeAgent] [OK] Gemini 폴백 준비 완료")
 except Exception as e:

@@ -1,0 +1,110 @@
+[
+  {
+    "id": "char_0",
+    "name": "이재용 회장",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "visionary Asian businessman, middle-aged, wearing a sharp dark suit, with a thoughtful and focused expression, looking intently into the distance",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test31\\images\\characters\\char_이재용_회장_standing_1769847033700.png"
+    ],
+    "appearance_scenes": [
+      46,
+      47,
+      48
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test31\\images\\characters\\char_이재용_회장_standing_1769847033700.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-31T14:26:30.929220",
+    "updated_at": "2026-01-31T17:10:33.715776"
+  },
+  {
+    "id": "char_1",
+    "name": "운전자",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "middle-aged Asian man, looking at the digital cockpit, hands on steering wheel, focused expression",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test31\\images\\characters\\char_운전자_standing_1769837242983.png"
+    ],
+    "appearance_scenes": [
+      64,
+      65,
+      66,
+      103,
+      104,
+      105,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      244,
+      245,
+      246
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test31\\images\\characters\\char_운전자_standing_1769837242983.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-31T14:26:30.931038",
+    "updated_at": "2026-01-31T17:10:09.555146"
+  },
+  {
+    "id": "char_2",
+    "name": "비즈니스 임원",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "Two confident business executives, one Asian male, one Caucasian male, shaking hands firmly, professional attire, conveying a sense of mutual success and agreement",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test31\\images\\characters\\char_비즈니스_임원_standing_1769837243497.png"
+    ],
+    "appearance_scenes": [
+      271,
+      272,
+      273
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test31\\images\\characters\\char_비즈니스_임원_standing_1769837243497.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-31T14:26:30.932499",
+    "updated_at": "2026-01-31T17:10:09.555152"
+  },
+  {
+    "id": "char_3",
+    "name": "핵심 인력들",
+    "name_en": "",
+    "description": "",
+    "role": "등장인물",
+    "nationality": "",
+    "era": "현대",
+    "appearance": "",
+    "character_prompt": "blurred silhouettes of individuals, professional attire, walking away through an open door or exit",
+    "reference_urls": [],
+    "generated_images": [
+      "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test31\\images\\characters\\char_핵심_인력들_standing_1769837242530.png"
+    ],
+    "appearance_scenes": [
+      286,
+      287,
+      288
+    ],
+    "selected_image_path": "C:\\Users\\KIMJAEHEON\\longform\\data\\projects\\20251214_144057_시니어\\videos\\test31\\images\\characters\\char_핵심_인력들_standing_1769837242530.png",
+    "auto_select_latest": true,
+    "created_at": "2026-01-31T14:26:30.933225",
+    "updated_at": "2026-01-31T17:10:09.555157"
+  }
+]

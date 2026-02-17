@@ -1354,6 +1354,128 @@ class InfographicVideoRecorder:
             return False
 
     # ================================================================
+    # 📸 이미지 캡처 모드 (FFmpeg 불필요)
+    # ================================================================
+
+    def capture_scene_as_image(
+        self,
+        html_content: str,
+        scene_index: int,
+        output_path: str,
+        fullscreen_mode: bool = True
+    ) -> bool:
+        """
+        인포그래픽 씬을 PNG 이미지로 캡처 (FFmpeg 불필요, 빠른 생성)
+
+        record_scene_video_fast()의 steps 1-4만 수행하고 FFmpeg 변환을 생략.
+        """
+        try:
+            self._update_driver_for_canvas(html_content)
+            driver = self._ensure_driver()
+            temp_dir = self._get_temp_dir()
+
+            # HTML 저장 및 로드
+            html_file = os.path.join(temp_dir, f"scene_{scene_index}_img.html")
+            with open(html_file, 'w', encoding='utf-8') as f:
+                f.write(html_content)
+
+            file_url = f"file:///{html_file.replace(os.sep, '/')}"
+            driver.get(file_url)
+            time.sleep(0.5)
+
+            # 씬 표시
+            if fullscreen_mode:
+                self._prepare_scene_fullscreen(driver, scene_index)
+                logger.info(f"[씬 {scene_index + 1}] 이미지 캡처: 전체화면 모드")
+            else:
+                self._show_only_scene_exact_layout(driver, scene_index)
+            time.sleep(0.3)
+
+            # 스크린샷을 최종 경로에 직접 저장
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            driver.save_screenshot(output_path)
+
+            if PIL_AVAILABLE:
+                try:
+                    from PIL import Image
+                    with Image.open(output_path) as img:
+                        logger.info(f"📸 씬 {scene_index + 1} 이미지 캡처: {img.size[0]}x{img.size[1]}")
+                except:
+                    pass
+
+            try:
+                os.remove(html_file)
+            except:
+                pass
+
+            return True
+
+        except Exception as e:
+            logger.error(f"씬 {scene_index + 1} 이미지 캡처 오류: {e}")
+            traceback.print_exc()
+            return False
+
+    def capture_selected_scenes_as_images(
+        self,
+        html_content: str,
+        scene_indices: List[int],
+        output_dir: str,
+        fullscreen_mode: bool = True,
+        scene_id_map: Optional[Dict[int, int]] = None,
+        output_size: Optional[Tuple[int, int]] = None,
+        progress_callback: Optional[Callable[[int, int, str], None]] = None
+    ) -> Dict[int, str]:
+        """
+        선택된 씬들을 PNG 이미지로 일괄 캡처 (FFmpeg 불필요)
+
+        Args:
+            scene_indices: 0-based HTML 인덱스 (HTML 네비게이션용)
+            scene_id_map: {0-based index → actual scene_id} 매핑 (파일명/결과 키용)
+            output_size: (width, height) 출력 크기 지정 시 리사이즈
+
+        Returns:
+            {scene_id: output_path} 딕셔너리 (scene_id_map 있으면 실제 씬 번호, 없으면 index+1)
+        """
+        os.makedirs(output_dir, exist_ok=True)
+        results = {}
+        total = len(scene_indices)
+
+        self._update_driver_for_canvas(html_content)
+        logger.info(f"[ImageCapture] 시작: {total}개 씬, 캔버스={self.canvas_width}x{self.canvas_height}")
+
+        for i, scene_idx in enumerate(scene_indices):
+            scene_id = scene_id_map[scene_idx] if scene_id_map and scene_idx in scene_id_map else scene_idx + 1
+            output_path = os.path.join(output_dir, f"infographic_scene_{scene_id:03d}.png")
+
+            if progress_callback:
+                progress_callback(i + 1, total, f"씬 {scene_id} 이미지 캡처 중...")
+
+            success = self.capture_scene_as_image(
+                html_content, scene_idx, output_path,
+                fullscreen_mode=fullscreen_mode
+            )
+
+            if success:
+                # 출력 크기 지정 시 리사이즈
+                if output_size and PIL_AVAILABLE:
+                    try:
+                        from PIL import Image
+                        with Image.open(output_path) as img:
+                            if img.size != output_size:
+                                resized = img.resize(output_size, Image.LANCZOS)
+                                resized.save(output_path, "PNG", compress_level=0)
+                                logger.info(f"📐 씬 {scene_id} 리사이즈: {img.size} → {output_size}")
+                    except Exception as e:
+                        logger.warning(f"씬 {scene_id} 리사이즈 실패: {e}")
+
+                results[scene_id] = output_path
+                print(f"✅ 씬 {scene_id} 이미지 캡처 완료")
+            else:
+                print(f"❌ 씬 {scene_id} 이미지 캡처 실패")
+
+        return results
+
+    # ================================================================
     # CSS 애니메이션 실시간 캡처 모드
     # ================================================================
 
@@ -1842,6 +1964,7 @@ class InfographicVideoRecorder:
         preserve_layout: bool = True,
         fullscreen_mode: bool = True,  # 🔴 신규: 전체화면 모드 (인포그래픽이 크게 보임)
         fade_effect: bool = True,
+        scene_id_map: Optional[Dict[int, int]] = None,
         progress_callback: Optional[Callable[[int, int, str], None]] = None
     ) -> Dict[int, str]:
         """
@@ -1853,11 +1976,13 @@ class InfographicVideoRecorder:
         - FFmpeg lanczos 업스케일
 
         Args:
+            scene_indices: 0-based HTML 인덱스 (HTML 네비게이션용)
             animation_mode: True면 실제 CSS 애니메이션 프레임별 캡처
             animation_fps: 애니메이션 캡처 FPS (10-20 권장)
             preserve_layout: True면 원본 레이아웃 보존
             fullscreen_mode: True면 캔버스 전체화면 확장 (권장)
             fade_effect: 페이드 인/아웃 효과
+            scene_id_map: {0-based index → actual scene_id} 매핑 (파일명/결과 키용)
         """
         os.makedirs(output_dir, exist_ok=True)
         results = {}
@@ -1868,18 +1993,19 @@ class InfographicVideoRecorder:
         logger.info(f"[VideoRecorder] 녹화 시작: {total}개 씬, 캔버스={self.canvas_width}x{self.canvas_height} → 출력={self.output_width}x{self.output_height}")
 
         for i, scene_idx in enumerate(scene_indices):
-            output_path = os.path.join(output_dir, f"infographic_scene_{scene_idx + 1:03d}.mp4")
+            scene_id = scene_id_map[scene_idx] if scene_id_map and scene_idx in scene_id_map else scene_idx + 1
+            output_path = os.path.join(output_dir, f"infographic_scene_{scene_id:03d}.mp4")
 
             if progress_callback:
                 quality_name = self.quality_preset.get('name', '고화질')
                 mode_str = "🎭 애니메이션" if animation_mode else "⚡ 정적"
-                progress_callback(i + 1, total, f"씬 {scene_idx + 1} {mode_str} 녹화 중... ({quality_name})")
+                progress_callback(i + 1, total, f"씬 {scene_id} {mode_str} 녹화 중... ({quality_name})")
 
             if animation_mode:
                 # CSS 애니메이션 실시간 캡처
                 def scene_progress(pct):
                     if progress_callback:
-                        progress_callback(i + 1, total, f"씬 {scene_idx + 1} 캡처 중... {pct}%")
+                        progress_callback(i + 1, total, f"씬 {scene_id} 캡처 중... {pct}%")
 
                 success = self.record_scene_with_animation(
                     html_content=html_content,
@@ -1899,10 +2025,10 @@ class InfographicVideoRecorder:
                 )
 
             if success:
-                results[scene_idx] = output_path
-                print(f"✅ 씬 {scene_idx + 1} 녹화 완료 → {self.output_width}x{self.output_height}")
+                results[scene_id] = output_path
+                print(f"✅ 씬 {scene_id} 녹화 완료 → {self.output_width}x{self.output_height}")
             else:
-                print(f"❌ 씬 {scene_idx + 1} 녹화 실패")
+                print(f"❌ 씬 {scene_id} 녹화 실패")
 
         return results
 

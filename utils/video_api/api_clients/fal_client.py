@@ -228,8 +228,13 @@ class FalAIClient(BaseVideoAPIClient):
             payload["prompt_optimizer"] = True
 
         elif "kling" in model_id:
-            # Kling 모델
-            payload["duration"] = str(request.duration)
+            # Kling 모델 - duration 허용 값 검증
+            kling_duration = int(request.duration) if isinstance(request.duration, (int, float)) else 5
+            allowed = sorted(model.durations) if model.durations else [5, 10]
+            if kling_duration not in allowed:
+                kling_duration = next((d for d in allowed if d >= kling_duration), allowed[-1])
+                print(f"[fal.ai] Kling duration 보정: {request.duration} → {kling_duration}")
+            payload["duration"] = str(kling_duration)
             if request.enable_audio and model.has_audio:
                 payload["with_audio"] = True
 

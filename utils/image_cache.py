@@ -170,3 +170,245 @@ def display_image_safe(image_path: str, width: int = 300, caption: str = None):
         st.image(image_path, caption=caption, width=width)
     except Exception as e:
         st.error(f"이미지 표시 오류: {e}")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 레퍼런스 이미지 캐시 (v2.0) - 병렬 이미지 생성 최적화용
+# ═══════════════════════════════════════════════════════════════════════════════
+
+import threading
+from typing import Dict
+
+
+class ReferenceImageCache:
+    """
+    레퍼런스 이미지 캐시 매니저 (싱글톤)
+
+    병렬 이미지 생성 시 같은 레퍼런스 이미지를 반복 로드하는 것을 방지
+    - bytes 캐시: API 전송용
+    - PIL 캐시: 이미지 처리용
+
+    사용 예:
+        cache = ReferenceImageCache()
+        img_bytes = cache.get("/path/to/image.png")
+        pil_img = cache.get_as_pil("/path/to/image.png")
+    """
+
+    _instance = None
+    _lock = threading.Lock()
+
+    def __new__(cls):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._initialized = False
+        return cls._instance
+
+    def __init__(self):
+        if getattr(self, '_initialized', False):
+            return
+
+        self._bytes_cache: Dict[str, bytes] = {}
+        self._pil_cache: Dict[str, Image.Image] = {}
+        self._max_bytes_size = 50  # 최대 50개 bytes 캐시
+        self._max_pil_size = 20  # PIL 캐시는 메모리 더 사용하므로 20개로 제한
+        self._hits = 0
+        self._misses = 0
+        self._initialized = True
+        print("[RefImageCache] ✅ 레퍼런스 이미지 캐시 초기화 완료")
+
+    def _get_cache_key(self, path: str) -> str:
+        """파일 경로 + 수정시간으로 캐시 키 생성"""
+        p = Path(path)
+        if p.exists():
+            try:
+                mtime = p.stat().st_mtime
+                return f"{path}:{mtime}"
+            except Exception:
+                pass
+        return path
+
+    def get(self, path: str) -> Optional[bytes]:
+        """
+        캐시에서 이미지 bytes 가져오기
+
+        Args:
+            path: 이미지 파일 경로
+
+        Returns:
+            이미지 bytes 또는 None (파일 없음)
+        """
+        if not path:
+            return None
+
+        key = self._get_cache_key(path)
+
+        # 캐시 히트
+        if key in self._bytes_cache:
+            self._hits += 1
+            print(f"[RefImageCache] ⚡ 캐시 히트: {Path(path).name} (총 {self._hits}회)")
+            return self._bytes_cache[key]
+
+        # 캐시 미스 - 파일에서 로드
+        self._misses += 1
+
+        try:
+            p = Path(path)
+            if not p.exists():
+                print(f"[RefImageCache] ⚠️ 파일 없음: {path}")
+                return None
+
+            with open(path, 'rb') as f:
+                data = f.read()
+
+            # 캐시 크기 관리 (FIFO 방식)
+            if len(self._bytes_cache) >= self._max_bytes_size:
+                oldest_key = next(iter(self._bytes_cache))
+                del self._bytes_cache[oldest_key]
+
+            self._bytes_cache[key] = data
+            print(f"[RefImageCache] 📁 캐시 미스, 로드: {Path(path).name} ({len(data):,} bytes)")
+
+            return data
+
+        except Exception as e:
+            print(f"[RefImageCache] ❌ 로드 실패: {path} - {e}")
+            return None
+
+    def get_as_pil(self, path: str, max_size: int = 1024) -> Optional[Image.Image]:
+        """
+        캐시에서 PIL Image로 반환 (리사이즈 포함)
+
+        Args:
+            path: 이미지 파일 경로
+            max_size: 최대 크기 (가로/세로 중 큰 쪽)
+
+        Returns:
+            PIL Image 또는 None
+        """
+        if not path:
+            return None
+
+        key = f"{self._get_cache_key(path)}:pil:{max_size}"
+
+        # PIL 캐시 히트
+        if key in self._pil_cache:
+            self._hits += 1
+            return self._pil_cache[key].copy()  # 복사본 반환 (원본 보존)
+
+        # bytes 캐시에서 가져오기
+        data = self.get(path)
+        if not data:
+            return None
+
+        try:
+            pil_image = Image.open(io.BytesIO(data))
+
+            # RGB로 변환 (RGBA인 경우)
+            if pil_image.mode == 'RGBA':
+                pil_image = pil_image.convert('RGB')
+
+            # 리사이즈
+            if pil_image.width > max_size or pil_image.height > max_size:
+                pil_image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+
+            # PIL 캐시 크기 관리
+            if len(self._pil_cache) >= self._max_pil_size:
+                oldest_key = next(iter(self._pil_cache))
+                del self._pil_cache[oldest_key]
+
+            self._pil_cache[key] = pil_image
+            return pil_image.copy()  # 복사본 반환
+
+        except Exception as e:
+            print(f"[RefImageCache] ❌ PIL 변환 실패: {path} - {e}")
+            return None
+
+    def preload(self, paths: list) -> int:
+        """
+        여러 이미지 미리 로드
+
+        Args:
+            paths: 이미지 경로 목록
+
+        Returns:
+            성공적으로 로드된 이미지 수
+        """
+        loaded = 0
+        unique_paths = set(p for p in paths if p)
+
+        for path in unique_paths:
+            if self.get(path):
+                loaded += 1
+
+        print(f"[RefImageCache] 📦 프리로드 완료: {loaded}/{len(unique_paths)}개")
+        return loaded
+
+    def clear(self):
+        """캐시 비우기"""
+        self._bytes_cache.clear()
+        self._pil_cache.clear()
+        self._hits = 0
+        self._misses = 0
+        print("[RefImageCache] 🗑️ 캐시 초기화됨")
+
+    def stats(self) -> Dict:
+        """캐시 통계"""
+        total = self._hits + self._misses
+        hit_rate = (self._hits / total * 100) if total > 0 else 0
+
+        bytes_size = sum(len(v) for v in self._bytes_cache.values())
+
+        return {
+            "bytes_cache_size": len(self._bytes_cache),
+            "pil_cache_size": len(self._pil_cache),
+            "max_bytes_size": self._max_bytes_size,
+            "max_pil_size": self._max_pil_size,
+            "memory_mb": bytes_size / 1024 / 1024,
+            "hits": self._hits,
+            "misses": self._misses,
+            "hit_rate": f"{hit_rate:.1f}%"
+        }
+
+
+# 전역 레퍼런스 이미지 캐시 인스턴스 (싱글톤)
+_reference_cache: Optional[ReferenceImageCache] = None
+
+
+def get_reference_cache() -> ReferenceImageCache:
+    """전역 레퍼런스 이미지 캐시 인스턴스 가져오기"""
+    global _reference_cache
+    if _reference_cache is None:
+        _reference_cache = ReferenceImageCache()
+    return _reference_cache
+
+
+def load_reference_with_cache(path: str) -> Optional[bytes]:
+    """캐시를 활용한 레퍼런스 이미지 로드 (bytes)"""
+    cache = get_reference_cache()
+    return cache.get(path)
+
+
+def load_reference_as_pil(path: str, max_size: int = 1024) -> Optional[Image.Image]:
+    """캐시를 활용한 레퍼런스 이미지 로드 (PIL Image)"""
+    cache = get_reference_cache()
+    return cache.get_as_pil(path, max_size)
+
+
+def preload_references(paths: list) -> int:
+    """여러 레퍼런스 이미지 미리 로드"""
+    cache = get_reference_cache()
+    return cache.preload(paths)
+
+
+def get_reference_cache_stats() -> Dict:
+    """레퍼런스 캐시 통계 조회"""
+    cache = get_reference_cache()
+    return cache.stats()
+
+
+def clear_reference_cache():
+    """레퍼런스 이미지 캐시 초기화"""
+    cache = get_reference_cache()
+    cache.clear()

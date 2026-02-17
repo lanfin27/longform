@@ -114,7 +114,7 @@ class TTStoSRTHybridV5:
         whisper_model: str = "base",
         device_mode: str = "auto",
         ai_provider: str = "google",
-        ai_model: str = "gemini-2.0-flash-exp",
+        ai_model: str = "gemini-2.5-flash",
         whisper_engine: str = "auto",
         whisper_compute_type: str = "auto",
         whisper_vad_filter: bool = True,
@@ -930,7 +930,7 @@ def convert_tts_to_srt_v5(
     split_style: str = "기본",
     whisper_model: str = "base",
     device_mode: str = "auto",
-    ai_model: str = "gemini-2.0-flash-exp",
+    ai_model: str = "gemini-2.5-flash",
     output_srt_path: str = None,
     output_json_path: str = None,
     progress_callback: Optional[Callable] = None
@@ -962,7 +962,7 @@ def convert_tts_to_srt_v4(
     split_style: str = "기본",
     whisper_model: str = "base",
     device_mode: str = "auto",
-    ai_model: str = "gemini-2.0-flash-exp",
+    ai_model: str = "gemini-2.5-flash",
     output_srt_path: str = None,
     output_json_path: str = None,
     progress_callback: Optional[Callable] = None
@@ -1007,7 +1007,7 @@ def convert_tts_to_srt_hybrid(
     split_style: str = "기본",
     whisper_model: str = "base",
     device_mode: str = "auto",
-    ai_model: str = "gemini-2.0-flash-exp",
+    ai_model: str = "gemini-2.5-flash",
     output_srt_path: str = None,
     output_json_path: str = None,
     progress_callback: Optional[Callable] = None

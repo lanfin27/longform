@@ -1,7 +1,7 @@
 {
   "agent_name": "scene_analysis_agent",
-  "version": "1.0.0",
-  "description": "Claude Code 기반 씬 분석 에이전트",
+  "version": "2.0.0",
+  "description": "Claude Code 기반 씬 분석 에이전트 (v2.0 - 16개 전체 필드)",
 
   "input": {
     "scenes_json_path": "{project_path}/analysis/scenes.json",
@@ -16,32 +16,72 @@
 
   "analysis_fields": {
     "required": [
+      "image_prompt",
+      "image_prompt_en",
+      "background_prompt",
       "background_prompt_en",
+      "character_prompt",
       "character_prompt_en",
-      "characters",
+      "image_prompt_korean_text",
+      "korean_text",
       "visual_elements",
-      "scene_mood"
-    ],
-    "optional": [
-      "korean_text_overlay",
       "direction_guide",
-      "camera_angle"
-    ]
+      "camera_suggestion",
+      "video_prompt_character",
+      "video_prompt_full",
+      "characters",
+      "location",
+      "mood"
+    ],
+    "optional": []
+  },
+
+  "field_types": {
+    "image_prompt": {"type": "string", "language": "korean"},
+    "image_prompt_en": {"type": "string", "language": "english"},
+    "background_prompt": {"type": "string", "language": "korean"},
+    "background_prompt_en": {"type": "string", "language": "english"},
+    "character_prompt": {"type": "string", "language": "korean"},
+    "character_prompt_en": {"type": "string", "language": "english"},
+    "image_prompt_korean_text": {"type": "string", "language": "english"},
+    "korean_text": {"type": "string", "language": "english"},
+    "visual_elements": {"type": "array", "language": "korean"},
+    "direction_guide": {"type": "string", "language": "korean"},
+    "camera_suggestion": {"type": "string", "language": "english"},
+    "video_prompt_character": {"type": "string", "language": "english"},
+    "video_prompt_full": {"type": "string", "language": "english"},
+    "characters": {"type": "array", "language": "mixed", "item_schema": {"name": "korean", "visual_prompt": "english"}},
+    "location": {"type": "string", "language": "korean"},
+    "mood": {"type": "string", "language": "korean"}
   },
 
   "bundle_settings": {
     "enabled": true,
     "share_fields": [
+      "image_prompt",
+      "image_prompt_en",
+      "background_prompt",
       "background_prompt_en",
+      "character_prompt",
       "character_prompt_en",
-      "characters"
+      "image_prompt_korean_text",
+      "korean_text",
+      "visual_elements",
+      "direction_guide",
+      "camera_suggestion",
+      "video_prompt_character",
+      "video_prompt_full",
+      "characters",
+      "location",
+      "mood"
     ]
   },
 
   "style_guidelines": {
     "image_style": "2D animation, Western animated series aesthetic",
     "exclude_from_background": ["people", "person", "human", "character"],
-    "language": "english"
+    "language": "english",
+    "text_prohibition_suffix": "no text, no letters, no words, no writing, no numbers, no speech bubbles, no readable text, brand logos are acceptable"
   },
 
   "execution": {

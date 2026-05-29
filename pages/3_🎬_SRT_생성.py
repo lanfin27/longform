@@ -213,12 +213,37 @@ with col_set1:
     )
 
 with col_set2:
+    SRT_STYLES = [
+        "잘게", "기본",
+        "시간 단위 (1초)", "시간 단위 (2초)", "시간 단위 (3초)",
+        "시간 단위 (5초)", "시간 단위 (10초)", "시간 단위 (커스텀)",
+    ]
     srt_style = st.selectbox(
         "SRT 스타일",
-        options=["잘게", "기본"],
+        options=SRT_STYLES,
         index=0,
-        help="잘게: 3초/40자, 기본: 5초/60자"
+        help=(
+            "잘게/기본: 음성 인식(VAD) 기준 자동 분할 (동일 동작). "
+            "시간 단위: 음성 인식 결과를 지정한 초 단위로 균등 분할합니다. "
+            "단어/문장 경계는 보존되며, 실제 길이는 ±30% 오차가 있을 수 있습니다."
+        )
     )
+
+    # ⭐ 시간 단위 분할 목표 시간(초) 파싱
+    target_sec = None
+    if srt_style == "시간 단위 (커스텀)":
+        target_sec = st.number_input(
+            "목표 시간(초)",
+            min_value=0.5,
+            max_value=30.0,
+            value=2.0,
+            step=0.5,
+            format="%.1f",
+            help="0.5~30초 사이의 임의 값 (소수점 1자리). 각 세그먼트가 약 이 길이가 되도록 분할합니다."
+        )
+    elif srt_style.startswith("시간 단위"):
+        # "시간 단위 (2초)" -> 2.0
+        target_sec = float(srt_style.split("(")[1].split("초")[0])
 
 with col_set3:
     language = st.selectbox(
@@ -512,7 +537,8 @@ if btn_whisper and GENERATOR_AVAILABLE and audio_path:
             result = generator.generate_whisper_srt(
                 audio_path=audio_path,
                 style=srt_style,
-                language=language
+                language=language,
+                target_sec=target_sec
             )
 
             progress_bar.progress(100)
@@ -524,6 +550,17 @@ if btn_whisper and GENERATOR_AVAILABLE and audio_path:
 
                 # 통계
                 stats = result.get("stats", {})
+
+                # ⭐ 시간 단위 분할 적용 시 추가 정보 표시
+                ts = stats.get("time_split")
+                if ts:
+                    st.info(
+                        f"⏱️ 시간분할 적용: target={ts['target_sec']:.1f}s · "
+                        f"평균 {ts['avg_duration']:.1f}s · "
+                        f"std {ts.get('std_duration', 0):.1f}s · "
+                        f"세그먼트 {ts['segment_count']}개 "
+                        f"(min {ts['min_duration']:.1f}s / max {ts['max_duration']:.1f}s)"
+                    )
                 col_s1, col_s2, col_s3 = st.columns(3)
                 with col_s1:
                     st.metric("총 씬 수", f"{len(result.get('scenes', []))}개")

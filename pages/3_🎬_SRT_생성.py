@@ -1182,12 +1182,34 @@ if btn_ai_correct and can_run_stage2:
         status_text.text(f"AI 원문 교정 중... (배치 크기: 150, v4.0 속도 최적화)")
         progress_bar.progress(25)
 
+        # BUG FIX: 1.7단계 줄바꿈 보존 - 교정 전 줄바꿈 맵 저장
+        had_linebreaks = {
+            s.get('scene_id'): True
+            for s in scenes
+            if '\n' in s.get('text', '')
+        }
+
         # AI 원문 교정 실행 (v4.0: 배치 크기 150, Claude 최적화)
         corrected_scenes, corrections = corrector.correct_with_original(
             scenes=scenes,
             original_script=original,
             progress_callback=update_progress
         )
+
+        # BUG FIX: 1.7단계 줄바꿈이 2단계 교정 후에도 유지되도록 후처리
+        if had_linebreaks:
+            max_chars_val = st.session_state.get('subtitle_max_chars', 43)
+            from utils.subtitle_formatter import SubtitleFormatter as _SF
+            _fmt = _SF(max_chars=max_chars_val)
+            restored_count = 0
+            for sc in corrected_scenes:
+                sid = sc.get('scene_id')
+                text = sc.get('text', '')
+                if sid in had_linebreaks and '\n' not in text and len(text) > max_chars_val:
+                    sc['text'] = _fmt.wrap_text(text)
+                    restored_count += 1
+            if restored_count > 0:
+                print(f"[SRT생성] 줄바꿈 복원: {restored_count}개 씬")
 
         progress_bar.progress(90)
 

@@ -173,7 +173,8 @@ class HybridSRTGenerator:
         audio_path: str,
         original_script: str = None,
         style: str = "잘게",
-        language: str = "ko"
+        language: str = "ko",
+        target_sec: float = None
     ) -> HybridResultV55:
         """
         HybridV5.5 파이프라인
@@ -183,6 +184,7 @@ class HybridSRTGenerator:
             original_script: 원문 스크립트 (갭 복구/검증용)
             style: 분리 스타일 (잘게, 기본, 크게)
             language: 언어 코드
+            target_sec: 시간 단위 분할 목표 길이(초). None이면 기존 경로 그대로 (회귀 0).
 
         Returns:
             HybridResultV55 결과 객체
@@ -281,38 +283,43 @@ class HybridSRTGenerator:
                 print(f"  [DEBUG] start_time: {sample.get('start_time')}, start: {sample.get('start')}")
                 print(f"  [DEBUG] end_time: {sample.get('end_time')}, end: {sample.get('end')}")
 
-            scenes = []
-            for i, scene in enumerate(validated_scenes):
-                # ⭐ v6.1: 올바른 타임스탬프 키 사용 (srt_validator가 start_time/end_time 설정)
-                # 우선순위: start_time > start > _start_seconds
-                start_sec = scene.get('start_time')
-                if start_sec is None:
-                    start_sec = scene.get('start', 0)
-                if not isinstance(start_sec, (int, float)):
-                    start_sec = 0
-                start_sec = float(start_sec)
+            if target_sec is not None and target_sec > 0:
+                # ⭐ 시간 단위 균등 분할 (word-level timestamps 기반)
+                scenes = self._build_time_split_scenes(validated_scenes, target_sec)
+            else:
+                # 기존 경로 (target_sec=None) - 회귀 0
+                scenes = []
+                for i, scene in enumerate(validated_scenes):
+                    # ⭐ v6.1: 올바른 타임스탬프 키 사용 (srt_validator가 start_time/end_time 설정)
+                    # 우선순위: start_time > start > _start_seconds
+                    start_sec = scene.get('start_time')
+                    if start_sec is None:
+                        start_sec = scene.get('start', 0)
+                    if not isinstance(start_sec, (int, float)):
+                        start_sec = 0
+                    start_sec = float(start_sec)
 
-                end_sec = scene.get('end_time')
-                if end_sec is None:
-                    end_sec = scene.get('end', 0)
-                if not isinstance(end_sec, (int, float)):
-                    end_sec = 0
-                end_sec = float(end_sec)
+                    end_sec = scene.get('end_time')
+                    if end_sec is None:
+                        end_sec = scene.get('end', 0)
+                    if not isinstance(end_sec, (int, float)):
+                        end_sec = 0
+                    end_sec = float(end_sec)
 
-                # 타임코드 생성
-                start_tc = self._format_timecode(start_sec)
-                end_tc = self._format_timecode(end_sec)
-                timecode = f"{start_tc} --> {end_tc}"
+                    # 타임코드 생성
+                    start_tc = self._format_timecode(start_sec)
+                    end_tc = self._format_timecode(end_sec)
+                    timecode = f"{start_tc} --> {end_tc}"
 
-                scenes.append(HybridSceneV55(
-                    scene_id=i + 1,
-                    text=scene.get('text', ''),
-                    start_time=start_sec,
-                    end_time=end_sec,
-                    duration=end_sec - start_sec,
-                    timecode=timecode,
-                    is_recovered=scene.get('_recovered', False)
-                ))
+                    scenes.append(HybridSceneV55(
+                        scene_id=i + 1,
+                        text=scene.get('text', ''),
+                        start_time=start_sec,
+                        end_time=end_sec,
+                        duration=end_sec - start_sec,
+                        timecode=timecode,
+                        is_recovered=scene.get('_recovered', False)
+                    ))
 
             print(f"  최종 씬: {len(scenes)}개")
 
@@ -363,6 +370,88 @@ class HybridSRTGenerator:
         whole_secs = int(secs)
         millis = int((secs - whole_secs) * 1000)
         return f"{hours:02d}:{minutes:02d}:{whole_secs:02d},{millis:03d}"
+
+    def _build_time_split_scenes(
+        self,
+        validated_scenes: List[Dict],
+        target_sec: float
+    ) -> List[HybridSceneV55]:
+        """
+        시간 단위 균등 분할 씬 생성
+
+        ⭐ per-scene이 아닌 global(전체 단어 평탄화)로 분할하는 이유:
+           target_sec >= 평균 VAD 씬 길이인 경우(예: VAD가 ~3초 씬을 만드는데
+           "시간 단위 (10초)" 선택) per-scene 분할로는 씬 경계를 넘지 못해
+           target에 절대 도달할 수 없다. 따라서 씬 경계를 넘어 단어를 평탄화한 뒤
+           분할하고, 씬 사이의 자연 경계는 무음(>=1.5*T) 강제 분할과
+           문장 종결 우선 규칙으로 보존한다.
+
+        validated_scenes의 word-level timestamps를 시간순으로 평탄화한 뒤
+        split_by_target_duration()으로 target_sec 근처로 균등 분할한다.
+        단어 정보가 없는 씬(갭 복구 등)은 씬 전체를 1개 단위(합성 단어)로
+        통과시켜 실제 start/end 정확도를 유지한다 (인공 균등 분할 금지).
+
+        반환 형태는 기존 경로와 동일한 HybridSceneV55 리스트이므로
+        1.5/2단계 및 다운로드 분기를 추가할 필요가 없다.
+        """
+        from utils.srt_time_splitter import Word, split_by_target_duration, summarize_segments
+
+        words: List[Word] = []
+        synthetic_count = 0
+
+        for scene in validated_scenes:
+            scene_words = scene.get('words') or []
+            valid = [
+                w for w in scene_words
+                if w.get('start') is not None and w.get('end') is not None
+            ]
+            if valid:
+                for w in valid:
+                    words.append(Word(
+                        start=float(w['start']),
+                        end=float(w['end']),
+                        text=w.get('word', '')
+                    ))
+            else:
+                # 폴백: 단어 타임스탬프가 없는 씬은 씬 전체를 1개 단위로 통과
+                start_sec = scene.get('start_time', scene.get('start'))
+                end_sec = scene.get('end_time', scene.get('end'))
+                if start_sec is None or end_sec is None:
+                    continue
+                words.append(Word(
+                    start=float(start_sec),
+                    end=float(end_sec),
+                    text=scene.get('text', '')
+                ))
+                synthetic_count += 1
+
+        # 시간순 정렬 (갭 복구 세그먼트가 뒤에 append 되었을 수 있음)
+        words.sort(key=lambda x: x.start)
+
+        segments = split_by_target_duration(words, target_sec=target_sec)
+
+        scenes: List[HybridSceneV55] = []
+        for i, seg in enumerate(segments):
+            start_tc = self._format_timecode(seg.start)
+            end_tc = self._format_timecode(seg.end)
+            scenes.append(HybridSceneV55(
+                scene_id=i + 1,
+                text=seg.text,
+                start_time=seg.start,
+                end_time=seg.end,
+                duration=seg.duration,
+                timecode=f"{start_tc} --> {end_tc}",
+                is_recovered=False
+            ))
+
+        stats = summarize_segments(segments)
+        print(f"  [시간분할] target={target_sec}s | 단어 {len(words)}개"
+              f"{f' (합성 {synthetic_count}개)' if synthetic_count else ''}"
+              f" -> 세그먼트 {stats['count']}개")
+        print(f"  [시간분할] 평균 {stats['avg']:.2f}s | min {stats['min']:.2f}s"
+              f" | max {stats['max']:.2f}s | std {stats['std']:.2f}s")
+
+        return scenes
 
     def _apply_original_text_matching(
         self,
@@ -435,7 +524,8 @@ class HybridSRTGenerator:
     def generate_whisper_srt(self,
                               audio_path: str,
                               style: str = "잘게",
-                              language: str = "ko") -> Dict:
+                              language: str = "ko",
+                              target_sec: float = None) -> Dict:
         """
         ⭐ 1단계: Whisper SRT 생성 (AI 교정 없이!)
 
@@ -446,6 +536,7 @@ class HybridSRTGenerator:
             audio_path: 오디오 파일 경로
             style: 분리 스타일 (잘게, 기본, 크게)
             language: 언어 코드
+            target_sec: 시간 단위 분할 목표 길이(초). None이면 기존 동작 그대로.
 
         Returns:
             {
@@ -469,7 +560,8 @@ class HybridSRTGenerator:
                 audio_path=audio_path,
                 original_script=None,  # ⭐ 원문 없이 생성!
                 style=style,
-                language=language
+                language=language,
+                target_sec=target_sec
             )
 
             if not result.success:
@@ -506,19 +598,36 @@ class HybridSRTGenerator:
             print(f"  SRT: {srt_path}")
             print(f"  JSON: {json_path}")
 
+            stats = {
+                'whisper_segments': result.whisper_segments,
+                'merged_scenes': result.scene_count,
+                'recovered_segments': result.recovered_segments,
+                'audio_duration': result.audio_duration,
+                'style': style
+            }
+
+            # ⭐ 시간 단위 분할 통계 (UI 디버깅용)
+            if target_sec is not None and target_sec > 0:
+                durations = [s.get('duration', 0) for s in scenes_dict]
+                n = len(durations)
+                avg = (sum(durations) / n) if n else 0.0
+                std = (sum((d - avg) ** 2 for d in durations) / n) ** 0.5 if n else 0.0
+                stats['time_split'] = {
+                    'target_sec': target_sec,
+                    'segment_count': n,
+                    'avg_duration': avg,
+                    'std_duration': std,
+                    'min_duration': min(durations) if durations else 0.0,
+                    'max_duration': max(durations) if durations else 0.0,
+                }
+
             return {
                 'success': True,
                 'scenes': scenes_dict,
                 'srt_content': srt_content,
                 'srt_path': str(srt_path),
                 'json_path': str(json_path),
-                'stats': {
-                    'whisper_segments': result.whisper_segments,
-                    'merged_scenes': result.scene_count,
-                    'recovered_segments': result.recovered_segments,
-                    'audio_duration': result.audio_duration,
-                    'style': style
-                }
+                'stats': stats
             }
 
         except Exception as e:

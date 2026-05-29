@@ -1138,18 +1138,21 @@ if btn_ai_correct and can_run_stage2:
         status_text.text(f"AI 원문 교정 준비 중... ({ai_model})")
         progress_bar.progress(10)
 
-        # ⭐ JSON 파일에서 직접 로드 시도 (세션 손실 방지)
+        # BUG FIX: session state의 scenes를 우선 사용 (1.5/1.7단계 결과 반영)
+        # 이전 코드는 json_path 파일에서 로드하여 1.5/1.7단계 결과가 소실되었음
         whisper_result = st.session_state["whisper_srt_result"]
-        json_path = whisper_result.get('json_path')
+        import copy
+        scenes = copy.deepcopy(whisper_result.get("scenes", []))
 
-        if json_path and os.path.exists(json_path):
-            with open(json_path, 'r', encoding='utf-8') as f:
-                scenes = json.load(f)
-            print(f"[SRT생성] JSON 파일에서 로드: {len(scenes)}개 씬")
+        if not scenes:
+            # session state에 scenes가 없을 때만 JSON 파일 폴백
+            json_path = whisper_result.get('json_path')
+            if json_path and os.path.exists(json_path):
+                with open(json_path, 'r', encoding='utf-8') as f:
+                    scenes = json.load(f)
+                print(f"[SRT생성] JSON 파일에서 폴백 로드: {len(scenes)}개 씬")
         else:
-            import copy
-            scenes = copy.deepcopy(whisper_result.get("scenes", []))
-            print(f"[SRT생성] 세션에서 로드: {len(scenes)}개 씬")
+            print(f"[SRT생성] 세션에서 로드: {len(scenes)}개 씬 (1.5/1.7단계 결과 포함)")
 
         original = st.session_state["original_script"]
 
